@@ -6,26 +6,31 @@ import java.util.ArrayList;
 
 public class AStar {
 	
+	// Set of nodes already explored
 	private static List<Node> closedSet = new ArrayList<Node>();
+	// Set of nodes yet to be explored
 	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 	
-	private static int LARGE_NUMBER = 1000;
-	
-	public static ArrayList<Node> AStar(Node start, Node goal) {
+	public static List<Node> AStar(Node start, Node goal) {
 		initAStar(start, goal);
 		
 		while (!openSet.isEmpty()) {
 			Node current = openSet.remove();
+			
+			// If goal is reached return solution path
 			if (current.equals(goal)) {
-				return reconstructPath(current.parent, current);
+				return reconstructPath(current);
 			}
+			
 			openSet.remove(current);
 			closedSet.add(current);
 			
+			//
 			List<Node> neighbors = current.getNeighbors();
-			for (int i = 0; i < neighbors.size(); i++) {
-				Node neighbor = neighbors.get(i);
+			for (Node neighbor : neighbors) {
 				if (closedSet.contains(neighbor)) continue;
+				
+				// Distance from start to neighbor of current node
 				int tentativeGScore = current.gScore + distanceBetween(current, neighbor);
 				if (!openSet.contains(neighbor)) {
 					openSet.add(neighbor);
@@ -55,9 +60,13 @@ public class AStar {
 		return dist;
 	}
 	
-	private static ArrayList<Node> reconstructPath(Node parent, Node current) {
-		// TODO Auto-generated method stub
-		return null;
+	private static List<Node> reconstructPath(Node current) {
+		List<Node> path = new ArrayList<Node>();
+		while (current.parent != null) {
+			path.add(current);
+			current = current.parent;
+		}
+		return path;
 	}
 	
 	/**
@@ -68,8 +77,7 @@ public class AStar {
 	 * @return
 	 */
 	private static int distanceBetween(Node current, Node neighbor) {
-		// TODO Auto-generated method stub
-		return 5;
+		return 1;
 	}
 	
 }

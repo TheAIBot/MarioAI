@@ -9,7 +9,7 @@ public class Node implements Comparable<Node> {
 	public final short y;
 	public int gScore; // g(n) for current node
 	public int fScore; // f(n) for current node
-	private static int LARGE_NUMBER = 1000; // temp in place of infinity
+	private static int LARGE_NUMBER = 10000; // temp in place of infinity
 	public Node parent; //cameFrom
 	private List<Node> neighbors;
 
@@ -28,8 +28,15 @@ public class Node implements Comparable<Node> {
 
 	@Override
 	public int compareTo(Node o) {
-		if (gScore < o.fScore) return -1;
-		if (gScore > o.fScore) return 1;
+		if (this.gScore < o.fScore) return -1;
+		if (this.gScore > o.fScore) return 1;
 		return 0;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Node)) return false;
+		Node node = (Node) o;
+		return (this.x == node.x && this.y == node.y);
 	}
 }
