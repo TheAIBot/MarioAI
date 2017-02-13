@@ -54,9 +54,14 @@ public class AStar {
 		start.fScore = heuristicFunction(start, goal);
 	}
 	
-	public static int heuristicFunction(Node start, Node goal) {
+	/**
+	 * @param start
+	 * @param goal
+	 * @return the estimated cost of the cheapest path from current node to goal node
+	 */
+	public static int heuristicFunction(Node node, Node goal) {
 		//temp use distance (later should use time)
-		int dist = (int) Math.sqrt(Math.pow((goal.x - start.x),2) + Math.pow((goal.y - start.y),2));
+		int dist = (int) Math.sqrt(Math.pow((goal.x - node.x),2) + Math.pow((goal.y - node.y),2));
 		return dist;
 	}
 	
