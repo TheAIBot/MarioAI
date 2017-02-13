@@ -1,20 +1,24 @@
 package MarioAI;
 
+import java.util.ArrayList;
+
 public class Node extends SuperNode {
+	public ArrayList<Node> edges = new ArrayList<Node>();
 	public final short x;
 	public final short y;
-<<<<<<< HEAD
 	private final int hash;
 
 	public Node(short x, short y) {
-=======
-
-	public Node(short x, short y) {
 		super();
->>>>>>> refs/remotes/origin/AStar
 		this.x = x;
 		this.y = y;
 		this.hash = Hasher.hashShortPoint(x, y);
+	}
+	
+	@Override
+	public ArrayList<Node> getNeighbors()
+	{
+		return edges;
 	}
 
 	@Override
@@ -33,12 +37,5 @@ public class Node extends SuperNode {
 	@Override
 	public int hashCode() {
 		return hash;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof Node)) return false;
-		Node node = (Node) o;
-		return (this.x == node.x && this.y == node.y);
 	}
 }
