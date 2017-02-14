@@ -1,5 +1,8 @@
 package MarioAI;
 
+/**
+ * Standard type of node
+ */
 public class Node extends SuperNode {
 	public final short x;
 	public final short y;

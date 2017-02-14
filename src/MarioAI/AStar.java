@@ -11,16 +11,29 @@ public class AStar {
 	// Set of nodes yet to be explored
 	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 	
-	public static List<Node> MultiNodeAStar(Node start, Node[] nodes) {
+	/**
+	 * A* algorithm for multiple goal nodes (tries to find path to just one of them)
+	 * Method to be used with the right most column of the screen
+	 * @param start
+	 * @param nodes
+	 * @return optimal path
+	 */
+	public static List<Node> runMultiNodeAStar(Node start, Node[] nodes) {
 		Node goal = new Node((short) 100, (short) 11);
 		for (Node node : nodes) {
 			node.neighbors.add(goal);
 		}
 		
-		return AStar(start, goal);
+		return runAStar(start, goal);
 	}
 	
-	public static List<Node> AStar(Node start, Node goal) {
+	/**
+	 * Basic A* search algorithm 
+	 * @param start
+	 * @param goal
+	 * @return
+	 */
+	public static List<Node> runAStar(Node start, Node goal) {
 		// Initialization
 		openSet.add(start);	
 		start.gScore = 0;
@@ -37,7 +50,7 @@ public class AStar {
 			openSet.remove(current);
 			closedSet.add(current);
 			
-			//
+			// Explore each neighbor of current node
 			List<Node> neighbors = current.getNeighbors();
 			for (Node neighbor : neighbors) {
 				if (closedSet.contains(neighbor)) continue;
@@ -50,6 +63,7 @@ public class AStar {
 					continue;
 				}
 				
+				// Update values
 				neighbor.parent = current;
 				neighbor.gScore = tentativeGScore;
 				neighbor.fScore = neighbor.gScore + heuristicFunction(neighbor, goal);
@@ -71,6 +85,10 @@ public class AStar {
 		return dist;
 	}
 	
+	/**
+	 * @param current
+	 * @return path
+	 */
 	private static List<Node> reconstructPath(Node current) {
 		List<Node> path = new ArrayList<Node>();
 		while (current.parent != null) {
@@ -85,7 +103,7 @@ public class AStar {
 	 * We hardcode this to 1 for the moement.
 	 * @param current
 	 * @param neighbor
-	 * @return
+	 * @return distance
 	 */
 	private static int distanceBetween(Node current, Node neighbor) {
 		return 1;

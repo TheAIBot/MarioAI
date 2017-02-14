@@ -3,6 +3,9 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents every possible type of node being valid input for the A* search algorithm
+ */
 public abstract class SuperNode implements Comparable<Node> {
 	public ArrayList<Node> neighbors = new ArrayList<Node>(); // previously called edges
 	public int gScore; // g(n) for current node - cost of path from start node to this node
