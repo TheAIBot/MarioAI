@@ -11,8 +11,20 @@ public class AStar {
 	// Set of nodes yet to be explored
 	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 	
+	public static List<Node> MultiNodeAStar(Node start, Node[] nodes) {
+		Node goal = new Node((short) 100, (short) 11);
+		for (Node node : nodes) {
+			node.neighbors.add(goal);
+		}
+		
+		return AStar(start, goal);
+	}
+	
 	public static List<Node> AStar(Node start, Node goal) {
-		initAStar(start, goal);
+		// Initialization
+		openSet.add(start);	
+		start.gScore = 0;
+		start.fScore = heuristicFunction(start, goal);
 		
 		while (!openSet.isEmpty()) {
 			Node current = openSet.remove();
@@ -46,12 +58,6 @@ public class AStar {
 		
 		// No solution was found
 		return null;
-	}
-
-	private static void initAStar(Node start, Node goal) {
-		openSet.add(start);	
-		start.gScore = 0;
-		start.fScore = heuristicFunction(start, goal);
 	}
 	
 	/**
