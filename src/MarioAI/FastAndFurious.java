@@ -1,5 +1,7 @@
 package MarioAI;
 
+import java.util.List;
+
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
@@ -12,6 +14,7 @@ public class FastAndFurious implements Agent {
 	private final Graph graph = new Graph();
 	private boolean firstTick = true;
 	private boolean secondTick = false;
+	private boolean[] action = new boolean[Environment.numberOfButtons]; 
 
 	public void reset() {
 	}
@@ -27,13 +30,14 @@ public class FastAndFurious implements Agent {
 				secondTick = false;
 			} else {
 				if (graph.updateMatrix(observation)) {
-					AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+					List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+					action = AStar.getNextMove(graph, path);
 				}
 			}
 
 		}
 
-		return new boolean[Environment.numberOfButtons];
+		return action;
 	}
 
 	public AGENT_TYPE getType() {

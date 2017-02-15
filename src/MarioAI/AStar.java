@@ -2,6 +2,10 @@ package MarioAI;
 
 import java.util.List;
 import java.util.PriorityQueue;
+
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.environments.Environment;
+
 import java.util.ArrayList;
 
 public class AStar {
@@ -55,7 +59,8 @@ public class AStar {
 			if (current.equals(goal)) {
 				return reconstructPath(current);
 			}
-
+			
+			// Current node has been explored
 			openSet.remove(current);
 			closedSet.add(current);
 
@@ -106,6 +111,16 @@ public class AStar {
 			current = current.parent;
 		}
 		return path;
+	}
+	
+	public static boolean[] getNextMove(Graph graph, List<Node> path) {
+		boolean[] action = new boolean[Environment.numberOfButtons];
+		Node start = path.get(0);
+		Node next = path.get(1);
+		if (next.x > start.x) action[Mario.KEY_RIGHT] = true;
+		if (next.x < start.x) action[Mario.KEY_LEFT] = true;
+		if (next.y > start.y) action[Mario.KEY_JUMP] = true;
+		return action;
 	}
 
 	/**
