@@ -13,7 +13,7 @@ public class AStar {
 
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of
-	 * them) Method to be used with the right most column of the screen
+	 * them). Method to be used with the right most column of the screen
 	 * 
 	 * @param start
 	 * @param nodes
@@ -21,14 +21,18 @@ public class AStar {
 	 */
 	public static List<Node> runMultiNodeAStar(Node start, Node[] nodes) {
 		// Add singleton goal node far to the right. This will ensure each
-		// vertical distance is minimal and all nodes in rightmost column will
+		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal position to end up in after A* search
 		Node goal = new Node((short) 1000, (short) 11);
 		for (Node node : nodes) {
 			node.neighbors.add(goal);
 		}
-
-		return runAStar(start, goal);
+		
+		// Remove auxiliary goal node
+		List<Node> path = runAStar(start, goal);
+		path.remove((path.size() - 1));
+		
+		return path;
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class AStar {
 	}
 
 	/**
-	 * Distance between two nodes. We hardcode this to 1 for the moement.
+	 * Distance between two nodes. We hardcode this to 1 for the moment.
 	 * 
 	 * @param current
 	 * @param neighbor
