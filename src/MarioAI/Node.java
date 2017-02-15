@@ -9,11 +9,11 @@ public class Node extends SuperNode {
 	public ArrayList<Node> edges = new ArrayList<Node>();
 	public final short x;
 	public final short y;
-	private final int hash;
 	
-	public final byte type;
-	public final short coloumn;
-	public final short row;
+	private int hash;
+	public byte type;
+	public short coloumn;
+	public short row;
 	
 	public Node(short x, short y, short coloumn, short row, byte type)
 	{
