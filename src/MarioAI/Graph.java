@@ -7,7 +7,7 @@ import java.util.List;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {
-	public static final int LEVEL_HEIGHT = 15;
+	public static final int LEVEL_HEIGHT = 22; // TEMP TESTING WITH 22. USED TO BE 15
 	public static final int SIGHT_WIDTH = 22;
 	private static final int LEVEL_START_SCOLLING = 160;
 	private static final int BLOCK_PIXEL_SIZE = 16;
@@ -65,6 +65,7 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
+		System.out.println("maxMarioXPos:" + maxMarioXPos);
 		return getColumn(maxMarioXPos);
 	}
 	
@@ -112,8 +113,9 @@ public class Graph {
 
 		} else {
 			int viewDiff = (LEVEL_HEIGHT / 2) - marioYPos;
-
+			System.out.println(viewDiff);
 			for (int y = 0; y < 22 - viewDiff; y++) {
+				System.out.println(y + viewDiff);
 				byteColumn[y] = level[21][y + viewDiff];
 			}
 		}
@@ -139,6 +141,7 @@ public class Graph {
 	}
 
 	private Node[] getColumn(int x) {
+		System.out.println("x:" + x);
 		return savedColumns.get(x);
 	}
 }
