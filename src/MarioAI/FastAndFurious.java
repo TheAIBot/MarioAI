@@ -6,14 +6,21 @@ import ch.idsia.mario.environments.Environment;
 public class FastAndFurious implements Agent {
 
 	private static final String name = "THE ULTIME AND SUPREME OVERLORD THAT BRINGS DEATH AND DESTRUCTION";
+	private final Graph graph = new Graph();
+	private boolean firstTick = true;
 
 	public void reset() {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		//observation.getMarioFloatPos()
-		
-		
+
+		if (firstTick) {
+			graph.createStartGraph(observation);
+			firstTick = false;
+		} else {
+			graph.updateMatrix(observation);
+		}
+
 		return new boolean[Environment.numberOfButtons];
 	}
 
