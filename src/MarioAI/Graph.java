@@ -2,6 +2,7 @@ package MarioAI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import ch.idsia.mario.environments.Environment;
 
@@ -14,12 +15,14 @@ public class Graph {
 	private static final int LEVEL_LEFT_X_POS = -(SIGHT_WIDTH / 2);
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
-	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new Object[LEVEL_HEIGHT];
+	private ArrayList<Surface>[] surfaces;
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT];
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
+	private int maxMarioXPos = oldMarioXPos;
 
 	public Graph() {
+		surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT];
 	}
 
 	private int getMarioXPos(float marioXPos) {
@@ -27,7 +30,7 @@ public class Graph {
 	}
 
 	public void createStartGraph(Environment observation) {
-		int marioYPos = Math.round(observation.getMarioFloatPos()[0]);
+		int marioYPos = Math.round(observation.getMarioFloatPos()[1]);
 
 		for (int i = 0; i < levelMatrix.length; i++) {
 			byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos);
@@ -36,18 +39,36 @@ public class Graph {
 		}
 	}
 
-	public void updateMatrix(Environment observation) {
+	public boolean updateMatrix(Environment observation) {
 		// observer.
 		int marioXPos = getMarioXPos(observation.getMarioFloatPos()[0]);
-		int marioYPos = Math.round(observation.getMarioFloatPos()[0]);
+		int marioYPos = Math.round(observation.getMarioFloatPos()[1]);
 		int change = marioXPos - oldMarioXPos;
+		oldMarioXPos = marioXPos;
+		maxMarioXPos = Math.max(maxMarioXPos, marioXPos);
 		if (change > 0) {
 			moveMatrixOneLeft(observation, marioXPos, marioYPos);
+			return true;
 		} else if (change < 0) {
 			moveMatrixOneRight(marioXPos);
+			return true;
 		}
+		return false;
 	}
 
+	public Node getMarioNode(Environment observation)
+	{
+		int marioXPos = Math.round(observation.getMarioFloatPos()[0]);
+		int marioYPos = Math.round(observation.getMarioFloatPos()[1]);
+		return getColumn(marioXPos)[marioYPos];
+	}
+	
+	public Node[] getGoalNodes()
+	{
+		return getColumn(maxMarioXPos);
+	}
+	
+	
 	private void moveMatrixOneRight(int marioXPos) {
 		// move columns right
 		for (int x = levelMatrix.length - 1; x > 1; x--) {

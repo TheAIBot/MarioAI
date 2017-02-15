@@ -25,10 +25,11 @@ public class Play {
 
     public static void main(String[] args) {
         Agent controller = new FastAndFurious();
+        /*Agent controller = new HumanKeyboardAgent();
         if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
             AgentsPool.addAgent(controller);
-        }
+        }*/
         EvaluationOptions options = new CmdLineOptions(new String[0]);
         options.setAgent(controller);
         Task task = new ProgressTask(options);

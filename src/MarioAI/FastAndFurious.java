@@ -11,6 +11,7 @@ public class FastAndFurious implements Agent {
 	private static final String name = "THE ULTIME AND SUPREME OVERLORD THAT BRINGS DEATH AND DESTRUCTION";
 	private final Graph graph = new Graph();
 	private boolean firstTick = true;
+	private boolean secondTick = false;
 
 	public void reset() {
 	}
@@ -18,10 +19,18 @@ public class FastAndFurious implements Agent {
 	public boolean[] getAction(Environment observation) {
 
 		if (firstTick) {
-			graph.createStartGraph(observation);
 			firstTick = false;
+			secondTick = true;
 		} else {
-			graph.updateMatrix(observation);
+			if (secondTick) {
+				graph.createStartGraph(observation);
+				secondTick = false;
+			} else {
+				if (graph.updateMatrix(observation)) {
+					AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+				}
+			}
+
 		}
 
 		return new boolean[Environment.numberOfButtons];
