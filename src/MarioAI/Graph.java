@@ -3,7 +3,6 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {
@@ -21,21 +20,15 @@ public class Graph {
 	private int oldMarioXPos = MARIO_START_X_POS;
 
 	public Graph() {
-		for (short x = 0; x < levelMatrix.length; x++) {
-			for (short y = 0; y < levelMatrix[0].length; y++) {
-				levelMatrix[x][y] = new Node(x, y);
-			}
-		}
 	}
 
 	private int getMarioXPos(float marioXPos) {
 		return (int) Math.max(LEVEL_START_SCOLLING / BLOCK_PIXEL_SIZE, Math.round(marioXPos));
 	}
-	
-	public void createStartGraph(Environment observation)
-	{
+
+	public void createStartGraph(Environment observation) {
 		int marioYPos = Math.round(observation.getMarioFloatPos()[0]);
-		
+
 		for (int i = 0; i < levelMatrix.length; i++) {
 			byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos);
 			Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, i);
@@ -50,15 +43,13 @@ public class Graph {
 		int change = marioXPos - oldMarioXPos;
 		if (change > 0) {
 			moveMatrixOneLeft(observation, marioXPos, marioYPos);
-		}
-		else if (change < 0) {
+		} else if (change < 0) {
 			moveMatrixOneRight(marioXPos);
 		}
 	}
-	
-	private void moveMatrixOneRight(int marioXPos)
-	{
-		//move columns right
+
+	private void moveMatrixOneRight(int marioXPos) {
+		// move columns right
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
 		}
@@ -112,7 +103,7 @@ public class Graph {
 		Node[] nodeColumn = new Node[byteColumn.length];
 		for (int y = 0; y < byteColumn.length; y++) {
 			if (byteColumn[y] > 0) {
-				nodeColumn[y] = new Node((short) x, (short) y);
+				nodeColumn[y] = new Node((short) x, (short) y, (short)x, (short)y, byteColumn[y]);
 			}
 		}
 		return nodeColumn;

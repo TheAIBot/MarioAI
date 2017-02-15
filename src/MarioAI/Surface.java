@@ -2,7 +2,7 @@ package MarioAI;
 
 import java.util.*;
 
-/*
+/**
  * A surface is a collection of nodes that are horisontally next to eachother
  * By using surfaces instead of nodes any path finding algorithm will be much
  * faster as it only have to deal with one surface instead of multiple individual nodes.

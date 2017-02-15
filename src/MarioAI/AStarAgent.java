@@ -1,9 +1,13 @@
-package ch.idsia.ai.agents.ai;
+package MarioAI;
 
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
+/**
+ * Momentary A* agent in use.
+ */
 public class AStarAgent extends BasicAIAgent implements Agent {
 
 	static final boolean superslow = false;

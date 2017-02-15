@@ -3,6 +3,9 @@ package MarioAI;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
+/**
+ * Main program agent. Is to run A* algorithm.
+ */
 public class FastAndFurious implements Agent {
 
 	private static final String name = "THE ULTIME AND SUPREME OVERLORD THAT BRINGS DEATH AND DESTRUCTION";

@@ -2,16 +2,26 @@ package MarioAI;
 
 import java.util.ArrayList;
 
+/**
+ * Standard type of node
+ */
 public class Node extends SuperNode {
 	public ArrayList<Node> edges = new ArrayList<Node>();
 	public final short x;
 	public final short y;
 	private final int hash;
-
-	public Node(short x, short y) {
-		super();
+	
+	public final byte type;
+	public final short coloumn;
+	public final short row;
+	
+	public Node(short x, short y, short coloumn, short row, byte type)
+	{
 		this.x = x;
 		this.y = y;
+		this.coloumn = coloumn;
+		this.row = row;
+		this.type = type;
 		this.hash = Hasher.hashShortPoint(x, y);
 	}
 	
@@ -38,4 +48,5 @@ public class Node extends SuperNode {
 	public int hashCode() {
 		return hash;
 	}
+
 }
