@@ -60,11 +60,11 @@ public class Grapher {
 		List<Node> circleNodes = getReachableNodes(node);
 		for (int i = 0; i < circleNodes.size(); i++) {
 			if (canMarioStandThere(circleNodes.get(i))) { //FIX
-				node.edges.add(circleNodes.get(i));
+				node.neighbors.add(circleNodes.get(i));
 			}
 		}									
 		//Recursion over the reachable nodes:
-		for (Node edge : node.edges) {
+		for (Node edge : node.neighbors) {
 			if (!inRecursion[edge.row][edge.coloumn]) {
 				inRecursion[edge.row][edge.coloumn] = true; //No infinite recursion.
 				connectNode(edge); //Thus it is depth first.

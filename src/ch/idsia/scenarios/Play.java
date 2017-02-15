@@ -13,6 +13,7 @@ import ch.idsia.mario.simulation.SimulationOptions;
 
 import java.awt.*;
 
+import MarioAI.FastAndFurious;
 import MarioAI.Grapher;
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +24,7 @@ import MarioAI.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        Agent controller = new HumanKeyboardAgent();
+        Agent controller = new FastAndFurious();
         if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
             AgentsPool.addAgent(controller);

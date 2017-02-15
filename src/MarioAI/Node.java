@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Standard type of node
  */
 public class Node extends SuperNode {
-	public ArrayList<Node> edges = new ArrayList<Node>();
+	public ArrayList<Node> neighbors = new ArrayList<Node>();
 	public final short x;
 	public final short y;
 	
@@ -28,7 +28,7 @@ public class Node extends SuperNode {
 	@Override
 	public ArrayList<Node> getNeighbors()
 	{
-		return edges;
+		return neighbors;
 	}
 
 	@Override
