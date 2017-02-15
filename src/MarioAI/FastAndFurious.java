@@ -11,6 +11,9 @@ public class FastAndFurious implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
+		//observation.getMarioFloatPos()
+		
+		
 		return new boolean[Environment.numberOfButtons];
 	}
 
