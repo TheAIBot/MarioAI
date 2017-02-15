@@ -7,11 +7,13 @@ import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
-
+import ch.idsia.tools.ToolsConfigurator;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.simulation.SimulationOptions;
 
 import java.awt.*;
+
+import MarioAI.Grapher;
 /**
  * Created by IntelliJ IDEA.
  * User: julian
