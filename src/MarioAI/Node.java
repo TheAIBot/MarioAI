@@ -22,11 +22,6 @@ public class Node extends SuperNode {
 		this.coloumn = coloumn;
 		this.row = row;
 		this.type = type;
-	}
-	
-	public Node(short x, short y) {
-		this.x = x;
-		this.y = y;
 		this.hash = Hasher.hashShortPoint(x, y);
 	}
 	
