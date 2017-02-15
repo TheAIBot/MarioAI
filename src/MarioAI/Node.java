@@ -1,13 +1,10 @@
 package MarioAI;
 
-<<<<<<< HEAD
+import java.util.ArrayList;
+
 /**
  * Standard type of node
  */
-=======
-import java.util.ArrayList;
-
->>>>>>> refs/remotes/origin/graphoptimizer
 public class Node extends SuperNode {
 	public ArrayList<Node> edges = new ArrayList<Node>();
 	public final short x;
