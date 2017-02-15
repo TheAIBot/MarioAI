@@ -12,9 +12,6 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 	public abstract ArrayList<Node> getNeighbors();
 	
 	public int compareTo(SuperNode o) {
-		//replace this with g - f;
-		if (this.gScore < o.fScore) return -1;
-		if (this.gScore > o.fScore) return 1;
-		return 0;
+		return this.gScore - o.fScore;
 	}
 }
