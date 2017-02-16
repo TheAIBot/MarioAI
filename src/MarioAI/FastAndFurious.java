@@ -28,10 +28,12 @@ public class FastAndFurious implements Agent {
 		
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+			//do edge creation first and then astar
+			//AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
-				AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+				//do edge creation first and then astar
+				//AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			}
 		}
 		tickCount++;
