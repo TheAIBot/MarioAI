@@ -17,7 +17,7 @@ public class Graph {
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
 	@SuppressWarnings("unchecked") // because java IS FUCKING STUPID
-	private ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT];
+	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT];
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT];
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
@@ -78,7 +78,7 @@ public class Graph {
 	}
 	
 	
-	private void moveMatrixOneRight(int marioXPos) {
+	private void moveMatrixOneRight(final int marioXPos) {
 		// move columns right
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
@@ -110,7 +110,7 @@ public class Graph {
 		levelMatrix[levelMatrix.length - 1] = columnToInsert;
 	}
 
-	private byte[] getByteColumnFromLevel(byte[][] level, int marioYPos) {
+	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos) {
 		return getByteColumnFromLevel(level, marioYPos, SIGHT_WIDTH - 1);
 	}
 	
@@ -133,7 +133,7 @@ public class Graph {
 		return byteColumn;
 	}
 
-	private Node[] convertByteColumnToNodeColumn(byte[] byteColumn, int x) {
+	private Node[] convertByteColumnToNodeColumn(final byte[] byteColumn, final int x) {
 		final Node[] nodeColumn = new Node[byteColumn.length];
 		for (int y = 0; y < byteColumn.length; y++) {
 			if (byteColumn[y] != 0) {
@@ -143,15 +143,15 @@ public class Graph {
 		return nodeColumn;
 	}
 
-	private void saveColumn(int x, Node[] column) {
+	private void saveColumn(final int x, final Node[] column) {
 		savedColumns.put(x, column);
 	}
 
-	private boolean containsColumn(int x) {
+	private boolean containsColumn(final int x) {
 		return savedColumns.containsKey(x);
 	}
 
-	private Node[] getColumn(int x) {
+	private Node[] getColumn(final int x) {
 		return savedColumns.get(x);
 	}
 }
