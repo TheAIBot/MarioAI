@@ -125,7 +125,6 @@ public class AStar {
 
 	/**
 	 * Distance between two nodes. We hardcode this to 1 for the moment.
-	 * 
 	 * @param current
 	 * @param neighbor
 	 * @return distance
