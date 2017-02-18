@@ -48,5 +48,10 @@ public class Node extends SuperNode {
 	public int hashCode() {
 		return hash;
 	}
+	
+	@Override
+	public String toString() {
+		return "Node";
+	}
 
 }

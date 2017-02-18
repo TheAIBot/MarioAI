@@ -25,8 +25,9 @@ public class Play {
 
     public static void main(String[] args) {
         Agent controller = new FastAndFurious();
-        /*Agent controller = new HumanKeyboardAgent();
-        if (args.length > 0) {
+    	Agent controller = new FastAndFurious();
+        //Agent controller = new HumanKeyboardAgent();
+        /*if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
             AgentsPool.addAgent(controller);
         }*/
@@ -37,7 +38,7 @@ public class Play {
         options.setVisualization(true);
         options.setNumberOfTrials(1);
         options.setMatlabFileName("");
-        options.setLevelRandSeed(42);
+        options.setLevelRandSeed(421);
         //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
         options.setLevelDifficulty(-1);
         task.setOptions(options);
