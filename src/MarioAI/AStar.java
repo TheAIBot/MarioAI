@@ -7,6 +7,7 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AStar {
 
@@ -16,8 +17,8 @@ public class AStar {
 	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 
 	/**
-	 * A* algorithm for multiple goal nodes (tries to find path to just one of
-	 * them). Method to be used with the right most column of the screen
+	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most
+	 * column of the screen
 	 * 
 	 * @param start
 	 * @param nodes
@@ -27,15 +28,16 @@ public class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal position to end up in after A* search
-		Node goal = new Node((short) 1000, (short) 11,(short)  0,(short)  0, (byte)3);
+		Node goal = new Node((short) 1000, (short) 11, (short) 0, (short) 0, (byte) 3);
 		for (Node node : nodes) {
+			if (node == null) continue;
 			node.neighbors.add(goal);
 		}
-		
+
 		// Remove auxiliary goal node
 		List<Node> path = runAStar(start, goal);
 		path.remove((path.size() - 1));
-		
+
 		return path;
 	}
 
@@ -47,6 +49,8 @@ public class AStar {
 	 * @return
 	 */
 	public static List<Node> runAStar(Node start, Node goal) {
+		if (goal == null) return null;
+
 		// Initialization
 		openSet.add(start);
 		start.gScore = 0;
@@ -59,7 +63,7 @@ public class AStar {
 			if (current.equals(goal)) {
 				return reconstructPath(current);
 			}
-			
+
 			// Current node has been explored
 			openSet.remove(current);
 			closedSet.add(current);
@@ -91,8 +95,7 @@ public class AStar {
 	/**
 	 * @param start
 	 * @param goal
-	 * @return the estimated cost of the cheapest path from current node to goal
-	 *         node
+	 * @return the estimated cost of the cheapest path from current node to goal node
 	 */
 	public static int heuristicFunction(Node node, Node goal) {
 		// temp use distance (later should use time)
@@ -110,9 +113,11 @@ public class AStar {
 			path.add(current);
 			current = current.parent;
 		}
+		Collections.reverse(path);
 		return path;
 	}
-	
+
+	// TODO Pending implementation of functionality for getting info about movement between nodes in Graph.
 	public static boolean[] getNextMove(Graph graph, List<Node> path) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
 		Node start = path.get(0);
@@ -125,6 +130,7 @@ public class AStar {
 
 	/**
 	 * Distance between two nodes. We hardcode this to 1 for the moment.
+	 * 
 	 * @param current
 	 * @param neighbor
 	 * @return distance
