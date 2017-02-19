@@ -7,7 +7,7 @@ import java.util.List;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {
-	public static final int LEVEL_HEIGHT = 22; // TEMP TESTING WITH 22. USED TO BE 15
+	public static final int LEVEL_HEIGHT = 15;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
 	private static final int LEVEL_START_SCOLLING = 160;
