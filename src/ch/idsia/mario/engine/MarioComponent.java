@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import MarioAI.Grapher;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.human.CheaterKeyboardAgent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.EvaluationInfo;
@@ -26,7 +27,6 @@ import ch.idsia.tools.tcp.ServerAgent;
 public class MarioComponent extends JComponent implements Runnable, /*KeyListener,*/ FocusListener, Environment {
     private static final long serialVersionUID = 790878775993203817L;
     public static final int TICKS_PER_SECOND = 24;
-    Grapher graph = null;
 
     private boolean running = false;
     private int width, height;
@@ -113,6 +113,15 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
     public void run() {
 
     }
+    
+    public void runOneTick() {
+        mario = ((LevelScene) scene).mario;
+
+        scene.tick();
+        boolean[] action = agent.getAction(this);
+        ((LevelScene) scene).mario.keys = action;
+        ((LevelScene) scene).mario.cheatKeys = cheatAgent.getAction(null);
+    }
 
     public EvaluationInfo run1(int currentTrial, int totalNumberOfTrials) {
         running = true;
@@ -167,11 +176,6 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
             }
 
             boolean[] action = agent.getAction(this/*DummyEnvironment*/);
-            if (graph == null) {
-                graph = new Grapher(this);				
-			}
-            graph.updateLevelGraph();
-            graph.printView();
             if (action != null)
             {
                 for (int i = 0; i < Environment.numberOfButtons; ++i)
@@ -279,6 +283,13 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
         for (int i = 0; i < ch.length; i++) {
             g.drawImage(Art.font[ch[i] - 32][c], x + i * 8, y, null);
         }
+    }
+    
+    public void startLevel(Level level)
+    {
+    	scene = new LevelScene(graphicsConfiguration, this, 0, 0, 0, 0, 1000);
+        levelScene = ((LevelScene) scene);
+        //scene.initLoadedLevel(level);
     }
 
     public void startLevel(long seed, int difficulty, int type, int levelLength, int timeLimit) {
