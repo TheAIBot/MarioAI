@@ -11,8 +11,6 @@ public class Node extends SuperNode {
 	
 	private int hash;
 	public byte type;
-	public short coloumn;
-	public short row;
 
 	public Node(short x, short y, byte type) {
 		this.x = x;
