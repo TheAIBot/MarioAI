@@ -61,13 +61,13 @@ public class Graph {
 		final int marioYPos = getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
-		maxMarioXPos = Math.max(maxMarioXPos, marioXPos);
-		if (change > 0) {
-			moveMatrixOneLeft(observation, marioXPos, marioYPos);
+		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 9);
+		if (change < 0) {
+			moveMatrixOneLeft(marioXPos);
 			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
 			return true;
-		} else if (change < 0) {
-			moveMatrixOneRight(marioXPos);
+		} else if (change > 0) {
+			moveMatrixOneRight(observation, marioXPos, marioYPos);
 			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
 			return true;
 		}
@@ -86,7 +86,7 @@ public class Graph {
 	}
 	
 	
-	private void moveMatrixOneRight(final int marioXPos) {
+	private void moveMatrixOneLeft(final int marioXPos) {
 		// move columns right
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
@@ -96,7 +96,7 @@ public class Graph {
 		levelMatrix[0] = columnToInsert;
 	}
 
-	private void moveMatrixOneLeft(final Environment observation, final int marioXPos, final int marioYPos) {
+	private void moveMatrixOneRight(final Environment observation, final int marioXPos, final int marioYPos) {
 		// no need to save the column that was overwritten as it's still saved
 		// in savedColumns
 
