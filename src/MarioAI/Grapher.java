@@ -3,8 +3,6 @@ package MarioAI;
 import java.util.*; 
 
 import ch.idsia.mario.environments.Environment;
-import jdk.internal.dynalink.beans.StaticClass;
-import sun.net.www.content.audio.x_aiff;
 
 public class Grapher {
 	Environment observation;
