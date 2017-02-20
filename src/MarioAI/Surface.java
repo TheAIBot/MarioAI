@@ -31,14 +31,14 @@ public class Surface extends SuperNode {
 	public void addNode(Node newNode) {
 		nodes.put(newNode.hashCode(), newNode);
 
-		for (Node edge : newNode.edges) {
-			if (edgesCount.containsKey(edge.hashCode())) {
-				edgesCount.put(edge.hashCode(), edge.hashCode() + 1);
+		for (Node neighbor : newNode.neighbors) {
+			if (edgesCount.containsKey(neighbor.hashCode())) {
+				edgesCount.put(neighbor.hashCode(), neighbor.hashCode() + 1);
 			} else {
-				edgesCount.put(edge.hashCode(), 1);
+				edgesCount.put(neighbor.hashCode(), 1);
 				// an edge is only added to a surfaces edges the first time
 				// so it isn't duplicated in the edges list
-				edges.add(edge);
+				edges.add(neighbor);
 			}
 		}
 	}
@@ -51,7 +51,7 @@ public class Surface extends SuperNode {
 	public Node removeNodeAndGet(short x, short y) {
 		Node toRemove = nodes.get(Hasher.hashShortPoint(x, y));
 		nodes.remove(toRemove.hashCode());
-		for (Node edge : toRemove.edges) {
+		for (Node edge : toRemove.neighbors) {
 			int edgeCount = edgesCount.get(edge.hashCode()) - 1;
 			if (edgeCount > 0) {
 				edgesCount.put(edge.hashCode(), edgeCount);

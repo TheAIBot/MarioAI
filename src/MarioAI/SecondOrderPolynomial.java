@@ -8,8 +8,8 @@ public class SecondOrderPolynomial{
 	//even though it is only one it should be possible to reach. Mario changing position in the air can compensate for this.
 	private short ceiledTopPunktX,ceiledTopPunktY; //Ceildes coordinates of the toppunkt
 	
-	public SecondOrderPolynomial(Node startingPosition, float jumpRange, float jumpHeight) {
-		setToJumpPolynomial(startingPosition, jumpRange, jumpHeight);
+	public SecondOrderPolynomial(Node startingPosition,short nodeColoumn, float jumpRange, float jumpHeight) {
+		setToJumpPolynomial(startingPosition, nodeColoumn, jumpRange, jumpHeight);
 	}
 	
 	public SecondOrderPolynomial() {
@@ -19,18 +19,18 @@ public class SecondOrderPolynomial{
 	}
 	
 	//
-	public void setToJumpPolynomial(Node startingPosition, float jumpRange, float jumpHeight) {
+	public void setToJumpPolynomial(Node startingPosition, short nodeColoumn, float jumpRange, float jumpHeight) {
 		a = -4 * jumpHeight / (jumpRange * jumpRange);
-		b = (8 * startingPosition.coloumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);
-		c = (-4 * startingPosition.coloumn  * (startingPosition.coloumn + jumpRange) * jumpHeight + startingPosition.row
+		b = (8 * nodeColoumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);
+		c = (-4 * nodeColoumn  * (nodeColoumn + jumpRange) * jumpHeight + startingPosition.y
 				* jumpRange * jumpRange) / (jumpRange * jumpRange);
 		setTopPunkt();
 	}
 	
 
 	public boolean isPastTopPunkt(short startPosition, short currentPosition) {
-		return (startPosition <= topPunktX && startPosition <= currentPosition ||
-			    startPosition >= topPunktX && startPosition >= currentPosition);
+		return (startPosition <= topPunktX && topPunktX <= currentPosition ||
+			    startPosition >= topPunktX && topPunktX >= currentPosition);
 	}	
 
 	public float getTopPunktX() {

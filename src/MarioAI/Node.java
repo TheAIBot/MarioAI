@@ -6,29 +6,23 @@ import java.util.ArrayList;
  * Standard type of node
  */
 public class Node extends SuperNode {
-	public ArrayList<Node> edges = new ArrayList<Node>();
+	public ArrayList<Node> neighbors = new ArrayList<Node>();
 	public final short x;
 	public final short y;
 	private final int hash;
-	
-	public final byte type;
-	public final short coloumn;
-	public final short row;
-	
-	public Node(short x, short y, short coloumn, short row, byte type)
-	{
+
+	public byte type;
+
+	public Node(short x, short y, byte type) {
 		this.x = x;
 		this.y = y;
-		this.coloumn = coloumn;
-		this.row = row;
 		this.type = type;
 		this.hash = Hasher.hashShortPoint(x, y);
 	}
-	
+
 	@Override
-	public ArrayList<Node> getNeighbors()
-	{
-		return edges;
+	public ArrayList<Node> getNeighbors() {
+		return neighbors;
 	}
 
 	@Override
@@ -48,7 +42,7 @@ public class Node extends SuperNode {
 	public int hashCode() {
 		return hash;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Node";

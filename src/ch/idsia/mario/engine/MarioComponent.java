@@ -167,11 +167,9 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
             }
 
             boolean[] action = agent.getAction(this/*DummyEnvironment*/);
-            if (graph == null) {
-                graph = new Grapher(this);				
+            if (graph == null) {			
 			}
-            graph.updateLevelGraph();
-            graph.printView();
+            //graph.printView();
             if (action != null)
             {
                 for (int i = 0; i < Environment.numberOfButtons; ++i)

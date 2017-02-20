@@ -23,7 +23,7 @@ public class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal position to end up in after A* search
-		Node goal = new Node((short) 1000, (short) 11,(short)  0,(short)  0, (byte)3);
+		Node goal = new Node((short) 1000, (short) 11, (byte)3);
 		for (Node node : nodes) {
 			node.neighbors.add(goal);
 		}
