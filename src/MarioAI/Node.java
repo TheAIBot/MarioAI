@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * Standard type of node
  */
 public class Node extends SuperNode {
-	public ArrayList<Node> neighbors = new ArrayList<Node>();
 	public final short x;
 	public final short y;
 	private final int hash;

@@ -25,12 +25,21 @@ public class AStar {
 		// pretty good goal position to end up in after A* search
 		Node goal = new Node((short) 1000, (short) 11, (byte)3);
 		for (Node node : nodes) {
-			node.neighbors.add(goal);
+			if (node != null) {
+				node.neighbors.add(goal);
+			}
+			
 		}
 		
 		// Remove auxiliary goal node
 		List<Node> path = runAStar(start, goal);
 		path.remove((path.size() - 1));
+		for (Node node : nodes) {
+			if (node != null) {
+				node.neighbors.remove(goal);
+			}
+			
+		}
 		
 		return path;
 	}
@@ -105,6 +114,7 @@ public class AStar {
 			path.add(current);
 			current = current.parent;
 		}
+		path.add(current);
 		return path;
 	}
 
