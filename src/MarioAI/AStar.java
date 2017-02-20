@@ -121,11 +121,31 @@ public final class AStar {
 		final boolean[] action = new boolean[Environment.numberOfButtons];
 		final Node start = path.get(0);
 		final Node next = path.get(1);
+		action[Mario.KEY_SPEED] = true;
 		if (next.x > start.x) action[Mario.KEY_RIGHT] = true;
 		if (next.x < start.x) action[Mario.KEY_LEFT] = true;
 		if (next.y > start.y) action[Mario.KEY_JUMP] = true;
 		return action;
 	}
+	
+	/**
+	 * Auxiliary method for creating actions (boolean array) in one line
+	 * @param left
+	 * @param right
+	 * @param down
+	 * @param jump
+	 * @param speed
+	 * @return action
+	 */
+	private boolean[] makeAction(boolean left, boolean right, boolean down, boolean jump, boolean speed) {
+    	final boolean[] action = new boolean[5];
+    	action[Mario.KEY_LEFT] = left;
+    	action[Mario.KEY_RIGHT] = right;
+    	action[Mario.KEY_DOWN] = down;
+    	action[Mario.KEY_JUMP] = jump;
+    	action[Mario.KEY_SPEED] = speed;
+    	return action;
+    }
 
 
 }
