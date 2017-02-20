@@ -23,16 +23,24 @@ public final class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal position to end up in after A* search
-		Node goal = new Node((short) 1000, (short) 11, (short) 0, (short) 0, (byte) 3);
+		Node goal = new Node((short) 1000, (short) 11, (byte)3);
 		for (Node node : nodes) {
-			if (node == null) continue;
-			node.neighbors.add(goal);
+			if (node != null) {
+				node.neighbors.add(goal);
+			}
 		}
 
 		// Remove auxiliary goal node
 		List<Node> path = runAStar(start, goal);
 		path.remove((path.size() - 1));
-
+		
+		for (Node node : nodes) {
+			if (node != null) {
+				node.neighbors.remove(goal);
+			}
+			
+		}
+		
 		return path;
 	}
 
@@ -112,18 +120,18 @@ public final class AStar {
 			path.add(current);
 			current = current.parent;
 		}
+		path.add(current);
 		Collections.reverse(path);
 		return path;
 	}
 
 	// TODO Pending implementation of functionality for getting info about movement between nodes in Graph.
-	public static boolean[] getNextMove(final Graph graph, final List<Node> path) {
+	public static boolean[] getNextMove(final Node mario, final List<Node> path) {
 		final boolean[] action = new boolean[Environment.numberOfButtons];
-		final Node start = path.get(0);
 		final Node next = path.get(1);
-		if (next.x > start.x) action[Mario.KEY_RIGHT] = true;
-		if (next.x < start.x) action[Mario.KEY_LEFT] = true;
-		if (next.y > start.y) action[Mario.KEY_JUMP] = true;
+		if (next.x > mario.x) action[Mario.KEY_RIGHT] = true;
+		if (next.x < mario.x) action[Mario.KEY_LEFT] = true;
+		if (next.y > mario.y) action[Mario.KEY_JUMP] = true;
 		return action;
 	}
 
