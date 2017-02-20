@@ -119,7 +119,7 @@ public final class AStar {
 	// TODO Pending implementation of functionality for getting info about movement between nodes in Graph.
 	public static boolean[] getNextMove(final Graph graph, final List<Node> path) {
 		final boolean[] action = new boolean[Environment.numberOfButtons];
-		final Node start = path.get(0);
+		final Node start = path.get(0); //mario node
 		final Node next = path.get(1);
 		action[Mario.KEY_SPEED] = true;
 		if (next.x > start.x) action[Mario.KEY_RIGHT] = true;
