@@ -9,12 +9,7 @@ import ch.idsia.mario.environments.Environment;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class AStar {
-
-	// Set of nodes already explored
-	private static List<Node> closedSet = new ArrayList<Node>();
-	// Set of nodes yet to be explored
-	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+public final class AStar {
 
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most
@@ -24,7 +19,7 @@ public class AStar {
 	 * @param nodes
 	 * @return optimal path
 	 */
-	public static List<Node> runMultiNodeAStar(Node start, Node[] nodes) {
+	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal position to end up in after A* search
@@ -48,7 +43,12 @@ public class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<Node> runAStar(Node start, Node goal) {
+	public static List<Node> runAStar(final Node start, final Node goal) {
+		// Set of nodes already explored
+		final List<Node> closedSet = new ArrayList<Node>();
+		// Set of nodes yet to be explored
+		final PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+		
 		if (goal == null) return null;
 
 		// Initialization
@@ -65,16 +65,16 @@ public class AStar {
 			}
 
 			// Current node has been explored
-			openSet.remove(current);
+			//openSet.remove(current);
 			closedSet.add(current);
 
 			// Explore each neighbor of current node
-			List<Node> neighbors = current.getNeighbors();
+			final List<Node> neighbors = current.getNeighbors();
 			for (Node neighbor : neighbors) {
 				if (closedSet.contains(neighbor)) continue;
 
 				// Distance from start to neighbor of current node
-				int tentativeGScore = current.gScore + distanceBetween(current, neighbor);
+				float tentativeGScore = current.gScore + GraphMath.distanceBetween(current, neighbor);
 				if (!openSet.contains(neighbor)) {
 					openSet.add(neighbor);
 				} else if (tentativeGScore >= neighbor.gScore) {
@@ -97,10 +97,9 @@ public class AStar {
 	 * @param goal
 	 * @return the estimated cost of the cheapest path from current node to goal node
 	 */
-	public static int heuristicFunction(Node node, Node goal) {
+	public static float heuristicFunction(final Node node, final Node goal) {
 		// temp use distance (later should use time)
-		int dist = (int) Math.sqrt(Math.pow((goal.x - node.x), 2) + Math.pow((goal.y - node.y), 2));
-		return dist;
+		return GraphMath.distanceBetween(node, goal);
 	}
 
 	/**
@@ -108,7 +107,7 @@ public class AStar {
 	 * @return path
 	 */
 	private static List<Node> reconstructPath(Node current) {
-		List<Node> path = new ArrayList<Node>();
+		final List<Node> path = new ArrayList<Node>();
 		while (current.parent != null) {
 			path.add(current);
 			current = current.parent;
@@ -118,25 +117,15 @@ public class AStar {
 	}
 
 	// TODO Pending implementation of functionality for getting info about movement between nodes in Graph.
-	public static boolean[] getNextMove(Graph graph, List<Node> path) {
-		boolean[] action = new boolean[Environment.numberOfButtons];
-		Node start = path.get(0);
-		Node next = path.get(1);
+	public static boolean[] getNextMove(final Graph graph, final List<Node> path) {
+		final boolean[] action = new boolean[Environment.numberOfButtons];
+		final Node start = path.get(0);
+		final Node next = path.get(1);
 		if (next.x > start.x) action[Mario.KEY_RIGHT] = true;
 		if (next.x < start.x) action[Mario.KEY_LEFT] = true;
 		if (next.y > start.y) action[Mario.KEY_JUMP] = true;
 		return action;
 	}
 
-	/**
-	 * Distance between two nodes. We hardcode this to 1 for the moment.
-	 * 
-	 * @param current
-	 * @param neighbor
-	 * @return distance
-	 */
-	private static int distanceBetween(Node current, Node neighbor) {
-		return 1;
-	}
 
 }
