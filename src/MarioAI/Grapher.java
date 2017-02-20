@@ -1,6 +1,6 @@
 package MarioAI;
 
-import java.util.*;
+import java.util.*; 
 
 import ch.idsia.mario.environments.Environment;
 import jdk.internal.dynalink.beans.StaticClass;
@@ -9,8 +9,8 @@ import sun.net.www.content.audio.x_aiff;
 public class Grapher {
 	Environment observation;
 	private byte[][] currentObservation;
-	private final short JUMP_HEIGHT = 4;
-	private final short MAX_JUMP_RANGE = 6;
+	private final float JUMP_HEIGHT = 4;
+	private final float MAX_JUMP_RANGE = 6;
 	private final short GRID_SIZE = 22;
 	private Node[][] observationGraph = new Node[GRID_SIZE][GRID_SIZE];
 	private boolean[][] inRecursion = new boolean[GRID_SIZE][GRID_SIZE];
@@ -52,7 +52,7 @@ public class Grapher {
 			observationGraph[GRID_SIZE / 2][GRID_SIZE / 2] = marioNode; // Mario
 																		// node
 			inRecursion[GRID_SIZE / 2][GRID_SIZE / 2] = true;
-				if (isSolid(currentObservation[marioNode.row + 1][marioNode.coloumn]))
+			if (isSolid(currentObservation[marioNode.row + 1][marioNode.coloumn]))
 				connectNode(marioNode);
 			System.out.println("The observation.");
 		}
@@ -159,61 +159,130 @@ public class Grapher {
 	 */
 	private List<Node> getPolynomialReachableNodes(Node startingNode, List<Node> listOfNodes) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
-		
-		// Starting of with just one polynomial:
-		//Calculates the different values used by the polynomial:
-		float jumpRange; //TODO Fix problemmet med 5.99 i stedet for 6, with jumpRange
+		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
-		for (jumpRange = MAX_JUMP_RANGE; jumpRange <= MAX_JUMP_RANGE; jumpRange++) {
+		//TODO All four corners of Mario!
+		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) {
 			polynomial.setToJumpPolynomial(startingNode, jumpRange, JUMP_HEIGHT);
-			//Starts of from Mario's initial position:
-			short currentXPosition = startingNode.coloumn;
-			float formerYPosition = startingNode.row;
-			short formerLowerYPosition = startingNode.row;
-			boolean hasMetHardGround = false;		
-			boolean isPastTopPunkt = false;
-					
-			while (!hasMetHardGround &&
-					currentXPosition + 1 < GRID_SIZE &&
-					currentXPosition > 0) { //Doesen't take falling down into a hole into account.
-				currentXPosition++;
-				float currentYPosition = polynomial.f(currentXPosition);
-				short currentLowerYPosition = (short) currentYPosition; //Automatic flooring included!
-				// TODO change to take the sign into account
-				short bound = (short) (startingNode.row - (currentLowerYPosition-startingNode.row));
-				
-				for (short y = formerLowerYPosition; (currentXPosition <= polynomial.getCeiledTopPunktX())? y >= bound : y<= bound; y = (short) ((currentXPosition <= polynomial.getCeiledTopPunktX())? y - 1: y + 1)) { //Can be split up into two for loops for added efficieny.
-					if (isSolid(currentObservation[y][currentXPosition])) {
-						hasMetHardGround = true;
-						Node fallDownPosition = getFallDownPosition(y, currentXPosition);
-						if(fallDownPosition != null) {
-							if (observationGraph[fallDownPosition.row][fallDownPosition.coloumn] != null) {
-								observationGraph[fallDownPosition.row][fallDownPosition.coloumn] = fallDownPosition;
-							}
-							
-							listOfNodes.add(fallDownPosition);
-						}
-						break;
-					} else if (canMarioStandThere(currentXPosition, y) && (currentXPosition >= polynomial.getCeiledTopPunktX())) { 
-						//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
-						//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
-						//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
-						//hvormed x positionen ikke ændrer sig.
+			jumpAlongPolynomial(startingNode, polynomial, listOfNodes);
 						
-						if (observationGraph[y][currentXPosition] == null) {
-							observationGraph[y][currentXPosition] = new Node(currentXPosition, y, currentXPosition, y,currentObservation[currentXPosition][y]);
-						}					
-						listOfNodes.add(observationGraph[y][currentXPosition]);
-					}		
-				}
-				
-				formerYPosition = currentYPosition;
-				formerLowerYPosition = bound;
-			}			
 		}
 		return listOfNodes; //No guarantee that there are no duplicate nodes.
 	}
+	
+	private void jumpAlongPolynomial(Node startingNode, SecondOrderPolynomial polynomial, List<Node> listOfNodes) {
+		
+		//Starts of from Mario's initial position:
+		short currentXPosition = startingNode.coloumn;
+		float formerYPosition = startingNode.row;
+		short formerLowerYPosition = startingNode.row;
+		boolean hasMetHardGround = false;
+				
+		float currentYPosition;
+		short currentLowerYPosition; //Automatic flooring included!
+		// TODO change to take the sign into account
+		short bound;
+		//TODO Doesen't take falling down into a hole into account.		
+			
+		//Get upwards moving part:
+		//Primarily collision detection.
+		while (!hasMetHardGround &&
+			   !polynomial.isPastTopPunkt(startingNode.coloumn, currentXPosition) &&
+			   isWithinView(currentXPosition)) { 
+			currentXPosition++;			
+			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
+			if (polynomial.isPastTopPunkt(startingNode.coloumn, currentXPosition)) { 
+				//Up to the max height of the polynomial!
+				currentYPosition = polynomial.getTopPunktY(); 						
+			} else {//Else up to the current height of the polynomial.
+				currentYPosition = polynomial.f(currentXPosition);				
+			}
+			//First rounded to 1/64.	
+			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!	
+			bound = (short) (startingNode.row - (currentLowerYPosition-startingNode.row)); 
+			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes);	
+			formerYPosition = currentYPosition;
+			formerLowerYPosition = bound;
+		}
+		
+		//Downwards:
+		if (polynomial.getTopPunktX() < currentXPosition) {
+			currentXPosition--; //The toppunkt was in the current block (and not ending there).
+			//Therefore the downward going part of that block needs to be checked.
+		}
 
+		while (!hasMetHardGround &&
+				isWithinView(currentXPosition)) { //Doesen't take falling down into a hole into account.
+			
+			currentXPosition++;					
+			currentYPosition = polynomial.f(currentXPosition);
+			//First rounded to 1/64.	
+			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!			
+			// TODO change to take the sign into account
+			bound = (short) (Math.round((startingNode.row - (currentLowerYPosition-startingNode.row))*100)/100f); //First roundet to two deciamals, then floored.		
+			
+			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes);			
+			
+			formerYPosition = currentYPosition;
+			formerLowerYPosition = bound;
+		}
+	}
+	
+	
+	private boolean ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<Node> listOfNodes) {
+		for (short y = formerLowerYPosition; y >= bound; y--) {
+			if (isHittingWallOrGround(currentXPosition,y)) {
+				hitWallOrGround(listOfNodes, currentXPosition,y);
+				return true;
+			} 
+			
+		}	
+		return false;
+	}
+	
+	private boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<Node> listOfNodes) {
+		for (short y = formerLowerYPosition; y <= bound; y++) {
+			if (isHittingWallOrGround(currentXPosition,y)) {
+				hitWallOrGround(listOfNodes, currentXPosition,y);
+				return true;
+			} else if (canMarioStandThere(currentXPosition, y)) { 
+				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
+				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
+				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
+				//hvormed x positionen ikke ændrer sig.
+				
+				if (observationGraph[y][currentXPosition] == null) {
+					observationGraph[y][currentXPosition] = new Node(currentXPosition, y, currentXPosition, y,currentObservation[currentXPosition][y]);
+				}					
+				listOfNodes.add(observationGraph[y][currentXPosition]);
+			}		
+		}
+		return false;
+	}
+	
+	/***
+	 * @return
+	 */
+	private boolean isHittingWallOrGround(short xPosition, short yPosition) {
+		return isSolid(currentObservation[yPosition][xPosition]);
+	}
+	
+	/***
+	 * 
+	 */
+	private void hitWallOrGround(List<Node> listOfNodes, short xPosition, short yPosition) {
+		Node fallDownPosition = getFallDownPosition(xPosition, yPosition);
+		if(fallDownPosition != null) {
+			if (observationGraph[fallDownPosition.row][fallDownPosition.coloumn] != null) {
+				observationGraph[fallDownPosition.row][fallDownPosition.coloumn] = fallDownPosition;
+			}			
+			listOfNodes.add(fallDownPosition);
+		}
+	}
+		
+	private boolean isWithinView(short xPosition) { //TODO Rename, curtesy of +1
+		return xPosition + 1 < GRID_SIZE && xPosition > 0;
+	}
 	
 	private Node getFallDownPosition(short row, short coloumn) {
 		// Not including zero, as there needs to be a block below mario to fall

@@ -28,11 +28,16 @@ public class SecondOrderPolynomial{
 	}
 	
 
+	public boolean isPastTopPunkt(short startPosition, short currentPosition) {
+		return (startPosition <= topPunktX && startPosition <= currentPosition ||
+			    startPosition >= topPunktX && startPosition >= currentPosition);
+	}	
+
 	public float getTopPunktX() {
 		return (topPunktX);
 	}
 	
-	public float getToppunktY() {
+	public float getTopPunktY() {
 		return topPunktY;
 	}
 
