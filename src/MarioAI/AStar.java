@@ -35,7 +35,7 @@ public final class AStar {
 		List<Node> path = runAStar(start, goal);
 		if (path != null) {
 			path.remove((path.size() - 1));
-		}		
+		}
 
 		for (Node node : nodes) {
 			if (node != null) {
@@ -96,11 +96,11 @@ public final class AStar {
 				neighbor.fScore = neighbor.gScore + heuristicFunction(neighbor, goal);
 			}
 		}
-for (Node node : closedSet) {
-	node.gScore = 0;
-	node.fScore = 0;
-	node.parent = null;
-}
+		for (Node node : closedSet) {
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
+		}
 		// No solution was found
 		return null;
 	}
@@ -130,21 +130,31 @@ for (Node node : closedSet) {
 		return path;
 	}
 
+	private static float xStartJump = 0;
+	private static boolean isJumping = false;
+
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
-	public static boolean[] getNextMove(final float marioXPos, final float marioYPos, final List<Node> path, boolean canJump, boolean isJumping) {
+	public static boolean[] getNextMove(final float marioXPos, final float marioYPos, final List<Node> path, boolean canJump) {
 		final boolean[] action = new boolean[Environment.numberOfButtons];
 		final Node next = path.get(0);
-		if ((float)next.x > marioXPos)
+		if ((float)next.x > marioXPos) {
 			action[Mario.KEY_RIGHT] = true;
-		if ((float)next.x < marioXPos)
+		}
+		if ((float)next.x < marioXPos) {
 			action[Mario.KEY_LEFT] = true;
-		if ((float)next.y < marioYPos && canJump)
+		}
+		if ((float)next.y < marioYPos && canJump) {
 			action[Mario.KEY_JUMP] = true;
-		if (isJumping && (float)next.y < marioYPos + 0.3) {
+			xStartJump = marioXPos;
+			isJumping = true;
+		}
+		if (isJumping && marioXPos - xStartJump < ((float)(next.x - xStartJump)) * 0.6) {
 			action[Mario.KEY_JUMP] = true;
+		}
+		else if (isJumping) {
+			isJumping = false;
 		}
 		return action;
 	}
-
 }

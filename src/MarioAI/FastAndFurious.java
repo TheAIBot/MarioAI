@@ -16,7 +16,6 @@ public class FastAndFurious implements Agent {
 	private boolean[] action = new boolean[Environment.numberOfButtons]; 
 	private int tickCount = 0;
 	private List<Node> newestPath = null;
-	private boolean isJumping = false;
 
 	public void reset() {
 	}
@@ -61,9 +60,7 @@ public class FastAndFurious implements Agent {
 			action = AStar.getNextMove(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), 
 					MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), 
 					newestPath, 
-					observation.mayMarioJump(),
-					isJumping);
-			isJumping = action[Mario.KEY_JUMP];
+					observation.mayMarioJump());
 		}
 		tickCount++;
 		return action;
