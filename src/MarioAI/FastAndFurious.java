@@ -3,6 +3,7 @@ package MarioAI;
 import java.util.List;
 
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 /**
@@ -14,6 +15,7 @@ public class FastAndFurious implements Agent {
 	private final Graph graph = new Graph();
 	private boolean[] action = new boolean[Environment.numberOfButtons]; 
 	private int tickCount = 0;
+	private List<Node> newestPath = null;
 
 	public void reset() {
 	}
@@ -31,16 +33,34 @@ public class FastAndFurious implements Agent {
 		
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
+			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			//do edge creation first and then astar
 			//AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-			action = AStar.getNextMove(graph, path);
+			if (path != null) {
+				newestPath = path;
+			}
+			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
+				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				//do edge creation first and then astar
 				List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-				action = AStar.getNextMove(graph, path);
+				if (path != null) {
+					newestPath = path;
+				}
 			}
+		}
+		if (newestPath != null &&
+			newestPath.size() >= 1 &&
+			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 1) {
+			newestPath.remove(0);
+		}
+		if (newestPath != null && newestPath.size() > 0) {
+			action = AStar.getNextMove(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), 
+					MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), 
+					newestPath, 
+					observation.mayMarioJump());
 		}
 		tickCount++;
 		return action;
