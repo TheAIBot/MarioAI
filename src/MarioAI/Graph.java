@@ -38,7 +38,7 @@ public class Graph {
 			levelMatrix[i] = columnToInsert;
 			saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
 		}
-		marioNode = new Node((short)marioXPos, (short)marioYPos, (byte)0);
+		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 		maxMarioXPos = SIGHT_WIDTH / 2;
 	}
 
