@@ -24,27 +24,13 @@ public class Graph {
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 
-	private int getCorrectedMarioXPos(final float[] marioXPos) {
-		return (int) Math.max(LEVEL_START_SCOLLING / BLOCK_PIXEL_SIZE, getMarioXPos(marioXPos));
-	}
-	
-	public static int getMarioXPos(final float[] marioXPos)
-	{
-		return (int)Math.round(marioXPos[0]) / BLOCK_PIXEL_SIZE;
-	}
-	
-	public static int getMarioYPos(final float[] marioYPos)
-	{
-		return (int)Math.round(marioYPos[1]) / BLOCK_PIXEL_SIZE;
-	}
-
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
 	}
 	
 	public void createStartGraph(final Environment observation) {
-		final int marioXPos = getMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = getMarioYPos(observation.getMarioFloatPos());
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 
 		for (int i = 0; i < levelMatrix.length; i++) {
 			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
@@ -57,18 +43,18 @@ public class Graph {
 	}
 
 	public boolean updateMatrix(final Environment observation) {
-		final int marioXPos = getMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = getMarioYPos(observation.getMarioFloatPos());
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
 		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 9);
 		if (change < 0) {
 			moveMatrixOneLeft(marioXPos);
-			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
+			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
 		} else if (change > 0) {
 			moveMatrixOneRight(observation, marioXPos, marioYPos);
-			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
+			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
 		}
 		return false;

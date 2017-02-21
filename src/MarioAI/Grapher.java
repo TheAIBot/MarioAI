@@ -208,7 +208,6 @@ public  class Grapher {
 				hitWallOrGround(listOfNodes, currentXPosition,y);
 				return true;
 			} 
-			
 		}	
 		return false;
 	}

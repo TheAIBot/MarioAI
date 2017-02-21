@@ -33,7 +33,9 @@ public final class AStar {
 
 		// Remove auxiliary goal node
 		List<Node> path = runAStar(start, goal);
-		path.remove((path.size() - 1));
+		if (path != null) {
+			path.remove((path.size() - 1));
+		}		
 
 		for (Node node : nodes) {
 			if (node != null) {
@@ -124,22 +126,24 @@ for (Node node : closedSet) {
 			path.add(current);
 			current = current.parent;
 		}
-		path.add(current);
 		Collections.reverse(path);
 		return path;
 	}
 
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
-	public static boolean[] getNextMove(final Node mario, final List<Node> path) {
+	public static boolean[] getNextMove(final float marioXPos, final float marioYPos, final List<Node> path, boolean canJump, boolean isJumping) {
 		final boolean[] action = new boolean[Environment.numberOfButtons];
-		final Node next = path.get(1);
-		if (next.x > mario.x)
+		final Node next = path.get(0);
+		if ((float)next.x > marioXPos)
 			action[Mario.KEY_RIGHT] = true;
-		if (next.x < mario.x)
+		if ((float)next.x < marioXPos)
 			action[Mario.KEY_LEFT] = true;
-		if (next.y > mario.y)
+		if ((float)next.y < marioYPos && canJump)
 			action[Mario.KEY_JUMP] = true;
+		if (isJumping && (float)next.y < marioYPos + 0.3) {
+			action[Mario.KEY_JUMP] = true;
+		}
 		return action;
 	}
 
