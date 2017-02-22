@@ -1,12 +1,16 @@
 package MarioAI;
 
 public class SecondOrderPolynomial{
-	private float a,b,c; //Parameters of the polynomial.
-	private float topPunktX, topPunktY; //Cordinates of the toppunkt
+	private float a;
+	private float b;
+	private float c; //Parameters of the polynomial.
+	private float topPunktX;
+	private float topPunktY; //Cordinates of the toppunkt
 	//TODO Maybe change ceil after discussions. Problem associated with making this into an integer
 	//, as sometimes two possible jump position in a row will be registrated as possible to reach,
 	//even though it is only one it should be possible to reach. Mario changing position in the air can compensate for this.
-	private short ceiledTopPunktX,ceiledTopPunktY; //Ceildes coordinates of the toppunkt
+	private short ceiledTopPunktX;
+	private short ceiledTopPunktY; //Ceildes coordinates of the toppunkt
 	
 	public SecondOrderPolynomial(Node startingPosition,short nodeColoumn, float jumpRange, float jumpHeight) {
 		setToJumpPolynomial(startingPosition, nodeColoumn, jumpRange, jumpHeight);
