@@ -47,47 +47,20 @@ public class TestTools {
 			return null;
 		}
 		
-		FastAndFurious agent = new FastAndFurious();
-		
+        Agent controller = new FastAndFurious();
         EvaluationOptions options = new CmdLineOptions(new String[0]);
-        options.setAgent(agent);
+        options.setAgent(controller);
+        Task task = new ProgressTask(options);
         options.setMaxFPS(false);
-        options.setVisualization(false);
+        options.setVisualization(true);
         options.setNumberOfTrials(1);
         options.setMatlabFileName("");
-        options.setLevelRandSeed(421);
+        options.setLevelRandSeed(422);
+        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
         options.setLevelDifficulty(-1);
-        
-        Evaluator evaluator = new Evaluator(options);
-        evaluator.init(options);
-        
-        SimulationOptions simulationOptions = options.getSimulationOptionsCopy();
-        
-        ToolsConfigurator.CreateMarioComponentFrame();
-        
-        GlobalOptions.VisualizationOn = simulationOptions.isVisualization();
-        
-        MarioComponent marioComponent = new MarioComponent(320, 240);
-        marioComponent.initNoGraphics();
-        
-        Mario.resetStatic(simulationOptions.getMarioMode());        
-        agent.reset();
-        marioComponent.setAgent(agent);
-        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
-        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
-        marioComponent.startLevel(level);
-        /*marioComponent.startLevel(simulationOptions.getLevelRandSeed(), 
-        		simulationOptions.getLevelDifficulty(), 
-        		simulationOptions.getLevelType(), 
-        		simulationOptions.getLevelLength(),
-        		simulationOptions.getTimeLimit());
-        		*/
-        marioComponent.setPaused(simulationOptions.isPauseWorld());
-        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
-        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
-        marioComponent.setMarioInvulnerable(simulationOptions.isMarioInvulnerable());
-        
-        return (Environment)marioComponent;
+        task.setOptions(options);
+
+        return (Environment)task.loadLevel(level, controller);
 	}
 	
 }

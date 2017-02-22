@@ -1,6 +1,8 @@
 package ch.idsia.ai.tasks;
 
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.tools.EvaluationOptions;
 
 /**
@@ -11,6 +13,9 @@ import ch.idsia.tools.EvaluationOptions;
  * Package: ch.idsia.ai.tasks
  */
 public interface Task {
+	
+	public MarioComponent loadLevel(Level level, Agent controller);
+	
     public double[] evaluate (Agent controller);
 
     public void setOptions (EvaluationOptions options);
