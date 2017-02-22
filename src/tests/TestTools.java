@@ -10,20 +10,12 @@ import MarioAI.FastAndFurious;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
-import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-import ch.idsia.mario.simulation.BasicSimulator;
-import ch.idsia.mario.simulation.Simulation;
-import ch.idsia.mario.simulation.SimulationOptions;
 import ch.idsia.tools.CmdLineOptions;
-import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.EvaluationOptions;
-import ch.idsia.tools.Evaluator;
-import ch.idsia.tools.LOGGER;
-import ch.idsia.tools.ToolsConfigurator;
 
 public class TestTools {
 

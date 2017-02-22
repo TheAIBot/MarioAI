@@ -34,8 +34,6 @@ public class FastAndFurious implements Agent {
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			//do edge creation first and then astar
-			//AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
 				newestPath = path;
@@ -44,7 +42,6 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
 				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-				//do edge creation first and then astar
 				List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
@@ -53,14 +50,11 @@ public class FastAndFurious implements Agent {
 		}
 		if (newestPath != null &&
 			newestPath.size() >= 1 &&
-			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 1) {
+			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 0.01) {
 			newestPath.remove(0);
 		}
 		if (newestPath != null && newestPath.size() > 0) {
-			action = AStar.getNextMove(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), 
-					MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), 
-					newestPath, 
-					observation.mayMarioJump());
+			action = MarioControls.getNextAction(observation, newestPath);
 		}
 		tickCount++;
 		return action;

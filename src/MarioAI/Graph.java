@@ -109,22 +109,15 @@ public class Graph {
 	}
 	
 	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos, final int sightColumnIndex) {
-		final byte[] byteColumn = new byte[LEVEL_HEIGHT];
-		if (marioYPos >= LEVEL_HEIGHT / 2) {
-			final int viewDiff = marioYPos - (LEVEL_HEIGHT / 2);
-
-			for (int y = 0 + viewDiff; y < LEVEL_HEIGHT; y++) {
-				byteColumn[y] = level[y - viewDiff + 4][sightColumnIndex];
-			}
-
-		} else {
-			final int viewDiff = (LEVEL_HEIGHT / 2) - marioYPos;
-
- 			for (int y = 0; y < LEVEL_HEIGHT - viewDiff; y++) {
-				byteColumn[y] = level[y + viewDiff - 4][sightColumnIndex];
-			}
+		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
+		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
+		final int startIndex = Math.max(topObservationYPos, 0);
+		final int endIndex = Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos);
+		for (int i = startIndex; i < endIndex; i++) {
+			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}
 		return byteColumn;
+		
 	}
 
 	private Node[] convertByteColumnToNodeColumn(final byte[] byteColumn, final int x) {
