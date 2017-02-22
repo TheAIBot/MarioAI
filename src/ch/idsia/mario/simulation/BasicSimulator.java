@@ -3,6 +3,7 @@ package ch.idsia.mario.simulation;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.tools.EvaluationInfo;
 
@@ -37,6 +38,20 @@ public class BasicSimulator implements Simulation
     public void setSimulationOptions(SimulationOptions simulationOptions)
     {
         this.simulationOptions = simulationOptions;
+    }
+    
+    public MarioComponent setLevel(Level level)
+    {
+        Mario.resetStatic(simulationOptions.getMarioMode());        
+        prepareMarioComponent();
+        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
+        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
+        marioComponent.startLevel(level);
+        marioComponent.setPaused(simulationOptions.isPauseWorld());
+        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
+        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
+        marioComponent.setMarioInvulnerable(simulationOptions.isMarioInvulnerable());
+        return marioComponent;
     }
 
     public EvaluationInfo simulateOneLevel()

@@ -1,6 +1,8 @@
 package ch.idsia.ai.tasks;
 
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.EvaluationOptions;
 import ch.idsia.tools.Evaluator;
@@ -20,6 +22,13 @@ public class ProgressTask implements Task {
 
     public ProgressTask(EvaluationOptions evaluationOptions) {
         setOptions(evaluationOptions);
+    }
+    
+    public MarioComponent loadLevel(Level level, Agent controller)
+    {
+      options.setAgent(controller);
+      Evaluator evaluator = new Evaluator(options);
+      return evaluator.loadLevel(level, controller);
     }
 
     public double[] evaluate(Agent controller) {
