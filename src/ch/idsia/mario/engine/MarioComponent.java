@@ -90,6 +90,10 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
 
     public void update(Graphics g) {
     }
+    
+    public void initNoGraphics() {
+    	graphicsConfiguration = getGraphicsConfiguration();
+    }
 
     public void init() {
         graphicsConfiguration = getGraphicsConfiguration();
@@ -114,13 +118,12 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
 
     }
     
-    public void runOneTick() {
+    public int runOneTick() {
         mario = ((LevelScene) scene).mario;
 
         scene.tick();
-        boolean[] action = agent.getAction(this);
-        ((LevelScene) scene).mario.keys = action;
-        ((LevelScene) scene).mario.cheatKeys = cheatAgent.getAction(null);
+        ((LevelScene) scene).mario.keys = agent.getAction(this);
+        return mario.getStatus();
     }
 
     public EvaluationInfo run1(int currentTrial, int totalNumberOfTrials) {
@@ -289,7 +292,7 @@ public class MarioComponent extends JComponent implements Runnable, /*KeyListene
     {
     	scene = new LevelScene(graphicsConfiguration, this, 0, 0, 0, 0, 1000);
         levelScene = ((LevelScene) scene);
-        //scene.initLoadedLevel(level);
+        scene.initLoadedLevel(level);
     }
 
     public void startLevel(long seed, int difficulty, int type, int levelLength, int timeLimit) {
