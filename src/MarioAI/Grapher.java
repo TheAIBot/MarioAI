@@ -230,9 +230,6 @@ public  class Grapher {
 				hitWallOrGround(listOfNodes, currentXPosition,y);
 				return true;
 			} else if (canMarioStandThere(currentXPosition, y)) { 
-				if (getColoumnRelativeToMario(observationGraph[currentXPosition][y], marioNode) < 0) {
-					System.out.println();
-				}
 				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
 				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
@@ -288,7 +285,7 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null) {
+		if (node == null || node.y < GRID_HEIGHT) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);
