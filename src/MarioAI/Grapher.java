@@ -7,9 +7,10 @@ import ch.idsia.mario.environments.Environment;
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
 	private static final float MAX_JUMP_RANGE = 6;
-	private static final short GRID_SIZE = 22;
-	private static Node[][] observationGraph = new Node[GRID_SIZE][GRID_SIZE];
-	private static boolean[][] inRecursion = new boolean[GRID_SIZE][GRID_SIZE];
+	private static final short GRID_HEIGHT = 15;
+	private static final short GRID_WIDTH = 22;
+	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
+	private static boolean[][] inRecursion = new boolean[GRID_WIDTH][GRID_WIDTH];
 	private static final short MARIO_JUMP_LENGHT = 5;
 	private static Node marioNode;
 	static int testPrintCounter = 24; // Rand value
@@ -26,7 +27,7 @@ public  class Grapher {
 			for (int i = 0; i < observationGraph.length; i++) {
 				System.out.printf("%03d ", i);				
 				for (int j = 0; j < observationGraph[i].length; j++) {
-					if (j == marioNode.y && i == GRID_SIZE/2) 
+					if (j == marioNode.y && i == GRID_WIDTH/2) 
 						System.out.printf("MMM ");
 					else {
 						if (observationGraph[i][j] == null) {
@@ -43,11 +44,11 @@ public  class Grapher {
 	
 	public static void graph(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
-		inRecursion= new boolean[GRID_SIZE][GRID_SIZE];
+		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
 		printView();
-		connectNode(mario, (short) (GRID_SIZE/2));
+		connectNode(mario, (short) (GRID_WIDTH/2));
 		System.out.println("The edges are ready!");
 	}
 	
@@ -62,30 +63,45 @@ public  class Grapher {
 		// Find the reachable nodes:
 		List<Node> reachableNodes = getReachableNodes(node, coloumn);
 		for (Node foundNode : reachableNodes) {
-			if (canMarioStandThere(getColoumnRelativeToMario(foundNode, marioNode), foundNode.y)) { // FIX
-				node.neighbors.add(foundNode); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
+			if (foundNode != null && isOnLevelMatrix(foundNode, marioNode) && canMarioStandThere(foundNode, marioNode)) { // FIX
+				node.addNeighbor(foundNode); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
+				System.out.println();
 			}
 		}
 		// Recursion over the reachable nodes:
-		for (Node neighbor : node.neighbors) {
-			short neighborColoumn = getColoumnRelativeToMario(neighbor, marioNode);
-			if (!inRecursion[neighborColoumn][neighbor.y]) {
-				inRecursion[neighborColoumn][neighbor.y] = true; //Infinite recursion not allowed!.
-				connectNode(neighbor,neighborColoumn ); // Check which nodes it can reach!
-				//Because of the structure, it is a depth first search.
+		for (Node neighbor : node.neighbors) { 
+			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
+			 * It must be possible to only calculate what is necessary.
+			 */
+			if (isOnLevelMatrix(neighbor, marioNode)) {
+				short neighborColoumn = getColoumnRelativeToMario(neighbor, marioNode);
+				if (!inRecursion[neighborColoumn][neighbor.y]) {
+					inRecursion[neighborColoumn][neighbor.y] = true; //Infinite recursion not allowed!.
+					connectNode(neighbor,neighborColoumn ); // Check which nodes it can reach!
+					//Because of the structure, it is a depth first search.
+				}				
 			}
 		}
+	}
 
+	private static boolean isOnLevelMatrix(short coloumn, short row) {
+		return (0 <= coloumn && coloumn < GRID_WIDTH &&
+				0 <= row 	 && row		< GRID_HEIGHT); 
+	}
+	
+	private static boolean isOnLevelMatrix(Node position, Node marioNode) {
+		return isOnLevelMatrix(getColoumnRelativeToMario(position, marioNode), position.y);
 	}
 	
 	private static short getColoumnRelativeToMario(Node node, Node marioNode) {
+		//Assumes that node!=null.
 		return (short) ((node.x - marioNode.x) + 11);
 	}
 
 	private static List<Node> getReachableNodes(Node startingNode, short nodeColoumn) {
 		ArrayList<Node> listOfNodes = new ArrayList<Node>();
 		//Three different ways to find the reachable nodes from a given position:
-		//getRunningReachableNodes(startingNode, nodeColoumn, listOfNodes); //TODO Obs. no need to return a list of nodes
+		getRunningReachableNodes(startingNode, nodeColoumn, listOfNodes); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
 		getPolynomialReachableNodes(startingNode,nodeColoumn, listOfNodes);
 		return listOfNodes;
@@ -96,10 +112,10 @@ public  class Grapher {
 		for (short i = -5; i < MARIO_JUMP_LENGHT; i++) { // Starting at 5 blocks
 															// below, to
 															// simulate falling.
-			if (startingNode.y + i >= GRID_SIZE || startingNode.y + i < 0 || startingNode.y - i >= GRID_SIZE
+			if (startingNode.y + i >= GRID_WIDTH || startingNode.y + i < 0 || startingNode.y - i >= GRID_WIDTH
 					|| startingNode.y - i < 0)
 				continue;
-			if (nodeColoumn + 1 < GRID_SIZE) {
+			if (nodeColoumn + 1 < GRID_WIDTH) {
 				listOfNodes.add(observationGraph[startingNode.y - i][nodeColoumn + 1]);
 			}
 			// Minus
@@ -111,17 +127,12 @@ public  class Grapher {
 	}
 
 	private static List<Node> getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
-		// (bad) Running:
-		for (short i = 1; i <= 1; i++) {
-			// Plus
-			if (nodeColoumn + 1 < GRID_SIZE) {
-				listOfNodes.add(observationGraph[startingNode.y][nodeColoumn + 1]);
-			}
-			// Minus
-			if (nodeColoumn - 1 >= 0) {
-				listOfNodes.add(observationGraph[startingNode.y][nodeColoumn - 1]);
-			}
+		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
+			listOfNodes.add(observationGraph[nodeColoumn + 1][startingNode.y]);
 		}
+		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
+			listOfNodes.add(observationGraph[nodeColoumn - 1][startingNode.y]);
+		}		
 		return listOfNodes;
 	}
 	
@@ -136,7 +147,7 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
 		//TODO All four corners of Mario!
-		for (float jumpRange = 6; jumpRange <= MAX_JUMP_RANGE; jumpRange++) {
+		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfNodes);
 						
@@ -219,6 +230,9 @@ public  class Grapher {
 				hitWallOrGround(listOfNodes, currentXPosition,y);
 				return true;
 			} else if (canMarioStandThere(currentXPosition, y)) { 
+				if (getColoumnRelativeToMario(observationGraph[currentXPosition][y], marioNode) < 0) {
+					System.out.println();
+				}
 				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
 				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
@@ -239,7 +253,8 @@ public  class Grapher {
 	 * @return
 	 */
 	private static boolean isHittingWallOrGround(short xPosition, short yPosition) {
-		return isSolid(observationGraph[xPosition][yPosition-1]);
+		//Being out of the level matrix does not constitute as hitting something
+		return (isOnLevelMatrix(xPosition, (short) (yPosition - 1))) && isSolid(observationGraph[xPosition][yPosition-1]);
 	}
 	
 	/***
@@ -253,13 +268,13 @@ public  class Grapher {
 	}
 		
 	private static boolean isWithinView(short xPosition) { //TODO Rename, curtesy of +1
-		return xPosition + 1 < GRID_SIZE && xPosition > 0;
+		return xPosition + 1 < GRID_WIDTH && xPosition > 0;
 	}
 	
 	private static Node getFallDownPosition(short coloumn, short row) {
 		// Not including zero, as there needs to be a block below mario to fall
 		// down and stand on.
-		for (short yPosition = row; yPosition < 15; yPosition++) {
+		for (short yPosition = row; yPosition < GRID_HEIGHT; yPosition++) {
 			if (canMarioStandThere(coloumn,yPosition))
 				return observationGraph[coloumn][row];
 		}
@@ -271,9 +286,19 @@ public  class Grapher {
 		if(x < topPunktX) return currentY--;
 		else return currentY++;
 	}
+	
+	private static boolean canMarioStandThere(Node node, Node marioNode) {
+		if (node == null) {
+			return false;
+		} else{
+			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);
+			return isOnSolidGround(node.y, nodeXPosition) && observationGraph[nodeXPosition][node.y - 1] == null;	
+		}
+	}
 
 	private static boolean canMarioStandThere(short coloumn,short row) {
-		return isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
+		return 0 < row && row < GRID_HEIGHT &&
+			   isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
 	}
 
 	private static boolean isOnSolidGround(short row, short coloumn) {

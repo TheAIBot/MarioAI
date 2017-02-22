@@ -28,11 +28,15 @@ public class TestTools {
 	}
 
 	public static void runWholeLevel(Environment observation) {
-		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING)
-			;
+		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
+	}
+	
+	public static byte[][] getLevelMap(Environment observation)
+	{
+		return ((MarioComponent) observation).getLevel().map;
 	}
 
-	public static Environment loadLevel(String filepath) {
+	public static Environment loadLevel(String filepath, Agent agent) {
 		Level level = null;
 		try {
 			level = Level.load(new DataInputStream(new FileInputStream(filepath)));
@@ -40,10 +44,9 @@ public class TestTools {
 			Assert.fail(e.getMessage());
 			return null;
 		}
-
-		Agent controller = new FastAndFurious();
+		
 		EvaluationOptions options = new CmdLineOptions(new String[0]);
-		options.setAgent(controller);
+		options.setAgent(agent);
 		Task task = new ProgressTask(options);
 		options.setMaxFPS(false);
 		options.setVisualization(true);
@@ -54,7 +57,7 @@ public class TestTools {
 		options.setLevelDifficulty(-1);
 		task.setOptions(options);
 
-		Environment environment = (Environment) task.loadLevel(level, controller);
+		Environment environment = (Environment) task.loadLevel(level, agent);
 		waitForLevelInit(environment);
 		return environment;
 	}
@@ -64,5 +67,4 @@ public class TestTools {
 			runOneTick(observation);
 		}
 	}
-
 }
