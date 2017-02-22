@@ -129,32 +129,4 @@ public final class AStar {
 		Collections.reverse(path);
 		return path;
 	}
-
-	private static float xStartJump = 0;
-	private static boolean isJumping = false;
-
-	// TODO Pending implementation of functionality for getting info about
-	// movement between nodes in Graph.
-	public static boolean[] getNextMove(final float marioXPos, final float marioYPos, final List<Node> path, boolean canJump) {
-		final boolean[] action = new boolean[Environment.numberOfButtons];
-		final Node next = path.get(0);
-		if ((float)next.x > marioXPos) {
-			action[Mario.KEY_RIGHT] = true;
-		}
-		if ((float)next.x < marioXPos) {
-			action[Mario.KEY_LEFT] = true;
-		}
-		if ((float)next.y < marioYPos && canJump) {
-			action[Mario.KEY_JUMP] = true;
-			xStartJump = marioXPos;
-			isJumping = true;
-		}
-		if (isJumping && marioXPos - xStartJump < ((float)(next.x - xStartJump)) * 0.6) {
-			action[Mario.KEY_JUMP] = true;
-		}
-		else if (isJumping) {
-			isJumping = false;
-		}
-		return action;
-	}
 }
