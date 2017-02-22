@@ -9,6 +9,7 @@ public class MarioControls {
 	
 	private static float xStartJump = 0;
 	private static boolean isJumping = false;
+	private static int marioOnGroundCounter = 0;
 
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
@@ -29,16 +30,21 @@ public class MarioControls {
 			action[Mario.KEY_JUMP] = true;
 			xStartJump = marioXPos;
 			isJumping = true;
+			marioOnGroundCounter = 0;
 		}
 		if (isJumping) {
+			marioOnGroundCounter = observation.isMarioOnGround() ? ++marioOnGroundCounter : 0;
 			final float distanceJumped = marioXPos - xStartJump;
-			final float totalJumpDistance = ((float)(next.x - xStartJump)) * 0.4f;
+			final float totalJumpDistance = ((float)(next.x - xStartJump)) * 0.6f;
 			if (isJumping && distanceJumped <= totalJumpDistance) {
 				action[Mario.KEY_JUMP] = true;
 			}
 			else {
 				isJumping = false;
 			}
+		}
+		if (isJumping && marioOnGroundCounter > 10) {
+			isJumping = false;
 		}
 		
 		return action;

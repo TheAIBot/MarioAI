@@ -112,7 +112,7 @@ public class Graph {
 		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
 		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
 		final int startIndex = Math.max(topObservationYPos, 0);
-		final int endIndex = Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos);
+		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), 15);
 		for (int i = startIndex; i < endIndex; i++) {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}

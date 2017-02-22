@@ -35,7 +35,12 @@ public class GraphTests {
 	{
 		for (int x = 0; x < nodeMap.length - nodeMapStartX; x++) {
 			for (int y = 0; y < nodeMap[0].length; y++) {
-				if (levelMap[x + levelMapStartX][y] != nodeMap[x + nodeMapStartX][y].type) {
+				if (nodeMap[x + nodeMapStartX][y] == null) {
+					if (levelMap[x + levelMapStartX][y] != 0) {
+						return false;
+					}
+				}
+				else if (levelMap[x + levelMapStartX][y] != nodeMap[x + nodeMapStartX][y].type) {
 					return false;
 				}
 			}
