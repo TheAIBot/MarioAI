@@ -24,8 +24,8 @@ import MarioAI.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        //Agent controller = new FastAndFurious();
-        Agent controller = new HumanKeyboardAgent();
+        Agent controller = new FastAndFurious();
+        //Agent controller = new HumanKeyboardAgent();
         /*if (args.length > 0) {
             controller = AgentsPool.load (args[0]);
             AgentsPool.addAgent(controller);

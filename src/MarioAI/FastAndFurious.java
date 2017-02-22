@@ -20,17 +20,7 @@ public class FastAndFurious implements Agent {
 	public void reset() {
 	}
 
-	public boolean[] getAction(Environment observation) {
-
-        byte[][] level = observation.getCompleteObservation();
-        for (int x = 0; x < level.length; x++) {
-			for (int y = 0; y < level[0].length; y++) {
-				System.out.print((char)(level[x][y] + 50));
-			}
-			System.out.println("");
-		}
-        System.out.println();
-		
+	public boolean[] getAction(Environment observation) {		
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
@@ -57,6 +47,7 @@ public class FastAndFurious implements Agent {
 			action = MarioControls.getNextAction(observation, newestPath);
 		}
 		tickCount++;
+		graph.printMatrix();
 		return action;
 	}
 

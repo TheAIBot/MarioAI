@@ -47,9 +47,9 @@ public  class Grapher {
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
-		printView();
+		//printView();
 		connectNode(mario, (short) (GRID_WIDTH/2));
-		System.out.println("The edges are ready!");
+		//System.out.println("The edges are ready!");
 	}
 	
 	private static void connectNode(Node node, short coloumn) {
