@@ -285,7 +285,7 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null || node.y < GRID_HEIGHT) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
+		if (node == null || node.y < 0  || GRID_HEIGHT < node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);
