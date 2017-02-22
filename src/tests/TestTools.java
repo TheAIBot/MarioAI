@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 
