@@ -136,7 +136,7 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
 		//TODO All four corners of Mario!
-		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) {
+		for (float jumpRange = 6; jumpRange <= MAX_JUMP_RANGE; jumpRange++) {
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfNodes);
 						
@@ -172,8 +172,8 @@ public  class Grapher {
 				currentYPosition = polynomial.f(currentXPosition);				
 			}
 			//First rounded to 1/64.	
-			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!	
-			bound = (short) (startingNode.y - (currentLowerYPosition-startingNode.y)); 
+			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!
+			bound = getBounds(startingNode, currentLowerYPosition); 
 			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes);	
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
@@ -193,9 +193,9 @@ public  class Grapher {
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!			
 			// TODO change to take the sign into account
-			bound = (short) (Math.round((startingNode.y - (currentLowerYPosition-startingNode.y))*100)/100f); //First roundet to two deciamals, then floored.		
+			bound = getBounds(startingNode, currentLowerYPosition); 	
 			
-			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes);			
+			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes, polynomial, startingNode);			
 			
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
@@ -212,7 +212,8 @@ public  class Grapher {
 		return false;
 	}
 	
-	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<Node> listOfNodes) {
+	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
+			                                    List<Node> listOfNodes, SecondOrderPolynomial polynomial, Node startingPosition) {
 		for (short y = formerLowerYPosition; y <= bound; y++) {
 			if (isHittingWallOrGround(currentXPosition,y)) {
 				hitWallOrGround(listOfNodes, currentXPosition,y);
@@ -223,9 +224,15 @@ public  class Grapher {
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
 				//hvormed x positionen ikke ændrer sig.		
 				listOfNodes.add(observationGraph[currentXPosition][y]);
+				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
+				//TODO Fix so no multi edges
 			}		
 		}
 		return false;
+	}
+	
+	private static short getBounds(Node startingNode, short currentLowerYPosition) {
+		return (short) (Math.round((startingNode.y - (currentLowerYPosition-startingNode.y))*64)/64); //Rounded and then floored!
 	}
 	
 	/***
