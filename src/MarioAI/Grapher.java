@@ -82,13 +82,15 @@ public  class Grapher {
 				}				
 			}
 		}
+	}
 
+	private static boolean isOnLevelMatrix(short coloumn, short row) {
+		return (0 <= coloumn && coloumn < GRID_WIDTH &&
+				0 <= row 	 && row		< GRID_HEIGHT); 
 	}
 	
 	private static boolean isOnLevelMatrix(Node position, Node marioNode) {
-		short coloumnPosition = getColoumnRelativeToMario(position, marioNode);
-		return (0 <= coloumnPosition && coloumnPosition < GRID_WIDTH &&
-				0 <= position.y 	 && position.y 		< GRID_HEIGHT); 
+		return isOnLevelMatrix(getColoumnRelativeToMario(position, marioNode), position.y);
 	}
 	
 	private static short getColoumnRelativeToMario(Node node, Node marioNode) {
@@ -251,7 +253,8 @@ public  class Grapher {
 	 * @return
 	 */
 	private static boolean isHittingWallOrGround(short xPosition, short yPosition) {
-		return isSolid(observationGraph[xPosition][yPosition-1]);
+		//Being out of the level matrix does not constitute as hitting something
+		return (isOnLevelMatrix(xPosition, (short) (yPosition - 1))) && isSolid(observationGraph[xPosition][yPosition-1]);
 	}
 	
 	/***
@@ -294,7 +297,8 @@ public  class Grapher {
 	}
 
 	private static boolean canMarioStandThere(short coloumn,short row) {
-		return isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
+		return 0 < row && row < GRID_HEIGHT &&
+			   isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
 	}
 
 	private static boolean isOnSolidGround(short row, short coloumn) {
