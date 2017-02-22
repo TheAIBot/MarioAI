@@ -1,6 +1,7 @@
 package MarioAI;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Standard type of node
@@ -17,6 +18,17 @@ public class Node extends SuperNode {
 		this.y = y;
 		this.type = type;
 		this.hash = Hasher.hashShortPoint(x, y);
+	}
+	
+	public void addNeighbor(Node neighbor) {
+		if (!this.isNeighbor(neighbor)) {
+			this.neighborMap.put(neighbor.hash, neighbor);
+			this.neighbors.add(neighbor);			
+		}
+	}
+	
+	public boolean isNeighbor(Node node) {
+		return (node != null && neighborMap.containsKey(node.hash));
 	}
 
 	@Override
