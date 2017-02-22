@@ -12,7 +12,7 @@ public class Graph {
 	public static final int SIGHT_HEIGHT = 22;
 	private static final int LEVEL_START_SCOLLING = 160;
 	private static final int BLOCK_PIXEL_SIZE = 16;
-	private static final int MARIO_START_X_POS = LEVEL_START_SCOLLING / BLOCK_PIXEL_SIZE;
+	private static final int MARIO_START_X_POS = 2;
 	private static final int LEVEL_LEFT_X_POS = -(SIGHT_WIDTH / 2);
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
@@ -24,51 +24,37 @@ public class Graph {
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 
-	private int getCorrectedMarioXPos(final float[] marioXPos) {
-		return (int) Math.max(LEVEL_START_SCOLLING / BLOCK_PIXEL_SIZE, getMarioXPos(marioXPos));
-	}
-	
-	public static int getMarioXPos(final float[] marioXPos)
-	{
-		return (int)Math.round(marioXPos[0]) / BLOCK_PIXEL_SIZE;
-	}
-	
-	public static int getMarioYPos(final float[] marioYPos)
-	{
-		return (int)Math.round(marioYPos[1]) / BLOCK_PIXEL_SIZE;
-	}
-
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
 	}
 	
 	public void createStartGraph(final Environment observation) {
-		final int marioXPos = getMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = getMarioYPos(observation.getMarioFloatPos());
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 
 		for (int i = 0; i < levelMatrix.length; i++) {
 			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, (i - (SIGHT_WIDTH / 2)) + marioXPos);
 			levelMatrix[i] = columnToInsert;
-			saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos, columnToInsert);
+			saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
 		}
-		marioNode = new Node((short)marioXPos, (short)marioYPos, (byte)0);
-		maxMarioXPos = 12;
+		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+		maxMarioXPos = SIGHT_WIDTH / 2;
 	}
 
 	public boolean updateMatrix(final Environment observation) {
-		final int marioXPos = getCorrectedMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = getMarioYPos(observation.getMarioFloatPos());
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
-		maxMarioXPos = Math.max(maxMarioXPos, marioXPos);
-		if (change > 0) {
-			moveMatrixOneLeft(observation, marioXPos, marioYPos);
-			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
+		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 9);
+		if (change < 0) {
+			moveMatrixOneLeft(marioXPos);
+			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
-		} else if (change < 0) {
-			moveMatrixOneRight(marioXPos);
-			marioNode = new Node((short)getMarioXPos(observation.getMarioFloatPos()), (short)marioYPos, (byte)0);
+		} else if (change > 0) {
+			moveMatrixOneRight(observation, marioXPos, marioYPos);
+			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
 		}
 		return false;
@@ -81,21 +67,22 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
+		System.out.println("maxMarioXPos:" + maxMarioXPos);
 		return getColumn(maxMarioXPos);
 	}
 	
 	
-	private void moveMatrixOneRight(final int marioXPos) {
+	private void moveMatrixOneLeft(final int marioXPos) {
 		// move columns right
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
 		}
-		final int columnToInsertXPos = marioXPos + LEVEL_LEFT_X_POS;
+		final int columnToInsertXPos = marioXPos - 9;
 		final Node[] columnToInsert = getColumn(columnToInsertXPos);
 		levelMatrix[0] = columnToInsert;
 	}
 
-	private void moveMatrixOneLeft(final Environment observation, final int marioXPos, final int marioYPos) {
+	private void moveMatrixOneRight(final Environment observation, final int marioXPos, final int marioYPos) {
 		// no need to save the column that was overwritten as it's still saved
 		// in savedColumns
 
@@ -104,7 +91,7 @@ public class Graph {
 			levelMatrix[x - 1] = levelMatrix[x];
 		}
 		Node[] columnToInsert;
-		final int columnToInsertXPos = marioXPos + LEVEL_RIGHT_X_POS;
+		final int columnToInsertXPos = marioXPos + 9;
 		// get column and insert it into the matrix
 		if (containsColumn(columnToInsertXPos)) {
 			columnToInsert = getColumn(columnToInsertXPos);

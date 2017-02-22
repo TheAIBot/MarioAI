@@ -85,7 +85,7 @@ public  class Grapher {
 	private static List<Node> getReachableNodes(Node startingNode, short nodeColoumn) {
 		ArrayList<Node> listOfNodes = new ArrayList<Node>();
 		//Three different ways to find the reachable nodes from a given position:
-		//getRunningReachableNodes(startingNode, listOfNodes, nodeColoumn); //TODO Obs. no need to return a list of nodes
+		//getRunningReachableNodes(startingNode, nodeColoumn, listOfNodes); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
 		getPolynomialReachableNodes(startingNode,nodeColoumn, listOfNodes);
 		return listOfNodes;
@@ -208,7 +208,6 @@ public  class Grapher {
 				hitWallOrGround(listOfNodes, currentXPosition,y);
 				return true;
 			} 
-			
 		}	
 		return false;
 	}

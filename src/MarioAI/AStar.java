@@ -2,14 +2,14 @@ package MarioAI;
 
 import java.util.List;
 import java.util.PriorityQueue;
+
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.environments.Environment;
+
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class AStar {
-
-	// Set of nodes already explored
-	private static List<Node> closedSet = new ArrayList<Node>();
-	// Set of nodes yet to be explored
-	private static PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+public final class AStar {
 
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of
@@ -19,28 +19,30 @@ public class AStar {
 	 * @param nodes
 	 * @return optimal path
 	 */
-	public static List<Node> runMultiNodeAStar(Node start, Node[] nodes) {
+	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes) {
 		// Add singleton goal node far to the right. This will ensure each
-		// vertical distance is minimal and all nodes in rightmost column will be
+		// vertical distance is minimal and all nodes in rightmost column will
+		// be
 		// pretty good goal position to end up in after A* search
-		Node goal = new Node((short) 1000, (short) 11, (byte)3);
+		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
 				node.neighbors.add(goal);
 			}
-			
 		}
-		
+
 		// Remove auxiliary goal node
 		List<Node> path = runAStar(start, goal);
-		path.remove((path.size() - 1));
+		if (path != null) {
+			path.remove((path.size() - 1));
+		}
+
 		for (Node node : nodes) {
 			if (node != null) {
 				node.neighbors.remove(goal);
 			}
-			
 		}
-		
+
 		return path;
 	}
 
@@ -51,7 +53,12 @@ public class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<Node> runAStar(Node start, Node goal) {
+	public static List<Node> runAStar(final Node start, final Node goal) {
+		// Set of nodes already explored
+		final List<Node> closedSet = new ArrayList<Node>();
+		// Set of nodes yet to be explored
+		final PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+
 		// Initialization
 		openSet.add(start);
 		start.gScore = 0;
@@ -65,16 +72,18 @@ public class AStar {
 				return reconstructPath(current);
 			}
 
-			openSet.remove(current);
+			// Current node has been explored
+			// openSet.remove(current);
 			closedSet.add(current);
 
 			// Explore each neighbor of current node
-			List<Node> neighbors = current.getNeighbors();
+			final List<Node> neighbors = current.getNeighbors();
 			for (Node neighbor : neighbors) {
-				if (closedSet.contains(neighbor)) continue;
+				if (closedSet.contains(neighbor))
+					continue;
 
 				// Distance from start to neighbor of current node
-				int tentativeGScore = current.gScore + distanceBetween(current, neighbor);
+				float tentativeGScore = current.gScore + GraphMath.distanceBetween(current, neighbor);
 				if (!openSet.contains(neighbor)) {
 					openSet.add(neighbor);
 				} else if (tentativeGScore >= neighbor.gScore) {
@@ -87,7 +96,11 @@ public class AStar {
 				neighbor.fScore = neighbor.gScore + heuristicFunction(neighbor, goal);
 			}
 		}
-
+		for (Node node : closedSet) {
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
+		}
 		// No solution was found
 		return null;
 	}
@@ -98,10 +111,9 @@ public class AStar {
 	 * @return the estimated cost of the cheapest path from current node to goal
 	 *         node
 	 */
-	public static int heuristicFunction(Node node, Node goal) {
+	public static float heuristicFunction(final Node node, final Node goal) {
 		// temp use distance (later should use time)
-		int dist = (int) Math.sqrt(Math.pow((goal.x - node.x), 2) + Math.pow((goal.y - node.y), 2));
-		return dist;
+		return GraphMath.distanceBetween(node, goal);
 	}
 
 	/**
@@ -109,24 +121,40 @@ public class AStar {
 	 * @return path
 	 */
 	private static List<Node> reconstructPath(Node current) {
-		List<Node> path = new ArrayList<Node>();
+		final List<Node> path = new ArrayList<Node>();
 		while (current.parent != null) {
 			path.add(current);
 			current = current.parent;
 		}
-		path.add(current);
+		Collections.reverse(path);
 		return path;
 	}
 
-	/**
-	 * Distance between two nodes. We hardcode this to 1 for the moment.
-	 * 
-	 * @param current
-	 * @param neighbor
-	 * @return distance
-	 */
-	private static int distanceBetween(Node current, Node neighbor) {
-		return 1;
-	}
+	private static float xStartJump = 0;
+	private static boolean isJumping = false;
 
+	// TODO Pending implementation of functionality for getting info about
+	// movement between nodes in Graph.
+	public static boolean[] getNextMove(final float marioXPos, final float marioYPos, final List<Node> path, boolean canJump) {
+		final boolean[] action = new boolean[Environment.numberOfButtons];
+		final Node next = path.get(0);
+		if ((float)next.x > marioXPos) {
+			action[Mario.KEY_RIGHT] = true;
+		}
+		if ((float)next.x < marioXPos) {
+			action[Mario.KEY_LEFT] = true;
+		}
+		if ((float)next.y < marioYPos && canJump) {
+			action[Mario.KEY_JUMP] = true;
+			xStartJump = marioXPos;
+			isJumping = true;
+		}
+		if (isJumping && marioXPos - xStartJump < ((float)(next.x - xStartJump)) * 0.6) {
+			action[Mario.KEY_JUMP] = true;
+		}
+		else if (isJumping) {
+			isJumping = false;
+		}
+		return action;
+	}
 }

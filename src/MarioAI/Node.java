@@ -8,8 +8,8 @@ import java.util.ArrayList;
 public class Node extends SuperNode {
 	public final short x;
 	public final short y;
-	private final int hash;
-
+	
+	private int hash;
 	public byte type;
 
 	public Node(short x, short y, byte type) {

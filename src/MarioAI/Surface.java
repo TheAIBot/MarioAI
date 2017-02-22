@@ -51,13 +51,13 @@ public class Surface extends SuperNode {
 	public Node removeNodeAndGet(short x, short y) {
 		Node toRemove = nodes.get(Hasher.hashShortPoint(x, y));
 		nodes.remove(toRemove.hashCode());
-		for (Node edge : toRemove.neighbors) {
-			int edgeCount = edgesCount.get(edge.hashCode()) - 1;
+		for (Node neighbor : toRemove.neighbors) {
+			int edgeCount = edgesCount.get(neighbor.hashCode()) - 1;
 			if (edgeCount > 0) {
-				edgesCount.put(edge.hashCode(), edgeCount);
+				edgesCount.put(neighbor.hashCode(), edgeCount);
 			} else {
-				edgesCount.remove(edge.hashCode());
-				edges.remove(edge);
+				edgesCount.remove(neighbor.hashCode());
+				edges.remove(neighbor);
 			}
 		}
 		return toRemove;

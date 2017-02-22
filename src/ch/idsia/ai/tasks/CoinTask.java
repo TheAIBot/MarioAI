@@ -1,6 +1,8 @@
 package ch.idsia.ai.tasks;
 
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.tools.EvaluationOptions;
 
 /**
@@ -25,4 +27,9 @@ public class CoinTask implements Task {
     public EvaluationOptions getOptions() {
         return options;
     }
+
+	public MarioComponent loadLevel(Level level, Agent controller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

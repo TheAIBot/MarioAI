@@ -1,5 +1,8 @@
 package ch.idsia.mario.simulation;
 
+import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.tools.EvaluationInfo;
 
 /**
@@ -26,6 +29,8 @@ public interface Simulation
 //    public EvaluationInfo simulateOneLevel();
 //
 //    public MarioComponent getMarioComponent();
+    
+    public MarioComponent setLevel(Level level);
 
     public EvaluationInfo simulateOneLevel();
 }
