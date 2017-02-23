@@ -37,6 +37,17 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     public boolean[] getAction(Environment observation)
     {
         float[] enemiesPos = observation.getEnemiesFloatPos();
+        System.out.println(observation.getMarioFloatPos()[0] / 16 + " " + observation.getMarioFloatPos()[1] / 16);
+        //System.out.println(observation.getCompleteObservation().length + " " + observation.getCompleteObservation()[0].length);
+        /*byte[][] level = observation.getCompleteObservation();
+        for (int x = 0; x < level.length; x++) {
+			for (int y = 0; y < level[0].length; y++) {
+				System.out.print((char)(level[x][y] + 50));
+			}
+			System.out.println("");
+		}
+        System.out.println();
+        */
         return Action;
     }
 
@@ -50,7 +61,6 @@ public class HumanKeyboardAgent extends KeyAdapter implements Agent
     public void keyPressed (KeyEvent e)
     {
         toggleKey(e.getKeyCode(), true);
-        System.out.println("sdf");
     }
 
     public void keyReleased (KeyEvent e)

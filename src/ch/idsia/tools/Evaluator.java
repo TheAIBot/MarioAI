@@ -1,6 +1,9 @@
 package ch.idsia.tools;
 
+import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.GlobalOptions;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.mario.simulation.BasicSimulator;
@@ -93,6 +96,12 @@ public class Evaluator implements Runnable
                 server.restartServer();
             }
         }
+    }
+    
+    public MarioComponent loadLevel(Level level, Agent agent)
+    {
+        Simulation simulator = new BasicSimulator(evaluationOptions.getSimulationOptionsCopy());
+        return simulator.setLevel(level);
     }
 
     public List<EvaluationInfo> evaluate()
