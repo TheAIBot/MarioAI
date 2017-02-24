@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.istack.internal.FinalArrayList;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import ch.idsia.ai.agents.Agent;
@@ -58,20 +59,19 @@ public class FastAndFurious implements Agent {
 		return action;
 	}
 	
-	private void drawPath(Environment observation, List<Node> path)
+	private void drawPath(final Environment observation, final List<Node> path)
 	{
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-		final float marioPreciseYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<Point> guiPath = new ArrayList<Point>(); 
+		final ArrayList<Point> guiPath = new ArrayList<Point>(); 
 		Point marioPoint = new Point(marioXPos, marioYPos);
 		
 		guiPath.add(convertPointToOnScreenPoint(observation, marioPoint));
 		
 		for (int i = 0; i < path.size(); i++) {
-			Node node = path.get(i);
-			Point point = new Point(node.x, node.y);
+			final Node node = path.get(i);
+			final Point point = new Point(node.x, node.y);
     		
     		guiPath.add(convertPointToOnScreenPoint(observation, point));
 		}
@@ -79,20 +79,12 @@ public class FastAndFurious implements Agent {
 		((MarioComponent)observation).setPath(guiPath);
 	}
 	
-	private Point convertPointToOnScreenPoint(Environment observation, Point point) {
+	private Point convertPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		point.x = (int)((point.x - Math.max(marioXPos - 11, 0)) * 16) - 8;
 		point.y = (int)((marioYPos * 16) + ((point.y - marioYPos) * 16)) - 8;
-		
-		/*
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-		
-		point.x = (int)(point.x - Math.max(marioXPos - 11, 0)) * 16 - 8;
-		point.y = (int)(marioYPos * 16) + (int)(point.y - marioYPos) * 16 - 8;
-		*/
 		
 		return point;
 	}
