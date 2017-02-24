@@ -976,6 +976,10 @@ public class LevelScene extends Scene implements SpriteContext
         }
     }
 
+    public void renderPath(Graphics g, ArrayList<Point> path) {    	
+    	layer.renderPath(g, path);
+    }
+    
     private void drawProgress(Graphics g) {
         String entirePathStr = "......................................>";
         double physLength = (levelLength - 53)*16;

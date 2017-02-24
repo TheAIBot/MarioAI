@@ -1,8 +1,14 @@
 package MarioAI;
 
+import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.istack.internal.FinalArrayList;
+import com.sun.org.apache.bcel.internal.generic.RETURN;
+
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -45,10 +51,41 @@ public class FastAndFurious implements Agent {
 		}
 		if (newestPath != null && newestPath.size() > 0) {
 			action = MarioControls.getNextAction(observation, newestPath);
+			drawPath(observation, newestPath);
 		}
 		tickCount++;
 		graph.printMatrix();
 		return action;
+	}
+	
+	private void drawPath(final Environment observation, final List<Node> path)
+	{
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		
+		final ArrayList<Point> guiPath = new ArrayList<Point>(); 
+		Point marioPoint = new Point(marioXPos, marioYPos);
+		
+		guiPath.add(convertPointToOnScreenPoint(observation, marioPoint));
+		
+		for (int i = 0; i < path.size(); i++) {
+			final Node node = path.get(i);
+			final Point point = new Point(node.x, node.y);
+    		
+    		guiPath.add(convertPointToOnScreenPoint(observation, point));
+		}
+		
+		((MarioComponent)observation).setPath(guiPath);
+	}
+	
+	private Point convertPointToOnScreenPoint(final Environment observation, final Point point) {
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		point.x = (int)((point.x - Math.max(marioXPos - 11, 0)) * 16) - 8;
+		point.y = (int)((marioYPos * 16) + ((point.y - marioYPos) * 16)) - 8;
+		
+		return point;
 	}
 
 	public AGENT_TYPE getType() {

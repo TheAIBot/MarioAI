@@ -1,6 +1,7 @@
 package ch.idsia.mario.engine;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 import ch.idsia.mario.engine.level.*;
 
@@ -171,6 +172,31 @@ public class LevelRenderer
             }
     }
 
+    public void renderPath(Graphics g, ArrayList<Point> path)
+    {
+    	
+    	//need atleast two points to draw a line
+    	if (path.size() > 1) {
+    		Color defaultColor = g.getColor();
+    		g.setColor(Color.red);
+    		
+    		final Stroke stroke = ((Graphics2D)g).getStroke();
+    		((Graphics2D)g).setStroke(new BasicStroke(2));
+    		
+        	for (int i = 0; i < path.size() - 1; i++) {
+    			Point start = path.get(i);
+    			Point end = path.get(i + 1);
+    			
+    			g.drawLine(start.x, start.y, end.x, end.y);
+    			g.fillOval(end.x - 5, end.y - 5, 10, 10);
+    		}
+        	//reset graphics values
+        	((Graphics2D)g).setStroke(stroke);
+        	g.setColor(defaultColor);
+		}
+
+    }
+    
     public void repaint(int x, int y, int w, int h)
     {
         updateArea(x * 16 - xCam, y * 16 - yCam, w * 16, h * 16);
