@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -52,6 +53,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private KeyAdapter prevHumanKeyBoardAgent;
 	private Mario mario = null;
 	private LevelScene levelScene = null;
+	
+	private ArrayList<Point> marioPath = new ArrayList<Point>(); 
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -159,6 +162,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			og.fillRect(0, 0, 320, 240);
 			scene.render(og, alpha);
+			((LevelScene)scene).renderPath(og, marioPath);
 		}
 
 		boolean[] action = agent.getAction(this/* DummyEnvironment */);
@@ -267,6 +271,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			if (GlobalOptions.VisualizationOn) {
 				og.fillRect(0, 0, 320, 240);
 				scene.render(og, alpha);
+				((LevelScene)scene).renderPath(og, marioPath);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -557,5 +562,9 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	
 	public Level getLevel() {
 		return ((LevelScene)scene).level;
+	}
+	
+	public void setPath(ArrayList<Point> path) {
+		marioPath = path;
 	}
 }
