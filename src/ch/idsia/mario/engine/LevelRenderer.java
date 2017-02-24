@@ -188,7 +188,7 @@ public class LevelRenderer
     			Point end = path.get(i + 1);
     			
     			g.drawLine(start.x, start.y, end.x, end.y);
-    			g.fillOval(end.x, end.y, 5, 5);
+    			g.fillOval(end.x - 5, end.y - 5, 10, 10);
     		}
         	//reset graphics values
         	((Graphics2D)g).setStroke(stroke);

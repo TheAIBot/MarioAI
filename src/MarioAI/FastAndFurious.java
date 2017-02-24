@@ -41,7 +41,6 @@ public class FastAndFurious implements Agent {
 				List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
-					
 				}
 			}
 		}
