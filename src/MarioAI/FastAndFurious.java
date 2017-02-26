@@ -45,6 +45,7 @@ public class FastAndFurious implements Agent {
 				if (path != null) {
 					newestPath = path;
 				}
+				isStuck = false;
 				ticksSinceLastUpdate = 0;
 			}
 		}
