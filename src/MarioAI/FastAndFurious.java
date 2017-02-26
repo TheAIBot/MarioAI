@@ -75,7 +75,7 @@ public class FastAndFurious implements Agent {
     		guiPath.add(convertPointToOnScreenPoint(observation, point));
 		}
 		
-		((MarioComponent)observation).setPath(guiPath);
+		((MarioComponent)observation).setDebugLines(guiPath);
 	}
 	
 	private Point convertPointToOnScreenPoint(final Environment observation, final Point point) {

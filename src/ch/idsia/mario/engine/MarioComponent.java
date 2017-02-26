@@ -54,7 +54,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private Mario mario = null;
 	private LevelScene levelScene = null;
 	
-	private ArrayList<Point> marioPath = new ArrayList<Point>(); 
+	private ArrayList<Point> debugLines = new ArrayList<Point>(); 
+	private ArrayList<Point> debugPoints = new ArrayList<Point>();
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -162,7 +163,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			og.fillRect(0, 0, 320, 240);
 			scene.render(og, alpha);
-			((LevelScene)scene).renderPath(og, marioPath);
+			((LevelScene)scene).renderDebugLines(og, debugLines);
+			((LevelScene)scene).renderDebugPoints(og, debugPoints);
 		}
 
 		boolean[] action = agent.getAction(this/* DummyEnvironment */);
@@ -271,7 +273,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			if (GlobalOptions.VisualizationOn) {
 				og.fillRect(0, 0, 320, 240);
 				scene.render(og, alpha);
-				((LevelScene)scene).renderPath(og, marioPath);
+				((LevelScene)scene).renderDebugLines(og, debugLines);
+				((LevelScene)scene).renderDebugPoints(og, debugPoints);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -564,7 +567,11 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		return ((LevelScene)scene).level;
 	}
 	
-	public void setPath(ArrayList<Point> path) {
-		marioPath = path;
+	public void setDebugLines(ArrayList<Point> lines) {
+		debugLines = lines;
+	}
+	
+	public void setDebugPoints(ArrayList<Point> points) {
+		debugPoints = points;
 	}
 }

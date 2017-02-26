@@ -976,8 +976,12 @@ public class LevelScene extends Scene implements SpriteContext
         }
     }
 
-    public void renderPath(Graphics g, ArrayList<Point> path) {    	
-    	layer.renderPath(g, path);
+    public void renderDebugLines(Graphics g, ArrayList<Point> lines) {    	
+    	layer.renderDebugLines(g, lines);
+    }
+    
+    public void renderDebugPoints(Graphics g, ArrayList<Point> points) {    	
+    	layer.renderDebugPoints(g, points);
     }
     
     private void drawProgress(Graphics g) {
