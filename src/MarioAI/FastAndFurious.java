@@ -13,7 +13,7 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 /**
- * Main program agent. Is to run A* algorithm.
+ * Main program agent.
  */
 public class FastAndFurious implements Agent {
 

@@ -173,7 +173,7 @@ public  class Grapher {
 		//Primarily collision detection.
 		while (!hasMetHardGround &&
 			   !polynomial.isPastTopPunkt(nodeColoumn, currentXPosition) &&
-			   isWithinView(currentXPosition)) { 
+			   isWithinView(currentXPosition)) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
 			if (polynomial.isPastTopPunkt(nodeColoumn, currentXPosition)) { 

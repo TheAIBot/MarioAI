@@ -1,5 +1,8 @@
 package MarioAI;
 
+/**
+ * Class containing auxiliary methods for calculations on the generated route graph
+ */
 public class GraphMath {
 	
 	/**
