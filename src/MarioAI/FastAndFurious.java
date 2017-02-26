@@ -22,11 +22,13 @@ public class FastAndFurious implements Agent {
 	private boolean[] action = new boolean[Environment.numberOfButtons]; 
 	private int tickCount = 0;
 	private List<Node> newestPath = null;
+	private boolean isStuck = false; 
+	private int ticksSinceLastUpdate = 0;
 
 	public void reset() {
 	}
 
-	public boolean[] getAction(Environment observation) {		
+	public boolean[] getAction(Environment observation) {
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
@@ -36,12 +38,15 @@ public class FastAndFurious implements Agent {
 			}
 			
 		} else if (tickCount > 30) {
-			if (graph.updateMatrix(observation)) {
+			if (graph.updateMatrix(observation) || isStuck) {
+				if (isStuck) graph.createStartGraph(observation);
 				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
+				isStuck = false;
+				ticksSinceLastUpdate = 0;
 			}
 		}
 		if (newestPath != null &&
@@ -54,6 +59,14 @@ public class FastAndFurious implements Agent {
 			drawPath(observation, newestPath);
 		}
 		tickCount++;
+		
+		ticksSinceLastUpdate++;
+		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
+		if (ticksSinceLastUpdate > 100) {
+			System.out.println("STUCK");
+			isStuck = true;
+		}
+		
 		graph.printMatrix();
 		return action;
 	}
