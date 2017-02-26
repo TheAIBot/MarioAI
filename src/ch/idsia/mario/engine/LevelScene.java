@@ -15,6 +15,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.debugGraphics.debugLines;
+import MarioAI.debugGraphics.debugPoints;
+
 
 public class LevelScene extends Scene implements SpriteContext
 {
@@ -976,8 +979,12 @@ public class LevelScene extends Scene implements SpriteContext
         }
     }
 
-    public void renderPath(Graphics g, ArrayList<Point> path) {    	
-    	layer.renderPath(g, path);
+    public void renderDebugLines(Graphics g, ArrayList<debugLines> lines) {    	
+    	layer.renderDebugLines(g, lines);
+    }
+    
+    public void renderDebugPoints(Graphics g, ArrayList<debugPoints> points) {    	
+    	layer.renderDebugPoints(g, points);
     }
     
     private void drawProgress(Graphics g) {

@@ -24,6 +24,9 @@ import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
 
+import MarioAI.debugGraphics.debugLines;
+import MarioAI.debugGraphics.debugPoints;
+
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;
 	public static final int TICKS_PER_SECOND = 24;
@@ -54,7 +57,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private Mario mario = null;
 	private LevelScene levelScene = null;
 	
-	private ArrayList<Point> marioPath = new ArrayList<Point>(); 
+	private ArrayList<debugLines> debugLinesToDraw = new ArrayList<debugLines>(); 
+	private ArrayList<debugPoints> debugPointsToDraw = new ArrayList<debugPoints>();
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -162,7 +166,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			og.fillRect(0, 0, 320, 240);
 			scene.render(og, alpha);
-			((LevelScene)scene).renderPath(og, marioPath);
+			((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
+			((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
 		}
 
 		boolean[] action = agent.getAction(this/* DummyEnvironment */);
@@ -271,7 +276,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			if (GlobalOptions.VisualizationOn) {
 				og.fillRect(0, 0, 320, 240);
 				scene.render(og, alpha);
-				((LevelScene)scene).renderPath(og, marioPath);
+				((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
+				((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -564,7 +570,16 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		return ((LevelScene)scene).level;
 	}
 	
-	public void setPath(ArrayList<Point> path) {
-		marioPath = path;
+	public void resetDebugGraphics() {
+		debugLinesToDraw.clear();
+		debugPointsToDraw.clear();
+	}
+	
+	public void addDebugLines(debugLines lines) {
+		debugLinesToDraw.add(lines);
+	}
+	
+	public void addDebugPoints(debugPoints points) {
+		debugPointsToDraw.add(points);
 	}
 }
