@@ -3,7 +3,11 @@ package ch.idsia.mario.engine;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
+
+import MarioAI.debugGraphics.debugLines;
+import MarioAI.debugGraphics.debugPoints;
 import ch.idsia.mario.engine.level.*;
+import jdk.internal.dynalink.linker.LinkerServices;
 
 public class LevelRenderer {
 	private int xCam;
@@ -151,42 +155,16 @@ public class LevelRenderer {
 			}
 	}
 
-	public void renderDebugLines(Graphics g, ArrayList<Point> lines) {
-		// need atleast two points to draw a line
-		if (lines.size() > 1) {
-			Color defaultColor = g.getColor();
-			g.setColor(Color.red);
-
-			final Stroke stroke = ((Graphics2D) g).getStroke();
-			((Graphics2D) g).setStroke(new BasicStroke(2));
-
-			for (int i = 0; i < lines.size() - 1; i++) {
-				Point start = lines.get(i);
-				Point end = lines.get(i + 1);
-
-				g.drawLine(start.x, start.y, end.x, end.y);
-			}
-			// reset graphics values
-			((Graphics2D) g).setStroke(stroke);
-			g.setColor(defaultColor);
+	public void renderDebugLines(Graphics g, ArrayList<debugLines> lines) {
+		for (int i = 0; i < lines.size(); i++) {
+			lines.get(i).draw(g);
 		}
 	}
 
-	public void renderDebugPoints(Graphics g, ArrayList<Point> points) {
-		// need atleast two points to draw a line
-		Color defaultColor = g.getColor();
-		g.setColor(Color.red);
-
-		final Stroke stroke = ((Graphics2D) g).getStroke();
-		((Graphics2D) g).setStroke(new BasicStroke(2));
-
-		for (int i = 0; i < points.size() - 1; i++) {
-			Point start = points.get(i);
-			g.fillOval(start.x - 5, start.y - 5, 10, 10);
+	public void renderDebugPoints(Graphics g, ArrayList<debugPoints> points) {
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).draw(g);
 		}
-		// reset graphics values
-		((Graphics2D) g).setStroke(stroke);
-		g.setColor(defaultColor);
 	}
 
 	public void repaint(int x, int y, int w, int h) {
