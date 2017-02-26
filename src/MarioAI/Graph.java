@@ -157,4 +157,8 @@ public class Graph {
 	private Node[] getColumn(final int x) {
 		return savedColumns.get(x);
 	}
+	
+	public int getMaxMarioXPos() {
+		return maxMarioXPos;
+	}
 }

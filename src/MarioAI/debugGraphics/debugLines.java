@@ -9,8 +9,8 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 
 public class debugLines {
-	public final Color color;
-	public final ArrayList<Point> lines; 
+	private final Color color;
+	private final ArrayList<Point> lines; 
 	
 	public debugLines(Color color, ArrayList<Point> lines) {
 		this.color = color;
@@ -21,7 +21,7 @@ public class debugLines {
 		// need atleast two points to draw a line
 		if (lines.size() > 1) {
 			final Color defaultColor = g.getColor();
-			g.setColor(Color.red);
+			g.setColor(color);
 
 			final Stroke stroke = ((Graphics2D) g).getStroke();
 			((Graphics2D) g).setStroke(new BasicStroke(2));

@@ -9,8 +9,8 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 
 public class debugPoints {
-	public final Color color;
-	public final ArrayList<Point> points; 
+	private final Color color;
+	private final ArrayList<Point> points; 
 	
 	public debugPoints(Color color, ArrayList<Point> points) {
 		this.color = color;
@@ -19,7 +19,7 @@ public class debugPoints {
 	
 	public void draw(Graphics g) {
 		final Color defaultColor = g.getColor();
-		g.setColor(Color.red);
+		g.setColor(color);
 
 		final Stroke stroke = ((Graphics2D) g).getStroke();
 		((Graphics2D) g).setStroke(new BasicStroke(2));

@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.Graph;
 import MarioAI.MarioMethods;
 import MarioAI.Node;
 import ch.idsia.mario.engine.MarioComponent;
@@ -12,7 +13,8 @@ import ch.idsia.mario.environments.Environment;
 
 public class DebugDraw {
 	
-	private static final int SIGHT_WIDTH = 22;
+	public static final int LEVEL_HEIGHT = 15;
+	public static final int LEVEL_WIDTH = 22;
 	private static final int BLOCK_PIXEL_SIZE = 16;
 	
 	public static void resetGraphics(final Environment observation) {
@@ -44,11 +46,37 @@ public class DebugDraw {
 		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.RED, pathCircles));
 	}
 	
+	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
+		int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH);
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final Node[][] levelMatrix =  graph.getLevelMatrix();
+		
+		int groundYLevel = marioYPos;
+		while(groundYLevel < LEVEL_HEIGHT && levelMatrix[marioXPos][groundYLevel] == null) {
+			groundYLevel++;
+		}
+		
+		if (groundYLevel < LEVEL_HEIGHT) {
+			final Node groundNode = levelMatrix[marioXPos][groundYLevel];
+			if (groundNode != null) {
+				ArrayList<Point>neighbors = new ArrayList<Point>();
+				
+				for (Node neighbor : groundNode.getNeighbors()) {
+					final Point neighborPoint = new Point(neighbor.x, neighbor.y);
+					convertLevelPointToOnScreenPoint(observation, neighborPoint);
+					neighbors.add(neighborPoint);
+				}
+				
+				((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, neighbors));
+			}	
+		}
+	}
+	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		point.x = (int)((point.x - Math.max(marioXPos - (SIGHT_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2);
+		point.x = (int)((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2);
 		point.y = (int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2);
 	}
 }
