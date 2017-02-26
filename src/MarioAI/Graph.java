@@ -8,6 +8,7 @@ import ch.idsia.mario.environments.Environment;
 
 public class Graph {
 	public static final int LEVEL_HEIGHT = 15;
+	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
 	private static final int LEVEL_START_SCOLLING = 160;
@@ -26,6 +27,22 @@ public class Graph {
 
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
+	}
+	
+	public void printMatrix()
+	{
+		for (int x = 0; x < LEVEL_HEIGHT; x++) {
+			for (int y = 0; y < LEVEL_WIDTH; y++) {
+				if (levelMatrix[y][x] == null) {
+					System.out.print(" ");
+				}
+				else {
+					System.out.print("X");
+				}
+			}
+			System.out.println("");
+		}
+		System.out.println();
 	}
 	
 	public void createStartGraph(final Environment observation) {
@@ -67,7 +84,6 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
-		System.out.println("maxMarioXPos:" + maxMarioXPos);
 		return getColumn(maxMarioXPos);
 	}
 	
@@ -112,7 +128,7 @@ public class Graph {
 		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
 		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
 		final int startIndex = Math.max(topObservationYPos, 0);
-		final int endIndex = Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos);
+		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), 15);
 		for (int i = startIndex; i < endIndex; i++) {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}

@@ -8,6 +8,7 @@ import ch.idsia.ai.tasks.Task;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import ch.idsia.tools.ToolsConfigurator;
+import tests.TestAgent;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.simulation.SimulationOptions;
 
@@ -25,6 +26,7 @@ public class Play {
 
     public static void main(String[] args) {
         Agent controller = new FastAndFurious();
+        //Agent controller = new TestAgent();
         //Agent controller = new HumanKeyboardAgent();
         /*if (args.length > 0) {
             controller = AgentsPool.load (args[0]);

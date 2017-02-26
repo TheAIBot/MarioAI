@@ -9,10 +9,9 @@ import java.util.HashSet;
 public class Node extends SuperNode {
 	public final short x;
 	public final short y;
+	public final byte type;
+	private final int hash;
 	
-	private int hash;
-	public byte type;
-
 	public Node(short x, short y, byte type) {
 		this.x = x;
 		this.y = y;
