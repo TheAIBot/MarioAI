@@ -50,9 +50,11 @@ public class FastAndFurious implements Agent {
 				ticksSinceLastUpdate = 0;
 			}
 		}
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		if (newestPath != null &&
 			newestPath.size() >= 1 &&
-			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 0.5) {
+			GraphMath.distanceBetween(marioXPos, marioYPos, newestPath.get(0).x, newestPath.get(0).y) <= 0.5) {
 			newestPath.remove(0);
 		}
 		if (newestPath != null && newestPath.size() > 0) {
