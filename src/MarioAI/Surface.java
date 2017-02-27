@@ -31,14 +31,14 @@ public class Surface extends SuperNode {
 	public void addNode(Node newNode) {
 		nodes.put(newNode.hashCode(), newNode);
 
-		for (Node neighbor : newNode.neighbors) {
-			if (edgesCount.containsKey(neighbor.hashCode())) {
-				edgesCount.put(neighbor.hashCode(), neighbor.hashCode() + 1);
+		for (DirectedEdge neighborEdge : newNode.edges) {
+			if (edgesCount.containsKey(neighborEdge.target.hashCode())) {
+				edgesCount.put(neighborEdge.target.hashCode(), neighborEdge.target.hashCode() + 1);
 			} else {
-				edgesCount.put(neighbor.hashCode(), 1);
+				edgesCount.put(neighborEdge.target.hashCode(), 1);
 				// an edge is only added to a surfaces edges the first time
 				// so it isn't duplicated in the edges list
-				edges.add(neighbor);
+				edges.add(neighborEdge.target);
 			}
 		}
 	}
@@ -51,20 +51,27 @@ public class Surface extends SuperNode {
 	public Node removeNodeAndGet(short x, short y) {
 		Node toRemove = nodes.get(Hasher.hashShortPoint(x, y));
 		nodes.remove(toRemove.hashCode());
-		for (Node neighbor : toRemove.neighbors) {
-			int edgeCount = edgesCount.get(neighbor.hashCode()) - 1;
+		for (DirectedEdge neighborEdge : toRemove.edges) {
+			int edgeCount = edgesCount.get(neighborEdge.target.hashCode()) - 1;
 			if (edgeCount > 0) {
-				edgesCount.put(neighbor.hashCode(), edgeCount);
+				edgesCount.put(neighborEdge.target.hashCode(), edgeCount);
 			} else {
-				edgesCount.remove(neighbor.hashCode());
-				edges.remove(neighbor);
+				edgesCount.remove(neighborEdge.target.hashCode());
+				edges.remove(neighborEdge.target);
 			}
 		}
 		return toRemove;
 	}
-
+	/*
 	@Override
 	public ArrayList<Node> getNeighbors() {
 		return edges;
+	}
+	*/
+
+	@Override
+	public ArrayList<DirectedEdge> getEdges() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -19,6 +19,7 @@ public class Node extends SuperNode {
 		this.hash = Hasher.hashShortPoint(x, y);
 	}
 	
+	/*
 	public void addNeighbor(Node neighbor) {
 		if (!this.isNeighbor(neighbor)) {
 			this.neighborMap.put(neighbor.hash, neighbor);
@@ -34,6 +35,30 @@ public class Node extends SuperNode {
 	public ArrayList<Node> getNeighbors() {
 		return neighbors;
 	}
+	*/	
+	
+	public void addEdge(DirectedEdge edge) {
+		if (!this.isConnectingEdge(edge)) {
+			this.edgesMap.put(edge.hashCode(), edge);
+			this.edges.add(edge);			
+		}
+	}
+
+	public void removeEdge(DirectedEdge edge) {
+		if (this.isConnectingEdge(edge)) {
+			this.edgesMap.remove(edge.hashCode(), edge);
+			this.edges.remove(edge);			
+		} 
+	}
+	
+	public boolean isConnectingEdge(DirectedEdge edge) {
+		return (edge != null && edgesMap.containsKey(edge.hashCode()));		
+	}
+
+	@Override
+	public ArrayList<DirectedEdge> getEdges() {
+		return edges;
+	}	
 
 	@Override
 	public boolean equals(Object b) {
