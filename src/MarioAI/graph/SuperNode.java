@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;

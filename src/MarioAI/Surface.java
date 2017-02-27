@@ -2,6 +2,10 @@ package MarioAI;
 
 import java.util.*;
 
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Node;
+import MarioAI.graph.SuperNode;
+
 /**
  * A surface is a collection of nodes that are horisontally next to eachother
  * By using surfaces instead of nodes any path finding algorithm will be much

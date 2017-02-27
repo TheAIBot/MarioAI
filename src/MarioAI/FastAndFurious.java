@@ -8,6 +8,10 @@ import com.sun.istack.internal.FinalArrayList;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.graph.Graph;
+import MarioAI.graph.GraphMath;
+import MarioAI.graph.Grapher;
+import MarioAI.graph.Node;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;

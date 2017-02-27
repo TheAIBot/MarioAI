@@ -1,8 +1,10 @@
-package MarioAI;
+package MarioAI.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import MarioAI.Hasher;
 
 /**
  * Standard type of node

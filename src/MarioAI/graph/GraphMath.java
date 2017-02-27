@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.graph;
 
 /**
  * Class containing auxiliary methods for calculations on the generated route graph

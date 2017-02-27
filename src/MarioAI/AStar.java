@@ -3,6 +3,10 @@ package MarioAI;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Goaling;
+import MarioAI.graph.GraphMath;
+import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 

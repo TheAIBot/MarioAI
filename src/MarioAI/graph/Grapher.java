@@ -1,7 +1,9 @@
-package MarioAI;
+package MarioAI.graph;
 
-import java.util.*; 
+import java.util.*;
 
+import MarioAI.Running;
+import MarioAI.SecondOrderPolynomial;
 import ch.idsia.mario.environments.Environment;
 
 public  class Grapher {

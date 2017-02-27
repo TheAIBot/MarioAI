@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.graph;
 
 import ch.idsia.mario.environments.Environment;
 

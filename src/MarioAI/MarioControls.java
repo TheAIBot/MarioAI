@@ -2,6 +2,7 @@ package MarioAI;
 
 import java.util.List;
 
+import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 

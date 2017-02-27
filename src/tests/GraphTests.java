@@ -3,10 +3,9 @@ package tests;
 import org.junit.Test;
 import org.junit.Assert;
 
-import MarioAI.Graph;
 import MarioAI.MarioMethods;
-import MarioAI.Node;
-
+import MarioAI.graph.Graph;
+import MarioAI.graph.Node;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;
 

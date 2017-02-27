@@ -1,4 +1,7 @@
-package MarioAI;
+package MarioAI.graph;
+
+import MarioAI.Hasher;
+import MarioAI.MotionAction;
 
 public class DirectedEdge {
 	public Node source;

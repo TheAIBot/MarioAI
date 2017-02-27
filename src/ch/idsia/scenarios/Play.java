@@ -15,7 +15,7 @@ import ch.idsia.mario.simulation.SimulationOptions;
 import java.awt.*;
 
 import MarioAI.FastAndFurious;
-import MarioAI.Grapher;
+import MarioAI.graph.Grapher;
 /**
  * Created by IntelliJ IDEA.
  * User: julian

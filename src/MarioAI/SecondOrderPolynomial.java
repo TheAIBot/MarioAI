@@ -1,5 +1,7 @@
 package MarioAI;
 
+import MarioAI.graph.Node;
+
 public class SecondOrderPolynomial implements MotionAction {
 	private float a;
 	private float b;

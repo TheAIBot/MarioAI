@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.graph;
 
 public class EdgeNotExistingException extends Exception{
 	

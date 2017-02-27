@@ -1,5 +1,7 @@
 package MarioAI;
 
+import MarioAI.graph.DirectedEdge;
+
 public class Hasher {
 	public static int hashShortPoint(short x, short y)
 	{

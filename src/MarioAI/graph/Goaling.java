@@ -1,4 +1,6 @@
-package MarioAI;
+package MarioAI.graph;
+
+import MarioAI.MotionAction;
 
 public class Goaling implements MotionAction {
 

@@ -8,10 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import MarioAI.DirectedEdge;
-import MarioAI.Graph;
 import MarioAI.MarioMethods;
-import MarioAI.Node;
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Graph;
+import MarioAI.graph.Node;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
