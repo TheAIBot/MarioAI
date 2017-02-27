@@ -6,7 +6,7 @@ import ch.idsia.mario.environments.Environment;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 6;
+	private static final float MAX_JUMP_RANGE = 5;
 	private static final short GRID_HEIGHT = 15;
 	private static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
@@ -44,6 +44,13 @@ public  class Grapher {
 	
 	public static void graph(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
+		for (int i = 0; i < levelMatrix.length; i++) {
+			for (int j = 0; j < levelMatrix[i].length; j++) {
+				if (levelMatrix[i][j] != null) {
+					levelMatrix[i][j].deleteAllEdges();
+				}
+			}
+		}
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
@@ -65,7 +72,6 @@ public  class Grapher {
 		for (DirectedEdge connectingEdge : connectingEdges) {
 			if (connectingEdge.target != null && isOnLevelMatrix(connectingEdge.target, marioNode) && canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
-				System.out.println();
 			}
 		}
 		// Recursion over the reachable nodes:
@@ -149,7 +155,6 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
-		//TODO All four corners of Mario!
 		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
@@ -293,7 +298,7 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null || node.y < 0  || GRID_HEIGHT < node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
+		if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);

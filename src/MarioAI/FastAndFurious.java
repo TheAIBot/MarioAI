@@ -52,7 +52,7 @@ public class FastAndFurious implements Agent {
 		}
 		if (newestPath != null &&
 			newestPath.size() >= 1 &&
-			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 0.1) {
+			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 0.5) {
 			newestPath.remove(0);
 		}
 		if (newestPath != null && newestPath.size() > 0) {
@@ -64,9 +64,9 @@ public class FastAndFurious implements Agent {
 		}
 		tickCount++;
 		
-		ticksSinceLastUpdate++;
-		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
-		if (ticksSinceLastUpdate > 100) {
+		//ticksSinceLastUpdate++;
+		//System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
+		if (ticksSinceLastUpdate > 30) { //TODO make unnecessary
 			System.out.println("STUCK");
 			isStuck = true;
 		}

@@ -26,7 +26,7 @@ public final class AStar {
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
-				node.addEdge(new DirectedEdge(node, goal, null));
+				node.addEdge(new DirectedEdge(node, goal, new Goaling()));
 			}
 		}
 

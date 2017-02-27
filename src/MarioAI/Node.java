@@ -1,6 +1,7 @@
 package MarioAI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -43,7 +44,12 @@ public class Node extends SuperNode {
 			this.edges.add(edge);			
 		}
 	}
-
+	
+	public void deleteAllEdges() {
+		this.edges = new ArrayList<DirectedEdge>();
+		this.edgesMap = new HashMap<Integer, DirectedEdge>();
+	}
+	
 	public void removeEdge(DirectedEdge edge) {
 		if (this.isConnectingEdge(edge)) {
 			this.edgesMap.remove(edge.hashCode(), edge);

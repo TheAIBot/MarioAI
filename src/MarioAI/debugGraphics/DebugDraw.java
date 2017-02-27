@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.DirectedEdge;
 import MarioAI.Graph;
 import MarioAI.MarioMethods;
 import MarioAI.Node;
@@ -47,7 +48,11 @@ public class DebugDraw {
 	}
 	
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
-		int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH);
+		if (MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.min(0, graph.getMaxMarioXPos() - LEVEL_WIDTH) == 38) {
+			int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH);
+		}
+		
+		int marioXPos = Math.min(11,MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH));
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix =  graph.getLevelMatrix();
 		
@@ -61,8 +66,8 @@ public class DebugDraw {
 			if (groundNode != null) {
 				ArrayList<Point>neighbors = new ArrayList<Point>();
 				
-				for (Node neighbor : groundNode.getNeighbors()) {
-					final Point neighborPoint = new Point(neighbor.x, neighbor.y);
+				for (DirectedEdge neighborEdge : groundNode.getEdges()) {
+					final Point neighborPoint = new Point(neighborEdge.target.x, neighborEdge.target.y);
 					convertLevelPointToOnScreenPoint(observation, neighborPoint);
 					neighbors.add(neighborPoint);
 				}
@@ -79,4 +84,5 @@ public class DebugDraw {
 		point.x = (int)((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2);
 		point.y = (int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2);
 	}
+
 }
