@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import MarioAI.Grapher;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.human.CheaterKeyboardAgent;
 import ch.idsia.mario.engine.level.Level;
@@ -26,6 +25,7 @@ import ch.idsia.tools.tcp.ServerAgent;
 
 import MarioAI.debugGraphics.debugLines;
 import MarioAI.debugGraphics.debugPoints;
+import MarioAI.graph.Grapher;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;

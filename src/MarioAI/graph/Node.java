@@ -1,7 +1,10 @@
-package MarioAI;
+package MarioAI.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+
+import MarioAI.Hasher;
 
 /**
  * Standard type of node
@@ -19,8 +22,9 @@ public class Node extends SuperNode {
 		this.hash = Hasher.hashShortPoint(x, y);
 	}
 	
+	/*
 	public void addNeighbor(Node neighbor) {
-		if (!this.isNeighbor(neighbor)) {
+		if (!isNeighbor(neighbor)) {
 			this.neighborMap.put(neighbor.hash, neighbor);
 			this.neighbors.add(neighbor);			
 		}
@@ -34,6 +38,35 @@ public class Node extends SuperNode {
 	public ArrayList<Node> getNeighbors() {
 		return neighbors;
 	}
+	*/	
+	
+	public void addEdge(DirectedEdge edge) {
+		if (!this.isConnectingEdge(edge)) {
+			this.edgesMap.put(edge.hashCode(), edge);
+			this.edges.add(edge);			
+		}
+	}
+	
+	public void deleteAllEdges() {
+		this.edges = new ArrayList<DirectedEdge>();
+		this.edgesMap = new HashMap<Integer, DirectedEdge>();
+	}
+	
+	public void removeEdge(DirectedEdge edge) {
+		if (this.isConnectingEdge(edge)) {
+			this.edgesMap.remove(edge.hashCode(), edge);
+			this.edges.remove(edge);			
+		} 
+	}
+	
+	public boolean isConnectingEdge(DirectedEdge edge) {
+		return (edge != null && edgesMap.containsKey(edge.hashCode()));		
+	}
+
+	@Override
+	public ArrayList<DirectedEdge> getEdges() {
+		return edges;
+	}	
 
 	@Override
 	public boolean equals(Object b) {

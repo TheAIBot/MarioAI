@@ -3,6 +3,10 @@ package MarioAI;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Goaling;
+import MarioAI.graph.GraphMath;
+import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -19,14 +23,14 @@ public final class AStar {
 	 * @param nodes
 	 * @return optimal path
 	 */
-	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes) {
+	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes)  {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
-				node.neighbors.add(goal);
+				node.addEdge(new DirectedEdge(node, goal, new Goaling()));
 			}
 		}
 
@@ -37,7 +41,7 @@ public final class AStar {
 		}
 		for (Node node : nodes) {
 			if (node != null) {
-				node.neighbors.remove(goal);
+				node.removeEdge(new DirectedEdge(node, goal, null));
 			}
 		}
 
@@ -75,22 +79,22 @@ public final class AStar {
 			closedSet.add(current);
 
 			// Explore each neighbor of current node
-			final List<Node> neighbors = current.getNeighbors();
-			for (Node neighbor : neighbors) {
-				if (closedSet.contains(neighbor)) continue;
-
+			final List<DirectedEdge> neighborEdges = current.getEdges();
+			for (DirectedEdge neighborEdge : neighborEdges) {
+				if (closedSet.contains(neighborEdge.target))
+					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + GraphMath.distanceBetween(current, neighbor);
-				if (!openSet.contains(neighbor)) {
-					openSet.add(neighbor);
-				} else if (tentativeGScore >= neighbor.gScore) {
+				float tentativeGScore = current.gScore + GraphMath.distanceBetween(current, neighborEdge.target);
+				if (!openSet.contains(neighborEdge.target)) {
+					openSet.add(neighborEdge.target);
+				} else if (tentativeGScore >= neighborEdge.target.gScore) {
 					continue;
 				}
 
 				// Update values
-				neighbor.parent = current;
-				neighbor.gScore = tentativeGScore;
-				neighbor.fScore = neighbor.gScore + heuristicFunction(neighbor, goal);
+				neighborEdge.target.parent = current;
+				neighborEdge.target.gScore = tentativeGScore;
+				neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
 			}
 		}
 		for (Node node : closedSet) {

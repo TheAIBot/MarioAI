@@ -8,6 +8,10 @@ import com.sun.istack.internal.FinalArrayList;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.graph.Graph;
+import MarioAI.graph.GraphMath;
+import MarioAI.graph.Grapher;
+import MarioAI.graph.Node;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -50,9 +54,11 @@ public class FastAndFurious implements Agent {
 				ticksSinceLastUpdate = 0;
 			}
 		}
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		if (newestPath != null &&
 			newestPath.size() >= 1 &&
-			GraphMath.distanceBetween(graph.getMarioNode(observation), newestPath.get(0)) <= 0.1) {
+			GraphMath.distanceBetween(marioXPos, marioYPos, newestPath.get(0).x, newestPath.get(0).y) <= 0.5) {
 			newestPath.remove(0);
 		}
 		if (newestPath != null && newestPath.size() > 0) {
@@ -60,17 +66,18 @@ public class FastAndFurious implements Agent {
 			
 			DebugDraw.resetGraphics(observation);
 			DebugDraw.drawPath(observation, newestPath);
-			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			//DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
-		
+		/*
 		ticksSinceLastUpdate++;
 		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
 		if (ticksSinceLastUpdate > 100) {
 			System.out.println("STUCK");
 			isStuck = true;
 		}
-		
+		*/
 		graph.printMatrix();
 		return action;
 	}

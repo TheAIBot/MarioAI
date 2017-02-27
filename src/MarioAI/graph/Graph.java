@@ -1,9 +1,11 @@
-package MarioAI;
+package MarioAI.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import MarioAI.MarioMethods;
+import MarioAI.Surface;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {

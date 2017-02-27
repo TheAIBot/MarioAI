@@ -3,11 +3,15 @@ package MarioAI.debugGraphics;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
-import MarioAI.Graph;
 import MarioAI.MarioMethods;
-import MarioAI.Node;
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Graph;
+import MarioAI.graph.Node;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
@@ -47,7 +51,7 @@ public class DebugDraw {
 	}
 	
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
-		int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH);
+		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix =  graph.getLevelMatrix();
 		
@@ -61,8 +65,8 @@ public class DebugDraw {
 			if (groundNode != null) {
 				ArrayList<Point>neighbors = new ArrayList<Point>();
 				
-				for (Node neighbor : groundNode.getNeighbors()) {
-					final Point neighborPoint = new Point(neighbor.x, neighbor.y);
+				for (DirectedEdge neighborEdge : groundNode.getEdges()) {
+					final Point neighborPoint = new Point(neighborEdge.target.x, neighborEdge.target.y);
 					convertLevelPointToOnScreenPoint(observation, neighborPoint);
 					neighbors.add(neighborPoint);
 				}
@@ -72,6 +76,28 @@ public class DebugDraw {
 		}
 	}
 	
+	public static void drawPathOptionNodes(final Environment observation, Graph graph) {
+		ArrayList<Point> allPathNodes = new ArrayList<Point>();
+		
+		Node mario = graph.getMarioNode(observation);
+		HashSet<Node> visitedNodes = new HashSet<Node>();
+		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
+		nodesToVisit.addAll(mario.getEdges());
+		
+		while (nodesToVisit.size() > 0) {
+			Node toCheck = nodesToVisit.poll().target;
+			
+			if (!visitedNodes.contains(toCheck)) {
+				visitedNodes.add(toCheck);
+				nodesToVisit.addAll(toCheck.getEdges());
+				Point p = new Point(toCheck.x, toCheck.y);
+				convertLevelPointToOnScreenPoint(observation, p);
+				allPathNodes.add(p);
+			}
+		}
+		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, allPathNodes));
+	}
+	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -79,4 +105,5 @@ public class DebugDraw {
 		point.x = (int)((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2);
 		point.y = (int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2);
 	}
+
 }
