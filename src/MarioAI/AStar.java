@@ -12,8 +12,8 @@ import java.util.Collections;
 public final class AStar {
 
 	/**
-	 * A* algorithm for multiple goal nodes (tries to find path to just one of
-	 * them). Method to be used with the right most column of the screen
+	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most
+	 * column of the screen
 	 * 
 	 * @param start
 	 * @param nodes
@@ -21,9 +21,8 @@ public final class AStar {
 	 */
 	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes)  {
 		// Add singleton goal node far to the right. This will ensure each
-		// vertical distance is minimal and all nodes in rightmost column will
-		// be
-		// pretty good goal position to end up in after A* search
+		// vertical distance is minimal and all nodes in rightmost column will be
+		// pretty good goal positions to end up in after A* search
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
@@ -31,12 +30,11 @@ public final class AStar {
 			}
 		}
 
-		// Remove auxiliary goal node
+		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		List<Node> path = runAStar(start, goal);
 		if (path != null) {
 			path.remove((path.size() - 1));
 		}
-
 		for (Node node : nodes) {
 			if (node != null) {
 				node.removeEdge(new DirectedEdge(node, goal, null));
@@ -81,7 +79,6 @@ public final class AStar {
 			for (DirectedEdge neighborEdge : neighborEdges) {
 				if (closedSet.contains(neighborEdge.target))
 					continue;
-
 				// Distance from start to neighbor of current node
 				float tentativeGScore = current.gScore + GraphMath.distanceBetween(current, neighborEdge.target);
 				if (!openSet.contains(neighborEdge.target)) {
@@ -108,8 +105,7 @@ public final class AStar {
 	/**
 	 * @param start
 	 * @param goal
-	 * @return the estimated cost of the cheapest path from current node to goal
-	 *         node
+	 * @return the estimated cost of the cheapest path from current node to goal node
 	 */
 	public static float heuristicFunction(final Node node, final Node goal) {
 		// temp use distance (later should use time)
