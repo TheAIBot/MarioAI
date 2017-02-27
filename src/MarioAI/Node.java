@@ -20,7 +20,7 @@ public class Node extends SuperNode {
 	}
 	
 	public void addNeighbor(Node neighbor) {
-		if (!this.isNeighbor(neighbor)) {
+		if (!isNeighbor(neighbor)) {
 			this.neighborMap.put(neighbor.hash, neighbor);
 			this.neighbors.add(neighbor);			
 		}

@@ -65,7 +65,6 @@ public  class Grapher {
 		for (Node foundNode : reachableNodes) {
 			if (foundNode != null && isOnLevelMatrix(foundNode, marioNode) && canMarioStandThere(foundNode, marioNode)) { // FIX
 				node.addNeighbor(foundNode); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
-				System.out.println();
 			}
 		}
 		// Recursion over the reachable nodes:
@@ -126,14 +125,13 @@ public  class Grapher {
 		return listOfNodes;
 	}
 
-	private static List<Node> getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+	private static void getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
 			listOfNodes.add(observationGraph[nodeColoumn + 1][startingNode.y]);
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			listOfNodes.add(observationGraph[nodeColoumn - 1][startingNode.y]);
 		}		
-		return listOfNodes;
 	}
 	
 	/*** Finds the possible places that mario can jump to, from the given position, 
@@ -142,7 +140,7 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-	private static List<Node> getPolynomialReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+	private static void getPolynomialReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
@@ -152,7 +150,6 @@ public  class Grapher {
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfNodes);
 						
 		}
-		return listOfNodes; //No guarantee that there are no duplicate nodes.
 	}
 	
 	private static void jumpAlongPolynomial(Node startingNode, short nodeColoumn, SecondOrderPolynomial polynomial, List<Node> listOfNodes) {
@@ -172,13 +169,13 @@ public  class Grapher {
 		//Get upwards moving part:
 		//Primarily collision detection.
 		while (!hasMetHardGround &&
-			   !polynomial.isPastTopPunkt(nodeColoumn, currentXPosition) &&
+			   !polynomial.isPastTopPoint(nodeColoumn, currentXPosition) &&
 			   isWithinView(currentXPosition)) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			if (polynomial.isPastTopPunkt(nodeColoumn, currentXPosition)) { 
+			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition)) { 
 				//Up to the max height of the polynomial!
-				currentYPosition = polynomial.getTopPunktY(); 						
+				currentYPosition = polynomial.getTopPointY(); 						
 			} else {//Else up to the current height of the polynomial.
 				currentYPosition = polynomial.f(currentXPosition);				
 			}
@@ -191,7 +188,7 @@ public  class Grapher {
 		}
 		
 		//Downwards:
-		if (polynomial.getTopPunktX() < currentXPosition) {
+		if (polynomial.getTopPointX() < currentXPosition) {
 			currentXPosition--; //The toppunkt was in the current block (and not ending there).
 			//Therefore the downward going part of that block needs to be checked.
 		}
