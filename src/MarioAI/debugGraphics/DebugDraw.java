@@ -51,15 +51,7 @@ public class DebugDraw {
 	}
 	
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
-<<<<<<< HEAD
-		int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), 11);
-=======
-		if (MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.min(0, graph.getMaxMarioXPos() - LEVEL_WIDTH) == 38) {
-			int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH);
-		}
-		
-		int marioXPos = Math.min(11,MarioMethods.getMarioXPos(observation.getMarioFloatPos()) - Math.max(0, graph.getMaxMarioXPos() - LEVEL_WIDTH));
->>>>>>> refs/remotes/origin/GraphingOfJustice
+		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix =  graph.getLevelMatrix();
 		
@@ -89,15 +81,15 @@ public class DebugDraw {
 		
 		Node mario = graph.getMarioNode(observation);
 		HashSet<Node> visitedNodes = new HashSet<Node>();
-		Queue<Node> nodesToVisit = new LinkedList<Node>();
-		nodesToVisit.addAll(mario.getNeighbors());
+		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
+		nodesToVisit.addAll(mario.getEdges());
 		
 		while (nodesToVisit.size() > 0) {
-			Node toCheck = nodesToVisit.poll();
+			Node toCheck = nodesToVisit.poll().target;
 			
 			if (!visitedNodes.contains(toCheck)) {
 				visitedNodes.add(toCheck);
-				nodesToVisit.addAll(toCheck.getNeighbors());
+				nodesToVisit.addAll(toCheck.getEdges());
 				Point p = new Point(toCheck.x, toCheck.y);
 				convertLevelPointToOnScreenPoint(observation, p);
 				allPathNodes.add(p);

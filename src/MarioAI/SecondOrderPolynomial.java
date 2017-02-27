@@ -1,7 +1,6 @@
 package MarioAI;
 
-<<<<<<< HEAD
-public class SecondOrderPolynomial {
+public class SecondOrderPolynomial implements MotionAction {
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.
@@ -15,34 +14,19 @@ public class SecondOrderPolynomial {
 	// position in the air can compensate for this.
 	private short ceiledTopPointX;
 	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
-
-	public SecondOrderPolynomial(Node startingPosition, short nodeColoumn, float jumpRange, float jumpHeight) {
-=======
-public class SecondOrderPolynomial implements MotionAction{
-	private float a;
-	private float b;
-	private float c; //Parameters of the polynomial.
-	private float topPunktX;
-	private float topPunktY; //Cordinates of the toppunkt
-	//TODO Maybe change ceil after discussions. Problem associated with making this into an integer
-	//, as sometimes two possible jump position in a row will be registrated as possible to reach,
-	//even though it is only one it should be possible to reach. Mario changing position in the air can compensate for this.
-	private short ceiledTopPunktX;
-	private short ceiledTopPunktY; //Ceildes coordinates of the toppunkt
 	private final int motionTypeID = 2;
 	
 	public SecondOrderPolynomial(SecondOrderPolynomial polynomial) {
 		a = polynomial.a;
 		b = polynomial.b;
 		c = polynomial.c;
-		topPunktX = polynomial.topPunktX;
-		topPunktY = polynomial.topPunktY;
-		ceiledTopPunktX = polynomial.ceiledTopPunktX;
-		ceiledTopPunktY = polynomial.ceiledTopPunktY;
+		topPointX = polynomial.topPointX;
+		topPointY = polynomial.topPointY;
+		ceiledTopPointX = polynomial.ceiledTopPointX;
+		ceiledTopPointY = polynomial.ceiledTopPointY;
 	}
-	
-	public SecondOrderPolynomial(Node startingPosition,short nodeColoumn, float jumpRange, float jumpHeight) {
->>>>>>> refs/remotes/origin/GraphingOfJustice
+
+	public SecondOrderPolynomial(Node startingPosition, short nodeColoumn, float jumpRange, float jumpHeight) {
 		setToJumpPolynomial(startingPosition, nodeColoumn, jumpRange, jumpHeight);
 	}
 
@@ -91,8 +75,6 @@ public class SecondOrderPolynomial implements MotionAction{
 		return a * x * x + b * x + c;
 	}
 
-<<<<<<< HEAD
-=======
 	public int motionTypeID() {
 		// TODO Auto-generated method stub
 		return motionTypeID;
@@ -117,6 +99,4 @@ public class SecondOrderPolynomial implements MotionAction{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
->>>>>>> refs/remotes/origin/GraphingOfJustice
 }

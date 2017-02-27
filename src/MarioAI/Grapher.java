@@ -68,17 +68,10 @@ public  class Grapher {
 		// Remember to use mario's speed in calculations.
 
 		// Find the reachable nodes:
-<<<<<<< HEAD
-		List<Node> reachableNodes = getReachableNodes(node, coloumn);
-		for (Node foundNode : reachableNodes) {
-			if (foundNode != null && isOnLevelMatrix(foundNode, marioNode) && canMarioStandThere(foundNode, marioNode)) { // FIX
-				node.addNeighbor(foundNode); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
-=======
 		List<DirectedEdge> connectingEdges = getConnectingEdges(node, coloumn);
 		for (DirectedEdge connectingEdge : connectingEdges) {
 			if (connectingEdge.target != null && isOnLevelMatrix(connectingEdge.target, marioNode) && canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
->>>>>>> refs/remotes/origin/GraphingOfJustice
 			}
 		}
 		// Recursion over the reachable nodes:
@@ -146,18 +139,13 @@ public  class Grapher {
 =======
 	*/
 	
-	private static List<DirectedEdge> getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
->>>>>>> refs/remotes/origin/GraphingOfJustice
+	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
 			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], new Running()));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], new Running()));
 		}		
-<<<<<<< HEAD
-=======
-		return listOfEdges;
->>>>>>> refs/remotes/origin/GraphingOfJustice
 	}
 	
 	/*** Finds the possible places that mario can jump to, from the given position, 
@@ -166,11 +154,7 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-<<<<<<< HEAD
-	private static void getPolynomialReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
-=======
-	private static List<DirectedEdge> getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
->>>>>>> refs/remotes/origin/GraphingOfJustice
+	private static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
@@ -178,10 +162,6 @@ public  class Grapher {
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}
-<<<<<<< HEAD
-=======
-		return listOfEdges; //No guarantee that there are no duplicate nodes.
->>>>>>> refs/remotes/origin/GraphingOfJustice
 	}
 	
 	private static void jumpAlongPolynomial(Node startingNode, short nodeColoumn, SecondOrderPolynomial polynomial, List<DirectedEdge> listOfEdges) {

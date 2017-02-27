@@ -64,17 +64,10 @@ public class FastAndFurious implements Agent {
 			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
-<<<<<<< HEAD
 		/*
 		ticksSinceLastUpdate++;
 		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
 		if (ticksSinceLastUpdate > 100) {
-=======
-		
-		//ticksSinceLastUpdate++;
-		//System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
-		if (ticksSinceLastUpdate > 30) { //TODO make unnecessary
->>>>>>> refs/remotes/origin/GraphingOfJustice
 			System.out.println("STUCK");
 			isStuck = true;
 		}
