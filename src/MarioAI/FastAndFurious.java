@@ -60,17 +60,18 @@ public class FastAndFurious implements Agent {
 			
 			DebugDraw.resetGraphics(observation);
 			DebugDraw.drawPath(observation, newestPath);
-			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			//DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
-		
+		/*
 		ticksSinceLastUpdate++;
 		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
 		if (ticksSinceLastUpdate > 100) {
 			System.out.println("STUCK");
 			isStuck = true;
 		}
-		
+		*/
 		graph.printMatrix();
 		return action;
 	}
