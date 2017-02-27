@@ -11,10 +11,16 @@ import java.util.ArrayList;
 public class debugLines {
 	private final Color color;
 	private final ArrayList<Point> lines; 
+	private final int size;
 	
 	public debugLines(Color color, ArrayList<Point> lines) {
+		this(color, lines, 2);
+	}
+	
+	public debugLines(Color color, ArrayList<Point> lines, int size) {
 		this.color = color;
 		this.lines = lines;
+		this.size = size;
 	}
 	
 	public void draw(Graphics g) {
@@ -24,7 +30,7 @@ public class debugLines {
 			g.setColor(color);
 
 			final Stroke stroke = ((Graphics2D) g).getStroke();
-			((Graphics2D) g).setStroke(new BasicStroke(2));
+			((Graphics2D) g).setStroke(new BasicStroke(size));
 			
 			drawLines(g);
 
