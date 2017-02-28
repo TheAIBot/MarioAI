@@ -34,4 +34,9 @@ public class Goaling implements MotionAction {
 		
 	}
 
+	public float getWeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

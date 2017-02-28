@@ -32,4 +32,9 @@ public class Running implements MotionAction{
 		return 0;
 	}
 
+	public float getWeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

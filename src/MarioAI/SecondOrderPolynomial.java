@@ -17,6 +17,7 @@ public class SecondOrderPolynomial implements MotionAction {
 	private short ceiledTopPointX;
 	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	private final int motionTypeID = 2;
+	private final float weight = 1.1f;
 	
 	public SecondOrderPolynomial(SecondOrderPolynomial polynomial) {
 		a = polynomial.a;
@@ -100,5 +101,9 @@ public class SecondOrderPolynomial implements MotionAction {
 	public int getTimespan() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public float getWeight() {
+		return weight;
 	}
 }
