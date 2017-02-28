@@ -23,9 +23,8 @@ public class DirectedEdge {
 		this.target = sink;
 		this.motion = motion;
 		hash = Hasher.hashEdge(this);
-		if (source != null && sink != null) weight = GraphMath.distanceBetween(source, sink) + 1.1f;
+		if (source != null && sink != null) this.weight = GraphMath.distanceBetween(source, sink) + weight;
 	}
-	
 
 	public int hashCode() {
 		return hash;
