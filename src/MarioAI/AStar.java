@@ -23,7 +23,7 @@ public final class AStar {
 	 * @param nodes
 	 * @return optimal path
 	 */
-	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes)  {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] nodes)  {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search
@@ -35,7 +35,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<Node> path = runAStar(start, goal);
+		List<DirectedEdge> path = runAStar(start, goal);
 		if (path != null) {
 			path.remove((path.size() - 1));
 		}
@@ -55,7 +55,7 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<Node> runAStar(final Node start, final Node goal) {
+	public static List<DirectedEdge> runAStar(final Node start, final Node goal) {
 		// Set of nodes already explored
 		final List<Node> closedSet = new ArrayList<Node>();
 		// Set of nodes yet to be explored
@@ -120,10 +120,17 @@ public final class AStar {
 	 * @param current
 	 * @return path
 	 */
-	private static List<Node> reconstructPath(Node current) {
-		final List<Node> path = new ArrayList<Node>();
+	private static List<DirectedEdge> reconstructPath(Node current) {
+		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (current.parent != null) {
-			path.add(current);
+			DirectedEdge fisk = null;
+			for (int i = 0; i < current.edges.size(); i++) {
+				if (current.edges.get(i).equals(current.parent)) {
+					fisk = current.edges.get(i);
+					break;
+				}
+			}
+			path.add(fisk);
 			current = current.parent;
 		}
 		Collections.reverse(path);

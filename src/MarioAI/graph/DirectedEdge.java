@@ -3,8 +3,8 @@ package MarioAI.graph;
 import MarioAI.Hasher;
 import MarioAI.MotionAction;
 
-public class DirectedEdge {
-	public Node source;
+public class DirectedEdge implements motionType {
+	public Node source; 
 	public Node target;
 	public MotionAction motion;
 	private int hash;

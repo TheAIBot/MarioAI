@@ -11,4 +11,6 @@ public interface MotionAction {
 
 	public void getActionPatern();
 	
+	public void getMaxY();
+	
 }
