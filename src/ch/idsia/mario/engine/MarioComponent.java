@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -13,7 +14,6 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import MarioAI.Grapher;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.human.CheaterKeyboardAgent;
 import ch.idsia.mario.engine.level.Level;
@@ -22,6 +22,10 @@ import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
+
+import MarioAI.debugGraphics.debugLines;
+import MarioAI.debugGraphics.debugPoints;
+import MarioAI.graph.Grapher;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;
@@ -52,6 +56,9 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private KeyAdapter prevHumanKeyBoardAgent;
 	private Mario mario = null;
 	private LevelScene levelScene = null;
+	
+	private ArrayList<debugLines> debugLinesToDraw = new ArrayList<debugLines>(); 
+	private ArrayList<debugPoints> debugPointsToDraw = new ArrayList<debugPoints>();
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -159,6 +166,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			og.fillRect(0, 0, 320, 240);
 			scene.render(og, alpha);
+			((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
+			((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
 		}
 
 		boolean[] action = agent.getAction(this/* DummyEnvironment */);
@@ -267,6 +276,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			if (GlobalOptions.VisualizationOn) {
 				og.fillRect(0, 0, 320, 240);
 				scene.render(og, alpha);
+				((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
+				((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -557,5 +568,18 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	
 	public Level getLevel() {
 		return ((LevelScene)scene).level;
+	}
+	
+	public void resetDebugGraphics() {
+		debugLinesToDraw.clear();
+		debugPointsToDraw.clear();
+	}
+	
+	public void addDebugLines(debugLines lines) {
+		debugLinesToDraw.add(lines);
+	}
+	
+	public void addDebugPoints(debugPoints points) {
+		debugPointsToDraw.add(points);
 	}
 }

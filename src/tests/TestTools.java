@@ -21,7 +21,7 @@ import ch.idsia.tools.EvaluationOptions;
 
 public class TestTools {
 
-	private static final int LEVEL_INIT_TICKS = 30;
+	public static final int LEVEL_INIT_TICKS = 30;
 
 	public static void runOneTick(Environment observation) {
 		((MarioComponent) observation).runOneTick();

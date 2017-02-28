@@ -1,13 +1,16 @@
-package MarioAI;
+package MarioAI.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import MarioAI.MarioMethods;
+import MarioAI.Surface;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {
 	public static final int LEVEL_HEIGHT = 15;
+	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
 	private static final int LEVEL_START_SCOLLING = 160;
@@ -16,16 +19,40 @@ public class Graph {
 	private static final int LEVEL_LEFT_X_POS = -(SIGHT_WIDTH / 2);
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
-	@SuppressWarnings("unchecked") // because java IS FUCKING STUPID
-	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT];
-	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT];
+	@SuppressWarnings("unchecked") // because Andreas thinks java IS FUCKING STUPID
+	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT]; // pending implementation 
+	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
+	//private int levelOffSet; // number of nodes moved to the right on the level
 
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
+	}
+	
+	public void printMatrix()
+	{
+//		if (marioNode != null) {
+//			//System.out.println(levelOffSet + "," + marioNode.x + "," + marioNode.y);
+//		}
+		for (int x = 0; x < LEVEL_HEIGHT; x++) {
+			for (int y = 0; y < LEVEL_WIDTH; y++) {
+//				if (marioNode != null && x + levelOffSet == marioNode.x && y== marioNode.y) {
+//					System.out.println("M");
+//					//continue;
+//				}
+				if (levelMatrix[y][x] == null) {
+					System.out.print(" ");
+				}
+				else {
+					System.out.print("X");
+				}
+			}
+			System.out.println("");
+		}
+		System.out.println();
 	}
 	
 	public void createStartGraph(final Environment observation) {
@@ -67,7 +94,6 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
-		System.out.println("maxMarioXPos:" + maxMarioXPos);
 		return getColumn(maxMarioXPos);
 	}
 	
@@ -102,6 +128,8 @@ public class Graph {
 		}
 
 		levelMatrix[levelMatrix.length - 1] = columnToInsert;
+		
+		//levelOffSet++;
 	}
 
 	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos) {
@@ -112,7 +140,7 @@ public class Graph {
 		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
 		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
 		final int startIndex = Math.max(topObservationYPos, 0);
-		final int endIndex = Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos);
+		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), 15);
 		for (int i = startIndex; i < endIndex; i++) {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}
@@ -140,5 +168,9 @@ public class Graph {
 
 	private Node[] getColumn(final int x) {
 		return savedColumns.get(x);
+	}
+	
+	public int getMaxMarioXPos() {
+		return maxMarioXPos;
 	}
 }

@@ -1,12 +1,14 @@
-package MarioAI;
+package MarioAI.graph;
 
-import java.util.*; 
+import java.util.*;
 
+import MarioAI.Running;
+import MarioAI.SecondOrderPolynomial;
 import ch.idsia.mario.environments.Environment;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 6;
+	private static final float MAX_JUMP_RANGE = 5;
 	private static final short GRID_HEIGHT = 15;
 	private static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
@@ -44,12 +46,19 @@ public  class Grapher {
 	
 	public static void graph(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
+		for (int i = 0; i < levelMatrix.length; i++) {
+			for (int j = 0; j < levelMatrix[i].length; j++) {
+				if (levelMatrix[i][j] != null) {
+					levelMatrix[i][j].deleteAllEdges();
+				}
+			}
+		}
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
-		printView();
+		//printView();
 		connectNode(mario, (short) (GRID_WIDTH/2));
-		System.out.println("The edges are ready!");
+		//System.out.println("The edges are ready!");
 	}
 	
 	private static void connectNode(Node node, short coloumn) {
@@ -61,23 +70,22 @@ public  class Grapher {
 		// Remember to use mario's speed in calculations.
 
 		// Find the reachable nodes:
-		List<Node> reachableNodes = getReachableNodes(node, coloumn);
-		for (Node foundNode : reachableNodes) {
-			if (foundNode != null && isOnLevelMatrix(foundNode, marioNode) && canMarioStandThere(foundNode, marioNode)) { // FIX
-				node.addNeighbor(foundNode); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
-				System.out.println();
+		List<DirectedEdge> connectingEdges = getConnectingEdges(node, coloumn);
+		for (DirectedEdge connectingEdge : connectingEdges) {
+			if (connectingEdge.target != null && isOnLevelMatrix(connectingEdge.target, marioNode) && canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
+				node.addEdge(connectingEdge); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
 		}
 		// Recursion over the reachable nodes:
-		for (Node neighbor : node.neighbors) { 
+		for (DirectedEdge neighborEdge : node.edges)  { 
 			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
 			 * It must be possible to only calculate what is necessary.
 			 */
-			if (isOnLevelMatrix(neighbor, marioNode)) {
-				short neighborColoumn = getColoumnRelativeToMario(neighbor, marioNode);
-				if (!inRecursion[neighborColoumn][neighbor.y]) {
-					inRecursion[neighborColoumn][neighbor.y] = true; //Infinite recursion not allowed!.
-					connectNode(neighbor,neighborColoumn ); // Check which nodes it can reach!
+			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
+				short neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
+				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
+					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
+					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
 					//Because of the structure, it is a depth first search.
 				}				
 			}
@@ -98,16 +106,18 @@ public  class Grapher {
 		return (short) ((node.x - marioNode.x) + 11);
 	}
 
-	private static List<Node> getReachableNodes(Node startingNode, short nodeColoumn) {
-		ArrayList<Node> listOfNodes = new ArrayList<Node>();
+	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
+		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		//Three different ways to find the reachable nodes from a given position:
-		getRunningReachableNodes(startingNode, nodeColoumn, listOfNodes); //TODO Obs. no need to return a list of nodes
+		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
-		getPolynomialReachableNodes(startingNode,nodeColoumn, listOfNodes);
-		return listOfNodes;
+		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		return listOfEdges;
 	}
-	
-	private static List<Node> getBadJumpReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+
+	/*
+
+	private static List<DirectedEdge> getBadJumpReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		// (bad) Jumping and falling.
 		for (short i = -5; i < MARIO_JUMP_LENGHT; i++) { // Starting at 5 blocks
 															// below, to
@@ -125,15 +135,19 @@ public  class Grapher {
 		}
 		return listOfNodes;
 	}
+<<<<<<< HEAD
 
-	private static List<Node> getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+	private static void getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+=======
+	*/
+	
+	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
-			listOfNodes.add(observationGraph[nodeColoumn + 1][startingNode.y]);
+			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], new Running()));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			listOfNodes.add(observationGraph[nodeColoumn - 1][startingNode.y]);
+			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], new Running()));
 		}		
-		return listOfNodes;
 	}
 	
 	/*** Finds the possible places that mario can jump to, from the given position, 
@@ -142,20 +156,17 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-	private static List<Node> getPolynomialReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
+	private static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
-		//TODO All four corners of Mario!
 		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
-			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfNodes);
-						
+			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}
-		return listOfNodes; //No guarantee that there are no duplicate nodes.
 	}
 	
-	private static void jumpAlongPolynomial(Node startingNode, short nodeColoumn, SecondOrderPolynomial polynomial, List<Node> listOfNodes) {
+	private static void jumpAlongPolynomial(Node startingNode, short nodeColoumn, SecondOrderPolynomial polynomial, List<DirectedEdge> listOfEdges) {
 		
 		//Starts of from Mario's initial position:
 		short currentXPosition = nodeColoumn;
@@ -172,26 +183,26 @@ public  class Grapher {
 		//Get upwards moving part:
 		//Primarily collision detection.
 		while (!hasMetHardGround &&
-			   !polynomial.isPastTopPunkt(nodeColoumn, currentXPosition) &&
-			   isWithinView(currentXPosition)) { 
+			   !polynomial.isPastTopPoint(nodeColoumn, currentXPosition) &&
+			   isWithinView(currentXPosition)) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			if (polynomial.isPastTopPunkt(nodeColoumn, currentXPosition)) { 
+			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition)) { 
 				//Up to the max height of the polynomial!
-				currentYPosition = polynomial.getTopPunktY(); 						
+				currentYPosition = polynomial.getTopPointY(); 						
 			} else {//Else up to the current height of the polynomial.
 				currentYPosition = polynomial.f(currentXPosition);				
 			}
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!
 			bound = getBounds(startingNode, currentLowerYPosition); 
-			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes);	
+			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfEdges);	
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
 		}
 		
 		//Downwards:
-		if (polynomial.getTopPunktX() < currentXPosition) {
+		if (polynomial.getTopPointX() < currentXPosition) {
 			currentXPosition--; //The toppunkt was in the current block (and not ending there).
 			//Therefore the downward going part of that block needs to be checked.
 		}
@@ -206,17 +217,18 @@ public  class Grapher {
 			// TODO change to take the sign into account
 			bound = getBounds(startingNode, currentLowerYPosition); 	
 			
-			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfNodes, polynomial, startingNode);			
+			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfEdges, polynomial, startingNode);			
 			
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
 		}
 	}
 		
-	private static boolean ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<Node> listOfNodes) {
+	private static boolean ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<DirectedEdge> listOfEdges) {
 		for (short y = formerLowerYPosition; y >= bound; y--) {
 			if (isHittingWallOrGround(currentXPosition,y)) {
-				hitWallOrGround(listOfNodes, currentXPosition,y);
+				//TODOD make.
+				//hitWallOrGround(listOfEdges, currentXPosition,y);
 				return true;
 			} 
 		}	
@@ -224,20 +236,19 @@ public  class Grapher {
 	}
 	
 	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
-			                                    List<Node> listOfNodes, SecondOrderPolynomial polynomial, Node startingPosition) {
+			                                    List<DirectedEdge> listOfEdges, SecondOrderPolynomial polynomial, Node startingPosition) {
 		for (short y = formerLowerYPosition; y <= bound; y++) {
 			if (isHittingWallOrGround(currentXPosition,y)) {
-				hitWallOrGround(listOfNodes, currentXPosition,y);
+				//TODO make.
+				//hitWallOrGround(listOfEdges, currentXPosition,y);
 				return true;
 			} else if (canMarioStandThere(currentXPosition, y)) { 
-				if (getColoumnRelativeToMario(observationGraph[currentXPosition][y], marioNode) < 0) {
-					System.out.println();
-				}
 				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
 				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
 				//hvormed x positionen ikke ændrer sig.		
-				listOfNodes.add(observationGraph[currentXPosition][y]);
+				//TODO one does no neccesarily need a new polynomial for ee
+				listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
 				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
 				//TODO Fix so no multi edges
 			}		
@@ -259,13 +270,16 @@ public  class Grapher {
 	
 	/***
 	 * 
+	 * 
 	 */
-	private static void hitWallOrGround(List<Node> listOfNodes, short xPosition, short yPosition) {
+	/*
+	private static void hitWallOrGround(List<DirectedEdge> listOfEdges, short xPosition, short yPosition) {
 		Node fallDownPosition = getFallDownPosition(xPosition, yPosition);
 		if(fallDownPosition != null) {
-			listOfNodes.add(fallDownPosition);
+			listOfEdges.add(fallDownPosition);
 		}
 	}
+	*/
 		
 	private static boolean isWithinView(short xPosition) { //TODO Rename, curtesy of +1
 		return xPosition + 1 < GRID_WIDTH && xPosition > 0;
@@ -288,7 +302,7 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null) {
+		if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);
