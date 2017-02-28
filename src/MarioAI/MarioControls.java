@@ -30,7 +30,7 @@ public class MarioControls {
 		if ((float) next.x < marioXPos) {
 			action[Mario.KEY_LEFT] = true;
 		}
-		if ((Math.abs((float) next.x - marioXPos) > 1 || Math.abs((float) next.y - marioYPos) > 1) && canJump && jumpCounter == 0) {
+		if ((Math.abs((float) next.x - marioXPos) > 1.5 || Math.abs((float) next.y - marioYPos) > 1.5) && canJump && jumpCounter == 0) {
 			// jumpCounter = getJumpTime(marioYPos - next.y);
 			jumpCounter = 7;
 		}

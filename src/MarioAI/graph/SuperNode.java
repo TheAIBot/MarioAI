@@ -26,7 +26,7 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 	public abstract ArrayList<DirectedEdge> getEdges();
 	
 	public int compareTo(SuperNode o) {
-		return (int) (this.fScore*SCORE_MULTIPLIER - o.fScore*SCORE_MULTIPLIER);
+		return (int) (o.fScore*SCORE_MULTIPLIER - this.fScore*SCORE_MULTIPLIER);
 	}
 	
 }

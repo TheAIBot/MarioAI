@@ -15,15 +15,15 @@ public class DirectedEdge {
 		this.target = sink;
 		this.motion = motion;
 		hash = Hasher.hashEdge(this);
-		if (source != null && sink != null) weight = GraphMath.distanceBetween(source, sink);
+		if (source != null && sink != null) this.weight = GraphMath.distanceBetween(source, sink);
 	}
 	
-	public DirectedEdge(Node source, Node sink, MotionAction motion, float weight) {
+	public DirectedEdge(Node source, Node sink, MotionAction motion, float weightAddon) {
 		this.source = source;
 		this.target = sink;
 		this.motion = motion;
 		hash = Hasher.hashEdge(this);
-		if (source != null && sink != null) this.weight = GraphMath.distanceBetween(source, sink) + weight;
+		if (source != null && sink != null) this.weight = GraphMath.distanceBetween(source, sink) + weightAddon;
 	}
 
 	public int hashCode() {
