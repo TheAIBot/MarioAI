@@ -183,7 +183,7 @@ public class LevelScene extends Scene implements SpriteContext
                     case(14): case(30): case(46): // canon
                         return 20;  // angry flower pot or cannon
                 }
-                System.err.println("Unknown value el = " + el + " ; Please, inform the developers");
+                //System.err.println("Unknown value el = " + el + " ; Please, inform the developers");
                 return el;
             case(2):
                 switch(el)

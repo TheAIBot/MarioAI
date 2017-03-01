@@ -58,7 +58,7 @@ public  class Grapher {
 		for (int i = 0; i < GRID_WIDTH; i++) {
 			if (observationGraph[i][marioNode.y] != null && observationGraph[i][marioNode.y].x == marioNode.x) {
 				System.out.println(i);
-				if (i == 12) {
+				if (i != 11) {
 					System.out.println("Error");
 				}
 			}

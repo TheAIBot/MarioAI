@@ -28,7 +28,7 @@ public class TestTools {
 	}
 	
 	public static void runWholeLevel(Environment observation) {
-		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
+		//while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
 		((MarioComponent) observation).run1(0, 1);
 	}
 	
