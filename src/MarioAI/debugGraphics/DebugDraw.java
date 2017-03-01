@@ -109,6 +109,32 @@ public class DebugDraw {
 		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, allrunningEdges));
 		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
+
+	public static void drawNeighborPaths(final Environment observation, Graph graph)
+	{		
+		Node mario = graph.getMarioNode(observation);
+		HashSet<Node> visitedNodes = new HashSet<Node>();
+		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
+		nodesToVisit.addAll(mario.getEdges());
+		
+		while (nodesToVisit.size() > 0) {
+			DirectedEdge fisk = nodesToVisit.poll();
+			Node toCheck = fisk.target;
+			if (!visitedNodes.contains(toCheck)) {
+				nodesToVisit.addAll(toCheck.getEdges());
+				visitedNodes.add(toCheck);				
+				
+				for (DirectedEdge directedEdge : toCheck.getEdges()) {
+					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
+					convertLevelPointToOnScreenPoint(observation, pSource);
+					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
+					convertLevelPointToOnScreenPoint(observation, pTarget);
+					((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+				}				
+			}
+		}
+	}
+	
 	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());

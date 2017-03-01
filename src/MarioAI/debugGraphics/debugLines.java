@@ -14,7 +14,15 @@ public class debugLines {
 	private final int size;
 	
 	public debugLines(Color color, ArrayList<Point> lines) {
-		this(color, lines, 2);
+		this(color, lines, 3);
+	}
+	
+	public debugLines(Color color, Point point1, Point point2) {
+		this.color = color;
+		lines = new ArrayList<Point>();
+		this.lines.add(point1);
+		this.lines.add(point2);
+		this.size = 1;
 	}
 	
 	public debugLines(Color color, ArrayList<Point> lines, int size) {
