@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Queue;
 
 import MarioAI.MarioMethods;
+import MarioAI.Running;
+import MarioAI.SecondOrderPolynomial;
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Node;
@@ -77,25 +79,38 @@ public class DebugDraw {
 	}
 	
 	public static void drawPathOptionNodes(final Environment observation, Graph graph) {
-		ArrayList<Point> allPathNodes = new ArrayList<Point>();
+		ArrayList<Point> allrunningEdges = new ArrayList<Point>();
+		ArrayList<Point> allJumpingEdges = new ArrayList<Point>();
 		
 		Node mario = graph.getMarioNode(observation);
-		HashSet<Node> visitedNodes = new HashSet<Node>();
+		HashSet<Node> visitedRunningNodes = new HashSet<Node>();
+		HashSet<Node> visitedJumpingNodes = new HashSet<Node>();
 		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
 		nodesToVisit.addAll(mario.getEdges());
 		
 		while (nodesToVisit.size() > 0) {
-			Node toCheck = nodesToVisit.poll().target;
+			DirectedEdge fisk = nodesToVisit.poll();
+			Node toCheck = fisk.target;
 			
-			if (!visitedNodes.contains(toCheck)) {
-				visitedNodes.add(toCheck);
+			if (!visitedRunningNodes.contains(toCheck) && 
+				!visitedJumpingNodes.contains(toCheck)) {
 				nodesToVisit.addAll(toCheck.getEdges());
+				
 				Point p = new Point(toCheck.x, toCheck.y);
 				convertLevelPointToOnScreenPoint(observation, p);
-				allPathNodes.add(p);
+				if (fisk instanceof Running) {
+					visitedRunningNodes.add(toCheck);
+					allrunningEdges.add(p);
+				}
+				else if (fisk instanceof SecondOrderPolynomial) {
+					visitedJumpingNodes.add(toCheck);
+					allJumpingEdges.add(p);
+				}
+				
 			}
 		}
-		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, allPathNodes));
+		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, allrunningEdges));
+		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
 	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
