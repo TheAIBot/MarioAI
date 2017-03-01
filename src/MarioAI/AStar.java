@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Goaling;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -30,7 +29,7 @@ public final class AStar {
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
-				node.addEdge(new DirectedEdge(node, goal, new Goaling()));
+				node.addEdge(new Running(node, goal));
 			}
 		}
 
@@ -41,7 +40,9 @@ public final class AStar {
 		}
 		for (Node node : nodes) {
 			if (node != null) {
-				node.removeEdge(new DirectedEdge(node, goal, null));
+				//remove the last edge as that's the egde to the goal
+				//because it was the soonest added edge
+				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
 
@@ -124,9 +125,9 @@ public final class AStar {
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (current.parent != null) {
 			DirectedEdge fisk = null;
-			for (int i = 0; i < current.edges.size(); i++) {
-				if (current.edges.get(i).equals(current.parent)) {
-					fisk = current.edges.get(i);
+			for (int i = 0; i < current.parent.edges.size(); i++) {
+				if (current.parent.edges.get(i).target.equals(current)) {
+					fisk = current.parent.edges.get(i);
 					break;
 				}
 			}

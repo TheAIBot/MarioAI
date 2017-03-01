@@ -19,8 +19,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	private final int motionTypeID = 2;
 	
-	public SecondOrderPolynomial(SecondOrderPolynomial polynomial) {
-		super(polynomial.source, polynomial.target);
+	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
+		super(source, target);
 		a = polynomial.a;
 		b = polynomial.b;
 		c = polynomial.c;
@@ -28,11 +28,6 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		topPointY = polynomial.topPointY;
 		ceiledTopPointX = polynomial.ceiledTopPointX;
 		ceiledTopPointY = polynomial.ceiledTopPointY;
-	}
-
-	public SecondOrderPolynomial(Node startingPosition, Node target, short nodeColoumn, float jumpRange, float jumpHeight) {
-		super(startingPosition, target);
-		setToJumpPolynomial(startingPosition, nodeColoumn, jumpRange, jumpHeight);
 	}
 
 	public SecondOrderPolynomial(Node source, Node target) {

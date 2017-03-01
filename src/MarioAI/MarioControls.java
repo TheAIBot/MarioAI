@@ -3,6 +3,7 @@ package MarioAI;
 import java.util.List;
 
 import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.GraphMath;
 import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -38,18 +39,23 @@ public class MarioControls {
 
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
-	public static boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
+	public static boolean getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseCenteredMarioYPos(observation.getMarioFloatPos());
-		//final boolean canJump = observation.mayMarioJump();
-
-		final boolean[] action = new boolean[Environment.numberOfButtons];
-		final DirectedEdge next = path.get(0);
+		final boolean canJump = observation.mayMarioJump();
+		boolean finishedPathSection = false;
 		
-		if (!missionSet) {
-			jumpCounter = getJumpTime(marioYPos - next.);
-			xAxisCounter = getXMovementTime(next.x - marioXPos);
-			movementDirection = (next.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+		DirectedEdge next = path.get(0);
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.5) {
+			path.remove(0);
+			next = path.get(0);
+			finishedPathSection = true;
+		}
+		
+		if (!missionSet && canJump) {
+			jumpCounter = getJumpTime(marioYPos - next.getMaxY());
+			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
+			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = false;
 		}
 
@@ -64,7 +70,7 @@ public class MarioControls {
 		
 		missionSet = !(jumpCounter == 0 && xAxisCounter == 0);
 		
-		return action;
+		return finishedPathSection;
 	}
 
 	private static int getJumpTime(float neededHeight) {
@@ -93,7 +99,7 @@ public class MarioControls {
 				distanceMoved += lengthXAcc[i];
 				steps++;
 				if (distanceMoved >= neededXDistance) {
-					xSpeedIndex = Math.min(-lengthXAcc.length, -steps);
+					xSpeedIndex = Math.max(-lengthXAcc.length, -steps);
 					return steps;
 				}
 			}
@@ -122,7 +128,7 @@ public class MarioControls {
 				distanceMoved += lengthXAcc[i];
 				steps++;
 				if (distanceMoved >= neededXDistance) {
-					xSpeedIndex = Math.max(lengthXAcc.length, steps);
+					xSpeedIndex = Math.min(lengthXAcc.length, steps);
 					return steps;
 				}
 			}

@@ -2,7 +2,6 @@ package MarioAI.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import MarioAI.Hasher;
 
@@ -23,7 +22,7 @@ public class Node extends SuperNode {
 	}
 	
 	public void addEdge(DirectedEdge edge) {
-		if (!this.isConnectingEdge(edge)) {
+		if (!isConnectingEdge(edge)) {
 			this.edgesMap.put(edge.hashCode(), edge);
 			this.edges.add(edge);			
 		}
@@ -35,7 +34,7 @@ public class Node extends SuperNode {
 	}
 	
 	public void removeEdge(DirectedEdge edge) {
-		if (this.isConnectingEdge(edge)) {
+		if (isConnectingEdge(edge)) {
 			this.edgesMap.remove(edge.hashCode(), edge);
 			this.edges.remove(edge);			
 		} 

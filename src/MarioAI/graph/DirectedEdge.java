@@ -1,7 +1,6 @@
 package MarioAI.graph;
 
 import MarioAI.Hasher;
-import MarioAI.MotionAction;
 
 public abstract class DirectedEdge {
 	public Node source; 
@@ -27,4 +26,9 @@ public abstract class DirectedEdge {
 	//public abstract void getActionPatern();
 	
 	public abstract float getMaxY();
+	
+	@Override
+	public String toString() {
+		return "[" + target.x + " : " + target.y + "]";
+	}
 }
