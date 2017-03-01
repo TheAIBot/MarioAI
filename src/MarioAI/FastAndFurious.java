@@ -43,14 +43,13 @@ public class FastAndFurious implements Agent {
 			}
 			
 		} else if (tickCount > 30) {
-			graph.updateMatrix(observation);
-			//if (graph.updateMatrix(observation)) {
-				
-			//}
+			//graph.updateMatrix(observation);
+			if (graph.updateMatrix(observation)) {
+				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			}
 		}
 		if (newestPath != null && newestPath.size() > 1) {
 			if (MarioControls.getNextAction(observation, newestPath, action)) {
-				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
@@ -58,7 +57,7 @@ public class FastAndFurious implements Agent {
 			}
 			
 			DebugDraw.resetGraphics(observation);
-			DebugDraw.drawPath(observation, newestPath);
+			//DebugDraw.drawPath(observation, newestPath);
 			//DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
 			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
