@@ -107,7 +107,7 @@ public class Graph {
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
 		}
-		final int columnToInsertXPos = marioXPos - 9;
+		final int columnToInsertXPos = marioXPos - 10;
 		final Node[] columnToInsert = getColumn(columnToInsertXPos);
 		levelMatrix[0] = columnToInsert;
 	}
