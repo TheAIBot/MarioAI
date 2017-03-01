@@ -29,6 +29,7 @@ public class TestTools {
 	
 	public static void runWholeLevel(Environment observation) {
 		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
+		((MarioComponent) observation).run1(0, 1);
 	}
 	
 	public static byte[][] getLevelMap(Environment observation)
@@ -37,7 +38,7 @@ public class TestTools {
 	}
 
 	public static Environment loadLevel(String filepath, Agent agent) {
-		return loadLevel(filepath, agent, false);
+		return loadLevel("src/tests/testLevels/" + filepath, agent, false);
 	}
 	
 	public static Environment loadLevel(String filepath, Agent agent,  boolean lockFPS) {

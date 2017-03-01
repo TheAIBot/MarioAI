@@ -4,7 +4,6 @@ import java.util.*;
 
 import MarioAI.Running;
 import MarioAI.SecondOrderPolynomial;
-import ch.idsia.mario.environments.Environment;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
@@ -56,7 +55,16 @@ public  class Grapher {
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
+		for (int i = 0; i < GRID_WIDTH; i++) {
+			if (observationGraph[i][marioNode.y] != null && observationGraph[i][marioNode.y].x == marioNode.x) {
+				System.out.println(i);
+				if (i == 12) {
+					System.out.println("Error");
+				}
+			}
+		}
 		//printView();
+
 		connectNode(mario, (short) (GRID_WIDTH/2)); //TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
 	}
@@ -72,8 +80,11 @@ public  class Grapher {
 		// Find the reachable nodes:
 		List<DirectedEdge> connectingEdges = getConnectingEdges(node, coloumn);
 		for (DirectedEdge connectingEdge : connectingEdges) {
-			if (connectingEdge.target != null && isOnLevelMatrix(connectingEdge.target, marioNode) && canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
-				node.addEdge(connectingEdge); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
+			if (connectingEdge.target != null && 
+				isOnLevelMatrix(connectingEdge.target, marioNode) && 
+				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
+				node.addEdge(connectingEdge); 
+				//TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
 		}
 		// Recursion over the reachable nodes:
@@ -300,7 +311,11 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
+		boolean bool1 = node == null;
+		boolean bool2 = node.y < 0;
+		boolean bool3 = GRID_HEIGHT <= node.y;
+		//if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { 
+		if (bool1|| bool2  ||bool3  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);

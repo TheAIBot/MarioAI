@@ -33,7 +33,6 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons]; 
-		
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
@@ -45,9 +44,15 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			//graph.updateMatrix(observation);
 			if (graph.updateMatrix(observation)) {
-				//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
-			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			
+
+			DebugDraw.resetGraphics(observation);
+			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			DebugDraw.drawNeighborPaths(observation, graph);
+			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		
 		if (newestPath != null && newestPath.size() > 1) {
@@ -57,16 +62,15 @@ public class FastAndFurious implements Agent {
 					newestPath = path;
 				}
 			}
-			
-			DebugDraw.resetGraphics(observation);
 			DebugDraw.drawPath(observation, newestPath);
-			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-			DebugDraw.drawNeighborPaths(observation, graph);;
-			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
 		graph.printMatrix(observation);
+		//action = new boolean[Environment.numberOfButtons];
+		//action[Mario.KEY_RIGHT] = true;
+		//System.out.println();
 		return action;
+		//return action;
 	}
 
 	public AGENT_TYPE getType() {
