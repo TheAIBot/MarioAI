@@ -9,7 +9,9 @@ import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import ch.idsia.tools.ToolsConfigurator;
 import tests.TestAgent;
+import tests.TestTools;
 import ch.idsia.mario.engine.GlobalOptions;
+import ch.idsia.mario.environments.Environment;
 import ch.idsia.mario.simulation.SimulationOptions;
 
 import java.awt.*;
@@ -25,25 +27,33 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        //Agent controller = new FastAndFurious();
-        Agent controller = new TestAgent();
-        //Agent controller = new HumanKeyboardAgent();
-        /*if (args.length > 0) {
-            controller = AgentsPool.load (args[0]);
-            AgentsPool.addAgent(controller);
-        }*/
-        EvaluationOptions options = new CmdLineOptions(new String[0]);
-        options.setAgent(controller);
-        Task task = new ProgressTask(options);
-        options.setMaxFPS(false);
-        options.setVisualization(true);
-        options.setNumberOfTrials(1);
-        options.setMatlabFileName("");
-        options.setLevelRandSeed(42);
-        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
-        options.setLevelDifficulty(-1);
-        task.setOptions(options);
+        boolean playLevel = true;
+        if (playLevel) {
+            Agent controller = new FastAndFurious();
+            Environment observation = TestTools.loadLevel("src/tests/testLevels/running.lvl", controller);
+            TestTools.runWholeLevel(observation);
+		} else {
+	        Agent controller = new FastAndFurious();
+			//Agent controller = new TestAgent();
+	        //Agent controller = new HumanKeyboardAgent();
+	        /*if (args.length > 0) {
+	            controller = AgentsPool.load (args[0]);
+	            AgentsPool.addAgent(controller);
+	        }*/
+	        EvaluationOptions options = new CmdLineOptions(new String[0]);
+	        options.setAgent(controller);
+	        Task task = new ProgressTask(options);
+	        options.setMaxFPS(false);
+	        options.setVisualization(true);
+	        options.setNumberOfTrials(1);
+	        options.setMatlabFileName("");
+	        options.setLevelRandSeed(42);
+	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        options.setLevelDifficulty(-1);
+	        task.setOptions(options);
 
-        System.out.println ("Score: " + task.evaluate (controller)[0]);
+	        System.out.println ("Score: " + task.evaluate (controller)[0]);
+			
+		}
     }
 }

@@ -14,7 +14,7 @@ public class FixLevels {
 	 */
 	public static void main(String[] args) {
 		
-		final String filepath = "src/tests/testLevels/flat.lvl";
+		final String filepath = "src/tests/testLevels/running.lvl";
 		
 		Level level = null;
 		try {
@@ -24,6 +24,7 @@ public class FixLevels {
 			level.xExit = 230;//default end
 			level.save(new DataOutputStream(new FileOutputStream(filepath)));
 		} catch (Exception e) {
+			System.out.println("ljhjkjhkhk");
 		}
 	}
 }

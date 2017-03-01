@@ -32,18 +32,20 @@ public class Graph {
 		return levelMatrix;
 	}
 	
-	public void printMatrix()
+	public void printMatrix(Environment observation)
 	{
 //		if (marioNode != null) {
 //			//System.out.println(levelOffSet + "," + marioNode.x + "," + marioNode.y);
 //		}
+
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
 			for (int y = 0; y < LEVEL_WIDTH; y++) {
-//				if (marioNode != null && x + levelOffSet == marioNode.x && y== marioNode.y) {
-//					System.out.println("M");
-//					//continue;
-//				}
-				if (levelMatrix[y][x] == null) {
+				if (marioNode != null && Math.min(marioXPos,11) == y && x == marioYPos) {
+					System.out.print("M");
+					//continue;
+				} else if (levelMatrix[y][x] == null) {
 					System.out.print(" ");
 				}
 				else {

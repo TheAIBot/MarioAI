@@ -57,7 +57,7 @@ public  class Grapher {
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
 		//printView();
-		connectNode(mario, (short) (GRID_WIDTH/2));
+		connectNode(mario, (short) (GRID_WIDTH/2)); //TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
 	}
 	
@@ -103,7 +103,7 @@ public  class Grapher {
 	
 	private static short getColoumnRelativeToMario(Node node, Node marioNode) {
 		//Assumes that node!=null.
-		return (short) ((node.x - marioNode.x) + 11);
+		return (short) ((node.x - marioNode.x) + GRID_WIDTH/2);
 	}
 
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
@@ -114,6 +114,7 @@ public  class Grapher {
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
 	}
+
 	
 	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
