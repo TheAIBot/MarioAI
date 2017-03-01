@@ -12,6 +12,9 @@ public class TestAgent implements Agent {
 	private float maxX = 0;
 	private float startX = 1000;
 	
+	//Fitted estimate of v(t) for Mario
+	//v(t) := .340909068708614-.340909068708614*exp(-.116533823678965*t)
+	
 	private float prevX = 0;
 
 	public void reset() {
