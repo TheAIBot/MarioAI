@@ -11,6 +11,7 @@ public class MarioControls {
 
 	private static final float[] heights = new float[] { 
 		0,
+		0,
 		1.632164f, 
 		2.4634132f, 
 		2.9610314f, 
