@@ -76,7 +76,7 @@ public class TestAStar {
 		assertTrue(e1.target.gScore == e2.target.y - e2.source.y);
 		assertTrue(e1  instanceof SecondOrderPolynomial);
 		assertTrue(e2 instanceof SecondOrderPolynomial);
-		assertTrue(eN instanceof Running);		
+		assertTrue(eN instanceof Running);
 	}
 }
 
