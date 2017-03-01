@@ -53,7 +53,7 @@ public class MarioControls {
 		}
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
+			jumpCounter = getJumpTime(Math.round(marioYPos) - (next.getMaxY()));
 			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = true;
