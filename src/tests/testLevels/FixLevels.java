@@ -24,6 +24,7 @@ public class FixLevels {
 			level.xExit = 230;//default end
 			level.save(new DataOutputStream(new FileOutputStream(filepath)));
 		} catch (Exception e) {
+			System.out.println("ljhjkjhkhk");
 		}
 	}
 }

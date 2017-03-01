@@ -53,6 +53,19 @@ public class Level
         spriteTemplates = new SpriteTemplate[width][height];
         observation = new byte[width][height];
     }
+    
+    public Level(int width, int height,int xExit)
+    {
+        this.width = width;
+        this.height = height;
+
+        this.xExit = xExit;
+        yExit = 10;
+        map = new byte[width][height];
+        data = new byte[width][height];
+        spriteTemplates = new SpriteTemplate[width][height];
+        observation = new byte[width][height];
+    }
 
 //    public void ASCIIToOutputStream(OutputStream os) throws IOException {
 //        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
