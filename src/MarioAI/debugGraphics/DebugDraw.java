@@ -127,9 +127,16 @@ public class DebugDraw {
 				for (DirectedEdge directedEdge : toCheck.getEdges()) {
 					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
 					convertLevelPointToOnScreenPoint(observation, pSource);
+					
 					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
 					convertLevelPointToOnScreenPoint(observation, pTarget);
-					((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+					if (pSource.y >= pTarget.y) {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+					}
+					else {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
+					}
+					
 				}				
 			}
 		}
