@@ -264,7 +264,7 @@ public  class Grapher {
 		return false;
 	}
 	
-	private static short getBounds(Node startingNode, short currentLowerYPosition) {
+	public static short getBounds(Node startingNode, short currentLowerYPosition) {
 		return (short) (Math.round((startingNode.y - (currentLowerYPosition-startingNode.y))*64)/64); //Rounded and then floored!
 	}
 	
