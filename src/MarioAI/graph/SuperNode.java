@@ -17,16 +17,16 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 	
 	public float gScore; // g(n) for current node - cost of path from start node to this node
 	public float fScore; // f(n) for current node - cost estimate of going through this node on cheapest path to the goal node
-	protected static int LARGE_NUMBER = 10000; // temp in place of infinity
 	public Node parent; //node we came from - used in A*
-
+	
+	private final float SCORE_MULTIPLIER = 128;
+	
 	//public abstract ArrayList<Node> getNeighbors();
 	
-
 	public abstract ArrayList<DirectedEdge> getEdges();
 	
 	public int compareTo(SuperNode o) {
-		return (int) (this.fScore - o.fScore); //(this.gScore - o.fScore)
+		return (int) (o.fScore*SCORE_MULTIPLIER - this.fScore*SCORE_MULTIPLIER);
 	}
 	
 }

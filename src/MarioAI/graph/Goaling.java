@@ -1,13 +1,12 @@
-package MarioAI;
+package MarioAI.graph;
 
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Node;
+import MarioAI.MotionAction;
 
-public class Running extends DirectedEdge{
-/*
-	private final int motionTypeID = 1;
+public class Goaling implements MotionAction {
 
-	public Running() {
+	final int motionTypeID = 3;
+	
+	public Goaling() {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -25,24 +24,14 @@ public class Running extends DirectedEdge{
 		return 0;
 	}
 
-	public void getActionPatern() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public int getTimespan() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	*/
 
-	public Running(Node source, Node target) {
-		super(source, target);
-	}
-
-	@Override
-	public float getMaxY() {
-		return (float)target.x;
+	public void getActionPatern() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public float getWeight() {

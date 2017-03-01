@@ -18,6 +18,7 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	private short ceiledTopPointX;
 	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	private final int motionTypeID = 2;
+	private final float weight = 1.1f;
 	
 	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
 		super(source, target);
@@ -101,10 +102,16 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+<<<<<<< HEAD
 */
 
 	@Override
 	public float getMaxY() {
 		return ceiledTopPointY;
+=======
+
+	public float getWeight() {
+		return weight;
+>>>>>>> dev
 	}
 }
