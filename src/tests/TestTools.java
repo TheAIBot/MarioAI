@@ -28,8 +28,7 @@ public class TestTools {
 	}
 
 	public static void runWholeLevel(Environment observation) {
-		((MarioComponent) observation).run1(0, 1);
-		//while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
+		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
 	}
 	
 	public static byte[][] getLevelMap(Environment observation)
@@ -53,7 +52,7 @@ public class TestTools {
 		options.setVisualization(true);
 		options.setNumberOfTrials(1);
 		options.setMatlabFileName("");
-		options.setLevelRandSeed(42);
+		options.setLevelRandSeed(422);
 		// options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 		options.setLevelDifficulty(-1);
 		task.setOptions(options);
