@@ -57,8 +57,9 @@ public class FastAndFurious implements Agent {
 			}
 			
 			DebugDraw.resetGraphics(observation);
-			//DebugDraw.drawPath(observation, newestPath);
+			DebugDraw.drawPath(observation, newestPath);
 			//DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+			DebugDraw.drawNeighborPaths(observation, graph);;
 			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;

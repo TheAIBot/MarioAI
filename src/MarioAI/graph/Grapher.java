@@ -114,32 +114,6 @@ public  class Grapher {
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
 	}
-
-	/*
-
-	private static List<DirectedEdge> getBadJumpReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
-		// (bad) Jumping and falling.
-		for (short i = -5; i < MARIO_JUMP_LENGHT; i++) { // Starting at 5 blocks
-															// below, to
-															// simulate falling.
-			if (startingNode.y + i >= GRID_WIDTH || startingNode.y + i < 0 || startingNode.y - i >= GRID_WIDTH
-					|| startingNode.y - i < 0)
-				continue;
-			if (nodeColoumn + 1 < GRID_WIDTH) {
-				listOfNodes.add(observationGraph[startingNode.y - i][nodeColoumn + 1]);
-			}
-			// Minus
-			if (nodeColoumn - 1 >= 0) {
-				listOfNodes.add(observationGraph[startingNode.y - i][nodeColoumn - 1]);
-			}
-		}
-		return listOfNodes;
-	}
-<<<<<<< HEAD
-
-	private static void getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
-=======
-	*/
 	
 	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
@@ -248,7 +222,7 @@ public  class Grapher {
 					return Collision.HIT_CEILING;					
 				}
 			} else if (collisionDetection == Collision.HIT_WALL) {
-				listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
+				//listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
 				return Collision.HIT_GROUND;
 			}
 		}
