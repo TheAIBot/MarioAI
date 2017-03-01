@@ -26,7 +26,7 @@ public class TestTools {
 	public static void runOneTick(Environment observation) {
 		((MarioComponent) observation).runOneTick();
 	}
-
+	
 	public static void runWholeLevel(Environment observation) {
 		while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
 	}
@@ -37,6 +37,10 @@ public class TestTools {
 	}
 
 	public static Environment loadLevel(String filepath, Agent agent) {
+		return loadLevel(filepath, agent, false);
+	}
+	
+	public static Environment loadLevel(String filepath, Agent agent,  boolean lockFPS) {
 		Level level = null;
 		try {
 			level = Level.load(new DataInputStream(new FileInputStream(filepath)));
@@ -48,7 +52,7 @@ public class TestTools {
 		EvaluationOptions options = new CmdLineOptions(new String[0]);
 		options.setAgent(agent);
 		Task task = new ProgressTask(options);
-		options.setMaxFPS(false);
+		options.setMaxFPS(lockFPS);
 		options.setVisualization(true);
 		options.setNumberOfTrials(1);
 		options.setMatlabFileName("");

@@ -30,7 +30,7 @@ public class Play {
         boolean playLevel = true;
         if (playLevel) {
             Agent controller = new FastAndFurious();
-            Environment observation = TestTools.loadLevel("src/tests/testLevels/running.lvl", controller);
+            Environment observation = TestTools.loadLevel("src/tests/testLevels/noJumpingThroughCeiling.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
