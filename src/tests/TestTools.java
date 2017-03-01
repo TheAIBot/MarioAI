@@ -29,7 +29,6 @@ public class TestTools {
 
 	public static void runWholeLevel(Environment observation) {
 		((MarioComponent) observation).run1(0, 1);
-		//while (((MarioComponent) observation).runOneTick() == Mario.STATUS_RUNNING) { }
 	}
 	
 	public static byte[][] getLevelMap(Environment observation)
