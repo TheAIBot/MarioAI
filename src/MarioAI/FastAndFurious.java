@@ -63,7 +63,7 @@ public class FastAndFurious implements Agent {
 			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
-		graph.printMatrix();
+		graph.printMatrix(observation);
 		return action;
 	}
 
