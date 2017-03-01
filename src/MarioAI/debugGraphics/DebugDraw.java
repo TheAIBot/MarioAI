@@ -25,7 +25,7 @@ public class DebugDraw {
 		((MarioComponent)observation).resetDebugGraphics();
 	}
 	
-	public static void drawPath(final Environment observation, final List<Node> path)
+	public static void drawPath(final Environment observation, final List<DirectedEdge> path)
 	{
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
@@ -38,7 +38,7 @@ public class DebugDraw {
 		pathLines.add(marioPoint);
 		
 		for (int i = 0; i < path.size(); i++) {
-			final Node node = path.get(i);
+			final Node node = path.get(i).target;
 			final Point point = new Point(node.x, node.y);
     		
 			convertLevelPointToOnScreenPoint(observation, point);

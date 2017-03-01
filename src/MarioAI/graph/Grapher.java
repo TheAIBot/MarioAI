@@ -143,10 +143,10 @@ public  class Grapher {
 	
 	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
-			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], new Running()));
+			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			listOfEdges.add(new DirectedEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], new Running()));
+			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}		
 	}
 	
@@ -159,7 +159,7 @@ public  class Grapher {
 	private static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
-		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(); //The jump polynomial.
+		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
 		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
@@ -268,7 +268,8 @@ public  class Grapher {
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
 				//hvormed x positionen ikke ændrer sig.		
 				//TODO one does no neccesarily need a new polynomial for ee
-				listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
+				
+				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y], polynomial));
 				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
 				//TODO Fix so no multi edges
 			}		
