@@ -248,12 +248,8 @@ public  class Grapher {
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
 				//hvormed x positionen ikke ændrer sig.		
 				//TODO one does no neccesarily need a new polynomial for ee
-<<<<<<< HEAD
 				
 				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y], polynomial));
-=======
-				listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial), 0.1f));
->>>>>>> dev
 				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
 				//TODO Fix so no multi edges
 			}		

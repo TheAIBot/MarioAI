@@ -85,7 +85,7 @@ public final class AStar {
 				if (closedSet.contains(neighborEdge.target))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.weight;
+				float tentativeGScore = current.gScore + neighborEdge.getWeight();
 				if (!openSet.contains(neighborEdge.target)) {
 					openSet.add(neighborEdge.target);
 				} else if (tentativeGScore >= neighborEdge.target.gScore) {

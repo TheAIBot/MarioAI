@@ -4,7 +4,6 @@ import java.util.List;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
-import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -51,18 +50,12 @@ public class MarioControls {
 			next = path.get(0);
 			finishedPathSection = true;
 		}
-<<<<<<< HEAD
 		
 		if (!missionSet && canJump) {
 			jumpCounter = getJumpTime(marioYPos - next.getMaxY());
 			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = false;
-=======
-		if ((Math.abs((float) next.x - marioXPos) > 1.5 || Math.abs((float) next.y - marioYPos) > 1.5) && canJump && jumpCounter == 0) {
-			// jumpCounter = getJumpTime(marioYPos - next.y);
-			jumpCounter = 7;
->>>>>>> dev
 		}
 
 		if (jumpCounter > 0) {

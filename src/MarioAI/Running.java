@@ -46,7 +46,6 @@ public class Running extends DirectedEdge{
 	}
 
 	public float getWeight() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
