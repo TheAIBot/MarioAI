@@ -14,7 +14,7 @@ public class FixLevels {
 	 */
 	public static void main(String[] args) {
 		
-		final String filepath = "src/tests/testLevels/flat.lvl";
+		final String filepath = "src/tests/testLevels/running.lvl";
 		
 		Level level = null;
 		try {
