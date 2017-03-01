@@ -42,7 +42,7 @@ public class Running extends DirectedEdge{
 
 	@Override
 	public float getMaxY() {
-		return (float)target.x;
+		return (float)target.y;
 	}
 
 	public float getWeight() {

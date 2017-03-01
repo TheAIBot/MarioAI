@@ -104,7 +104,7 @@ public class SecondOrderPolynomial extends DirectedEdge {
 
 	@Override
 	public float getMaxY() {
-		return ceiledTopPointY;
+		return target.y - ceiledTopPointY;
 	}
 
 	public float getWeight() {

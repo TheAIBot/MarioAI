@@ -39,8 +39,8 @@ public class MarioControls {
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
 	public static boolean getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
-		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseCenteredMarioYPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final boolean canJump = observation.mayMarioJump();
 		boolean finishedPathSection = false;
 		
@@ -52,10 +52,10 @@ public class MarioControls {
 		}
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(marioYPos - next.getMaxY());
+			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
 			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-			missionSet = false;
+			missionSet = true;
 		}
 
 		if (jumpCounter > 0) {
@@ -74,7 +74,7 @@ public class MarioControls {
 
 	private static int getJumpTime(float neededHeight) {
 		for (int i = 0; i < heights.length; i++) {
-			if (heights[i] > neededHeight) {
+			if (heights[i] >= neededHeight) {
 				return i;
 			}
 		}
@@ -90,14 +90,14 @@ public class MarioControls {
 					distanceMoved += lengthXAcc[i];
 					steps++;
 				}
+				//speed is now 0
+				xSpeedIndex = 0;
 			}
-			//speed is now 0
-			xSpeedIndex = 0;
 			
-			for (int i = 0; i < lengthXAcc.length; i++) {
+			for (int i = -xSpeedIndex; i < lengthXAcc.length; i++) {
 				distanceMoved += lengthXAcc[i];
 				steps++;
-				if (distanceMoved >= neededXDistance) {
+				if (distanceMoved >= -neededXDistance) {
 					xSpeedIndex = Math.max(-lengthXAcc.length, -steps);
 					return steps;
 				}
@@ -105,7 +105,7 @@ public class MarioControls {
 			while(true) {
 				distanceMoved += MAX_X_ACCELERATION;
 				steps++;
-				if (distanceMoved >= neededXDistance) {
+				if (distanceMoved >= -neededXDistance) {
 					xSpeedIndex = -lengthXAcc.length;
 					return steps;
 				}
@@ -119,11 +119,11 @@ public class MarioControls {
 					distanceMoved += lengthXAcc[i];
 					steps++;
 				}
+				//speed is now 0
+				xSpeedIndex = 0;
 			}
-			//speed is now 0
-			xSpeedIndex = 0;
 			
-			for (int i = 0; i < lengthXAcc.length; i++) {
+			for (int i = xSpeedIndex; i < lengthXAcc.length; i++) {
 				distanceMoved += lengthXAcc[i];
 				steps++;
 				if (distanceMoved >= neededXDistance) {
