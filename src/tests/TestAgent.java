@@ -65,7 +65,7 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 40:
 		case TestTools.LEVEL_INIT_TICKS + 41:
 		case TestTools.LEVEL_INIT_TICKS + 42:
-			System.out.print("{" + (tick - (TestTools.LEVEL_INIT_TICKS + 1)) + ", " + ((maxX - startX) - prevX) + "},");
+			System.out.print("<" + (tick - (TestTools.LEVEL_INIT_TICKS + 1)) + ", " + ((maxX - startX) - prevX) + ">|");
 			prevX = (maxX - startX);
 			actions[Mario.KEY_RIGHT] = true;
 			break;
