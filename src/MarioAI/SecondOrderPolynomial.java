@@ -1,8 +1,9 @@
 package MarioAI;
 
+import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Node;
 
-public class SecondOrderPolynomial implements MotionAction {
+public class SecondOrderPolynomial extends DirectedEdge {
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.
@@ -16,10 +17,9 @@ public class SecondOrderPolynomial implements MotionAction {
 	// position in the air can compensate for this.
 	private short ceiledTopPointX;
 	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
-	private final int motionTypeID = 2;
-	private final float weight = 1.1f;
 	
-	public SecondOrderPolynomial(SecondOrderPolynomial polynomial) {
+	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
+		super(source, target);
 		a = polynomial.a;
 		b = polynomial.b;
 		c = polynomial.c;
@@ -29,11 +29,8 @@ public class SecondOrderPolynomial implements MotionAction {
 		ceiledTopPointY = polynomial.ceiledTopPointY;
 	}
 
-	public SecondOrderPolynomial(Node startingPosition, short nodeColoumn, float jumpRange, float jumpHeight) {
-		setToJumpPolynomial(startingPosition, nodeColoumn, jumpRange, jumpHeight);
-	}
-
-	public SecondOrderPolynomial() {
+	public SecondOrderPolynomial(Node source, Node target) {
+		super(source, target);
 		a = 0;
 		b = 0;
 		c = 0;
@@ -77,7 +74,8 @@ public class SecondOrderPolynomial implements MotionAction {
 	public float f(float x) {
 		return a * x * x + b * x + c;
 	}
-
+	
+/*
 	public int motionTypeID() {
 		// TODO Auto-generated method stub
 		return motionTypeID;
@@ -102,8 +100,14 @@ public class SecondOrderPolynomial implements MotionAction {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+*/
+
+	@Override
+	public float getMaxY() {
+		return target.y - ceiledTopPointY;
+	}
 
 	public float getWeight() {
-		return weight;
+		return 0.1f;
 	}
 }

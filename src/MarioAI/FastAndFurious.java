@@ -8,6 +8,7 @@ import com.sun.istack.internal.FinalArrayList;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Grapher;
@@ -24,45 +25,37 @@ public class FastAndFurious implements Agent {
 
 	private static final String name = "THE ULTIME AND SUPREME OVERLORD THAT BRINGS DEATH AND DESTRUCTION";
 	private final Graph graph = new Graph();
-	private boolean[] action = new boolean[Environment.numberOfButtons]; 
 	private int tickCount = 0;
-	private List<Node> newestPath = null;
-	private boolean isStuck = false; 
-	private int ticksSinceLastUpdate = 0;
+	private List<DirectedEdge> newestPath = null;
 
 	public void reset() {
 	}
 
 	public boolean[] getAction(Environment observation) {
+		boolean[] action = new boolean[Environment.numberOfButtons]; 
+		
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
 				newestPath = path;
 			}
 			
 		} else if (tickCount > 30) {
-			if (graph.updateMatrix(observation) || isStuck) {
-				if (isStuck) graph.createStartGraph(observation);
+			graph.updateMatrix(observation);
+			//if (graph.updateMatrix(observation)) {
+				
+			//}
+		}
+		if (newestPath != null && newestPath.size() > 1) {
+			if (MarioControls.getNextAction(observation, newestPath, action)) {
 				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-				List<Node> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
-				isStuck = false;
-				ticksSinceLastUpdate = 0;
 			}
-		}
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		if (newestPath != null &&
-			newestPath.size() >= 1 &&
-			GraphMath.distanceBetween(marioXPos, marioYPos, newestPath.get(0).x, newestPath.get(0).y) <= 0.5) {
-			newestPath.remove(0);
-		}
-		if (newestPath != null && newestPath.size() > 0) {
-			action = MarioControls.getNextAction(observation, newestPath);
 			
 			DebugDraw.resetGraphics(observation);
 			DebugDraw.drawPath(observation, newestPath);
@@ -70,14 +63,6 @@ public class FastAndFurious implements Agent {
 			DebugDraw.drawPathOptionNodes(observation, graph);
 		}
 		tickCount++;
-		/*
-		ticksSinceLastUpdate++;
-		System.out.println("TICKS SINCE LAST UPDATE " + ticksSinceLastUpdate);
-		if (ticksSinceLastUpdate > 100) {
-			System.out.println("STUCK");
-			isStuck = true;
-		}
-		*/
 		graph.printMatrix();
 		return action;
 	}

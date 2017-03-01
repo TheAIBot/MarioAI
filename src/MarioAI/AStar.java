@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Goaling;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Node;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -23,25 +22,27 @@ public final class AStar {
 	 * @param nodes
 	 * @return optimal path
 	 */
-	public static List<Node> runMultiNodeAStar(final Node start, final Node[] nodes)  {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] nodes)  {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
 		for (Node node : nodes) {
 			if (node != null) {
-				node.addEdge(new DirectedEdge(node, goal, new Goaling()));
+				node.addEdge(new Running(node, goal));
 			}
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<Node> path = runAStar(start, goal);
+		List<DirectedEdge> path = runAStar(start, goal);
 		if (path != null) {
 			path.remove((path.size() - 1));
 		}
 		for (Node node : nodes) {
 			if (node != null) {
-				node.removeEdge(new DirectedEdge(node, goal, null));
+				//remove the last edge as that's the egde to the goal
+				//because it was the soonest added edge
+				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
 
@@ -55,7 +56,7 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<Node> runAStar(final Node start, final Node goal) {
+	public static List<DirectedEdge> runAStar(final Node start, final Node goal) {
 		// Set of nodes already explored
 		final List<Node> closedSet = new ArrayList<Node>();
 		// Set of nodes yet to be explored
@@ -84,7 +85,7 @@ public final class AStar {
 				if (closedSet.contains(neighborEdge.target))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.weight;
+				float tentativeGScore = current.gScore + neighborEdge.getWeight();
 				if (!openSet.contains(neighborEdge.target)) {
 					openSet.add(neighborEdge.target);
 				} else if (tentativeGScore >= neighborEdge.target.gScore) {
@@ -120,10 +121,17 @@ public final class AStar {
 	 * @param current
 	 * @return path
 	 */
-	private static List<Node> reconstructPath(Node current) {
-		final List<Node> path = new ArrayList<Node>();
+	private static List<DirectedEdge> reconstructPath(Node current) {
+		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (current.parent != null) {
-			path.add(current);
+			DirectedEdge fisk = null;
+			for (int i = 0; i < current.parent.edges.size(); i++) {
+				if (current.parent.edges.get(i).target.equals(current)) {
+					fisk = current.parent.edges.get(i);
+					break;
+				}
+			}
+			path.add(fisk);
 			current = current.parent;
 		}
 		Collections.reverse(path);

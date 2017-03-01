@@ -1,7 +1,10 @@
 package MarioAI;
 
-public class Running implements MotionAction{
+import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.Node;
 
+public class Running extends DirectedEdge{
+/*
 	private final int motionTypeID = 1;
 
 	public Running() {
@@ -31,9 +34,18 @@ public class Running implements MotionAction{
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	*/
+
+	public Running(Node source, Node target) {
+		super(source, target);
+	}
+
+	@Override
+	public float getMaxY() {
+		return (float)target.y;
+	}
 
 	public float getWeight() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
