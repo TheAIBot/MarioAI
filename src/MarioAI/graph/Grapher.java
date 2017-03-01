@@ -170,6 +170,7 @@ public  class Grapher {
 		
 		//Starts of from Mario's initial position:
 		short currentXPosition = nodeColoumn;
+		short xPositionOffsetForJump = 0;
 		float formerYPosition = startingNode.y;
 		short formerLowerYPosition = startingNode.y;
 		boolean hasMetHardGround = false;
@@ -178,25 +179,33 @@ public  class Grapher {
 		short currentLowerYPosition; //Automatic flooring included!
 		// TODO change to take the sign into account
 		short bound;
-		//TODO Doesen't take falling down into a hole into account.		
-			
+		//TODO Doesen't take falling down into a hole into account.	
+		
+		Collision collisionDetection = Collision.HIT_NOTHING;
+		
 		//Get upwards moving part:
 		//Primarily collision detection.
-		while (!hasMetHardGround &&
-			   !polynomial.isPastTopPoint(nodeColoumn, currentXPosition) &&
+		while ((collisionDetection != Collision.HIT_GROUND) &&
+			   !polynomial.isPastTopPoint(nodeColoumn, (short) (currentXPosition + xPositionOffsetForJump)) &&
 			   isWithinView(currentXPosition)) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition)) { 
+			if (polynomial.isPastTopPoint(nodeColoumn, (short)(currentXPosition + xPositionOffsetForJump))) { 
 				//Up to the max height of the polynomial!
 				currentYPosition = polynomial.getTopPointY(); 						
 			} else {//Else up to the current height of the polynomial.
-				currentYPosition = polynomial.f(currentXPosition);				
+				currentYPosition = polynomial.f((short)(currentXPosition + xPositionOffsetForJump));				
 			}
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!
 			bound = getBounds(startingNode, currentLowerYPosition); 
-			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfEdges);	
+			collisionDetection = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, startingNode, listOfEdges);	
+			if (collisionDetection == Collision.HIT_CEILING) {
+				currentXPosition--;
+				xPositionOffsetForJump+= 2;
+			} else if (collisionDetection == Collision.HIT_GROUND) {
+				hasMetHardGround = true;
+			}
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
 		}
@@ -224,15 +233,26 @@ public  class Grapher {
 		}
 	}
 		
-	private static boolean ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<DirectedEdge> listOfEdges) {
+	private static Collision ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, Collision collisionDetection,
+												 SecondOrderPolynomial polynomial,Node startingPosition, List<DirectedEdge> listOfEdges) {
+		
+		boolean isHittingWall = false;		
 		for (short y = formerLowerYPosition; y >= bound; y--) {
 			if (isHittingWallOrGround(currentXPosition,y)) {
-				//TODOD make.
-				//hitWallOrGround(listOfEdges, currentXPosition,y);
-				return true;
-			} 
-		}	
-		return false;
+				if (y == formerLowerYPosition) {
+					collisionDetection = Collision.HIT_WALL;
+					isHittingWall =  true;
+				} else if (!isHittingWall){
+					//TODOD make.
+					//hitWallOrGround(listOfEdges, currentXPosition,y);
+					return Collision.HIT_CEILING;					
+				}
+			} else if (collisionDetection == Collision.HIT_WALL) {
+				listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
+				return Collision.HIT_GROUND;
+			}
+		}
+		return collisionDetection;
 	}
 	
 	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
@@ -324,3 +344,5 @@ public  class Grapher {
 	}
 	
 }
+
+
