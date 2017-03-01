@@ -54,7 +54,7 @@ public class Level
         observation = new byte[width][height];
     }
     
-    public Level(int width, int height,int xExit)
+    public Level(int width, int height, int xExit)
     {
         this.width = width;
         this.height = height;
@@ -143,7 +143,10 @@ public class Level
 
         int width = dis.readShort() & 0xffff;
         int height = dis.readShort() & 0xffff;
-        Level level = new Level(width, height);
+        int xExit = dis.readShort() & 0xffff;
+        int yExit = dis.readShort() & 0xffff;
+        Level level = new Level(width, height, xExit);
+        level.yExit = yExit;
         level.map = new byte[width][height];
         level.data = new byte[width][height];
         for (int i = 0; i < width; i++)
@@ -161,6 +164,8 @@ public class Level
 
         dos.writeShort((short) width);
         dos.writeShort((short) height);
+        dos.writeShort(xExit);
+        dos.writeShort(yExit);
 
         for (int i = 0; i < width; i++)
         {

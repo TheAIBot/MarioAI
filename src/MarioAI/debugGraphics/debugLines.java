@@ -17,17 +17,21 @@ public class debugLines {
 		this(color, lines, 3);
 	}
 	
+	public debugLines(Color color, ArrayList<Point> lines, int size) {
+		this.color = color;
+		this.lines = lines;
+		this.size = size;
+	}
+	
 	public debugLines(Color color, Point point1, Point point2) {
+		this(color, point1, point2, 1);
+	}
+	
+	public debugLines(Color color, Point point1, Point point2, int size) {
 		this.color = color;
 		lines = new ArrayList<Point>();
 		this.lines.add(point1);
 		this.lines.add(point2);
-		this.size = 1;
-	}
-	
-	public debugLines(Color color, ArrayList<Point> lines, int size) {
-		this.color = color;
-		this.lines = lines;
 		this.size = size;
 	}
 	
