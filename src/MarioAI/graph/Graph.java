@@ -65,7 +65,9 @@ public class Graph {
 			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, (i - (SIGHT_WIDTH / 2)) + marioXPos);
 			levelMatrix[i] = columnToInsert;
-			saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
+			//saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
+			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
+			saveColumn(columnIndex, columnToInsert);
 		}
 		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 		maxMarioXPos = SIGHT_WIDTH / 2;
@@ -76,7 +78,7 @@ public class Graph {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
-		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 9);
+		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
 		if (change < 0) {
 			moveMatrixOneLeft(marioXPos);
 			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
@@ -119,7 +121,7 @@ public class Graph {
 			levelMatrix[x - 1] = levelMatrix[x];
 		}
 		Node[] columnToInsert;
-		final int columnToInsertXPos = marioXPos + 9;
+		final int columnToInsertXPos = marioXPos + 10;
 		// get column and insert it into the matrix
 		if (containsColumn(columnToInsertXPos)) {
 			columnToInsert = getColumn(columnToInsertXPos);
@@ -140,9 +142,9 @@ public class Graph {
 	
 	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos, final int sightColumnIndex) {
 		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
-		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
+		final int topObservationYPos = marioYPos - (SIGHT_HEIGHT / 2);
 		final int startIndex = Math.max(topObservationYPos, 0);
-		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), 15);
+		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), LEVEL_HEIGHT);
 		for (int i = startIndex; i < endIndex; i++) {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}
