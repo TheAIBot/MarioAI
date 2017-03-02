@@ -11,6 +11,7 @@ public class MarioControls {
 
 	private static final float[] heights = new float[] { 
 		0,
+		0,
 		1.632164f, 
 		2.4634132f, 
 		2.9610314f, 
@@ -52,7 +53,7 @@ public class MarioControls {
 		}
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
+			jumpCounter = getJumpTime(Math.round(marioYPos) - (next.getMaxY()));
 			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = true;

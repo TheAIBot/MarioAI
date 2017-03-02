@@ -69,7 +69,7 @@ public class Node extends SuperNode {
 
 	@Override
 	public String toString() {
-		return "Node";
+		return "[" + x + " : " + y + "]";
 	}
 
 }
