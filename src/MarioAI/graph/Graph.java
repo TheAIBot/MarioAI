@@ -19,7 +19,7 @@ public class Graph {
 	private static final int LEVEL_LEFT_X_POS = -(SIGHT_WIDTH / 2);
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
-	@SuppressWarnings("unchecked") // because Andreas thinks java IS FUCKING STUPID
+	@SuppressWarnings("unchecked") 
 	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT]; // pending implementation 
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
@@ -32,18 +32,20 @@ public class Graph {
 		return levelMatrix;
 	}
 	
-	public void printMatrix()
+	public void printMatrix(Environment observation)
 	{
 //		if (marioNode != null) {
 //			//System.out.println(levelOffSet + "," + marioNode.x + "," + marioNode.y);
 //		}
+
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
 			for (int y = 0; y < LEVEL_WIDTH; y++) {
-//				if (marioNode != null && x + levelOffSet == marioNode.x && y== marioNode.y) {
-//					System.out.println("M");
-//					//continue;
-//				}
-				if (levelMatrix[y][x] == null) {
+				if (marioNode != null && Math.min(marioXPos,11) == y && x == marioYPos) {
+					System.out.print("M");
+					//continue;
+				} else if (levelMatrix[y][x] == null) {
 					System.out.print(" ");
 				}
 				else {
@@ -63,7 +65,9 @@ public class Graph {
 			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, (i - (SIGHT_WIDTH / 2)) + marioXPos);
 			levelMatrix[i] = columnToInsert;
-			saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
+			//saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
+			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
+			saveColumn(columnIndex, columnToInsert);
 		}
 		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 		maxMarioXPos = SIGHT_WIDTH / 2;
@@ -74,7 +78,7 @@ public class Graph {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
-		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 9);
+		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
 		if (change < 0) {
 			moveMatrixOneLeft(marioXPos);
 			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
@@ -103,7 +107,7 @@ public class Graph {
 		for (int x = levelMatrix.length - 1; x > 1; x--) {
 			levelMatrix[x] = levelMatrix[x - 1];
 		}
-		final int columnToInsertXPos = marioXPos - 9;
+		final int columnToInsertXPos = marioXPos - 10;
 		final Node[] columnToInsert = getColumn(columnToInsertXPos);
 		levelMatrix[0] = columnToInsert;
 	}
@@ -117,7 +121,7 @@ public class Graph {
 			levelMatrix[x - 1] = levelMatrix[x];
 		}
 		Node[] columnToInsert;
-		final int columnToInsertXPos = marioXPos + 9;
+		final int columnToInsertXPos = marioXPos + 10;
 		// get column and insert it into the matrix
 		if (containsColumn(columnToInsertXPos)) {
 			columnToInsert = getColumn(columnToInsertXPos);
@@ -138,9 +142,9 @@ public class Graph {
 	
 	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos, final int sightColumnIndex) {
 		final byte[] byteColumn = new byte[LEVEL_HEIGHT];		
-		final int topObservationYPos = marioYPos - SIGHT_HEIGHT / 2;
+		final int topObservationYPos = marioYPos - (SIGHT_HEIGHT / 2);
 		final int startIndex = Math.max(topObservationYPos, 0);
-		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), 15);
+		final int endIndex = Math.min(Math.min(startIndex + LEVEL_HEIGHT, SIGHT_HEIGHT + topObservationYPos), LEVEL_HEIGHT);
 		for (int i = startIndex; i < endIndex; i++) {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}

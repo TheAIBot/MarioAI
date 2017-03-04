@@ -8,7 +8,7 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 	
-	//private static int ll = 0;
+	private static int ll = 0;
 	public static int hashEdge(DirectedEdge edge)
 	{
 		//64 should be greater than the largest y value possible.
@@ -30,7 +30,7 @@ public class Hasher {
 		int b3 = ((int)edge.source.y  & 0x000000ff) << 16;
 		int b4 = ((int)edge.source.x  & 0x000000ff) << 24;
 		
-		return b1 | b2 | b3 | b4;
-		//return ll++;
+		//return b1 | b2 | b3 | b4;
+		return ll++;
 	}
 }

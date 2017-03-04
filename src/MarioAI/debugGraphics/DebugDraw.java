@@ -91,27 +91,57 @@ public class DebugDraw {
 		while (nodesToVisit.size() > 0) {
 			DirectedEdge fisk = nodesToVisit.poll();
 			Node toCheck = fisk.target;
-			
-			if (!visitedRunningNodes.contains(toCheck) && 
-				!visitedJumpingNodes.contains(toCheck)) {
+			if (!visitedRunningNodes.contains(toCheck) && fisk instanceof Running) {
 				nodesToVisit.addAll(toCheck.getEdges());
-				
 				Point p = new Point(toCheck.x, toCheck.y);
 				convertLevelPointToOnScreenPoint(observation, p);
-				if (fisk instanceof Running) {
-					visitedRunningNodes.add(toCheck);
-					allrunningEdges.add(p);
-				}
-				else if (fisk instanceof SecondOrderPolynomial) {
-					visitedJumpingNodes.add(toCheck);
-					allJumpingEdges.add(p);
-				}
-				
+				visitedRunningNodes.add(toCheck);
+				allrunningEdges.add(p);
+			}
+			else if (!visitedJumpingNodes.contains(toCheck) && fisk instanceof SecondOrderPolynomial) {
+				nodesToVisit.addAll(toCheck.getEdges());
+				Point p = new Point(toCheck.x, toCheck.y);
+				convertLevelPointToOnScreenPoint(observation, p);
+				visitedJumpingNodes.add(toCheck);
+				allJumpingEdges.add(p);
 			}
 		}
 		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.BLACK, allrunningEdges));
 		((MarioComponent)observation).addDebugPoints(new debugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
+
+	public static void drawNeighborPaths(final Environment observation, Graph graph)
+	{		
+		Node mario = graph.getMarioNode(observation);
+		HashSet<Node> visitedNodes = new HashSet<Node>();
+		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
+		nodesToVisit.addAll(mario.getEdges());
+		
+		while (nodesToVisit.size() > 0) {
+			DirectedEdge fisk = nodesToVisit.poll();
+			Node toCheck = fisk.target;
+			if (!visitedNodes.contains(toCheck)) {
+				nodesToVisit.addAll(toCheck.getEdges());
+				visitedNodes.add(toCheck);				
+				
+				for (DirectedEdge directedEdge : toCheck.getEdges()) {
+					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
+					convertLevelPointToOnScreenPoint(observation, pSource);
+					
+					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
+					convertLevelPointToOnScreenPoint(observation, pTarget);
+					if (pSource.y >= pTarget.y) {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+					}
+					else {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
+					}
+					
+				}				
+			}
+		}
+	}
+	
 	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());

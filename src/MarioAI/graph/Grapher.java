@@ -4,7 +4,6 @@ import java.util.*;
 
 import MarioAI.Running;
 import MarioAI.SecondOrderPolynomial;
-import ch.idsia.mario.environments.Environment;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
@@ -56,8 +55,17 @@ public  class Grapher {
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		marioNode = mario;
+		for (int i = 0; i < GRID_WIDTH; i++) {
+			if (observationGraph[i][marioNode.y] != null && observationGraph[i][marioNode.y].x == marioNode.x) {
+				System.out.println(i);
+				if (i != 11) {
+					System.out.println("Error");
+				}
+			}
+		}
 		//printView();
-		connectNode(mario, (short) (GRID_WIDTH/2));
+
+		connectNode(mario, (short) (GRID_WIDTH/2)); //TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
 	}
 	
@@ -72,8 +80,11 @@ public  class Grapher {
 		// Find the reachable nodes:
 		List<DirectedEdge> connectingEdges = getConnectingEdges(node, coloumn);
 		for (DirectedEdge connectingEdge : connectingEdges) {
-			if (connectingEdge.target != null && isOnLevelMatrix(connectingEdge.target, marioNode) && canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
-				node.addEdge(connectingEdge); //TODO Fix the fact that there are no guarantee that there aren't duplicates.
+			if (connectingEdge.target != null && 
+				isOnLevelMatrix(connectingEdge.target, marioNode) && 
+				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
+				node.addEdge(connectingEdge); 
+				//TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
 		}
 		// Recursion over the reachable nodes:
@@ -103,7 +114,7 @@ public  class Grapher {
 	
 	private static short getColoumnRelativeToMario(Node node, Node marioNode) {
 		//Assumes that node!=null.
-		return (short) ((node.x - marioNode.x) + 11);
+		return (short) ((node.x - marioNode.x) + GRID_WIDTH/2);
 	}
 
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
@@ -114,32 +125,6 @@ public  class Grapher {
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
 	}
-
-	/*
-
-	private static List<DirectedEdge> getBadJumpReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
-		// (bad) Jumping and falling.
-		for (short i = -5; i < MARIO_JUMP_LENGHT; i++) { // Starting at 5 blocks
-															// below, to
-															// simulate falling.
-			if (startingNode.y + i >= GRID_WIDTH || startingNode.y + i < 0 || startingNode.y - i >= GRID_WIDTH
-					|| startingNode.y - i < 0)
-				continue;
-			if (nodeColoumn + 1 < GRID_WIDTH) {
-				listOfNodes.add(observationGraph[startingNode.y - i][nodeColoumn + 1]);
-			}
-			// Minus
-			if (nodeColoumn - 1 >= 0) {
-				listOfNodes.add(observationGraph[startingNode.y - i][nodeColoumn - 1]);
-			}
-		}
-		return listOfNodes;
-	}
-<<<<<<< HEAD
-
-	private static void getRunningReachableNodes(Node startingNode, short nodeColoumn, List<Node> listOfNodes) {
-=======
-	*/
 	
 	private static void getRunningReachableEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
@@ -160,7 +145,7 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+		for (float jumpRange = 2; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}
@@ -170,6 +155,7 @@ public  class Grapher {
 		
 		//Starts of from Mario's initial position:
 		short currentXPosition = nodeColoumn;
+		short xPositionOffsetForJump = 0;
 		float formerYPosition = startingNode.y;
 		short formerLowerYPosition = startingNode.y;
 		boolean hasMetHardGround = false;
@@ -178,25 +164,35 @@ public  class Grapher {
 		short currentLowerYPosition; //Automatic flooring included!
 		// TODO change to take the sign into account
 		short bound;
-		//TODO Doesen't take falling down into a hole into account.		
-			
+		//TODO Doesen't take falling down into a hole into account.	
+		
+		Collision collisionDetection = Collision.HIT_NOTHING;
+		
 		//Get upwards moving part:
 		//Primarily collision detection.
-		while (!hasMetHardGround &&
-			   !polynomial.isPastTopPoint(nodeColoumn, currentXPosition) &&
+		while ((collisionDetection != Collision.HIT_GROUND)&&
+				collisionDetection != Collision.HIT_CEILING &&
+			   !polynomial.isPastTopPoint(nodeColoumn, (short) (currentXPosition + xPositionOffsetForJump)) &&
 			   isWithinView(currentXPosition)) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition)) { 
+			if (polynomial.isPastTopPoint(nodeColoumn, (short)(currentXPosition + xPositionOffsetForJump))) { 
 				//Up to the max height of the polynomial!
 				currentYPosition = polynomial.getTopPointY(); 						
 			} else {//Else up to the current height of the polynomial.
-				currentYPosition = polynomial.f(currentXPosition);				
+				currentYPosition = polynomial.f((short)(currentXPosition + xPositionOffsetForJump));				
 			}
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!
 			bound = getBounds(startingNode, currentLowerYPosition); 
-			hasMetHardGround = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfEdges);	
+			collisionDetection = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, startingNode, listOfEdges);	
+			if (collisionDetection == Collision.HIT_WALL) {
+				currentXPosition--;
+				xPositionOffsetForJump+= 2;
+			} else if (collisionDetection == Collision.HIT_GROUND ||
+					   collisionDetection == Collision.HIT_CEILING) {
+				hasMetHardGround = true;
+			}
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
 		}
@@ -224,15 +220,26 @@ public  class Grapher {
 		}
 	}
 		
-	private static boolean ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, List<DirectedEdge> listOfEdges) {
+	private static Collision ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, Collision collisionDetection,
+												 SecondOrderPolynomial polynomial,Node startingPosition, List<DirectedEdge> listOfEdges) {
+		
+		boolean isHittingWall = false;		
 		for (short y = formerLowerYPosition; y >= bound; y--) {
 			if (isHittingWallOrGround(currentXPosition,y)) {
-				//TODOD make.
-				//hitWallOrGround(listOfEdges, currentXPosition,y);
-				return true;
-			} 
-		}	
-		return false;
+				if (y == formerLowerYPosition) {
+					collisionDetection = Collision.HIT_WALL;
+					isHittingWall =  true;
+				} else if (!isHittingWall){
+					//TODOD make.
+					//hitWallOrGround(listOfEdges, currentXPosition,y);
+					return Collision.HIT_CEILING;					
+				}
+			} else if (collisionDetection == Collision.HIT_WALL) {
+				//listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
+				return Collision.HIT_GROUND;
+			}
+		}
+		return collisionDetection;
 	}
 	
 	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
@@ -257,7 +264,7 @@ public  class Grapher {
 		return false;
 	}
 	
-	private static short getBounds(Node startingNode, short currentLowerYPosition) {
+	public static short getBounds(Node startingNode, short currentLowerYPosition) {
 		return (short) (Math.round((startingNode.y - (currentLowerYPosition-startingNode.y))*64)/64); //Rounded and then floored!
 	}
 	
@@ -266,7 +273,8 @@ public  class Grapher {
 	 */
 	private static boolean isHittingWallOrGround(short xPosition, short yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
-		return (isOnLevelMatrix(xPosition, (short) (yPosition - 1))) && isSolid(observationGraph[xPosition][yPosition-1]);
+		boolean result = (isOnLevelMatrix(xPosition, (short) (yPosition -1))) && isSolid(observationGraph[xPosition][yPosition-1]);
+		return result;
 	}
 	
 	/***
@@ -303,7 +311,11 @@ public  class Grapher {
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
-		if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
+		boolean bool1 = node == null;
+		boolean bool2 = node.y < 0;
+		boolean bool3 = GRID_HEIGHT <= node.y;
+		//if (node == null || node.y < 0  || GRID_HEIGHT <= node.y  ) { 
+		if (bool1|| bool2  ||bool3  ) { //Node can't stand on air, nor can he stand on nothing -> things that are not in the array.
 			return false;
 		} else{
 			short nodeXPosition = getColoumnRelativeToMario(node, marioNode);
@@ -321,7 +333,10 @@ public  class Grapher {
 	}
 
 	private static boolean isSolid(Node node) {
+		//return node != null;
 		return node != null && node.type != -11;// TODO(*) Fix
 	}
 	
 }
+
+
