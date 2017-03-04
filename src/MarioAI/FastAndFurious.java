@@ -27,6 +27,8 @@ public class FastAndFurious implements Agent {
 	private final Graph graph = new Graph();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
+	
+	private static final boolean DEBUG = true;
 
 	public void reset() {
 	}
@@ -48,11 +50,12 @@ public class FastAndFurious implements Agent {
 			}
 			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			
-
-			DebugDraw.resetGraphics(observation);
-			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-			DebugDraw.drawNeighborPaths(observation, graph);
-			DebugDraw.drawPathOptionNodes(observation, graph);
+			if (DEBUG) {
+				DebugDraw.resetGraphics(observation);
+				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+				DebugDraw.drawNeighborPaths(observation, graph);
+				DebugDraw.drawPathOptionNodes(observation, graph);
+			}
 		}
 		
 		if (newestPath != null && newestPath.size() > 1) {
@@ -62,7 +65,7 @@ public class FastAndFurious implements Agent {
 					newestPath = path;
 				}
 			}
-			DebugDraw.drawPath(observation, newestPath);
+			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
 		}
 		tickCount++;
 		graph.printMatrix(observation);
