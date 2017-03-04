@@ -42,35 +42,38 @@ public class FastAndFurious implements Agent {
 			}
 			
 		} else if (tickCount > 30) {
-			//graph.updateMatrix(observation);
 			if (graph.updateMatrix(observation)) {
 				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
-			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			
-
 			DebugDraw.resetGraphics(observation);
 			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
 			DebugDraw.drawNeighborPaths(observation, graph);
 			DebugDraw.drawPathOptionNodes(observation, graph);
-		}
-		
-		if (newestPath != null && newestPath.size() > 1) {
-			if (MarioControls.getNextAction(observation, newestPath, action)) {
+			
+			if (newestPath != null && newestPath.size() > 1) {
+				if (MarioControls.reachedNextNode(observation, newestPath)) {
+					List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+					if (path != null) {
+						newestPath = path;
+					}
+				}
+				MarioControls.getNextAction(observation, newestPath, action);
+				DebugDraw.drawPath(observation, newestPath);
+			}
+			else {
+				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
 			}
-			DebugDraw.drawPath(observation, newestPath);
+			
+			graph.printMatrix(observation);
 		}
 		tickCount++;
-		graph.printMatrix(observation);
-		//action = new boolean[Environment.numberOfButtons];
-		//action[Mario.KEY_RIGHT] = true;
-		//System.out.println();
+		
 		return action;
-		//return action;
 	}
 
 	public AGENT_TYPE getType() {

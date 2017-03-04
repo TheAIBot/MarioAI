@@ -2,6 +2,7 @@ package tests;
 
 import java.util.ArrayList;
 
+import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
 import ch.idsia.ai.agents.*;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -22,79 +23,31 @@ public class TestAgent implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
+		/*
 		startX = Math.min(startX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
 		maxX = Math.max(maxX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
 
-		switch (tick) {
-		case TestTools.LEVEL_INIT_TICKS + 1:
-		case TestTools.LEVEL_INIT_TICKS + 2:
-		case TestTools.LEVEL_INIT_TICKS + 3:
-		case TestTools.LEVEL_INIT_TICKS + 4:
-		case TestTools.LEVEL_INIT_TICKS + 5:
-		case TestTools.LEVEL_INIT_TICKS + 6:
-		case TestTools.LEVEL_INIT_TICKS + 7:
-		case TestTools.LEVEL_INIT_TICKS + 8:
-		case TestTools.LEVEL_INIT_TICKS + 9:
-		case TestTools.LEVEL_INIT_TICKS + 10:
-		case TestTools.LEVEL_INIT_TICKS + 11:
-		case TestTools.LEVEL_INIT_TICKS + 12:
-		case TestTools.LEVEL_INIT_TICKS + 13:
-		case TestTools.LEVEL_INIT_TICKS + 14:
-		case TestTools.LEVEL_INIT_TICKS + 15:
-		case TestTools.LEVEL_INIT_TICKS + 16:
-		/*case TestTools.LEVEL_INIT_TICKS + 17:
-		case TestTools.LEVEL_INIT_TICKS + 18:
-		case TestTools.LEVEL_INIT_TICKS + 19:
-		case TestTools.LEVEL_INIT_TICKS + 20:
-		case TestTools.LEVEL_INIT_TICKS + 21:
-		case TestTools.LEVEL_INIT_TICKS + 22:
-		case TestTools.LEVEL_INIT_TICKS + 23:
-		case TestTools.LEVEL_INIT_TICKS + 24:
-		case TestTools.LEVEL_INIT_TICKS + 25:
-		case TestTools.LEVEL_INIT_TICKS + 26:
-		case TestTools.LEVEL_INIT_TICKS + 27:
-		case TestTools.LEVEL_INIT_TICKS + 28:
-		case TestTools.LEVEL_INIT_TICKS + 29:
-		case TestTools.LEVEL_INIT_TICKS + 30:
-		case TestTools.LEVEL_INIT_TICKS + 31:
-		case TestTools.LEVEL_INIT_TICKS + 32:
-		case TestTools.LEVEL_INIT_TICKS + 33:
-		case TestTools.LEVEL_INIT_TICKS + 34:
-		case TestTools.LEVEL_INIT_TICKS + 35:
-		case TestTools.LEVEL_INIT_TICKS + 36:
-		case TestTools.LEVEL_INIT_TICKS + 37:
-		case TestTools.LEVEL_INIT_TICKS + 38:
-		case TestTools.LEVEL_INIT_TICKS + 39:
-		case TestTools.LEVEL_INIT_TICKS + 40:
-		case TestTools.LEVEL_INIT_TICKS + 41:
-		case TestTools.LEVEL_INIT_TICKS + 42:
-		*/
+		int a1 = TestTools.LEVEL_INIT_TICKS +  200;
+		int a3 =                         a1 +  8;
+		
+		if (tick >= TestTools.LEVEL_INIT_TICKS && tick < a1) {
 			System.out.println((maxX - startX) - prevX);
-			prevX = (maxX - startX);
 			actions[Mario.KEY_RIGHT] = true;
-			break;
-		case TestTools.LEVEL_INIT_TICKS + 17:
-			System.out.println("reversing");
-			prevX = (maxX - startX);
-			actions[Mario.KEY_LEFT] = true;
-			break;
-		case TestTools.LEVEL_INIT_TICKS + 18:
-		case TestTools.LEVEL_INIT_TICKS + 19:
-		case TestTools.LEVEL_INIT_TICKS + 20:
-		case TestTools.LEVEL_INIT_TICKS + 21:
-		case TestTools.LEVEL_INIT_TICKS + 22:
-		case TestTools.LEVEL_INIT_TICKS + 23:
-		case TestTools.LEVEL_INIT_TICKS + 24:
-		case TestTools.LEVEL_INIT_TICKS + 25:
-		case TestTools.LEVEL_INIT_TICKS + 26:
-		case TestTools.LEVEL_INIT_TICKS + 27:
-			System.out.println((maxX - startX) - prevX);
-			prevX = (maxX - startX);
-			actions[Mario.KEY_LEFT] = true;
-			break;
 		}
+		else if (tick == a1) {
+			System.out.println((maxX - startX) - prevX);
+			System.out.println("reversing");
+			actions[Mario.KEY_LEFT] = true;
+		}
+		else if (tick > a1 && tick < a3) {
+			System.out.println((maxX - startX) - prevX);
+			actions[Mario.KEY_LEFT] = true;
+		}
+		prevX = (maxX - startX);
 
+		*/
 		tick++;
+		System.out.println(MarioControls.getDeaccelerationDistanceMoved(tick));
 		return actions;
 	}
 
