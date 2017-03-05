@@ -996,18 +996,18 @@ public class LevelScene extends Scene implements SpriteContext
             progress_str += ".";
         progress_str += "M";
         try {
-        drawStringDropShadow(g, entirePathStr.substring(progress_str.length()), progress_str.length(), 28, 0);
+        drawStringDropShadow(g, entirePathStr.substring(progress_str.length()), progress_str.length(), 28 / 2, 0);
         } catch (StringIndexOutOfBoundsException e)
         {
 //            System.err.println("warning: progress line inaccuracy");
         }
-        drawStringDropShadow(g, progress_str, 0, 28, 2);
+        drawStringDropShadow(g, progress_str, 0, 28 / 2, 2);
     }
 
     public static void drawStringDropShadow(Graphics g, String text, int x, int y, int c)
     {
-        drawString(g, text, (x*8+5) * Art.SIZE_MULTIPLIER, (y*8+5) * Art.SIZE_MULTIPLIER, 0);
-        drawString(g, text, (x*8+4) * Art.SIZE_MULTIPLIER, (y*8+4) * Art.SIZE_MULTIPLIER, c);
+        //drawString(g, text, (x*8+5), (y*8+5), 0);
+        drawString(g, text, (x*8+4), (y*8+4), c);
     }
 
     private static void drawString(Graphics g, String text, int x, int y, int c)
@@ -1015,7 +1015,7 @@ public class LevelScene extends Scene implements SpriteContext
         char[] ch = text.toCharArray();
         for (int i = 0; i < ch.length; i++)
         {
-            g.drawImage(Art.font[ch[i] - 32][c], (x + i * 8) * Art.SIZE_MULTIPLIER, y * Art.SIZE_MULTIPLIER, null);
+            g.drawImage(Art.font[ch[i] - 32][c], (x + i * 8), y, null);
         }
     }
 
