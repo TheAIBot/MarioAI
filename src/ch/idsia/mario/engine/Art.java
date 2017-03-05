@@ -33,6 +33,8 @@ public class Art
     public static Image titleScreen;
     final static String curDir = System.getProperty("user.dir");
     final static String img = curDir + "/../img/";
+    
+    public final static int SIZE_MULTIPLIER = 2;
 
     public static void init(GraphicsConfiguration gc)
     {
@@ -40,15 +42,15 @@ public class Art
         {
 //            System.out.println("Image Directory: " + img);
 //            System.out.println(curDir);
-            mario = cutImage(gc, "mariosheet.png", 32, 32);
-            smallMario = cutImage(gc, "smallmariosheet.png", 16, 16);
-            fireMario = cutImage(gc, "firemariosheet.png", 32, 32);
-            enemies = cutImage(gc, "enemysheet.png", 16, 32);
-            items = cutImage(gc, "itemsheet.png", 16, 16);
-            level = cutImage(gc, "mapsheet.png", 16, 16);
-            map = cutImage(gc, "worldmap.png", 16, 16);
-            particles = cutImage(gc, "particlesheet.png", 8, 8);
-            bg = cutImage(gc, "bgsheet.png", 32, 32);
+            mario = cutImage(gc, "mariosheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            smallMario = cutImage(gc, "smallmariosheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            fireMario = cutImage(gc, "firemariosheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            enemies = cutImage(gc, "enemysheet.png", 16 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            items = cutImage(gc, "itemsheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            level = cutImage(gc, "mapsheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            map = cutImage(gc, "worldmap.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            particles = cutImage(gc, "particlesheet.png", 8 * SIZE_MULTIPLIER, 8 * SIZE_MULTIPLIER);
+            bg = cutImage(gc, "bgsheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
             logo = getImage(gc, "logo.gif");
             titleScreen = getImage(gc, "title.gif");
             font = cutImage(gc, "font.gif", 8, 8);
