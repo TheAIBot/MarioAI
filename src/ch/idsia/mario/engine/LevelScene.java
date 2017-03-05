@@ -880,20 +880,20 @@ public class LevelScene extends Scene implements SpriteContext
             bgLayer[i].render(g, tick, alpha);
         }
 
-        g.translate(-xCam, -yCam);
+        g.translate(-xCam * Art.SIZE_MULTIPLIER, -yCam * Art.SIZE_MULTIPLIER);
 
         for (Sprite sprite : sprites)
         {
             if (sprite.layer == 0) sprite.render(g, alpha);
         }
 
-        g.translate(xCam, yCam);
+        g.translate(xCam * Art.SIZE_MULTIPLIER, yCam * Art.SIZE_MULTIPLIER);
 
         layer.setCam(xCam, yCam);
         layer.render(g, tick, paused?0:alpha);
         layer.renderExit0(g, tick, paused?0:alpha, mario.winTime==0);
 
-        g.translate(-xCam, -yCam);
+        g.translate(-xCam * Art.SIZE_MULTIPLIER, -yCam * Art.SIZE_MULTIPLIER);
 
         // TODO: Dump out of render!
         if (mario.cheatKeys[Mario.KEY_DUMP_CURRENT_WORLD])
@@ -910,7 +910,7 @@ public class LevelScene extends Scene implements SpriteContext
 
         }
 
-        g.translate(xCam, yCam);
+        g.translate(xCam * Art.SIZE_MULTIPLIER, yCam * Art.SIZE_MULTIPLIER);
         g.setColor(Color.BLACK);
         layer.renderExit1(g, tick, paused?0:alpha);
 
@@ -936,9 +936,9 @@ public class LevelScene extends Scene implements SpriteContext
 
         if (GlobalOptions.Labels)
         {
-            g.drawString("xCam: " + xCam + "yCam: " + yCam, 70, 40);
-            g.drawString("x : " + mario.x + "y: " + mario.y, 70, 50);
-            g.drawString("xOld : " + mario.xOld + "yOld: " + mario.yOld, 70, 60);
+            g.drawString("xCam: " + xCam + "yCam: " + yCam, 70 * Art.SIZE_MULTIPLIER, 40 * Art.SIZE_MULTIPLIER);
+            g.drawString("x : " + mario.x + "y: " + mario.y, 70 * Art.SIZE_MULTIPLIER, 50 * Art.SIZE_MULTIPLIER);
+            g.drawString("xOld : " + mario.xOld + "yOld: " + mario.yOld, 70 * Art.SIZE_MULTIPLIER, 60 * Art.SIZE_MULTIPLIER);
         }
 
         if (startTime > 0)
@@ -996,18 +996,18 @@ public class LevelScene extends Scene implements SpriteContext
             progress_str += ".";
         progress_str += "M";
         try {
-        drawStringDropShadow(g, entirePathStr.substring(progress_str.length()), progress_str.length(), 28, 0);
+        drawStringDropShadow(g, entirePathStr.substring(progress_str.length()), progress_str.length(), 28 / 2, 0);
         } catch (StringIndexOutOfBoundsException e)
         {
 //            System.err.println("warning: progress line inaccuracy");
         }
-        drawStringDropShadow(g, progress_str, 0, 28, 2);
+        drawStringDropShadow(g, progress_str, 0, 28 / 2, 2);
     }
 
     public static void drawStringDropShadow(Graphics g, String text, int x, int y, int c)
     {
-        drawString(g, text, x*8+5, y*8+5, 0);
-        drawString(g, text, x*8+4, y*8+4, c);
+        //drawString(g, text, (x*8+5), (y*8+5), 0);
+        drawString(g, text, (x*8+4), (y*8+4), c);
     }
 
     private static void drawString(Graphics g, String text, int x, int y, int c)
@@ -1015,7 +1015,7 @@ public class LevelScene extends Scene implements SpriteContext
         char[] ch = text.toCharArray();
         for (int i = 0; i < ch.length; i++)
         {
-            g.drawImage(Art.font[ch[i] - 32][c], x + i * 8, y, null);
+            g.drawImage(Art.font[ch[i] - 32][c], (x + i * 8), y, null);
         }
     }
 
@@ -1027,32 +1027,32 @@ public class LevelScene extends Scene implements SpriteContext
         int[] yp = new int[20];
         for (int i = 0; i < 16; i++)
         {
-            xp[i] = x + (int) (Math.cos(i * Math.PI / 15) * radius);
-            yp[i] = y + (int) (Math.sin(i * Math.PI / 15) * radius);
+            xp[i] = (x + (int) (Math.cos(i * Math.PI / 15) * radius)) * Art.SIZE_MULTIPLIER;
+            yp[i] = (y + (int) (Math.sin(i * Math.PI / 15) * radius)) * Art.SIZE_MULTIPLIER;
         }
-        xp[16] = 320;
-        yp[16] = y;
-        xp[17] = 320;
-        yp[17] = 240;
-        xp[18] = 0;
-        yp[18] = 240;
-        xp[19] = 0;
-        yp[19] = y;
+        xp[16] = 320 * Art.SIZE_MULTIPLIER;
+        yp[16] = y * Art.SIZE_MULTIPLIER;
+        xp[17] = 320 * Art.SIZE_MULTIPLIER;
+        yp[17] = 240 * Art.SIZE_MULTIPLIER;
+        xp[18] = 0 * Art.SIZE_MULTIPLIER;
+        yp[18] = 240 * Art.SIZE_MULTIPLIER;
+        xp[19] = 0 * Art.SIZE_MULTIPLIER;
+        yp[19] = y * Art.SIZE_MULTIPLIER;
         g.fillPolygon(xp, yp, xp.length);
 
         for (int i = 0; i < 16; i++)
         {
-            xp[i] = x - (int) (Math.cos(i * Math.PI / 15) * radius);
-            yp[i] = y - (int) (Math.sin(i * Math.PI / 15) * radius);
+            xp[i] = (x - (int) (Math.cos(i * Math.PI / 15) * radius)) * Art.SIZE_MULTIPLIER;
+            yp[i] = (y - (int) (Math.sin(i * Math.PI / 15) * radius)) * Art.SIZE_MULTIPLIER;
         }
-        xp[16] = 320;
-        yp[16] = y;
-        xp[17] = 320;
-        yp[17] = 0;
-        xp[18] = 0;
-        yp[18] = 0;
-        xp[19] = 0;
-        yp[19] = y;
+        xp[16] = 320 * Art.SIZE_MULTIPLIER;
+        yp[16] = y * Art.SIZE_MULTIPLIER;
+        xp[17] = 320 * Art.SIZE_MULTIPLIER;
+        yp[17] = 0 * Art.SIZE_MULTIPLIER;
+        xp[18] = 0 * Art.SIZE_MULTIPLIER;
+        yp[18] = 0 * Art.SIZE_MULTIPLIER;
+        xp[19] = 0 * Art.SIZE_MULTIPLIER;
+        yp[19] = y * Art.SIZE_MULTIPLIER;
 
         g.fillPolygon(xp, yp, xp.length);
     }

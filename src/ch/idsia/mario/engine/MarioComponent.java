@@ -241,7 +241,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		Graphics g = null;
 		Graphics og = null;
 
-		image = createVolatileImage(320, 240);
+		image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 		g = getGraphics();
 		og = image.getGraphics();
 
@@ -274,7 +274,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 			// og.setColor(Color.RED);
 			if (GlobalOptions.VisualizationOn) {
-				og.fillRect(0, 0, 320, 240);
+				og.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 				scene.render(og, alpha);
 				((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
 				((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
@@ -335,11 +335,14 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 				LevelScene.drawStringDropShadow(og, "Trial:", 33, 4, 7);
 				LevelScene.drawStringDropShadow(og, msg, 33, 5, 7);
 
+				g.drawImage(image, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+				/*
 				if (width != 320 || height != 240) {
 					g.drawImage(image, 0, 0, 640 * 2, 480 * 2, null);
 				} else {
 					g.drawImage(image, 0, 0, null);
 				}
+				*/
 			} else {
 				// Win or Die without renderer!! independently.
 				marioStatus = ((LevelScene) scene).mario.getStatus();
@@ -393,7 +396,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private void drawString(Graphics g, String text, int x, int y, int c) {
 		char[] ch = text.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
-			g.drawImage(Art.font[ch[i] - 32][c], x + i * 8, y, null);
+			g.drawImage(Art.font[ch[i] - 32][c], (x + i * 8), y, null);
 		}
 	}
 
