@@ -31,7 +31,7 @@ public class Play {
         if (loadLevel) {
             Agent controller = new FastAndFurious();
             //Environment observation = TestTools.loadLevel("jumpLevels/3HighJumps.lvl", controller, true);
-            Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("jumpLevels/3Width.lvl", controller, true);
             
             //Agent controller = new TestAgent();
             //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
