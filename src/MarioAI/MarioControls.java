@@ -105,8 +105,8 @@ public class MarioControls {
 			}
 			while (distanceMoved < -neededXDistance) {
 				steps++;
-				xSpeedIndex++;
-				distanceMoved += getDistanceFromSpeed(xSpeedIndex);
+				xSpeedIndex--;
+				distanceMoved += getDistanceFromSpeed(-xSpeedIndex);
 			}
 			return steps;
 		}

@@ -10,8 +10,8 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestAgent implements Agent {
 	private int tick = 0;
-	private float maxX = 0;
-	private float startX = 1000;
+	//private float maxX = 0;
+	//private float startX = 1000;
 	
 	//Fitted estimate of v(t) for Mario
 	//v(t) := .340909068708614-.340909068708614*exp(-.116533823678965*t)
@@ -23,6 +23,17 @@ public class TestAgent implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
+		
+		if (tick == TestTools.LEVEL_INIT_TICKS) {
+			prevX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		}
+		else if (tick > TestTools.LEVEL_INIT_TICKS) {
+			actions[Mario.KEY_RIGHT] = true;
+			float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			System.out.println(marioX - prevX);
+			prevX = marioX;
+		}
+		
 		/*
 		startX = Math.min(startX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
 		maxX = Math.max(maxX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
@@ -47,7 +58,7 @@ public class TestAgent implements Agent {
 
 		*/
 		tick++;
-		System.out.println(MarioControls.getDeaccelerationDistanceMoved(tick));
+		//System.out.println(MarioControls.getDeaccelerationDistanceMoved(tick));
 		return actions;
 	}
 
