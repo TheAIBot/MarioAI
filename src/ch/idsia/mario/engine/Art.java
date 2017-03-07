@@ -34,7 +34,7 @@ public class Art
     final static String curDir = System.getProperty("user.dir");
     final static String img = curDir + "/../img/";
     
-    public final static int SIZE_MULTIPLIER = 4;
+    public static int SIZE_MULTIPLIER = 4;
 
     public static void init(GraphicsConfiguration gc)
     {
@@ -42,15 +42,15 @@ public class Art
         {
 //            System.out.println("Image Directory: " + img);
 //            System.out.println(curDir);
-            mario = cutImage(gc, "mariosheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
-            smallMario = cutImage(gc, "smallmariosheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
-            fireMario = cutImage(gc, "firemariosheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
-            enemies = cutImage(gc, "enemysheet.png", 16 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
-            items = cutImage(gc, "itemsheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
-            level = cutImage(gc, "mapsheet.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
-            map = cutImage(gc, "worldmap.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
-            particles = cutImage(gc, "particlesheet.png", 8 * SIZE_MULTIPLIER, 8 * SIZE_MULTIPLIER);
-            bg = cutImage(gc, "bgsheet.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            mario = cutImage(gc, "mariosheet" + SIZE_MULTIPLIER + "x.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            smallMario = cutImage(gc, "smallmariosheet" + SIZE_MULTIPLIER + "x.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            fireMario = cutImage(gc, "firemariosheet" + SIZE_MULTIPLIER + "x.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            enemies = cutImage(gc, "enemysheet" + SIZE_MULTIPLIER + "x.png", 16 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
+            items = cutImage(gc, "itemsheet" + SIZE_MULTIPLIER + "x.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            level = cutImage(gc, "mapsheet" + SIZE_MULTIPLIER + "x.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            map = cutImage(gc, "worldmap" + SIZE_MULTIPLIER + "x.png", 16 * SIZE_MULTIPLIER, 16 * SIZE_MULTIPLIER);
+            particles = cutImage(gc, "particlesheet" + SIZE_MULTIPLIER + "x.png", 8 * SIZE_MULTIPLIER, 8 * SIZE_MULTIPLIER);
+            bg = cutImage(gc, "bgsheet" + SIZE_MULTIPLIER + "x.png", 32 * SIZE_MULTIPLIER, 32 * SIZE_MULTIPLIER);
             logo = getImage(gc, "logo.gif");
             titleScreen = getImage(gc, "title.gif");
             font = cutImage(gc, "font.gif", 8, 8);
