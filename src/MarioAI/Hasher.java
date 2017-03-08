@@ -3,6 +3,8 @@ package MarioAI;
 import MarioAI.graph.DirectedEdge;
 
 public class Hasher {
+	
+	public final float speedFactor = 46; //Se asociated math calculation. Approxcematly 16/0.35, meaning 8 levels of speed.
 	public static int hashShortPoint(short x, short y)
 	{
 		return x + Short.MAX_VALUE * y;
@@ -18,7 +20,9 @@ public class Hasher {
 		short factor = (short) Math.round(vx * 10); // arbitrarily chosen value
 		//h = (a*P1 + b)*P2 + c
 		//return (int) ((x*31 + y)*59 + vx * factor);
-		return (int) (vx * factor) + x * Short.MAX_VALUE + y * Short.MAX_VALUE * Short.MAX_VALUE;
+		return ((byte) (vx * factor) & 15) +
+			   (( x & 511) << 4 ) + 
+			   ((y & 15) << 13);
 	}
 	
 	private static int ll = 0;

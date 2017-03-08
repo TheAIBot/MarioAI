@@ -110,4 +110,16 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	public float getWeight() {
 		return 0.1f;
 	}
+
+	@Override
+	public float getTraversedTime(float v0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getSpeedAfterTraversal(float v0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
