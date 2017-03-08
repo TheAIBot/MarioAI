@@ -43,7 +43,7 @@ public  class Grapher {
 
 	}
 	
-	public static void graph(Node[][] levelMatrix, Node mario) {
+	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
 		for (int i = 0; i < levelMatrix.length; i++) {
 			for (int j = 0; j < levelMatrix[i].length; j++) {
@@ -112,7 +112,7 @@ public  class Grapher {
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		//Three different ways to find the reachable nodes from a given position:
-		//getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
@@ -145,17 +145,13 @@ public  class Grapher {
 	
 	private static void jumpAlongPolynomial(Node startingNode, short nodeColoumn, SecondOrderPolynomial polynomial, List<DirectedEdge> listOfEdges) {
 		//Starts of from Mario's initial position:
-		short currentXPosition = nodeColoumn;
-		short xPositionOffsetForJump = 0;
-		float formerYPosition = startingNode.y;
+		short currentXPosition = nodeColoumn, xPositionOffsetForJump = 0;
+		float formerYPosition = startingNode.y, currentYPosition;
 		short formerLowerYPosition = startingNode.y;
 		boolean hasMetHardGround = false;
-				
-		float currentYPosition;
+		
 		short currentLowerYPosition; //Automatic flooring included!
-		// TODO change to take the sign into account
 		short bound;
-		//TODO Doesen't take falling down into a hole into account.	
 		
 		Collision collisionDetection = Collision.HIT_NOTHING;
 		

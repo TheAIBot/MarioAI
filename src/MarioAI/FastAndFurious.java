@@ -37,7 +37,7 @@ public class FastAndFurious implements Agent {
 		boolean[] action = new boolean[Environment.numberOfButtons]; 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
 				newestPath = path;
@@ -46,7 +46,7 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			//graph.updateMatrix(observation);
 			if (graph.updateMatrix(observation)) {
-				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
 			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			
@@ -65,7 +65,7 @@ public class FastAndFurious implements Agent {
 				if (path != null) {
 					newestPath = path;
 				} else {
-					Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+					Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 					path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 					
 				}
