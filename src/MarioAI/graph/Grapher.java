@@ -53,6 +53,7 @@ public  class Grapher {
 					currentNode.fScore=0;
 					currentNode.gScore=0;
 					currentNode.parent = null;
+					currentNode.ancestorEdge = null;
 				}
 			}
 		}
@@ -119,7 +120,7 @@ public  class Grapher {
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		//Three different ways to find the reachable nodes from a given position:
-		//getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
@@ -144,7 +145,7 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+		for (float jumpRange = 3; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}
@@ -216,7 +217,7 @@ public  class Grapher {
 	private static Collision ascendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, Collision collisionDetection,
 												 SecondOrderPolynomial polynomial,Node startingPosition, List<DirectedEdge> listOfEdges) {
 		boolean isHittingWall = false;		
-		for (short y = formerLowerYPosition; y >= bound; y--) {
+		for (short y = formerLowerYPosition; y >= Math.max(bound,0); y--) {
 			Collision lowerRightMarioCorner = lowerRightCornerCollision(isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection);
 			Collision upperRightMarioCorner = upperRightCornerCollision(isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection);	
 			Collision upperLeftMarioCorner 	= upperLeftCornerCollision (isHittingWall , y, formerLowerYPosition, currentXPosition, collisionDetection);	
@@ -241,62 +242,10 @@ public  class Grapher {
 		return collisionDetection;
 	}
 	
-	//TODO Fix error
-	private static Collision cornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection,
-			 SecondOrderPolynomial polynomial,Node startingPosition, List<DirectedEdge> listOfEdges) {
-		if (isHittingWallOrGround(currentXPosition,y)) {
-			if (y == formerLowerYPosition) {
-				return collisionDetection = Collision.HIT_WALL;
-			} else if (!isHittingWall){
-				//TODOD make.
-				//hitWallOrGround(listOfEdges, currentXPosition,y);
-				return Collision.HIT_CEILING;					
-			} else return Collision.HIT_WALL;
-		} else if (collisionDetection == Collision.HIT_WALL) {
-			//listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
-			return Collision.HIT_GROUND;
-		} else return Collision.HIT_NOTHING;
-	}
-	
-	private static Collision lowerRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
-		if (isHittingWallOrGround(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
-			return Collision.HIT_WALL;
-		}
-		/*
-		else if (collisionDetection == Collision.HIT_WALL) {
-			//listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
-			return Collision.HIT_GROUND;
-		} 
-		*/
-		else return Collision.HIT_NOTHING;
-	}
-	
-	private static Collision upperRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
-		if (isHittingWallOrGround(currentXPosition,(short)(y-1))) {
-			if (y == formerLowerYPosition) {
-				return Collision.HIT_WALL;
-			} else if (!isHittingWall){
-				//TODOD make.
-				//hitWallOrGround(listOfEdges, currentXPosition,y);
-				return Collision.HIT_CEILING;					
-			} else return Collision.HIT_WALL;
-		} else return Collision.HIT_NOTHING;
-	}
-	
-	private static Collision upperLeftCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
-		if (isHittingWallOrGround((short)(currentXPosition-1),(short)(y-1))) {
-			return Collision.HIT_CEILING;
-		} else return Collision.HIT_NOTHING;
-	}
-	
 	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
 			                                    List<DirectedEdge> listOfEdges, SecondOrderPolynomial polynomial, Node startingPosition) {
 		for (short y = formerLowerYPosition; y <= bound; y++) {
-			if (isHittingWallOrGround(currentXPosition,y)) {
-				//TODO make.
-				//hitWallOrGround(listOfEdges, currentXPosition,y);
-				return true;
-			} else if (canMarioStandThere(currentXPosition, y)) { 
+			if (canMarioStandThere(currentXPosition, y)) { 
 				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
 				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
 				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
@@ -306,7 +255,10 @@ public  class Grapher {
 				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y], polynomial));
 				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
 				//TODO Fix so no multi edges
-			}		
+				return true; //TODO Fix this. Shouldn't just return true, as this sometimes will not include some possibilities
+			} else if (!isAir(currentXPosition, y) && !isAir(currentXPosition, (short)(y-1))) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -318,9 +270,16 @@ public  class Grapher {
 	/***
 	 * @return
 	 */
-	private static boolean isHittingWallOrGround(short xPosition, short yPosition) {
+	private static boolean isHittingWallOrGroundUpwards(short xPosition, short yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
 		boolean result = (isOnLevelMatrix(xPosition, (short) (yPosition -1))) && isSolid(observationGraph[xPosition][yPosition-1]);
+		return result;
+	}
+	
+	private static boolean isHittingWallOrGroundDownwards(short xPosition, short yPosition) {
+		//Being out of the level matrix does not constitute as hitting something
+		boolean result = isOnLevelMatrix(xPosition, (short) (yPosition -1)) && 
+						(isSolid(observationGraph[xPosition][yPosition-1])   || isJumpThroughNode(observationGraph[xPosition][yPosition-1]));
 		return result;
 	}
 	
@@ -376,13 +335,51 @@ public  class Grapher {
 	}
 
 	private static boolean isOnSolidGround(short row, short coloumn) {
-		return observationGraph[coloumn][row] != null && ( isSolid(observationGraph[coloumn][row]) || observationGraph[coloumn][row].type == -11); //TODO Fix in general.
+		return observationGraph[coloumn][row] != null; //TODO Fix in general.
 	}
 
 	private static boolean isSolid(Node node) {
 		//return node != null;
 		return node != null && node.type != -11;// TODO(*) Fix
 	}
+	
+	private static boolean isAir(short coloumn, short row) {
+		//return node != null;
+		return !(0 <= row 	  && row < GRID_HEIGHT     &&
+				 0 <= coloumn && coloumn < GRID_WIDTH) ||				
+				 observationGraph[coloumn][row] == null;// TODO(*) Fix
+	}
+	
+	private static boolean isJumpThroughNode(Node node) {
+		return (node != null && node.type == 11);
+	}
+	
+
+	
+	private static Collision lowerRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
+		if (isHittingWallOrGroundUpwards(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
+			return Collision.HIT_WALL;
+		} else return Collision.HIT_NOTHING;
+	}
+	
+	private static Collision upperRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
+		if (isHittingWallOrGroundUpwards(currentXPosition,(short)(y-1))) {
+			if (y == formerLowerYPosition) {
+				return Collision.HIT_WALL;
+			} else if (!isHittingWall){
+				//TODOD make.
+				//hitWallOrGround(listOfEdges, currentXPosition,y);
+				return Collision.HIT_CEILING;					
+			} else return Collision.HIT_WALL;
+		} else return Collision.HIT_NOTHING;
+	}
+	
+	private static Collision upperLeftCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
+		if (isHittingWallOrGroundUpwards((short)(currentXPosition-1),(short)(y-1))) {
+			return Collision.HIT_CEILING;
+		} else return Collision.HIT_NOTHING;
+	}
+
 	
 }
 

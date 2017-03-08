@@ -57,11 +57,12 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawNeighborPaths(observation, graph);
 				DebugDraw.drawReachableNodes(observation, graph);
 				DebugDraw.drawPathOptionNodes(observation, graph);
+				System.out.println();
 			}
 		}
 		
-		if (newestPath != null && newestPath.size() > 1) {
-			if (MarioControls.getNextAction(observation, newestPath, action)) {
+		if (newestPath != null && newestPath.size() > 1 && tickCount > 30) {
+			if (MarioControls.getNextAction(observation, newestPath, action) || tickCount%8 == 0) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
@@ -74,7 +75,9 @@ public class FastAndFurious implements Agent {
 			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
 		} else if (tickCount > 30){
 			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getLevelMatrix()[21]);
+			//TODO the mistake is here.			
+			//List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			newestPath = path;
 		}
 		tickCount++;

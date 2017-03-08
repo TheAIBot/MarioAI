@@ -31,7 +31,7 @@ public class Play {
         if (loadLevel) {
             Agent controller = new FastAndFurious();
             //Agent controller = new TestAgent();
-            Environment observation = TestTools.loadLevel("platformJump.lvl", controller);
+            Environment observation = TestTools.loadLevel("jumpThroughPermeableCeiling.lvl", controller);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
