@@ -8,17 +8,6 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 	
-	/**
-	 * @param x
-	 * @param y
-	 * @param vx
-	 * @return
-	 */
-	public static int hashSpeedNode(short x, short y, float vx) {
-		short factor = (short) Math.round(vx * 10); // arbitrarily chosen value
-		return x + Short.MAX_VALUE * y * factor;
-	}
-	
 	private static int ll = 0;
 	public static int hashEdge(DirectedEdge edge)
 	{
@@ -44,5 +33,4 @@ public class Hasher {
 		//return b1 | b2 | b3 | b4;
 		return ll++;
 	}
-	
 }
