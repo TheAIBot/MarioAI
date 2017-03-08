@@ -123,46 +123,25 @@ public class DebugDraw {
 			if (!visitedNodes.contains(toCheck)) {
 				nodesToVisit.addAll(toCheck.getEdges());
 				visitedNodes.add(toCheck);				
-				addDebugLines(observation, toCheck);
+				
+				for (DirectedEdge directedEdge : toCheck.getEdges()) {
+					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
+					convertLevelPointToOnScreenPoint(observation, pSource);
+					
+					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
+					convertLevelPointToOnScreenPoint(observation, pTarget);
+					if (pSource.y >= pTarget.y) {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+					}
+					else {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
+					}
+					
+				}				
 			}
 		}
 	}
 	
-	/**
-	 * Draw reachable nodes from Mario's current position
-	 * @param observation
-	 * @param graph
-	 */
-	public static void drawReachableNodes(final Environment observation, Graph graph) {		
-		Node mario = graph.getMarioNode(observation);
-		List<DirectedEdge> edges = mario.getEdges();
-		
-		for (DirectedEdge edge : edges) {
-			Node toCheck = edge.target;
-			addDebugLines(observation, toCheck);
-		}
-	}
-	
-	/**
-	 * Auxiliary method
-	 * @param observation
-	 * @param toCheck
-	 */
-	private static void addDebugLines(final Environment observation, Node toCheck) {
-		for (DirectedEdge directedEdge : toCheck.getEdges()) {
-			Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
-			convertLevelPointToOnScreenPoint(observation, pSource);
-			
-			Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
-			convertLevelPointToOnScreenPoint(observation, pTarget);
-			if (pSource.y >= pTarget.y) {
-				((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
-			}
-			else {
-				((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
-			}
-		}
-	}
 	
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
