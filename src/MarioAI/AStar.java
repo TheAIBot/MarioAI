@@ -1,16 +1,16 @@
 package MarioAI;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Node;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.environments.Environment;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public final class AStar {
 
@@ -58,10 +58,10 @@ public final class AStar {
 	 */
 	public static List<DirectedEdge> runAStar(final Node start, final Node goal) {
 		// Set of nodes already explored
-		final List<Node> closedSet = new ArrayList<Node>();
+		final Map<Integer, Node> closedSet = new HashMap<Integer, Node>();
 		// Set of nodes yet to be explored
 		final PriorityQueue<Node> openSet = new PriorityQueue<Node>();
-
+		
 		// Initialization
 		openSet.add(start);
 		start.gScore = 0;
@@ -77,12 +77,12 @@ public final class AStar {
 
 			// Current node has been explored
 			// openSet.remove(current);
-			closedSet.add(current);
+			closedSet.put(current.hashCode(), current);
 
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				if (closedSet.contains(neighborEdge.target))
+				if (closedSet.containsKey(neighborEdge.target.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
 				float tentativeGScore = current.gScore + neighborEdge.getWeight();
@@ -98,11 +98,15 @@ public final class AStar {
 				neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
 			}
 		}
-		for (Node node : closedSet) {
-			node.gScore = 0;
-			node.fScore = 0;
-			node.parent = null;
+		
+		//TODO look at this and change it
+		Iterator<Node> iter = closedSet.values().iterator();
+		while (iter.hasNext()) {
+			iter.next().gScore = 0;
+			iter.next().fScore = 0;
+			iter.next().parent = null;
 		}
+		
 		// No solution was found
 		return null;
 	}
