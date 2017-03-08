@@ -82,7 +82,7 @@ public class MarioControls {
 		return heights.length;
 	}
 	
-	private static int getXMovementTime(float neededXDistance) {
+	public static int getXMovementTime(float neededXDistance) {
 		if (neededXDistance < 0) {
 			float distanceMoved = 0;
 			int steps = 0;

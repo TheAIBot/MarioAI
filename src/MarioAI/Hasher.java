@@ -16,7 +16,9 @@ public class Hasher {
 	 */
 	public static int hashSpeedNode(short x, short y, float vx) {
 		short factor = (short) Math.round(vx * 10); // arbitrarily chosen value
-		return x + Short.MAX_VALUE * y * factor;
+		//h = (a*P1 + b)*P2 + c
+		//return (int) ((x*31 + y)*59 + vx * factor);
+		return (int) (vx * factor) + x * Short.MAX_VALUE + y * Short.MAX_VALUE * Short.MAX_VALUE;
 	}
 	
 	private static int ll = 0;
