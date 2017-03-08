@@ -47,8 +47,12 @@ public  class Grapher {
 		observationGraph = levelMatrix;
 		for (int i = 0; i < levelMatrix.length; i++) {
 			for (int j = 0; j < levelMatrix[i].length; j++) {
-				if (levelMatrix[i][j] != null) {
-					levelMatrix[i][j].deleteAllEdges();
+				Node currentNode = levelMatrix[i][j];
+				if (currentNode != null) {
+					currentNode.deleteAllEdges();
+					currentNode.fScore=0;
+					currentNode.gScore=0;
+					currentNode.parent = null;
 				}
 			}
 		}
@@ -84,6 +88,9 @@ public  class Grapher {
 			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
 			 * It must be possible to only calculate what is necessary.
 			 */
+			if (neighborEdge.target.ancestorEdge == null) {
+				neighborEdge.target.ancestorEdge = neighborEdge;
+			}
 			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
 				short neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
 				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
@@ -112,7 +119,7 @@ public  class Grapher {
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, short nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		//Three different ways to find the reachable nodes from a given position:
-		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		//getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
 		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;

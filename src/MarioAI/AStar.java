@@ -41,7 +41,7 @@ public final class AStar {
 		for (Node node : nodes) {
 			if (node != null) {
 				//remove the last edge as that's the egde to the goal
-				//because it was the soonest added edge
+				//because it was the last edge added
 				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
