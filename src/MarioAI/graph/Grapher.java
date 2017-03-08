@@ -137,7 +137,7 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 5; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}
@@ -221,11 +221,15 @@ public  class Grapher {
 			if 		  (upperLeftMarioCorner == Collision.HIT_CEILING  || upperRightMarioCorner == Collision.HIT_CEILING) {
 				collisionDetection = Collision.HIT_CEILING;
 				break;
-			} else if (upperRightMarioCorner == Collision.HIT_NOTHING && lowerRightMarioCorner == Collision.HIT_GROUND) {
+			} 
+			/*
+			else if (upperRightMarioCorner == Collision.HIT_NOTHING && lowerRightMarioCorner == Collision.HIT_GROUND) {
 				collisionDetection = Collision.HIT_GROUND;
 				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
 				break;
-			} else if (upperRightMarioCorner == Collision.HIT_WALL    || lowerRightMarioCorner == Collision.HIT_WALL){
+			} 
+			*/
+			else if (upperRightMarioCorner == Collision.HIT_WALL    || lowerRightMarioCorner == Collision.HIT_WALL){
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				//No break.
@@ -254,10 +258,14 @@ public  class Grapher {
 	private static Collision lowerRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
 		if (isHittingWallOrGround(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
 			return Collision.HIT_WALL;
-		} else if (collisionDetection == Collision.HIT_WALL) {
+		}
+		/*
+		else if (collisionDetection == Collision.HIT_WALL) {
 			//listOfEdges.add(new DirectedEdge(startingPosition, observationGraph[currentXPosition][y], new SecondOrderPolynomial(polynomial)));
 			return Collision.HIT_GROUND;
-		} else return Collision.HIT_NOTHING;
+		} 
+		*/
+		else return Collision.HIT_NOTHING;
 	}
 	
 	private static Collision upperRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
