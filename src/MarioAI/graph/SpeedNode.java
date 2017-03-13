@@ -37,7 +37,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	public int compareTo(SpeedNode o) {
-		return (int) (o.fScore - this.fScore);
+		return (int) (this.fScore - o.fScore);
 	}
 
 }

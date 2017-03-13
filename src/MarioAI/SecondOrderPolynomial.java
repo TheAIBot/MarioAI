@@ -86,13 +86,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 
 	@Override
 	public float getTraversedTime(float v0) {
-		// TODO Auto-generated method stub
-		return 10;
+		// TODO Auto-generated method stub 
+		if (v0 == 0) return 9001f;
+		return (target.x - source.x) / v0;
 	}
 
 	@Override
 	public float getSpeedAfterTraversal(float v0) {
 		// TODO Auto-generated method stub
-		return 1;
+		return v0;
 	}
 }

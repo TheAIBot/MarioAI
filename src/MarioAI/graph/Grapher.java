@@ -124,7 +124,7 @@ public  class Grapher {
 		//Three different ways to find the reachable nodes from a given position:
 		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
-		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		//getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
 		return listOfEdges;
 	}
 	

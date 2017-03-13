@@ -25,15 +25,15 @@ public final class AStar {
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
 	 * @param start
-	 * @param nodes
+	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] nodes) {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
-		for (Node node : nodes) {
+		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
 			}
@@ -41,11 +41,11 @@ public final class AStar {
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
-		if (path != null && path.size() > 0) {
+		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
 
-		for (Node node : nodes) {
+		for (Node node : rightmostNodes) {
 			if (node != null) {
 				//remove the last edge as that's the edge to the goal
 				//because it was the first added edge
@@ -72,6 +72,7 @@ public final class AStar {
 
 		// Initialization
 		openSet.add(start);
+		openSetMap.put(start.hashCode(), start);
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
@@ -104,14 +105,14 @@ public final class AStar {
 					openSet.add(sn);
 				} else if (tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
 					continue;
+				} else {
+					// Update values
+					openSet.remove(sn);
+					sn.parent = current.node;
+					sn.gScore = tentativeGScore;
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					openSet.add(sn);
 				}
-				
-				// Update values
-				openSet.remove(sn);
-				sn.parent = current.node;
-				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal);
-				openSet.add(sn);
 			}
 		}
 
@@ -146,7 +147,8 @@ public final class AStar {
 	 */
 	public static float heuristicFunction(final SpeedNode start, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		return GraphMath.distanceBetween(start.node, goal.node);
+		if (start.vx == 0) return  1000000f;
+		else return GraphMath.distanceBetween(start.node, goal.node)/start.vx;
 	}
 
 	/**
