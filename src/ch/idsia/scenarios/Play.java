@@ -27,7 +27,7 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
             Agent controller = new FastAndFurious();
             //Environment observation = TestTools.loadLevel("jumpLevels/3HighJumps.lvl", controller, true);
