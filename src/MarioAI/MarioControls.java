@@ -164,4 +164,17 @@ public class MarioControls {
 		}
 		return (float)driftDistance;
 	}
+	
+	private static int getFallingTime(float fallingHeight) {
+		final double a = -0.0596454130952380;
+		final double b = 0.0892932892857146;
+		final double c = 4.19153429166667;
+		int time = 0;
+		double fallenDistance = 0;
+		while(fallenDistance >= fallingHeight) {
+			time++;
+			fallenDistance += a * t^2 - b * t + c;
+		}
+		v(t) = a * t^2 - b * t + c;
+	}
 }
