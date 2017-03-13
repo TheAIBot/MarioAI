@@ -93,13 +93,13 @@ public final class AStar {
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
 				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx),
-											 neighborEdge.source);
+											 current);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
 				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);
 				if (!openSetMap.containsKey(sn.hashCode())) {
-					sn.parent = current.node;
+					sn.parent = current;
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
 					openSet.add(sn);
@@ -108,7 +108,7 @@ public final class AStar {
 				} else {
 					// Update values
 					openSet.remove(sn);
-					sn.parent = current.node;
+					sn.parent = current;
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
 					openSet.add(sn);
@@ -156,18 +156,17 @@ public final class AStar {
 	 * @return path
 	 */
 	private static List<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
-		Node current = currentSpeedNode.node;
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		while (current.parent != null) {
+		while (currentSpeedNode.parent != null) {
 			DirectedEdge fisk = null;
-			for (int i = 0; i < current.parent.edges.size(); i++) {
-				if (current.parent.edges.get(i).target.equals(current)) {
-					fisk = current.parent.edges.get(i);
+			for (int i = 0; i < currentSpeedNode.parent.node.edges.size(); i++) {
+				if (currentSpeedNode.parent.node.edges.get(i).target.equals(currentSpeedNode.node)) {
+					fisk = currentSpeedNode.parent.node.edges.get(i);
 					break;
 				}
 			}
 			path.add(fisk);
-			current = current.parent;
+			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);
 		return path;

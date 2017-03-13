@@ -7,10 +7,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public Node node;
 	public float vx;
 	public float gScore, fScore;
-	public Node parent;
+	public SpeedNode parent;
 	public int hash;
 	
-	public SpeedNode(Node node, float vx, Node parent) {
+	public SpeedNode(Node node, float vx, SpeedNode parent) {
 		this.node = node;
 		this.vx = vx;
 		this.parent = parent;
