@@ -87,15 +87,21 @@ public final class AStar {
 				// Distance from start to neighbor of current node
 				float tentativeGScore = current.gScore + neighborEdge.getWeight();
 				if (!openSet.contains(neighborEdge.target)) {
+					neighborEdge.target.parent = current;
+					neighborEdge.target.gScore = tentativeGScore;
+					neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
 					openSet.add(neighborEdge.target);
 				} else if (tentativeGScore >= neighborEdge.target.gScore) {
 					continue;
+				} else {
+					openSet.remove(neighborEdge.target);
+					neighborEdge.target.parent = current;
+					neighborEdge.target.gScore = tentativeGScore;
+					neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
+					openSet.add(neighborEdge.target);
 				}
 
 				// Update values
-				neighborEdge.target.parent = current;
-				neighborEdge.target.gScore = tentativeGScore;
-				neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
 			}
 		}
 		for (Node node : closedSet) {

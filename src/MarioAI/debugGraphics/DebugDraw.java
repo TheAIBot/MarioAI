@@ -32,7 +32,8 @@ public class DebugDraw {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 
 		final ArrayList<Point> pathLines = new ArrayList<Point>();
-		final ArrayList<Point> pathCircles = new ArrayList<Point>();
+		final ArrayList<Point> pathCirclesPolynomial = new ArrayList<Point>();
+		final ArrayList<Point> pathCirclesRunning = new ArrayList<Point>();
 
 		final Point marioPoint = new Point(marioXPos, marioYPos);
 		convertLevelPointToOnScreenPoint(observation, marioPoint);
@@ -44,11 +45,14 @@ public class DebugDraw {
 
 			convertLevelPointToOnScreenPoint(observation, point);
 			pathLines.add(point);
-			pathCircles.add(point);
+			if (path.get(i) instanceof SecondOrderPolynomial) {
+				pathCirclesPolynomial.add(point);
+			} else pathCirclesRunning.add(point);
 		}
 
 		((MarioComponent) observation).addDebugLines(new debugLines(Color.RED, pathLines));
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.RED, pathCircles));
+		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.DARK_GRAY, pathCirclesPolynomial));
+		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.RED, pathCirclesRunning));
 	}
 
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {

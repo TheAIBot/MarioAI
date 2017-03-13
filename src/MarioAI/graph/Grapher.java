@@ -7,12 +7,13 @@ import MarioAI.SecondOrderPolynomial;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 5;
+	private static final float MAX_JUMP_RANGE = 4;
 	private static final short GRID_HEIGHT = 15;
 	private static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private static boolean[][] inRecursion = new boolean[GRID_WIDTH][GRID_WIDTH];
 	private static final short MARIO_JUMP_LENGHT = 5;
+	private static final int MarioHeight = 2;
 	private static Node marioNode;
 	static int testPrintCounter = 24; // Rand value
 
@@ -62,7 +63,8 @@ public  class Grapher {
 		marioNode = mario;
 		//printView();
 
-		connectNode(mario, (short) (GRID_WIDTH/2)); //TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
+		connectNode(mario, (short) (GRID_WIDTH/2)); 
+		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
 	}
 	
@@ -191,6 +193,7 @@ public  class Grapher {
 			formerLowerYPosition = bound;
 		}
 		
+		
 		//Downwards:
 		if (polynomial.getTopPointX() < currentXPosition) {
 			currentXPosition--; //The toppunkt was in the current block (and not ending there).
@@ -225,15 +228,11 @@ public  class Grapher {
 			if 		  (upperLeftMarioCorner == Collision.HIT_CEILING  || upperRightMarioCorner == Collision.HIT_CEILING) {
 				collisionDetection = Collision.HIT_CEILING;
 				break;
-			} 
-			/*
-			else if (upperRightMarioCorner == Collision.HIT_NOTHING && lowerRightMarioCorner == Collision.HIT_GROUND) {
+			} else if (upperRightMarioCorner == Collision.HIT_NOTHING && lowerRightMarioCorner == Collision.HIT_GROUND) {
 				collisionDetection = Collision.HIT_GROUND;
 				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
 				break;
-			} 
-			*/
-			else if (upperRightMarioCorner == Collision.HIT_WALL    || lowerRightMarioCorner == Collision.HIT_WALL){
+			} else if (upperRightMarioCorner == Collision.HIT_WALL    || lowerRightMarioCorner == Collision.HIT_WALL){
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				//No break.
@@ -356,9 +355,11 @@ public  class Grapher {
 	
 
 	
-	private static Collision lowerRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, short currentXPosition, Collision collisionDetection) {
+	private static Collision lowerRightCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, 
+													   short currentXPosition, Collision collisionDetection) {
 		if (isHittingWallOrGroundUpwards(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
-			return Collision.HIT_WALL;
+			if(isAir(currentXPosition, (short)(y-MarioHeight))) return Collision.HIT_GROUND;
+			else return Collision.HIT_WALL;
 		} else return Collision.HIT_NOTHING;
 	}
 	

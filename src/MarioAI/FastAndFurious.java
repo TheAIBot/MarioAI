@@ -61,8 +61,8 @@ public class FastAndFurious implements Agent {
 			}
 		}
 		
-		if (newestPath != null && newestPath.size() > 1 && tickCount > 30) {
-			if (MarioControls.getNextAction(observation, newestPath, action) || tickCount%8 == 0) {
+		if ((newestPath != null && newestPath.size() > 1)) {
+			if (MarioControls.getNextAction(observation, newestPath, action)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
