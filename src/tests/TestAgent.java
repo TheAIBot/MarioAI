@@ -68,16 +68,16 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 16:
 			actions[Mario.KEY_JUMP] = true;
 			actions[Mario.KEY_RIGHT] = true;	
-			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + "|");
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">");
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			break;
 		case TestTools.LEVEL_INIT_TICKS + 17:
 			actions[Mario.KEY_JUMP] = false;
 			actions[Mario.KEY_RIGHT] = false;
-			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + "|");
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">");
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			break;
@@ -91,8 +91,8 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 25:
 		case TestTools.LEVEL_INIT_TICKS + 26:
 		case TestTools.LEVEL_INIT_TICKS + 27:
-			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + "|");
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">");
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		}
@@ -116,6 +116,9 @@ public class TestAgent implements Agent {
 <-0.115692616|-0.8446703>
 <-0.10296631|-0.1697998>
 <-0.091639996|0.0>
+
+Mytic function
+f^-1(x) = -8.581199590 ln(1. - 2.933333524 y)
 
 		 */
 		
