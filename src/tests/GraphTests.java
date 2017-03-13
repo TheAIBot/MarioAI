@@ -1,9 +1,7 @@
 package tests;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.Graph;
@@ -20,9 +18,8 @@ public class GraphTests {
 	public void testLevelMatrixCreation()
 	{
 		BasicAIAgent agent = new BasicAIAgent("");
-		Environment observation = TestTools.loadLevel("src/tests/testLevels/flat.lvl", agent);
+		Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		TestTools.runOneTick(observation);
 		Graph graph = new Graph();
 		graph.createStartGraph(observation);
 		
