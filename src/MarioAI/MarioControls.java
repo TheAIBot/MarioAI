@@ -1,6 +1,7 @@
 package MarioAI;
 
 import java.util.List;
+import java.util.Map.Entry;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
@@ -136,7 +137,9 @@ public class MarioControls {
 	}
 	
 	public static int getSpeedIntFromDistance(float distance) {
-		
+		final double a = -8.581199590;
+		final double b = -2.933333524;
+		return (int)Math.round(a * Math.log(1 + b * distance));
 	}
 	
 	public static float getDeaccelerationDistanceMoved(int speed) {
@@ -159,14 +162,16 @@ public class MarioControls {
 		return Integer.MAX_VALUE;
 	}
 	
-	private static float getDriftingDistance(int speed, int driftTime) {
+	private static float[] getDriftingDistance(int speed, int driftTime) {
 		final double a = getDistanceFromSpeedInt(speed);
 		final double b = -0.116533779064398;
 		double driftDistance = 0;
+		double lastSpeed = 0;
 		for (int i = 0; i < driftTime; i++) {
-			driftDistance += a * Math.exp(b * i);
+			lastSpeed = a * Math.exp(b * i);
+			driftDistance += lastSpeed;
 		}
-		return (float)driftDistance;
+		return new float[] {(float)driftDistance, (float)lastSpeed};
 	}
 	
 	private static int getFallingTime(float fallingHeight) {
