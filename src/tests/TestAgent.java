@@ -75,6 +75,9 @@ height
 2.2210116
 1.4872351
 0.6760254
+
+Velocity while falling as a function of time (in ticks)
+v(t) = -0.0596454130952380 * t^2 - 0.0892932892857146 * t + 4.19153429166667
 		 */
 		
 		tick++;
