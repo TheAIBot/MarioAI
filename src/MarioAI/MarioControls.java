@@ -2,8 +2,6 @@ package MarioAI;
 
 import java.util.List;
 
-import com.sun.swing.internal.plaf.basic.resources.basic;
-
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -39,8 +37,6 @@ public class MarioControls {
 	private static int movementDirection = 0;
 	private static boolean missionSet = false;
 	
-	//max be lengthXAcc.length
-	//min be -lengthXAcc.length
 	private static int xSpeedIndex = 0;
 
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
