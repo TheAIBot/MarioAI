@@ -112,6 +112,11 @@ drifting
 0.036890984
 0.0328331
 0.0
+
+
+Resultat: Hastighed som funktion af tiden (i ticks) ved drifting
+v(t) = v0 * exp(-0.116533779064398*t)
+
 		 */
 
 		

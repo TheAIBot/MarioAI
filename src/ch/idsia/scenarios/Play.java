@@ -27,14 +27,11 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
-            //Agent controller = new FastAndFurious();
-            //Environment observation = TestTools.loadLevel("jumpLevels/3HighJumps.lvl", controller, true);
-            //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
-            
-            Agent controller = new TestAgent();
-            Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+            Agent controller = new FastAndFurious();
+            //Agent controller = new TestAgent();
+            Environment observation = TestTools.loadLevel("flat.lvl", controller);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

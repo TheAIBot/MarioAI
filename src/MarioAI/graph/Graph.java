@@ -42,7 +42,7 @@ public class Graph {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
 			for (int y = 0; y < LEVEL_WIDTH; y++) {
-				if (marioNode != null && Math.min(marioXPos,11) == y && x == marioYPos) {
+				if (marioNode != null && 11 == y && x == marioYPos) {
 					System.out.print("M");
 					//continue;
 				} else if (levelMatrix[y][x] == null) {

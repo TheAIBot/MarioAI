@@ -19,9 +19,9 @@ import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
-	Agent agent = new FastAndFurious();
-	Environment observation = TestTools.loadLevel("src/tests/testLevels/flat.lvl", agent);
-	Graph graph = new Graph();
+	Agent agent;
+	Environment observation;
+	Graph graph;
 	
 	public void setUp(String levelName) {
 		agent = new FastAndFurious();
@@ -30,7 +30,7 @@ public class TestAStar {
 		TestTools.runOneTick(observation);
 		graph = new Graph();
 		graph.createStartGraph(observation);
-		Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setUp("jumping");
+		setUp("testJumping");
 		
 		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		assertTrue(path != null);
