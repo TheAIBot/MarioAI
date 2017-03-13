@@ -38,7 +38,7 @@ public class TestMarioMovements {
 		
 		float distanceMoved = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved += MarioControls.getDistanceFromSpeed(i);
+			distanceMoved += MarioControls.getDistanceFromSpeedInt(i);
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
@@ -88,7 +88,7 @@ public class TestMarioMovements {
 		
 		float distanceMoved = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved -= MarioControls.getDistanceFromSpeed(i);
+			distanceMoved -= MarioControls.getDistanceFromSpeedInt(i);
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;

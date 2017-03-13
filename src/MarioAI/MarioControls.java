@@ -102,7 +102,7 @@ public class MarioControls {
 			while (distanceMoved < -neededXDistance) {
 				steps++;
 				xSpeedIndex--;
-				distanceMoved += getDistanceFromSpeed(-xSpeedIndex);
+				distanceMoved += getDistanceFromSpeedInt(-xSpeedIndex);
 			}
 			return steps;
 		}
@@ -119,7 +119,7 @@ public class MarioControls {
 			while (distanceMoved < neededXDistance) {
 				steps++;
 				xSpeedIndex++;
-				distanceMoved += getDistanceFromSpeed(xSpeedIndex);
+				distanceMoved += getDistanceFromSpeedInt(xSpeedIndex);
 			}
 			return steps;
 		}
@@ -128,18 +128,22 @@ public class MarioControls {
 		}
 	}
 	
-	public static float getDistanceFromSpeed(int speed) {
+	public static float getDistanceFromSpeedInt(int speed) {
 		final double a = -0.340909068708614;
 		final double b = -0.116533823678965;
 		final double c = 0.340909068708614;
 		return (float)(a * Math.exp(b * (double)speed) + c);
 	}
 	
+	public static int getSpeedIntFromDistance(float distance) {
+		
+	}
+	
 	public static float getDeaccelerationDistanceMoved(int speed) {
 		final double a = 0.2606629227512888;
 		final double b = 4.161597216697656;
 		final double c = -0.342432087168023;
-		final double actualSpeed = getDistanceFromSpeed(speed);
+		final double actualSpeed = getDistanceFromSpeedInt(speed);
 		//has an average error of 0.0072 in the speed range 5-50
 		return (float)(a * Math.exp(b * actualSpeed) + c);
 	}
@@ -156,7 +160,7 @@ public class MarioControls {
 	}
 	
 	private static float getDriftingDistance(int speed, int driftTime) {
-		final double a = getDistanceFromSpeed(speed);
+		final double a = getDistanceFromSpeedInt(speed);
 		final double b = -0.116533779064398;
 		double driftDistance = 0;
 		for (int i = 0; i < driftTime; i++) {
