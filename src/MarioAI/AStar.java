@@ -118,7 +118,7 @@ public final class AStar {
 
 		//TODO look at this and decide if is should be changed or removed
 		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
-		while (iter.hasNext()) {
+		while (iter.hasNext() && iter.next().node.parent != null) {
 			iter.next().node.gScore = 0;
 			iter.next().node.fScore = 0;
 			iter.next().node.parent = null;
@@ -147,7 +147,7 @@ public final class AStar {
 	 */
 	public static float heuristicFunction(final SpeedNode start, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		if (start.vx == 0) return  1000000f;
+		if (start.vx == 0) return 1000000f;
 		else return GraphMath.distanceBetween(start.node, goal.node)/start.vx;
 	}
 
