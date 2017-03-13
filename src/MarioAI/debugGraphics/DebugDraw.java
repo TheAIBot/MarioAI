@@ -14,6 +14,7 @@ import MarioAI.SecondOrderPolynomial;
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Node;
+import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
@@ -123,8 +124,21 @@ public class DebugDraw {
 			Node toCheck = fisk.target;
 			if (!visitedNodes.contains(toCheck)) {
 				nodesToVisit.addAll(toCheck.getEdges());
-				visitedNodes.add(toCheck);
-				addDebugLines(observation, toCheck);
+				visitedNodes.add(toCheck);				
+				
+				for (DirectedEdge directedEdge : toCheck.getEdges()) {
+					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
+					convertLevelPointToOnScreenPoint(observation, pSource);
+					
+					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
+					convertLevelPointToOnScreenPoint(observation, pTarget);
+					if (pSource.y >= pTarget.y) {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+					}
+					else {
+						((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
+					}
+				}		
 			}
 		}
 	}
@@ -180,11 +194,8 @@ public class DebugDraw {
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-
-		point.x = (int) ((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE)
-				- (BLOCK_PIXEL_SIZE / 2);
-		point.y = (int) ((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE))
-				- (BLOCK_PIXEL_SIZE / 2);
+		point.x = ((int)((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
+		point.y = ((int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
 	}
 
 }

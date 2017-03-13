@@ -2,6 +2,7 @@ package tests;
 
 import java.util.ArrayList;
 
+import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
 import ch.idsia.ai.agents.*;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -9,11 +10,7 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestAgent implements Agent {
 	private int tick = 0;
-	private float maxX = 0;
-	private float startX = 1000;
-	
-	//Fitted estimate of v(t) for Mario
-	//v(t) := .340909068708614-.340909068708614*exp(-.116533823678965*t)
+	private float oldXPos = 0;
 	
 	private float prevX = 0;
 
@@ -22,78 +19,102 @@ public class TestAgent implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
-		startX = Math.min(startX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
-		maxX = Math.max(maxX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
 
-		switch (tick) {
-		case TestTools.LEVEL_INIT_TICKS + 1:
-		case TestTools.LEVEL_INIT_TICKS + 2:
-		case TestTools.LEVEL_INIT_TICKS + 3:
-		case TestTools.LEVEL_INIT_TICKS + 4:
-		case TestTools.LEVEL_INIT_TICKS + 5:
-		case TestTools.LEVEL_INIT_TICKS + 6:
-		case TestTools.LEVEL_INIT_TICKS + 7:
-		case TestTools.LEVEL_INIT_TICKS + 8:
-		case TestTools.LEVEL_INIT_TICKS + 9:
-		case TestTools.LEVEL_INIT_TICKS + 10:
-		case TestTools.LEVEL_INIT_TICKS + 11:
-		case TestTools.LEVEL_INIT_TICKS + 12:
-		case TestTools.LEVEL_INIT_TICKS + 13:
-		case TestTools.LEVEL_INIT_TICKS + 14:
-		case TestTools.LEVEL_INIT_TICKS + 15:
-		case TestTools.LEVEL_INIT_TICKS + 16:
-		/*case TestTools.LEVEL_INIT_TICKS + 17:
-		case TestTools.LEVEL_INIT_TICKS + 18:
-		case TestTools.LEVEL_INIT_TICKS + 19:
-		case TestTools.LEVEL_INIT_TICKS + 20:
-		case TestTools.LEVEL_INIT_TICKS + 21:
-		case TestTools.LEVEL_INIT_TICKS + 22:
-		case TestTools.LEVEL_INIT_TICKS + 23:
-		case TestTools.LEVEL_INIT_TICKS + 24:
-		case TestTools.LEVEL_INIT_TICKS + 25:
-		case TestTools.LEVEL_INIT_TICKS + 26:
-		case TestTools.LEVEL_INIT_TICKS + 27:
-		case TestTools.LEVEL_INIT_TICKS + 28:
-		case TestTools.LEVEL_INIT_TICKS + 29:
-		case TestTools.LEVEL_INIT_TICKS + 30:
-		case TestTools.LEVEL_INIT_TICKS + 31:
-		case TestTools.LEVEL_INIT_TICKS + 32:
-		case TestTools.LEVEL_INIT_TICKS + 33:
-		case TestTools.LEVEL_INIT_TICKS + 34:
-		case TestTools.LEVEL_INIT_TICKS + 35:
-		case TestTools.LEVEL_INIT_TICKS + 36:
-		case TestTools.LEVEL_INIT_TICKS + 37:
-		case TestTools.LEVEL_INIT_TICKS + 38:
-		case TestTools.LEVEL_INIT_TICKS + 39:
-		case TestTools.LEVEL_INIT_TICKS + 40:
-		case TestTools.LEVEL_INIT_TICKS + 41:
-		case TestTools.LEVEL_INIT_TICKS + 42:
-		*/
-			System.out.println((maxX - startX) - prevX);
-			prevX = (maxX - startX);
+		int a1 = TestTools.LEVEL_INIT_TICKS +  40;
+		int a3 =                         a1 +  40;
+		
+		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float xChange = currentXPos - prevX;
+		
+		if (tick >= TestTools.LEVEL_INIT_TICKS && tick < a1) {
+			System.out.println(xChange);
 			actions[Mario.KEY_RIGHT] = true;
-			break;
-		case TestTools.LEVEL_INIT_TICKS + 17:
-			System.out.println("reversing");
-			prevX = (maxX - startX);
-			actions[Mario.KEY_LEFT] = true;
-			break;
-		case TestTools.LEVEL_INIT_TICKS + 18:
-		case TestTools.LEVEL_INIT_TICKS + 19:
-		case TestTools.LEVEL_INIT_TICKS + 20:
-		case TestTools.LEVEL_INIT_TICKS + 21:
-		case TestTools.LEVEL_INIT_TICKS + 22:
-		case TestTools.LEVEL_INIT_TICKS + 23:
-		case TestTools.LEVEL_INIT_TICKS + 24:
-		case TestTools.LEVEL_INIT_TICKS + 25:
-		case TestTools.LEVEL_INIT_TICKS + 26:
-		case TestTools.LEVEL_INIT_TICKS + 27:
-			System.out.println((maxX - startX) - prevX);
-			prevX = (maxX - startX);
-			actions[Mario.KEY_LEFT] = true;
-			break;
 		}
+		else if (tick == a1) {
+			System.out.println(xChange);
+			System.out.println("drifting");
+			actions[Mario.KEY_LEFT] = false;
+		}
+		else if (tick > a1 && tick < a3) {
+			System.out.println(xChange);
+		}
+		prevX = currentXPos;
+		
+		/*
+speed
+0.15054345
 
+dirfting
+0.13398361
+0.11924553
+0.106128454
+0.09445429
+0.084064245
+0.07481718
+0.06658745
+0.059262753
+0.05274391
+0.046941996
+0.041778326
+0.037182808
+0.033092737
+0.0
+
+
+speed
+0.28154993
+
+drifting
+0.25057936
+0.22301579
+0.19848394
+0.17665052
+0.15721893
+0.139925
+0.12453318
+0.1108346
+0.098642826
+0.08779192
+0.07813501
+0.069540024
+0.061890602
+0.055082798
+0.04902363
+0.043631077
+0.03883171
+0.034560204
+0.0
+
+
+
+//speed
+0.33768654
+
+drifting
+0.30054092
+0.26748085
+0.23805809
+0.2118721
+0.18856621
+0.16782379
+0.14936352
+0.13293266
+0.11831093
+0.105296135
+0.09371376
+0.083405495
+0.074230194
+0.066064835
+0.058797836
+0.052330017
+0.04657364
+0.0414505
+0.036890984
+0.0328331
+0.0
+		 */
+
+		
 		tick++;
 		return actions;
 	}

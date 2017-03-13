@@ -44,12 +44,9 @@ public class FastAndFurious implements Agent {
 			}
 			
 		} else if (tickCount > 30) {
-			//graph.updateMatrix(observation);
 			if (graph.updateMatrix(observation)) {
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
-			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
 				DebugDraw.drawEndNodes(observation, graph);
@@ -57,36 +54,22 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawNeighborPaths(observation, graph);
 				DebugDraw.drawReachableNodes(observation, graph);
 				DebugDraw.drawPathOptionNodes(observation, graph);
-				System.out.println();
 			}
 		}
-		
-		if ((newestPath != null && newestPath.size() > 1)) {
-			if (MarioControls.getNextAction(observation, newestPath, action)) {
+					
+		if (newestPath != null && newestPath.size() > 1) {
+			if (MarioControls.reachedNextNode(observation, newestPath)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
-				} else {
-					Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-					path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-					
 				}
 			}
+			MarioControls.getNextAction(observation, newestPath, action);
 			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
-		} else if (tickCount > 30){
-			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getLevelMatrix()[21]);
-			//TODO the mistake is here.			
-			//List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-			newestPath = path;
 		}
 		tickCount++;
-		graph.printMatrix(observation);
-		//action = new boolean[Environment.numberOfButtons];
-		//action[Mario.KEY_RIGHT] = true;
-		//System.out.println();
+		
 		return action;
-		//return action;
 	}
 
 	public AGENT_TYPE getType() {

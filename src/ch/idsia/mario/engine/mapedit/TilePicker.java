@@ -50,6 +50,7 @@ public class TilePicker extends JComponent implements MouseListener, MouseMotion
             for (int y=0; y<16; y++)
             {
                 g.drawImage(Art.level[x][y], (x << 4), (y << 4), null);
+                //g.drawImage(Art.level[x][y], (x << 4), (y << 4), ((x + 1) << 4), ((y + 1) << 4), x * 16 * Art.SIZE_MULTIPLIER, y * 16 * Art.SIZE_MULTIPLIER, (x + 1) * 16 * Art.SIZE_MULTIPLIER, (y + 1) * 16 * Art.SIZE_MULTIPLIER, null);
             }
 
         g.setColor(Color.WHITE);
