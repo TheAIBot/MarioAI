@@ -41,7 +41,7 @@ public final class AStar {
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
-		if (path != null) {
+		if (path != null && path.size() > 0) {
 			path.remove((path.size() - 1));
 		}
 
@@ -145,7 +145,8 @@ public final class AStar {
 	 * @return
 	 */
 	public static float heuristicFunction(final SpeedNode start, final SpeedNode goal) {
-		return MarioControls.getXMovementTime(goal.node.x - start.node.x);
+		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
+		return GraphMath.distanceBetween(start.node, goal.node);
 	}
 
 	/**
