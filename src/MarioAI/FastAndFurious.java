@@ -34,7 +34,7 @@ public class FastAndFurious implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		boolean[] action = new boolean[Environment.numberOfButtons]; 
+		boolean[] action = new boolean[Environment.numberOfButtons];
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
