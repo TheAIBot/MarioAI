@@ -17,7 +17,7 @@ import MarioAI.graph.SpeedNode;
 //-Calculate time over edge
 //-Change heuristic
 //-Generate SpeedNodes based on current velocity and possible changes in velocity
-//-finish hash of speed nodes
+//-finish hash of speed nodes - DONE
 
 public final class AStar {
 
@@ -72,9 +72,9 @@ public final class AStar {
 
 		// Initialization
 		openSet.add(start);
-		start.node.gScore = 0;
+		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
-		start.node.fScore = heuristicFunction(start, goal);
+		start.fScore = heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
 			SpeedNode current = openSet.remove();
