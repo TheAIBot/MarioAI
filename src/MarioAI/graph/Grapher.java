@@ -147,7 +147,7 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 3; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, listOfEdges);						
 		}

@@ -194,7 +194,7 @@ public class DebugDraw {
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		point.x = ((int)((point.x - Math.max(marioXPos - (LEVEL_WIDTH / 2), 0)) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
+		point.x = ((int)((point.x - (Math.max(marioXPos - (LEVEL_WIDTH / 2) + 1, 0)) + 1) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
 		point.y = ((int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
 	}
 

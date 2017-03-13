@@ -158,4 +158,14 @@ public class MarioControls {
 		//if it ever happens then it should be visible with this
 		return Integer.MAX_VALUE;
 	}
+	
+	private static float getdriftingDistance(int speed, int driftTime) {
+		final double a = getDistanceFromSpeed(speed);
+		final double b = -0.116533779064398;
+		double driftDistance = 0;
+		for (int i = 0; i < driftTime; i++) {
+			driftDistance += a * Math.exp(b * i);
+		}
+		return (float)driftDistance;
+	}
 }
