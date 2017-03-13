@@ -37,50 +37,39 @@ public class FastAndFurious implements Agent {
 		boolean[] action = new boolean[Environment.numberOfButtons]; 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
 				newestPath = path;
 			}
 			
 		} else if (tickCount > 30) {
-			//graph.updateMatrix(observation);
 			if (graph.updateMatrix(observation)) {
-				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
-			//Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
+				DebugDraw.drawEndNodes(observation, graph);
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
 				DebugDraw.drawNeighborPaths(observation, graph);
 				DebugDraw.drawReachableNodes(observation, graph);
 				DebugDraw.drawPathOptionNodes(observation, graph);
 			}
 		}
-		
+					
 		if (newestPath != null && newestPath.size() > 1) {
-			if (MarioControls.getNextAction(observation, newestPath, action)) {
+			if (MarioControls.reachedNextNode(observation, newestPath)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
 			}
+			MarioControls.getNextAction(observation, newestPath, action);
 			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
-		} else if (tickCount > 30){
-			System.out.println("Fail");
-			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-			newestPath = path;
-			System.out.println("");
 		}
 		tickCount++;
-		graph.printMatrix(observation);
-		//action = new boolean[Environment.numberOfButtons];
-		//action[Mario.KEY_RIGHT] = true;
-		//System.out.println();
+		
 		return action;
-		//return action;
 	}
 
 	public AGENT_TYPE getType() {

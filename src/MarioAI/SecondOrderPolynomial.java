@@ -75,33 +75,6 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		return a * x * x + b * x + c;
 	}
 	
-/*
-	public int motionTypeID() {
-		// TODO Auto-generated method stub
-		return motionTypeID;
-	}
-
-	public int getXAccelleration() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getYAccelleration() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void getActionPatern() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public int getTimespan() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-*/
-
 	@Override
 	public float getMaxY() {
 		return ceiledTopPointY - source.y;

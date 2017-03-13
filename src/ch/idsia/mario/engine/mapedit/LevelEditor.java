@@ -8,6 +8,7 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.level.*;
 
 
@@ -130,6 +131,7 @@ public class LevelEditor extends JFrame implements ActionListener
     
     public static void main(String[] args)
     {
+    	Art.SIZE_MULTIPLIER = 1;
         new LevelEditor().setVisible(true);
     }
 

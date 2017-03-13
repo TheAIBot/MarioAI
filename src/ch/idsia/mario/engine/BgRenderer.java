@@ -28,7 +28,7 @@ public class BgRenderer
         this.height = height;
 
         this.level = level;
-        image = graphicsConfiguration.createCompatibleImage(width, height, Transparency.BITMASK);
+        image = graphicsConfiguration.createCompatibleImage(width * Art.SIZE_MULTIPLIER, height * Art.SIZE_MULTIPLIER, Transparency.BITMASK);
         g = (Graphics2D) image.getGraphics();
         g.setComposite(AlphaComposite.Src);
 
@@ -45,7 +45,7 @@ public class BgRenderer
         this.yCam = yCam;
 
         g.setComposite(AlphaComposite.Src);
-        g.copyArea(0, 0, width, height, xCamD, yCamD);
+        g.copyArea(0, 0, width * Art.SIZE_MULTIPLIER, height * Art.SIZE_MULTIPLIER, xCamD * Art.SIZE_MULTIPLIER, yCamD * Art.SIZE_MULTIPLIER);
 
         if (xCamD < 0)
         {
@@ -73,7 +73,7 @@ public class BgRenderer
     private void updateArea(int x0, int y0, int w, int h)
     {
         g.setBackground(transparent);
-        g.clearRect(x0, y0, w, h);
+        g.clearRect(x0 * Art.SIZE_MULTIPLIER, y0 * Art.SIZE_MULTIPLIER, w * Art.SIZE_MULTIPLIER, h * Art.SIZE_MULTIPLIER);
         int xTileStart = (x0 + xCam) / 32;
         int yTileStart = (y0 + yCam) / 32;
         int xTileEnd = (x0 + xCam + w) / 32;
@@ -83,7 +83,7 @@ public class BgRenderer
             for (int y = yTileStart; y <= yTileEnd; y++)
             {
                 int b = level.getBlock(x, y) & 0xff;
-                g.drawImage(Art.bg[b % 8][b / 8], (x << 5) - xCam, (y << 5) - yCam-16, null);
+                g.drawImage(Art.bg[b % 8][b / 8], ((x << 5) - xCam) * Art.SIZE_MULTIPLIER, ((y << 5) - yCam-16) * Art.SIZE_MULTIPLIER, null);
             }
         }
     }
