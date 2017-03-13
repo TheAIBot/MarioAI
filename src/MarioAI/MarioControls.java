@@ -155,7 +155,7 @@ public class MarioControls {
 		return Integer.MAX_VALUE;
 	}
 	
-	private static float getdriftingDistance(int speed, int driftTime) {
+	private static float getDriftingDistance(int speed, int driftTime) {
 		final double a = getDistanceFromSpeed(speed);
 		final double b = -0.116533779064398;
 		double driftDistance = 0;
@@ -166,15 +166,9 @@ public class MarioControls {
 	}
 	
 	private static int getFallingTime(float fallingHeight) {
-		final double a = -0.0596454130952380;
-		final double b = 0.0892932892857146;
-		final double c = 4.19153429166667;
-		int time = 0;
-		double fallenDistance = 0;
-		while(fallenDistance >= fallingHeight) {
-			time++;
-			fallenDistance += a * t^2 - b * t + c;
-		}
-		v(t) = a * t^2 - b * t + c;
+		final double a = 0.08333333333;
+		final double b = 2400;
+		final double c = -0.7500000000;
+		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 }
