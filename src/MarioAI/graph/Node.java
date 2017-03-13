@@ -13,6 +13,7 @@ public class Node extends SuperNode {
 	public final short y;
 	public final byte type;
 	private final int hash;
+	public DirectedEdge ancestorEdge = null;
 	
 	public Node(short x, short y, byte type) {
 		this.x = x;

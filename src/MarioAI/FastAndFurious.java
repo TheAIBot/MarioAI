@@ -27,6 +27,8 @@ public class FastAndFurious implements Agent {
 	private final Graph graph = new Graph();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
+	
+	private static final boolean DEBUG = true;
 
 	public void reset() {
 	}
@@ -35,7 +37,7 @@ public class FastAndFurious implements Agent {
 		boolean[] action = new boolean[Environment.numberOfButtons]; 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
 				newestPath = path;
@@ -43,33 +45,27 @@ public class FastAndFurious implements Agent {
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
-				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
-			
-			DebugDraw.resetGraphics(observation);
-			DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-			DebugDraw.drawNeighborPaths(observation, graph);
-			DebugDraw.drawPathOptionNodes(observation, graph);
-			
-			if (newestPath != null && newestPath.size() > 1) {
-				if (MarioControls.reachedNextNode(observation, newestPath)) {
-					List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-					if (path != null) {
-						newestPath = path;
-					}
-				}
-				MarioControls.getNextAction(observation, newestPath, action);
-				DebugDraw.drawPath(observation, newestPath);
+			if (DEBUG) {
+				DebugDraw.resetGraphics(observation);
+				DebugDraw.drawEndNodes(observation, graph);
+				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+				DebugDraw.drawNeighborPaths(observation, graph);
+				DebugDraw.drawReachableNodes(observation, graph);
+				DebugDraw.drawPathOptionNodes(observation, graph);
 			}
-			else {
-				Grapher.graph(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		}
+					
+		if (newestPath != null && newestPath.size() > 1) {
+			if (MarioControls.reachedNextNode(observation, newestPath)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
 			}
-			
-			graph.printMatrix(observation);
+			MarioControls.getNextAction(observation, newestPath, action);
+			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
 		}
 		tickCount++;
 		
