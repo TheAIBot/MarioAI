@@ -78,6 +78,10 @@ height
 
 Velocity while falling as a function of time (in ticks)
 v(t) = -0.0596454130952380 * t^2 - 0.0892932892857146 * t + 4.19153429166667
+
+Time as a function of distance fallen
+t(x) = -.7500000000+0.8333333333e-1*sqrt(81.+2400.*x)
+
 		 */
 		
 		tick++;

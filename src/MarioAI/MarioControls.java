@@ -155,7 +155,7 @@ public class MarioControls {
 		return Integer.MAX_VALUE;
 	}
 	
-	private static float getdriftingDistance(int speed, int driftTime) {
+	private static float getDriftingDistance(int speed, int driftTime) {
 		final double a = getDistanceFromSpeed(speed);
 		final double b = -0.116533779064398;
 		double driftDistance = 0;
