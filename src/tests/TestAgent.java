@@ -19,8 +19,8 @@ public class TestAgent implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
-/*
-		int a1 = TestTools.LEVEL_INIT_TICKS +  40;
+
+		int a1 = TestTools.LEVEL_INIT_TICKS +  10;
 		int a3 =                         a1 +  40;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -39,9 +39,9 @@ public class TestAgent implements Agent {
 			System.out.println(xChange);
 		}
 		prevX = currentXPos;
-*/
+
 		
-		
+		/*
 		switch (tick) {
 		case TestTools.LEVEL_INIT_TICKS:
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -96,6 +96,7 @@ public class TestAgent implements Agent {
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		}
+		*/
 		
 		/*
 <-0.2346077|0.0>

@@ -162,13 +162,20 @@ public class MarioControls {
 		return Integer.MAX_VALUE;
 	}
 	
-	private static float[] getDriftingDistance(int speed, int driftTime) {
+	public static float[] getDriftingDistance(int speed, int driftTime) {
 		final double a = getDistanceFromSpeedInt(speed);
-		final double b = -0.116533779064398;
+		final double b = -0.11653355831586142;
+		final double c = -0.00000056420864292;
 		double driftDistance = 0;
 		double lastSpeed = 0;
 		for (int i = 0; i < driftTime; i++) {
-			lastSpeed = a * Math.exp(b * i);
+			lastSpeed = a * Math.exp(b * (i + 1)) + c;
+			//mario stops if his speed is less than 0.03
+			final double MIN_MARIO_SPEED = 0.03;
+			if (lastSpeed <= MIN_MARIO_SPEED) {
+				lastSpeed = 0;
+				break;
+			}
 			driftDistance += lastSpeed;
 		}
 		return new float[] {(float)driftDistance, (float)lastSpeed};
