@@ -38,14 +38,14 @@ public class TestMarioMovements {
 		
 		float distanceMoved = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved += MarioControls.getDistanceFromSpeed(i);
+			distanceMoved += MarioControls.getDistanceFromSpeedInt(i);
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
 		float expectedYPos = startMarioYPos;
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
-			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "x: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class TestMarioMovements {
 		
 		float distanceMoved = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved -= MarioControls.getDistanceFromSpeed(i);
+			distanceMoved -= MarioControls.getDistanceFromSpeedInt(i);
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
@@ -96,6 +96,53 @@ public class TestMarioMovements {
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
 			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+		}
+	}
+	
+	@Test
+	public void testDrifting() {
+		int[] speeds = new int[] {1};//, 2, 5, 10, 20, 30, 40, 50};
+		
+		for (int i = 0; i < speeds.length; i++) {
+			testDriftSpeed(speeds[i], 1);
+			testDriftSpeed(speeds[i], 2);
+			testDriftSpeed(speeds[i], 3);
+			testDriftSpeed(speeds[i], 5);
+			testDriftSpeed(speeds[i], 10);
+			testDriftSpeed(speeds[i], 20);
+			testDriftSpeed(speeds[i], 30);
+			testDriftSpeed(speeds[i], 40);
+			testDriftSpeed(speeds[i], 50);
+		}
+	}
+	private void testDriftSpeed(int speed, int driftTime) {
+		final UnitTestAgent agent = new UnitTestAgent();		
+		Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		
+		agent.action[Mario.KEY_RIGHT] = true;
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		for (int i = 0; i < speed; i++) {
+			TestTools.runOneTick(observation);
+		}
+		agent.action[Mario.KEY_RIGHT] = false;
+		for (int i = 0; i < driftTime; i++) {
+			TestTools.runOneTick(observation);
+		}
+		final float endMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		float distanceMoved = 0;
+		for (int i = 1; i <= speed; i++) {
+			distanceMoved += MarioControls.getDistanceFromSpeedInt(i);
+		}
+		distanceMoved += MarioControls.getDriftingDistance(speed, driftTime)[0];
+		
+		float expectedXPos = startMarioXPos + distanceMoved;
+		float expectedYPos = startMarioYPos;
+		
+		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
+			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\ndrift: " + driftTime + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
 	}
 	

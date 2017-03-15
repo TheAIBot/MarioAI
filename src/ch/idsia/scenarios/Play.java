@@ -29,9 +29,9 @@ public class Play {
     public static void main(String[] args) {
         boolean loadLevel = false;
         if (loadLevel) {
-            Agent controller = new FastAndFurious();
-            //Agent controller = new TestAgent();
-            Environment observation = TestTools.loadLevel("flat.lvl", controller);
+            //Agent controller = new FastAndFurious();
+            Agent controller = new TestAgent();
+            Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
@@ -48,7 +48,7 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed(650);
+	        options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);

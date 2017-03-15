@@ -9,10 +9,10 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAgent implements Agent {
-	private int tick = 0;
-	private float oldXPos = 0;
-	
+	private int tick = 0;	
 	private float prevX = 0;
+	private float startX = 0;
+	private float startY = 0;
 
 	public void reset() {
 	}
@@ -20,7 +20,7 @@ public class TestAgent implements Agent {
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
 
-		int a1 = TestTools.LEVEL_INIT_TICKS +  40;
+		int a1 = TestTools.LEVEL_INIT_TICKS +  10;
 		int a3 =                         a1 +  40;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -39,86 +39,89 @@ public class TestAgent implements Agent {
 			System.out.println(xChange);
 		}
 		prevX = currentXPos;
+
 		
 		/*
-speed
-0.15054345
+		switch (tick) {
+		case TestTools.LEVEL_INIT_TICKS:
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		case TestTools.LEVEL_INIT_TICKS + 1:
+		case TestTools.LEVEL_INIT_TICKS + 2:
+		case TestTools.LEVEL_INIT_TICKS + 3:
+		case TestTools.LEVEL_INIT_TICKS + 4:
+		case TestTools.LEVEL_INIT_TICKS + 5:
+		case TestTools.LEVEL_INIT_TICKS + 6:
+		case TestTools.LEVEL_INIT_TICKS + 7:
+		case TestTools.LEVEL_INIT_TICKS + 8:
+		case TestTools.LEVEL_INIT_TICKS + 9:
+			actions[Mario.KEY_RIGHT] = true;
+		startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			break;
+		case TestTools.LEVEL_INIT_TICKS + 10:
+		case TestTools.LEVEL_INIT_TICKS + 11:
+		case TestTools.LEVEL_INIT_TICKS + 12:
+		case TestTools.LEVEL_INIT_TICKS + 13:
+		case TestTools.LEVEL_INIT_TICKS + 14:
+		case TestTools.LEVEL_INIT_TICKS + 15:
+		case TestTools.LEVEL_INIT_TICKS + 16:
+			actions[Mario.KEY_JUMP] = true;
+			actions[Mario.KEY_RIGHT] = true;	
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			break;
+		case TestTools.LEVEL_INIT_TICKS + 17:
+			actions[Mario.KEY_JUMP] = false;
+			actions[Mario.KEY_RIGHT] = false;
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			break;
+		case TestTools.LEVEL_INIT_TICKS + 18:
+		case TestTools.LEVEL_INIT_TICKS + 19:
+		case TestTools.LEVEL_INIT_TICKS + 20:
+		case TestTools.LEVEL_INIT_TICKS + 21:
+		case TestTools.LEVEL_INIT_TICKS + 22:
+		case TestTools.LEVEL_INIT_TICKS + 23:
+		case TestTools.LEVEL_INIT_TICKS + 24:
+		case TestTools.LEVEL_INIT_TICKS + 25:
+		case TestTools.LEVEL_INIT_TICKS + 26:
+		case TestTools.LEVEL_INIT_TICKS + 27:
+			System.out.print("<" + (startX - MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos())) + ",");
+			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) + ">|");
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		}
+		*/
+		
+		/*
+<-0.2346077|0.0>
+<-0.24630094|0.8312502>
+<-0.2567079|0.8312502>
+<-0.26596975|0.7125001>
+<-0.2742133|0.59375>
+<-0.28154993|0.4749999>
+<-0.28807926|0.3562498>
+<-0.29389048|0.23750019>
+<-0.26156235|0.01437521>
+<-0.23279047|-0.17528105>
+<-0.20718384|-0.3364892>
+<-0.1843934|-0.4735155>
+<-0.16411018|-0.58998823>
+<-0.14605808|-0.6889901>
+<-0.12999153|-0.7731414>
+<-0.115692616|-0.8446703>
+<-0.10296631|-0.1697998>
+<-0.091639996|0.0>
 
-dirfting
-0.13398361
-0.11924553
-0.106128454
-0.09445429
-0.084064245
-0.07481718
-0.06658745
-0.059262753
-0.05274391
-0.046941996
-0.041778326
-0.037182808
-0.033092737
-0.0
-
-
-speed
-0.28154993
-
-drifting
-0.25057936
-0.22301579
-0.19848394
-0.17665052
-0.15721893
-0.139925
-0.12453318
-0.1108346
-0.098642826
-0.08779192
-0.07813501
-0.069540024
-0.061890602
-0.055082798
-0.04902363
-0.043631077
-0.03883171
-0.034560204
-0.0
-
-
-
-//speed
-0.33768654
-
-drifting
-0.30054092
-0.26748085
-0.23805809
-0.2118721
-0.18856621
-0.16782379
-0.14936352
-0.13293266
-0.11831093
-0.105296135
-0.09371376
-0.083405495
-0.074230194
-0.066064835
-0.058797836
-0.052330017
-0.04657364
-0.0414505
-0.036890984
-0.0328331
-0.0
-
-
-Resultat: Hastighed som funktion af tiden (i ticks) ved drifting
-v(t) = v0 * exp(-0.116533779064398*t)
+Mytic function
+f^-1(x) = -8.581199590 ln(1. - 2.933333524 y)
 
 		 */
-
 		
 		tick++;
 		return actions;

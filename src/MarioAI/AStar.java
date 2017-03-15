@@ -40,7 +40,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null), new SpeedNode(goal, 0, null));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -80,6 +80,10 @@ public final class AStar {
 		while (!openSet.isEmpty()) {
 			SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
+			if (current.vx < 0) {
+				System.out.println(current.fScore);
+			}
+			System.out.println(current.vx);
 
 			// If goal is reached return solution path
 			if (current.node.equals(goal.node)) {

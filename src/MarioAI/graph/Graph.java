@@ -98,7 +98,6 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
-		//return getColumn(maxMarioXPos);
 		return levelMatrix[LEVEL_WIDTH - 1];
 	}
 	

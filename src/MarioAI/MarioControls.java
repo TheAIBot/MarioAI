@@ -1,8 +1,7 @@
 package MarioAI;
 
 import java.util.List;
-
-import com.sun.swing.internal.plaf.basic.resources.basic;
+import java.util.Map.Entry;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
@@ -10,8 +9,12 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
-
+	
+	private static float vx;
+	
 	private static final int MAX_JUMP_TIME = 8;
+	private static final float MAX_X_VELOCITY = 0.35f;
+	
 	private static final float[] heights = new float[] { 
 		0,
 		0,
@@ -39,8 +42,6 @@ public class MarioControls {
 	private static int movementDirection = 0;
 	private static boolean missionSet = false;
 	
-	//max be lengthXAcc.length
-	//min be -lengthXAcc.length
 	private static int xSpeedIndex = 0;
 
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
@@ -51,6 +52,7 @@ public class MarioControls {
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.5) {
 			path.remove(0);
 			next = path.get(0);
+			vx = path.get(0).getSpeedAfterTraversal(vx);
 			return true;
 		}
 		return false;
@@ -65,8 +67,9 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - (next.getMaxY()));
-			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
+			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
+			int fallTime = getFallingTime(next.target.y - next.getMaxY());
+			xAxisCounter = getXMovementTime(next.target.x - marioXPos, jumpCounter + fallTime);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = true;
 		}
@@ -92,7 +95,7 @@ public class MarioControls {
 		return MAX_JUMP_TIME;
 	}
 	
-	public static int getXMovementTime(float neededXDistance) {
+	private static int getXMovementTime(float neededXDistance, int time) {
 		if (neededXDistance < 0) {
 			float distanceMoved = 0;
 			int steps = 0;
@@ -106,7 +109,7 @@ public class MarioControls {
 			while (distanceMoved < -neededXDistance) {
 				steps++;
 				xSpeedIndex--;
-				distanceMoved += getDistanceFromSpeed(-xSpeedIndex);
+				distanceMoved += getDistanceFromSpeedInt(-xSpeedIndex);
 			}
 			return steps;
 		}
@@ -120,10 +123,10 @@ public class MarioControls {
 				//speed is now 0
 				xSpeedIndex = 0;
 			}
-			while (distanceMoved < neededXDistance) {
+			while (distanceMoved + getDriftingDistance(xSpeedIndex, time - steps)[0] < neededXDistance) {
 				steps++;
 				xSpeedIndex++;
-				distanceMoved += getDistanceFromSpeed(xSpeedIndex);
+				distanceMoved += getDistanceFromSpeedInt(xSpeedIndex);
 			}
 			return steps;
 		}
@@ -132,35 +135,75 @@ public class MarioControls {
 		}
 	}
 	
-	public static float getDistanceFromSpeed(int speed) {
+	public static float getDistanceFromSpeedInt(int speed) {
 		final double a = -0.340909068708614;
 		final double b = -0.116533823678965;
 		final double c = 0.340909068708614;
 		return (float)(a * Math.exp(b * (double)speed) + c);
 	}
 	
+	public static int getSpeedIntFromDistance(float distance) {
+		final double a = -8.581199590;
+		final double b = -2.933333524;
+		return (int)Math.round(a * Math.log(1 + b * distance));
+	}
+	
 	public static float getDeaccelerationDistanceMoved(int speed) {
 		final double a = 0.2606629227512888;
 		final double b = 4.161597216697656;
 		final double c = -0.342432087168023;
-		final double actualSpeed = getDistanceFromSpeed(speed);
+		final double actualSpeed = getDistanceFromSpeedInt(speed);
 		//has an average error of 0.0072 in the speed range 5-50
 		return (float)(a * Math.exp(b * actualSpeed) + c);
 	}
 	
 	private static int getDeaccelerationNeededSteps(int speed) {
 		for (int i = 0; i < deaccelerationSteps.length; i++) {
-			if (deaccelerationSteps[i][0] < speed && 
-				deaccelerationSteps[i][1] > speed) {
+			if (deaccelerationSteps[i][0] <= speed && 
+				deaccelerationSteps[i][1] >= speed) {
 				return i;
 			}			
 		}
 		//if it ever happens then it should be visible with this
 		return Integer.MAX_VALUE;
 	}
-
-	public static float getMaxV() {
-		// TODO Auto-generated method stub
-		return 0.35f;
+	
+	public static float[] getDriftingDistance(int speed, int driftTime) {
+		final double a = getDistanceFromSpeedInt(speed);
+		final double b = -0.11653355831586142;
+		final double c = -0.00000056420864292;
+		double driftDistance = 0;
+		double lastSpeed = a;
+		for (int i = 0; i < driftTime; i++) {
+			lastSpeed = a * Math.exp(b * (i + 1)) + c;
+			//mario stops if his speed is less than 0.03
+			final double MIN_MARIO_SPEED = 0.03;
+			if (lastSpeed <= MIN_MARIO_SPEED) {
+				lastSpeed = 0;
+				break;
+			}
+			driftDistance += lastSpeed;
+		}
+		return new float[] {(float)driftDistance, (float)lastSpeed};
 	}
+	
+	private static int getFallingTime(float fallingHeight) {
+		final double a = 0.08333333333;
+		final double b = 2400;
+		final double c = -0.7500000000;
+		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
+	}
+	
+	public static float getMaxV() {
+		return MAX_X_VELOCITY;
+	}
+
+	public static float getXVelocity() {
+		return vx;
+	}
+
+	public static void setVelocity(float velocity) {
+		MarioControls.vx = velocity;
+	}
+	
 }

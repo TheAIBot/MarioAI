@@ -131,15 +131,16 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		VolatileImage image = null;
 		Graphics g = null;
 		Graphics og = null;
-
-		image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
-		g = getGraphics();
-		og = image.getGraphics();
+		if (GlobalOptions.VisualizationOn) {
+			image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			g = getGraphics();
+			og = image.getGraphics();	
+		}
 
 		if (!GlobalOptions.VisualizationOn) {
 			String msgClick = "Vizualization is not available";
-			drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 1);
-			drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 7);
+			//drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 1);
+			//drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 7);
 		}
 
 		addFocusListener(this);
