@@ -154,8 +154,8 @@ public class MarioControls {
 	
 	private static int getDeaccelerationNeededSteps(int speed) {
 		for (int i = 0; i < deaccelerationSteps.length; i++) {
-			if (deaccelerationSteps[i][0] < speed && 
-				deaccelerationSteps[i][1] > speed) {
+			if (deaccelerationSteps[i][0] <= speed && 
+				deaccelerationSteps[i][1] >= speed) {
 				return i;
 			}			
 		}
