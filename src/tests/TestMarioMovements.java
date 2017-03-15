@@ -101,7 +101,7 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testDrifting() {
-		int[] speeds = new int[] {1, 2, 5, 10, 20, 30, 40, 50};
+		int[] speeds = new int[] {1};//, 2, 5, 10, 20, 30, 40, 50};
 		
 		for (int i = 0; i < speeds.length; i++) {
 			testDriftSpeed(speeds[i], 1);

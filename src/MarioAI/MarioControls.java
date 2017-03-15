@@ -168,7 +168,7 @@ public class MarioControls {
 		final double b = -0.11653355831586142;
 		final double c = -0.00000056420864292;
 		double driftDistance = 0;
-		double lastSpeed = 0;
+		double lastSpeed = a;
 		for (int i = 0; i < driftTime; i++) {
 			lastSpeed = a * Math.exp(b * (i + 1)) + c;
 			//mario stops if his speed is less than 0.03
