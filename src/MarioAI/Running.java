@@ -24,11 +24,13 @@ public class Running extends DirectedEdge{
 
 	@Override
 	public float getTraversedTime(float v0) {
+		v0 = Math.abs(v0);
 		return (float) (7.010101392f-16.29465006f*v0+31.36548962f*  Math.pow(v0-0.15f,2)-15.03197676f* Math.pow((v0-0.15f),3));
 	}
 
 	@Override
 	public float getSpeedAfterTraversal(float v0) {
+		v0 *= dir;
 		return (float) (0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3));
 	}
 

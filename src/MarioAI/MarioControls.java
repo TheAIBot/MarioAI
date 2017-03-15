@@ -158,4 +158,9 @@ public class MarioControls {
 		//if it ever happens then it should be visible with this
 		return Integer.MAX_VALUE;
 	}
+
+	public static float getMaxV() {
+		// TODO Auto-generated method stub
+		return 0.35f;
+	}
 }
