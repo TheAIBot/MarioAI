@@ -67,8 +67,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	private void setTopPoint() {
 		topPointX = ((-b / a) / 2);
 		topPointY = f(topPointX);
-		ceiledTopPointX = (short) Math.ceil(ceiledTopPointX);
-		ceiledTopPointY = (short) Math.ceil(ceiledTopPointY);
+		ceiledTopPointX = (short) Math.ceil(topPointX);
+		ceiledTopPointY = (short) Math.ceil(topPointY);
 	}
 
 	public float f(float x) {

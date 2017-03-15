@@ -4,9 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
-
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
@@ -23,7 +20,7 @@ import ch.idsia.mario.environments.Environment;
  */
 public class FastAndFurious implements Agent {
 
-	private static final String name = "THE ULTIME AND SUPREME OVERLORD THAT BRINGS DEATH AND DESTRUCTION";
+	private static final String name = "The painkiller";
 	private final Graph graph = new Graph();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
@@ -45,6 +42,7 @@ public class FastAndFurious implements Agent {
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
+				graph.printMatrix(observation);
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
 			if (DEBUG) {
