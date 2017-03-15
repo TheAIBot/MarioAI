@@ -27,7 +27,7 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
             //Agent controller = new FastAndFurious();
             Agent controller = new TestAgent();
@@ -48,7 +48,7 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed(650);
+	        options.setLevelRandSeed(4322);
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);

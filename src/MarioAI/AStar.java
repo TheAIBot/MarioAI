@@ -97,7 +97,7 @@ public final class AStar {
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);
+				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);// + neighborEdge.getWeight();
 				if (!openSetMap.containsKey(sn.hashCode())) {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;
