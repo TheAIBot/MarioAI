@@ -136,7 +136,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			g = getGraphics();
 			og = image.getGraphics();	
 		}
-
+		
 		if (!GlobalOptions.VisualizationOn) {
 			String msgClick = "Vizualization is not available";
 			//drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 1);
