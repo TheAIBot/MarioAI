@@ -2,6 +2,7 @@ package MarioAI.debugGraphics;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import MarioAI.graph.Graph;
 import MarioAI.graph.Node;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class DebugDraw {
@@ -51,9 +53,9 @@ public class DebugDraw {
 			} else pathCirclesRunning.add(point);
 		}
 
-		((MarioComponent) observation).addDebugLines(new debugLines(Color.RED, pathLines));
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.DARK_GRAY, pathCirclesPolynomial));
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.RED, pathCirclesRunning));
+		((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.RED, pathLines));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.DARK_GRAY, pathCirclesPolynomial));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.RED, pathCirclesRunning));
 	}
 
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
@@ -77,7 +79,7 @@ public class DebugDraw {
 					neighbors.add(neighborPoint);
 				}
 
-				((MarioComponent) observation).addDebugPoints(new debugPoints(Color.BLACK, neighbors));
+				((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, neighbors));
 			}
 		}
 	}
@@ -109,8 +111,8 @@ public class DebugDraw {
 				allJumpingEdges.add(p);
 			}
 		}
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.BLACK, allrunningEdges));
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.WHITE, allJumpingEdges, 6));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, allrunningEdges));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
 
 	public static void drawNeighborPaths(final Environment observation, Graph graph) {
@@ -133,25 +135,30 @@ public class DebugDraw {
 					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
 					convertLevelPointToOnScreenPoint(observation, pTarget);
 					if (pSource.y >= pTarget.y) {
-						((MarioComponent)observation).addDebugLines(new debugLines(Color.GREEN, pSource,pTarget));
+						((MarioComponent)observation).addDebugDrawing(new DebugLines(Color.GREEN, pSource,pTarget));
 					}
 					else {
-						((MarioComponent)observation).addDebugLines(new debugLines(Color.ORANGE, pSource,pTarget));
+						((MarioComponent)observation).addDebugDrawing(new DebugLines(Color.ORANGE, pSource,pTarget));
 					}
 				}		
 			}
 		}
 	}
 
-	public static void drawEndNodes(final Environment observation, Graph graph) {
+	public static void drawEndNodes(final Environment observation, Node[] endNodes) {
 		ArrayList<Point> allEndPoints = new ArrayList<Point>();
-		Node mario = graph.getMarioNode(observation);
-		for (int i = 0; i < 15; i++) {
-			Point p = new Point(mario.x + 10, i);
+		int x = 0;
+		for (int i = 0; i < endNodes.length; i++) {
+			if (endNodes[i] != null) {
+				x = endNodes[i].x;
+			}
+		}
+		for (int i = 0; i < endNodes.length; i++) {
+			Point p = new Point(x, i);
 			convertLevelPointToOnScreenPoint(observation, p);
 			allEndPoints.add(p);
 		}
-		((MarioComponent) observation).addDebugPoints(new debugPoints(Color.BLUE, allEndPoints, 12));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLUE, allEndPoints, 12));
 	}
 
 	/**
@@ -166,28 +173,58 @@ public class DebugDraw {
 
 		for (DirectedEdge edge : edges) {
 			Node toCheck = edge.target;
-			addDebugLines(observation, toCheck);
+			for (DirectedEdge directedEdge : toCheck.getEdges()) {
+				Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
+				convertLevelPointToOnScreenPoint(observation, pSource);
+
+				Point pTarget = new Point(directedEdge.target.x, directedEdge.target.y);
+				convertLevelPointToOnScreenPoint(observation, pTarget);
+				if (pSource.y >= pTarget.y) {
+					((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.GREEN, pSource, pTarget));
+				} else {
+					((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.ORANGE, pSource, pTarget));
+				}
+			}
 		}
 	}
-
-	/**
-	 * Auxiliary method
-	 * 
-	 * @param observation
-	 * @param toCheck
-	 */
-	private static void addDebugLines(final Environment observation, Node toCheck) {
-		for (DirectedEdge directedEdge : toCheck.getEdges()) {
-			Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
-			convertLevelPointToOnScreenPoint(observation, pSource);
-
-			Point pTarget = new Point(directedEdge.target.x, directedEdge.target.y);
-			convertLevelPointToOnScreenPoint(observation, pTarget);
-			if (pSource.y >= pTarget.y) {
-				((MarioComponent) observation).addDebugLines(new debugLines(Color.GREEN, pSource, pTarget));
-			} else {
-				((MarioComponent) observation).addDebugLines(new debugLines(Color.ORANGE, pSource, pTarget));
+	
+	public static void drawActions(final Environment observation, final boolean[] actions) {
+		ArrayList<Point> startsGreen = new ArrayList<Point>();
+		ArrayList<Point> sizesGreen = new ArrayList<Point>();
+		ArrayList<Point> startsRed = new ArrayList<Point>();
+		ArrayList<Point> sizesRed = new ArrayList<Point>();
+		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
+		
+		Point[] keyPositions = new Point[] {
+				new Point((marioXPos - 4) * Art.SIZE_MULTIPLIER, 139),
+				new Point((marioXPos - 3) * Art.SIZE_MULTIPLIER, 139),
+				new Point((marioXPos - 2) * Art.SIZE_MULTIPLIER, 139),
+				new Point((marioXPos - 3) * Art.SIZE_MULTIPLIER, 129)
+		};
+		int[] keys = new int[] {
+				Mario.KEY_LEFT,
+				Mario.KEY_DOWN,
+				Mario.KEY_RIGHT,
+				Mario.KEY_JUMP
+		};
+		Point size = new Point((int)(BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER, (int)(BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER);
+		
+		for (int i = 0; i < keys.length; i++) {
+			convertLevelPointToOnScreenPoint(observation, keyPositions[i]);
+			keyPositions[i].x /= 10;
+			keyPositions[i].y /= 10;
+			
+			if (actions[keys[i]]) {
+				startsGreen.add(keyPositions[i]);
+				sizesGreen.add(size);
 			}
+			else {
+				startsRed.add(keyPositions[i]);
+				sizesRed.add(size);
+			}
+			
+			((MarioComponent) observation).addDebugDrawing(new DebugSquare(Color.GREEN, startsGreen, sizesGreen));
+			((MarioComponent) observation).addDebugDrawing(new DebugSquare(Color.RED, startsRed, sizesRed));
 		}
 	}
 

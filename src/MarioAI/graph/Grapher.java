@@ -8,7 +8,7 @@ import MarioAI.SecondOrderPolynomial;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 6;
+	private static final float MAX_JUMP_RANGE = 4;
 	private static final short GRID_HEIGHT = 15;
 	private static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];

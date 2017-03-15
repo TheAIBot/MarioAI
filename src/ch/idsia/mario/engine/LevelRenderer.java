@@ -4,8 +4,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-import MarioAI.debugGraphics.debugLines;
-import MarioAI.debugGraphics.debugPoints;
+import MarioAI.debugGraphics.DebugDrawing;
+import MarioAI.debugGraphics.DebugLines;
+import MarioAI.debugGraphics.DebugPoints;
 import ch.idsia.mario.engine.level.*;
 import jdk.internal.dynalink.linker.LinkerServices;
 
@@ -155,15 +156,9 @@ public class LevelRenderer {
 			}
 	}
 
-	public void renderDebugLines(Graphics g, ArrayList<debugLines> lines) {
-		for (int i = 0; i < lines.size(); i++) {
-			lines.get(i).draw(g);
-		}
-	}
-
-	public void renderDebugPoints(Graphics g, ArrayList<debugPoints> points) {
-		for (int i = 0; i < points.size(); i++) {
-			points.get(i).draw(g);
+	public void renderDebugDrawings(Graphics g, ArrayList<DebugDrawing> drawings) {
+		for (int i = 0; i < drawings.size(); i++) {
+			drawings.get(i).draw(g);
 		}
 	}
 

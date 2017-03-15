@@ -98,7 +98,14 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
-		return levelMatrix[LEVEL_WIDTH - 1];
+		for (int x = levelMatrix.length - 1; x >= 0; x--) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				if (levelMatrix[x][y] != null) {
+					return levelMatrix[x];
+				}
+			}
+		}
+		throw new Error("No blocks was found in the matrix");
 	}
 	
 	
