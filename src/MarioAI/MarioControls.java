@@ -62,8 +62,9 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - (next.getMaxY()));
-			xAxisCounter = getXMovementTime(next.target.x - marioXPos);
+			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
+			int fallTime = getFallingTime(next.target.y - next.getMaxY());
+			xAxisCounter = getXMovementTime(next.target.x - marioXPos, jumpCounter + fallTime);
 			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = true;
 		}
@@ -89,7 +90,7 @@ public class MarioControls {
 		return MAX_JUMP_TIME;
 	}
 	
-	private static int getXMovementTime(float neededXDistance) {
+	private static int getXMovementTime(float neededXDistance, int time) {
 		if (neededXDistance < 0) {
 			float distanceMoved = 0;
 			int steps = 0;
@@ -117,7 +118,7 @@ public class MarioControls {
 				//speed is now 0
 				xSpeedIndex = 0;
 			}
-			while (distanceMoved < neededXDistance) {
+			while (distanceMoved + getDriftingDistance(xSpeedIndex, time - steps)[0] < neededXDistance) {
 				steps++;
 				xSpeedIndex++;
 				distanceMoved += getDistanceFromSpeedInt(xSpeedIndex);
