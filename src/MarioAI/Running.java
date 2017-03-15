@@ -4,9 +4,13 @@ import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Node;
 
 public class Running extends DirectedEdge{
+	
+	private short dir;
 
 	public Running(Node source, Node target) {
 		super(source, target);
+		if (target != null && target.x < source.x) dir = -1;
+		else dir = 1;
 	}
 
 	@Override

@@ -141,14 +141,14 @@ public final class AStar {
 	/**
 	 * TODO refactor proper integration with xvelocity
 	 * 
-	 * @param start
+	 * @param current
 	 * @param goal
 	 * @return
 	 */
-	public static float heuristicFunction(final SpeedNode start, final SpeedNode goal) {
+	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		if (start.vx == 0) return 1000000f;
-		else return GraphMath.distanceBetween(start.node, goal.node)/start.vx;
+		if (current.vx == 0) return 1000000f;
+		else return GraphMath.distanceBetween(current.node, goal.node)/current.vx;
 	}
 
 	/**
