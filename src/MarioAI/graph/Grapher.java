@@ -61,11 +61,12 @@ public  class Grapher {
 		}
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
+		Node oldMarioNode = marioNode;
 		marioNode = mario;
 		mario.deleteAllEdges();
 		//printView();
-
-		connectNode(mario, (short) (GRID_WIDTH/2)); 
+		if(canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
+			connectNode(mario, (short) (GRID_WIDTH/2)); 
 		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
 	}
@@ -135,7 +136,7 @@ public  class Grapher {
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			//listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}		
 	}
 	
@@ -241,7 +242,9 @@ public  class Grapher {
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
 					   lowerFacingMarioCorner == Collision.HIT_WALL){
-				collisionDetection = Collision.HIT_WALL;
+				//TODO temp
+				//collisionDetection = Collision.HIT_WALL;
+				collisionDetection = Collision.HIT_CEILING;
 				isHittingWall = true;
 				//No break.
 			}
@@ -336,7 +339,7 @@ public  class Grapher {
 		}
 	}
 
-	private static boolean canMarioStandThere(short coloumn,short row) {
+	public static boolean canMarioStandThere(short coloumn,short row) {
 		return 0 < row && row < GRID_HEIGHT &&
 			   isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
 	}

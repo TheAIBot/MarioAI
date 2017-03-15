@@ -41,7 +41,7 @@ public class FastAndFurious implements Agent {
 			}
 			
 		} else if (tickCount > 30) {
-			if (graph.updateMatrix(observation)) {
+			if (graph.updateMatrix(observation) || true) {
 				graph.printMatrix(observation);
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}

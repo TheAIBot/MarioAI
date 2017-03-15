@@ -7,6 +7,7 @@ import java.util.List;
 import MarioAI.MarioMethods;
 import MarioAI.Surface;
 import ch.idsia.mario.environments.Environment;
+import MarioAI.graph.Grapher;
 
 public class Graph {
 	public static final int LEVEL_HEIGHT = 15;
@@ -85,6 +86,11 @@ public class Graph {
 			return true;
 		} else if (change > 0) {
 			moveMatrixOneRight(observation, marioXPos, marioYPos);
+			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+			return true;
+		}
+		if ((short)(marioYPos + 1) != marioNode.y && 
+			Grapher.canMarioStandThere((short)11, (short)(marioYPos + 1))) {
 			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
 		}
