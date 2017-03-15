@@ -3,9 +3,26 @@ package MarioAI;
 import MarioAI.graph.DirectedEdge;
 
 public class Hasher {
+	
+	public final float speedFactor = 46; //Se asociated math calculation. Approxcematly 16/0.35, meaning 8 levels of speed.
 	public static int hashShortPoint(short x, short y)
 	{
 		return x + Short.MAX_VALUE * y;
+	}
+	
+	/**
+	 * @param x
+	 * @param y
+	 * @param vx
+	 * @return
+	 */
+	public static int hashSpeedNode(short x, short y, float vx) {
+		short factor = (short) 10; // arbitrarily chosen value
+		//h = (a*P1 + b)*P2 + c
+		//return (int) ((x*31 + y)*59 + vx * factor);
+		return ((byte) (vx * factor) & 15) +
+			   (( x & 511) << 4 ) + 
+			   ((y & 15) << 13);
 	}
 	
 	private static int ll = 0;
@@ -33,4 +50,5 @@ public class Hasher {
 		//return b1 | b2 | b3 | b4;
 		return ll++;
 	}
+	
 }

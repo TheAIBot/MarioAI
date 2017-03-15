@@ -33,4 +33,14 @@ public abstract class DirectedEdge {
 	public String toString() {
 		return "[" + target.x + " : " + target.y + "]";
 	}
+	
+	/**
+	 * TODO Change assumption of not accelerating during traversal
+	 * @param initial velocity v0
+	 * @return the time it takes to traverse the edge given an intial velocity
+	 */
+	public abstract float getTraversedTime(float v0);
+	
+	public abstract float getSpeedAfterTraversal(float v0);
+	
 }

@@ -1,47 +1,54 @@
 package MarioAI;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Node;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.environments.Environment;
+import MarioAI.graph.SpeedNode;
 
-import java.util.ArrayList;
-import java.util.Collections;
+//TODO
+//-Calculate time over edge
+//-Change heuristic
+//-Generate SpeedNodes based on current velocity and possible changes in velocity
+//-finish hash of speed nodes - DONE
 
 public final class AStar {
 
 	/**
-	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most
-	 * column of the screen
+	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
 	 * @param start
-	 * @param nodes
+	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] nodes)  {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
-		// pretty good goal positions to end up in after A* search
+		// pretty good goal positions to end up in after A* search 
 		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
-		for (Node node : nodes) {
+		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
 			}
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(start, goal);
-		if (path != null) {
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
+		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
-		for (Node node : nodes) {
+
+		for (Node node : rightmostNodes) {
 			if (node != null) {
-				//remove the last edge as that's the egde to the goal
-				//because it was the last edge added
+				//remove the last edge as that's the edge to the goal
+				//because it was the first added edge
 				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
@@ -56,89 +63,110 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<DirectedEdge> runAStar(final Node start, final Node goal) {
+	public static List<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal) {
 		// Set of nodes already explored
-		final List<Node> closedSet = new ArrayList<Node>();
+		final Map<Integer, SpeedNode> closedSetMap = new HashMap<Integer, SpeedNode>();
 		// Set of nodes yet to be explored
-		final PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+		final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
+		final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 
 		// Initialization
 		openSet.add(start);
+		openSetMap.put(start.hashCode(), start);
 		start.gScore = 0;
+		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
-			Node current = openSet.remove();
+			SpeedNode current = openSet.remove();
+			openSetMap.remove(current.hashCode());
 
 			// If goal is reached return solution path
-			if (current.equals(goal)) {
+			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
 
 			// Current node has been explored
-			// openSet.remove(current);
-			closedSet.add(current);
+			closedSetMap.put(current.hashCode(), current);
 
 			// Explore each neighbor of current node
-			final List<DirectedEdge> neighborEdges = current.getEdges();
+			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				if (closedSet.contains(neighborEdge.target))
+				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx),
+											 current);
+				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getWeight();
-				if (!openSet.contains(neighborEdge.target)) {
-					neighborEdge.target.parent = current;
-					neighborEdge.target.gScore = tentativeGScore;
-					neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
-					openSet.add(neighborEdge.target);
-				} else if (tentativeGScore >= neighborEdge.target.gScore) {
+				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);
+				if (!openSetMap.containsKey(sn.hashCode())) {
+					sn.parent = current;
+					sn.gScore = tentativeGScore;
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					openSet.add(sn);
+				} else if (tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
 					continue;
 				} else {
-					openSet.remove(neighborEdge.target);
-					neighborEdge.target.parent = current;
-					neighborEdge.target.gScore = tentativeGScore;
-					neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
-					openSet.add(neighborEdge.target);
+					// Update values
+					openSet.remove(sn);
+					sn.parent = current;
+					sn.gScore = tentativeGScore;
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					openSet.add(sn);
 				}
-
-				// Update values
 			}
 		}
-		for (Node node : closedSet) {
-			node.gScore = 0;
-			node.fScore = 0;
-			node.parent = null;
+
+		//TODO look at this and decide if is should be changed or removed
+		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
+		while (iter.hasNext() && iter.next().node.parent != null) {
+			iter.next().node.gScore = 0;
+			iter.next().node.fScore = 0;
+			iter.next().node.parent = null;
 		}
+
 		// No solution was found
 		return null;
 	}
 
 	/**
 	 * @param start
-	 * @param goal
+	 * @param goal.node
 	 * @return the estimated cost of the cheapest path from current node to goal node
 	 */
-	public static float heuristicFunction(final Node node, final Node goal) {
-		// temp use distance (later should use time)
-		return GraphMath.distanceBetween(node, goal);
+//	public static float heuristicFunction(final Node start, final Node goal) {
+//		// temp use distance (later should use time)
+//		return GraphMath.distanceBetween(start, goal);
+//	}
+
+	/**
+	 * TODO refactor proper integration with xvelocity
+	 * 
+	 * @param current
+	 * @param goal
+	 * @return
+	 */
+	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
+		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
+		if (current.vx == 0) return 1000000f;
+		else return GraphMath.distanceBetween(current.node, goal.node)/current.vx;
 	}
 
 	/**
 	 * @param current
 	 * @return path
 	 */
-	private static List<DirectedEdge> reconstructPath(Node current) {
+	private static List<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		while (current.parent != null) {
+		while (currentSpeedNode.parent != null) {
 			DirectedEdge fisk = null;
-			for (int i = 0; i < current.parent.edges.size(); i++) {
-				if (current.parent.edges.get(i).target.equals(current)) {
-					fisk = current.parent.edges.get(i);
+			for (int i = 0; i < currentSpeedNode.parent.node.edges.size(); i++) {
+				if (currentSpeedNode.parent.node.edges.get(i).target.equals(currentSpeedNode.node)) {
+					fisk = currentSpeedNode.parent.node.edges.get(i);
 					break;
 				}
 			}
 			path.add(fisk);
-			current = current.parent;
+			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);
 		return path;

@@ -19,7 +19,7 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 	public float fScore; // f(n) for current node - cost estimate of going through this node on cheapest path to the goal node
 	public Node parent; //node we came from - used in A*
 	
-	private final float SCORE_MULTIPLIER = 128;
+	private final float SCORE_MULTIPLIER = 128; // arbitrary high enough number
 	
 	//public abstract ArrayList<Node> getNeighbors();
 	
