@@ -198,6 +198,7 @@ public class MarioControls {
 		return MAX_X_VELOCITY;
 	}
 
+	public static float getXVelocity() {
 		return vx;
 	}
 
