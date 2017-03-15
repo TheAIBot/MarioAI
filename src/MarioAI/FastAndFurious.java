@@ -65,7 +65,7 @@ public class FastAndFurious implements Agent {
 			MarioControls.getNextAction(observation, newestPath, action);
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
-				DebugDraw.drawActions(observation, action);
+				DebugDraw.drawAction(observation, action);
 			}
 		}
 		tickCount++;

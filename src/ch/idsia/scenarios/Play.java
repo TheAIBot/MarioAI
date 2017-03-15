@@ -29,10 +29,10 @@ public class Play {
     public static void main(String[] args) {
         boolean loadLevel = true;
         if (loadLevel) {
-            //Agent controller = new FastAndFurious();
+            Agent controller = new FastAndFurious();
             //Agent controller = new TestAgent();
-        	Agent controller = new HumanKeyboardAgent();
-            Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
+        	//Agent controller = new HumanKeyboardAgent();
+            Environment observation = TestTools.loadLevel("jumpLevels/3Width.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

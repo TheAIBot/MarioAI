@@ -188,18 +188,18 @@ public class DebugDraw {
 		}
 	}
 	
-	public static void drawActions(final Environment observation, final boolean[] actions) {
+	public static void drawAction(final Environment observation, final boolean[] actions) {
 		ArrayList<Point> startsGreen = new ArrayList<Point>();
 		ArrayList<Point> sizesGreen = new ArrayList<Point>();
 		ArrayList<Point> startsRed = new ArrayList<Point>();
 		ArrayList<Point> sizesRed = new ArrayList<Point>();
-		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
+		final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
 		
-		Point[] keyPositions = new Point[] {
-				new Point((marioXPos - 4) * Art.SIZE_MULTIPLIER, 139),
-				new Point((marioXPos - 3) * Art.SIZE_MULTIPLIER, 139),
-				new Point((marioXPos - 2) * Art.SIZE_MULTIPLIER, 139),
-				new Point((marioXPos - 3) * Art.SIZE_MULTIPLIER, 129)
+		Point2D.Float[] keyPositions = new Point2D.Float[] {
+				new Point2D.Float((marioXPos - 10), 14),
+				new Point2D.Float((marioXPos -  9), 14),
+				new Point2D.Float((marioXPos -  8), 14),
+				new Point2D.Float((marioXPos -  9), 13)
 		};
 		int[] keys = new int[] {
 				Mario.KEY_LEFT,
@@ -211,15 +211,14 @@ public class DebugDraw {
 		
 		for (int i = 0; i < keys.length; i++) {
 			convertLevelPointToOnScreenPoint(observation, keyPositions[i]);
-			keyPositions[i].x /= 10;
-			keyPositions[i].y /= 10;
+			Point keyPosition = new Point((int)keyPositions[i].x, (int)keyPositions[i].y);
 			
 			if (actions[keys[i]]) {
-				startsGreen.add(keyPositions[i]);
+				startsGreen.add(keyPosition);
 				sizesGreen.add(size);
 			}
 			else {
-				startsRed.add(keyPositions[i]);
+				startsRed.add(keyPosition);
 				sizesRed.add(size);
 			}
 			
@@ -229,10 +228,17 @@ public class DebugDraw {
 	}
 
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
+		Point2D.Float p = new Point2D.Float(point.x, point.y);
+		convertLevelPointToOnScreenPoint(observation, p);
+		point.x = (int)p.x;
+		point.y = (int)p.y;
+	}
+	
+	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point2D.Float point) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		point.x = ((int)((point.x - (Math.max(marioXPos - (LEVEL_WIDTH / 2) + 1, 0)) + 1) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
-		point.y = ((int)((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
+		point.x = (((point.x - (Math.max(marioXPos - (LEVEL_WIDTH / 2) + 1, 0)) + 1) * BLOCK_PIXEL_SIZE) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
+		point.y = (((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
 	}
 
 }
