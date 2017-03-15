@@ -188,4 +188,9 @@ public class MarioControls {
 		final double c = -0.7500000000;
 		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
+	
+	public static float getMaxV() {
+		// TODO Auto-generated method stub
+		return 0.35f;
+	}
 }
