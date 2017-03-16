@@ -20,7 +20,7 @@ public class TestAgent implements Agent {
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
 
-		int a1 = TestTools.LEVEL_INIT_TICKS +  10;
+		int a1 = TestTools.LEVEL_INIT_TICKS +  30;
 		int a3 =                         a1 +  40;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -33,10 +33,12 @@ public class TestAgent implements Agent {
 		else if (tick == a1) {
 			System.out.println(xChange);
 			System.out.println("drifting");
-			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_RIGHT] = false;
+			actions[Mario.KEY_LEFT] = true;
 		}
 		else if (tick > a1 && tick < a3) {
 			System.out.println(xChange);
+			actions[Mario.KEY_LEFT] = true;
 		}
 		prevX = currentXPos;
 
