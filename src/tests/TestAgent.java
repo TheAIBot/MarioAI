@@ -2,11 +2,16 @@ package tests;
 
 import java.util.ArrayList;
 
+import MarioAI.FastAndFurious;
 import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
 import ch.idsia.ai.agents.*;
+import ch.idsia.ai.tasks.ProgressTask;
+import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
+import ch.idsia.tools.CmdLineOptions;
+import ch.idsia.tools.EvaluationOptions;
 
 public class TestAgent implements Agent {
 	private int tick = 0;	
@@ -20,8 +25,8 @@ public class TestAgent implements Agent {
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
 
-		int a1 = TestTools.LEVEL_INIT_TICKS +  30;
-		int a3 =                         a1 +  40;
+		int a1 = TestTools.LEVEL_INIT_TICKS +  6;
+		int a3 =                         a1 +  20;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float xChange = currentXPos - prevX;
@@ -29,16 +34,18 @@ public class TestAgent implements Agent {
 		if (tick >= TestTools.LEVEL_INIT_TICKS && tick < a1) {
 			System.out.println(xChange);
 			actions[Mario.KEY_RIGHT] = true;
+			actions[Mario.KEY_JUMP] = true;
 		}
 		else if (tick == a1) {
 			System.out.println(xChange);
 			System.out.println("drifting");
 			actions[Mario.KEY_RIGHT] = false;
-			actions[Mario.KEY_LEFT] = true;
+			//actions[Mario.KEY_LEFT] = true;
+			actions[Mario.KEY_JUMP] = false;
 		}
 		else if (tick > a1 && tick < a3) {
 			System.out.println(xChange);
-			actions[Mario.KEY_LEFT] = true;
+			//actions[Mario.KEY_LEFT] = true;
 		}
 		prevX = currentXPos;
 
@@ -100,34 +107,15 @@ public class TestAgent implements Agent {
 		}
 		*/
 		
-		/*
-<-0.2346077|0.0>
-<-0.24630094|0.8312502>
-<-0.2567079|0.8312502>
-<-0.26596975|0.7125001>
-<-0.2742133|0.59375>
-<-0.28154993|0.4749999>
-<-0.28807926|0.3562498>
-<-0.29389048|0.23750019>
-<-0.26156235|0.01437521>
-<-0.23279047|-0.17528105>
-<-0.20718384|-0.3364892>
-<-0.1843934|-0.4735155>
-<-0.16411018|-0.58998823>
-<-0.14605808|-0.6889901>
-<-0.12999153|-0.7731414>
-<-0.115692616|-0.8446703>
-<-0.10296631|-0.1697998>
-<-0.091639996|0.0>
-
-Mytic function
-f^-1(x) = -8.581199590 ln(1. - 2.933333524 y)
-
-		 */
-		
 		tick++;
 		return actions;
 	}
+	
+    public static void main(String[] args) {
+        Agent controller = new TestAgent();
+        Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+        TestTools.runWholeLevel(observation);
+    }
 
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;

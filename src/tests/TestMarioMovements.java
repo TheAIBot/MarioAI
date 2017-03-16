@@ -10,8 +10,6 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestMarioMovements {
 	
-	private static final float ACCEPTED_DEVIATION = 0.0001f;
-	
 	@Test
 	public void testRightMovement() {
 		testRightSpeed(1);
@@ -47,7 +45,14 @@ public class TestMarioMovements {
 		float expectedYPos = startMarioYPos;
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
-			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + 
+					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
+					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
+		}
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0) != speed) {
+			Assert.fail("Expected steps didn't match correct steps." + 
+					"\nExpected: " + speed + 
+					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
 		}
 	}
 	
@@ -102,6 +107,11 @@ public class TestMarioMovements {
 			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + 
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
+		}
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0) != speed) {
+			Assert.fail("Expected steps didn't match correct steps." + 
+					"\nExpected: " + speed + 
+					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
 		}
 	}
 	
@@ -161,7 +171,7 @@ public class TestMarioMovements {
 	//public void testJumo
 	
 	private boolean withinAcceptableError(float x1, float y1, float x2, float y2) {
-		return 	Math.abs(x1 - x2) <= ACCEPTED_DEVIATION && 
-				Math.abs(y1 - y2) <= ACCEPTED_DEVIATION;
+		return 	Math.abs(x1 - x2) <= MarioControls.ACCEPTED_DEVIATION && 
+				Math.abs(y1 - y2) <= MarioControls.ACCEPTED_DEVIATION;
 	}
 }

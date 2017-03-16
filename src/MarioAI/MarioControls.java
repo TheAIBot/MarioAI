@@ -2,15 +2,15 @@ package MarioAI;
 
 import java.util.List;
 
-import com.sun.istack.internal.FinalArrayList;
-
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
-
+	
+	public static final float ACCEPTED_DEVIATION = 0.0002f;
+	
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float[] heights = new float[] { 
@@ -25,23 +25,16 @@ public class MarioControls {
 		4.051875f, 
 		4.15625f 
 	};
-	
-	private static int jumpCounter = 0;
-	private static int xAxisCounter = 0;
-	private static int movementDirection = 0;
-	private static boolean missionSet = false;
-	
+		
 	private static float oldX = 0;
-	private static boolean shouldBeJumping = false;
-	private static boolean first = false;
-	private static int fallTime = 0;
+	private static int jumpTime = 0;
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.7) {
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
 			next = path.get(0);
 			return true;
@@ -53,59 +46,32 @@ public class MarioControls {
 	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		final boolean canJump = observation.mayMarioJump();
 		final DirectedEdge next = path.get(0);
-		
-		if (!missionSet && canJump) {
-			missionSet = true;
-			first = true;
-		}
 
-		if (missionSet) {
-			if (jumpCounter == 0) {
-				float getJumpNodeHeight = next.getMaxY();
-				//float jumpTarget = next.source.y - getJumpNodeHeight;
-				float jumpHeight = Math.abs(Math.round(marioYPos) - Math.round(getJumpNodeHeight));
-				if (getJumpNodeHeight < Math.round(marioYPos)) {
-					jumpCounter = getJumpTime(jumpHeight);
-					fallTime = getFallingTime(next.target.y - next.getMaxY());
-				}
-			}
-			if (jumpCounter > 0) {
-				if (first) {
-					shouldBeJumping = true;
-					action[Mario.KEY_JUMP] = true;
-					jumpCounter--;
-					//fallTime--;
-					first = false;
-				}
-				if (shouldBeJumping) {
-					if (!observation.isMarioOnGround()) {
-						action[Mario.KEY_JUMP] = true;
-						jumpCounter--;
-						//fallTime--;
-					}
-					else {
-						first = true;
-					}
-				}
+		if (jumpTime < 0) {
+			final float getJumpNodeHeight = next.getMaxY();
+			if (getJumpNodeHeight < Math.round(marioYPos)) {
+				final int jumpCounter = getJumpTime(getJumpNodeHeight);
+				final int fallTime = getFallingTime(next.target.y - next.getMaxY());
+				jumpTime = jumpCounter + fallTime;
 			}
 		}
+		if (jumpTime > 0) {
+			action[Mario.KEY_JUMP] = true;
+		}
+		jumpTime--;
 		
-		if (missionSet) {
-			final float speed = marioXPos - oldX;
-			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-			xAxisCounter = getXMovementTime(next.target.x - marioXPos, speed, jumpCounter + fallTime);
-			if (xAxisCounter > 0) {
-				action[movementDirection] = true;
-			}
-			//xAxisCounter--;
-		}		
+	
+		final float speed = marioXPos - oldX;
+		final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+		final int xAxisCounter = getXMovementTime(next.target.x - marioXPos, speed, jumpTime);
+		if (xAxisCounter > 0) {
+			action[movementDirection] = true;
+		}
 		oldX = marioXPos;
-		missionSet = !(jumpCounter == 0 && xAxisCounter == 0);
 	}
 
-	private static int getJumpTime(float neededHeight) {
+	public static int getJumpTime(float neededHeight) {
 		for (int i = 0; i < heights.length; i++) {
 			if (heights[i] >= neededHeight) {
 				return i;
@@ -114,10 +80,13 @@ public class MarioControls {
 		return MAX_JUMP_TIME;
 	}
 	
-	private static int getXMovementTime(final float neededXDistance, float speed, final int time) {
+	public static int getXMovementTime(float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
-		if (neededXDistance < 0) {
+		if ((neededXDistance < 0 && speed > 0) ||
+			(neededXDistance > 0 && speed < 0)) {
+			speed = Math.abs(speed);
+			
 			if (speed > 0) {
 				steps = getDeaccelerationNeededSteps(speed);
 				distanceMoved = -getDeaccelerationDistanceMoved(speed);
@@ -125,31 +94,19 @@ public class MarioControls {
 				//speed is now 0
 				speed = 0;
 			}
-			while (distanceMoved + getDriftingDistance(speed, time - steps) < -neededXDistance) {
-				steps++;
-				speed = getNextTickSpeed(-speed);
-				distanceMoved += speed;
-			}
-			return steps;
 		}
-		else if (neededXDistance > 0) {
-			if (speed < 0) {
-				steps = getDeaccelerationNeededSteps(-speed);
-				distanceMoved = -getDeaccelerationDistanceMoved(-speed);
-				
-				//speed is now 0
-				speed = 0;
-			}
-			while (distanceMoved + getDriftingDistance(speed, time - steps) < neededXDistance) {
-				steps++;
-				speed = getNextTickSpeed(speed);
-				distanceMoved += speed;
-			}
-			return steps;
-		}
-		else {
+		else if (neededXDistance == 0) {
 			return 0;
 		}
+		speed = Math.abs(speed);
+		neededXDistance = Math.abs(neededXDistance);
+		
+		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, time - steps)) > ACCEPTED_DEVIATION) {
+			speed = getNextTickSpeed(speed);
+			distanceMoved += speed;
+			steps++;
+		}
+		return steps;
 	}
 	
 	public static float getNextTickSpeed(final float speed) {

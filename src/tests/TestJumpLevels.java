@@ -34,16 +34,15 @@ public class TestJumpLevels {
 		final FastAndFurious agent = new FastAndFurious();		
 		Environment observation = TestTools.loadLevel(levelPath, agent);
 		
-		/*
+		
 		for (int i = 0; i < 2000; i++) {
 			TestTools.runOneTick(observation);
 			
-			if (((MarioComponent) observation).getMarioMode() != Mario.STATUS_RUNNING) {
+			if (((MarioComponent) observation).getMarioStatus() != Mario.STATUS_RUNNING) {
 				break;
 			}
 			
-		}*/
-		TestTools.runWholeLevel(observation);
+		}
 		
 		final int mode = ((MarioComponent) observation).getMarioStatus();
 		if (mode != Mario.STATUS_WIN) {
