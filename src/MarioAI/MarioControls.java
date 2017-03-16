@@ -2,6 +2,8 @@ package MarioAI;
 
 import java.util.List;
 
+import com.sun.istack.internal.FinalArrayList;
+
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -52,7 +54,7 @@ public class MarioControls {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final boolean canJump = observation.mayMarioJump();
-		DirectedEdge next = path.get(0);
+		final DirectedEdge next = path.get(0);
 		
 		if (!missionSet && canJump) {
 			missionSet = true;
@@ -112,7 +114,7 @@ public class MarioControls {
 		return MAX_JUMP_TIME;
 	}
 	
-	private static int getXMovementTime(float neededXDistance, float speed, int time) {
+	private static int getXMovementTime(final float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
 		if (neededXDistance < 0) {
@@ -150,20 +152,13 @@ public class MarioControls {
 		}
 	}
 	
-	public static float getNextTickSpeed(float speed) {
+	public static float getNextTickSpeed(final float speed) {
 		final float a = 0.8899999428459493f;
 		final float b = 0.03750000378899981f;
 		return a * speed + b;
 	}
 	
-	public static float getSpeedFromSpeedInt(int speed) {
-		final double a = -0.340909068708614;
-		final double b = -0.116533823678965;
-		final double c = 0.340909068708614;
-		return (float)(a * Math.exp(b * (double)speed) + c);
-	}
-	
-	public static float getDeaccelerationDistanceMoved(float speed) {
+	public static float getDeaccelerationDistanceMoved(final float speed) {
 		final double a = 0.2606629227512888;
 		final double b = 4.161597216697656;
 		final double c = -0.342432087168023;
@@ -176,14 +171,14 @@ public class MarioControls {
 		final float b = -0.11653327286299346f;
 		final float c = -0.3409108568136135f;
 		int steps = 0;
-		while(speed > MIN_MARIO_SPEED) {
+		while(speed >= MIN_MARIO_SPEED) {
 			speed = (float) (a * Math.exp(b * steps)  + c);
 			steps++;
 		}
 		return steps;
 	}
 	
-	public static float getDriftingDistance(float speed, int driftTime) {
+	public static float getDriftingDistance(final float speed, final int driftTime) {
 		final double a = speed;
 		final double b = -0.11653355831586142;
 		final double c = -0.00000056420864292;
@@ -199,7 +194,7 @@ public class MarioControls {
 		return (float)driftDistance;
 	}
 	
-	private static int getFallingTime(float fallingHeight) {
+	private static int getFallingTime(final float fallingHeight) {
 		final double a = 0.08333333333;
 		final double b = 2400;
 		final double c = -0.7500000000;

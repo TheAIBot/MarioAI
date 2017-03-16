@@ -37,8 +37,10 @@ public class TestMarioMovements {
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		float distanceMoved = 0;
+		float actualSpeed = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved += MarioControls.getSpeedFromSpeedInt(i);
+			actualSpeed = MarioControls.getNextTickSpeed(actualSpeed);
+			distanceMoved += actualSpeed;
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
@@ -87,8 +89,10 @@ public class TestMarioMovements {
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		float distanceMoved = 0;
+		float actualSpeed = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved -= MarioControls.getSpeedFromSpeedInt(i);
+			actualSpeed = -MarioControls.getNextTickSpeed(-actualSpeed);
+			distanceMoved += actualSpeed;
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
