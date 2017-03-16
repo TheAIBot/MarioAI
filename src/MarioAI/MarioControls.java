@@ -49,12 +49,7 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 
 		if (jumpTime < 0) {
-			final float getJumpNodeHeight = next.getMaxY();
-			if (getJumpNodeHeight < Math.round(marioYPos)) {
-				final int jumpCounter = getJumpTime(getJumpNodeHeight);
-				final int fallTime = getFallingTime(next.target.y - next.getMaxY());
-				jumpTime = jumpCounter + fallTime;
-			}
+			jumpTime = getJumpTime(next, marioYPos);
 		}
 		if (jumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
@@ -63,21 +58,38 @@ public class MarioControls {
 		
 	
 		final float speed = marioXPos - oldX;
-		final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 		final int xAxisCounter = getXMovementTime(next.target.x - marioXPos, speed, jumpTime);
 		if (xAxisCounter > 0) {
+			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
 		}
 		oldX = marioXPos;
 	}
+	
+	public static int getJumpTime(DirectedEdge next, float marioYPos) {
+		final float getJumpNodeHeight = next.getMaxY();
+		if (getJumpNodeHeight < Math.round(marioYPos)) {
+			final int jumpCounter = getJumpUpTime(getJumpNodeHeight);
+			final int fallTime = getFallingTime(next.target.y - next.getMaxY());
+			return jumpCounter + fallTime;
+		}
+		return 0;
+	}
 
-	public static int getJumpTime(float neededHeight) {
+	private static int getJumpUpTime(float neededHeight) {
 		for (int i = 0; i < heights.length; i++) {
 			if (heights[i] >= neededHeight) {
 				return i;
 			}
 		}
 		return MAX_JUMP_TIME;
+	}
+	
+	private static int getFallingTime(final float fallingHeight) {
+		final double a = 0.08333333333;
+		final double b = 2400;
+		final double c = -0.7500000000;
+		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 	
 	public static int getXMovementTime(float neededXDistance, float speed, final int time) {
@@ -149,12 +161,5 @@ public class MarioControls {
 			driftDistance += lastSpeed;
 		}
 		return (float)driftDistance;
-	}
-	
-	private static int getFallingTime(final float fallingHeight) {
-		final double a = 0.08333333333;
-		final double b = 2400;
-		final double c = -0.7500000000;
-		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 }
