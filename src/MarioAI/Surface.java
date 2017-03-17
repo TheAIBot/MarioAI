@@ -2,9 +2,9 @@ package MarioAI;
 
 import java.util.*;
 
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Node;
-import MarioAI.graph.SuperNode;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SuperNode;
 
 /**
  * A surface is a collection of nodes that are horisontally next to eachother

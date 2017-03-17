@@ -1,6 +1,7 @@
-package MarioAI.graph;
+package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
+import MarioAI.graph.nodes.Node;
 
 public abstract class DirectedEdge {
 	public Node source; 

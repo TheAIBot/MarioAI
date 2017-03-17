@@ -2,9 +2,10 @@ package MarioAI.graph;
 
 import java.util.*;
 
-
-import MarioAI.Running;
-import MarioAI.SecondOrderPolynomial;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.nodes.Node;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;

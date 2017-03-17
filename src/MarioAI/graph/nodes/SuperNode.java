@@ -1,9 +1,11 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import MarioAI.graph.edges.DirectedEdge;
 
 /**
  * Represents every possible type of node being valid input for the A* search algorithm

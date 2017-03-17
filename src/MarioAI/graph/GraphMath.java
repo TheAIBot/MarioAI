@@ -1,5 +1,7 @@
 package MarioAI.graph;
 
+import MarioAI.graph.nodes.Node;
+
 /**
  * Class containing auxiliary methods for calculations on the generated route graph
  */

@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.debugGraphics.DebugDraw;
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Grapher;
-import MarioAI.graph.Node;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;

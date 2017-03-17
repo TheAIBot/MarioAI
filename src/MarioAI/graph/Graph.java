@@ -6,6 +6,7 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.Surface;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {

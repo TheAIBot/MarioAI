@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
-import MarioAI.graph.Node;
-import MarioAI.graph.SpeedNode;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 
 //TODO
 //-Calculate time over edge
