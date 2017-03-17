@@ -30,7 +30,6 @@ public class Running extends DirectedEdge{
 
 	@Override
 	public float getSpeedAfterTraversal(float v0) {
-		System.out.println(v0);
 		if (dir == -1) System.out.println("HER: " +  (0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3)));
 		return (float) ((0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3)));
 	}

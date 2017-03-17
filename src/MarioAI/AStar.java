@@ -19,6 +19,9 @@ import MarioAI.graph.SpeedNode;
 //-Generate SpeedNodes based on current velocity and possible changes in velocity
 //-finish hash of speed nodes - DONE
 
+
+//Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
+
 public final class AStar {
 
 	/**
@@ -40,7 +43,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0.1f, null,null), new SpeedNode(goal, 0, null, null));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -96,7 +99,7 @@ public final class AStar {
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current);
+				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
@@ -114,6 +117,7 @@ public final class AStar {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					sn.ancestorEdge = neighborEdge;
 					openSet.add(sn);
 				}
 			}
