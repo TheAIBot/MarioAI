@@ -125,10 +125,12 @@ public final class AStar {
 
 		//TODO look at this and decide if is should be changed or removed
 		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
-		while (iter.hasNext() && iter.next().node.parent != null) {
-			iter.next().node.gScore = 0;
-			iter.next().node.fScore = 0;
-			iter.next().node.parent = null;
+		while (iter.hasNext()) {
+			SpeedNode node = iter.next();
+			if (node == null) continue;
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
 		}
 
 		// No solution was found
