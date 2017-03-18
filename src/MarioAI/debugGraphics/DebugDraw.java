@@ -40,8 +40,7 @@ public class DebugDraw {
 
 		final Point2D.Float marioPoint = new Point2D.Float(marioXPos, marioYPos);
 		convertLevelPointToOnScreenPoint(observation, marioPoint);
-		Point marioP = new Point((int)marioPoint.x, (int)marioPoint.y);
-		pathLines.add(marioP);
+		pathLines.add(new Point((int)marioPoint.x, (int)marioPoint.y));
 
 		for (int i = 0; i < path.size(); i++) {
 			final Node node = path.get(i).target;
@@ -51,7 +50,9 @@ public class DebugDraw {
 			pathLines.add(point);
 			if (path.get(i) instanceof SecondOrderPolynomial) {
 				pathCirclesPolynomial.add(point);
-			} else pathCirclesRunning.add(point);
+			} else {
+				pathCirclesRunning.add(point);
+			}
 		}
 
 		((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.RED, pathLines));
@@ -96,15 +97,15 @@ public class DebugDraw {
 		nodesToVisit.addAll(mario.getEdges());
 
 		while (nodesToVisit.size() > 0) {
-			DirectedEdge fisk = nodesToVisit.poll();
-			Node toCheck = fisk.target;
-			if (!visitedRunningNodes.contains(toCheck) && fisk instanceof Running) {
+			DirectedEdge edge = nodesToVisit.poll();
+			Node toCheck = edge.target;
+			if (!visitedRunningNodes.contains(toCheck) && edge instanceof Running) {
 				nodesToVisit.addAll(toCheck.getEdges());
 				Point p = new Point(toCheck.x, toCheck.y);
 				convertLevelPointToOnScreenPoint(observation, p);
 				visitedRunningNodes.add(toCheck);
 				allrunningEdges.add(p);
-			} else if (!visitedJumpingNodes.contains(toCheck) && fisk instanceof SecondOrderPolynomial) {
+			} else if (!visitedJumpingNodes.contains(toCheck) && edge instanceof SecondOrderPolynomial) {
 				nodesToVisit.addAll(toCheck.getEdges());
 				Point p = new Point(toCheck.x, toCheck.y);
 				convertLevelPointToOnScreenPoint(observation, p);
@@ -123,8 +124,8 @@ public class DebugDraw {
 		nodesToVisit.addAll(mario.getEdges());
 
 		while (nodesToVisit.size() > 0) {
-			DirectedEdge fisk = nodesToVisit.poll();
-			Node toCheck = fisk.target;
+			DirectedEdge edge = nodesToVisit.poll();
+			Node toCheck = edge.target;
 			if (!visitedNodes.contains(toCheck)) {
 				nodesToVisit.addAll(toCheck.getEdges());
 				visitedNodes.add(toCheck);				
