@@ -31,16 +31,17 @@ public class DebugDraw {
 	}
 
 	public static void drawPath(final Environment observation, final List<DirectedEdge> path) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 
 		final ArrayList<Point> pathLines = new ArrayList<Point>();
 		final ArrayList<Point> pathCirclesPolynomial = new ArrayList<Point>();
 		final ArrayList<Point> pathCirclesRunning = new ArrayList<Point>();
 
-		final Point marioPoint = new Point(marioXPos, marioYPos);
+		final Point2D.Float marioPoint = new Point2D.Float(marioXPos, marioYPos);
 		convertLevelPointToOnScreenPoint(observation, marioPoint);
-		pathLines.add(marioPoint);
+		Point marioP = new Point((int)marioPoint.x, (int)marioPoint.y);
+		pathLines.add(marioP);
 
 		for (int i = 0; i < path.size(); i++) {
 			final Node node = path.get(i).target;
