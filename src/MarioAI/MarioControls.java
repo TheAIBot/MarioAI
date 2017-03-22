@@ -63,7 +63,7 @@ public class MarioControls {
 		
 	
 		currentXSpeed = marioXPos - oldX;
-		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed).key.intValue();
+		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed).getXMovementTime();
 		if (xAxisCounter > 0) {
 			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
@@ -107,9 +107,10 @@ public class MarioControls {
 		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 	
-	public static Pair<Integer, Float> getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
+	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		final int jumpTimeInTicks = getJumpTime(edge, startY);
-		return getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
+		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
+		return new MovementInformation(xMovementInformation.key, jumpTimeInTicks, xMovementInformation.value);
 	}
 	
 	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {
