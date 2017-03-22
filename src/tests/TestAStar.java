@@ -45,7 +45,7 @@ public class TestAStar {
 		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		assertTrue(path != null);
 		
-		float c = 1.0f;
+//		float c = 1.0f;
 		for (DirectedEdge directedEdge : path) {
 			//assertEquals(directedEdge.target.gScore, c, delta);
 			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
@@ -55,7 +55,7 @@ public class TestAStar {
 //			} catch (ClassCastException e) {
 //				Assert.fail();
 //			}
-			c++;
+//			c++;
 		}
 		// goal node has been removed from path returned
 		assertNotEquals(path.get(path.size()-1).target.x, 1000, delta);
@@ -66,7 +66,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setUp("TestAStarJumpThinWall");
+		setUp("TestAStarJump");
 		
 		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		assertTrue(path != null);
