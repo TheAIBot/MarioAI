@@ -1,7 +1,8 @@
 package tests;
 
-import static org.junit.Assert.*;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -14,8 +15,6 @@ import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
-import MarioAI.graph.nodes.Node;
-
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 

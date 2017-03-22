@@ -8,7 +8,7 @@ import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
 
 public  class Grapher {
-	private static final float JUMP_HEIGHT = 4;
+	private static final float MAX_JUMP_HEIGHT = 4;
 	private static final float MAX_JUMP_RANGE = 4;
 	public static final short GRID_HEIGHT = 15;
 	public static final short GRID_WIDTH = 22;
@@ -155,9 +155,11 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 2; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
-			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
-			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
+		for (int jumpHeight = 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
+				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
+			}
 		}
 	}
 	

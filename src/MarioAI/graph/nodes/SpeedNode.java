@@ -5,12 +5,13 @@ import MarioAI.graph.edges.DirectedEdge;
 
 public class SpeedNode implements Comparable<SpeedNode> {
 	
-	public Node node;
-	public float vx;
-	public float gScore, fScore;
-	public SpeedNode parent;
-	public int hash;
-	public DirectedEdge ancestorEdge;
+	public final Node node;
+	public final float vx;
+	public float gScore;
+	public float fScore;
+	public final SpeedNode parent;
+	public final int hash;
+	public final DirectedEdge ancestorEdge;
 	
 	public SpeedNode(Node node, float vx, SpeedNode parent, DirectedEdge ancestorEdge) {
 		this.node = node;

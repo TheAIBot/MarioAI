@@ -3,6 +3,8 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.omg.CORBA.INTERNAL;
+
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
@@ -63,7 +65,7 @@ public class MarioControls {
 		
 	
 		currentXSpeed = marioXPos - oldX;
-		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed).getXMovementTime();
+		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed, jumpTime).getXMovementTime();
 		if (xAxisCounter > 0) {
 			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
@@ -113,6 +115,10 @@ public class MarioControls {
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		final int jumpTimeInTicks = getJumpTime(edge, startY);
+		return getStepsAndSpeedAfterJump(startX, startY, endNode, edge, speed, jumpTimeInTicks);
+	}
+	
+	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int jumpTimeInTicks) {
 		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
 		return new MovementInformation(xMovementInformation.key, jumpTimeInTicks, xMovementInformation.value);
 	}
