@@ -37,7 +37,7 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
-			next = path.get(0);
+			if (path.size() > 0) next = path.get(0);
 			return true;
 		}
 		return false;
