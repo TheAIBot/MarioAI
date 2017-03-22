@@ -64,6 +64,9 @@ public  class Grapher {
 		Node oldMarioNode = marioNode;
 		marioNode = mario;
 		mario.deleteAllEdges();
+		if (mario.x >= 160) {
+			System.out.println();
+		}
 		//printView();
 		if(canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
 			connectNode(mario, (short) (GRID_WIDTH/2)); 
@@ -136,7 +139,7 @@ public  class Grapher {
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			//listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}		
 	}
 	
@@ -176,7 +179,7 @@ public  class Grapher {
 		while ((collisionDetection != Collision.HIT_GROUND)&&
 				collisionDetection != Collision.HIT_CEILING &&
 			   !polynomial.isPastTopPoint(nodeColoumn, (short) (currentXPosition + xPositionOffsetForJump)) &&
-			   isWithinView(currentXPosition)) {
+			   isWithinView((short) (currentXPosition + xPositionOffsetForJump))) {
 			currentXPosition++;			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
 			if (polynomial.isPastTopPoint(nodeColoumn, (short)(currentXPosition + xPositionOffsetForJump))) { 
@@ -206,18 +209,25 @@ public  class Grapher {
 			currentXPosition--; //The toppunkt was in the current block (and not ending there).
 			//Therefore the downward going part of that block needs to be checked.
 		}
-
+		currentJumpDirection = (direction.isLeftType())? JumpDirection.LEFT_DOWNWARDS: JumpDirection.RIGHT_DOWNWARDS;
 		while (!hasMetHardGround &&
-				isWithinView(currentXPosition)) { //Doesen't take falling down into a hole into account.
+				isWithinView((short) (currentXPosition + xPositionOffsetForJump))) { //Doesen't take falling down into a hole into account.
 			
 			currentXPosition++;					
-			currentYPosition = polynomial.f(currentXPosition);
+			currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!			
 			// TODO change to take the sign into account
 			bound = getBounds(startingNode, currentLowerYPosition); 	
 			
-			hasMetHardGround = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, listOfEdges, polynomial, startingNode);			
+			collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
+					 								  polynomial, currentJumpDirection, startingNode, listOfEdges);				
+			if (collisionDetection == Collision.HIT_WALL) {
+				currentXPosition--;
+				xPositionOffsetForJump++;
+			} else if (collisionDetection == Collision.HIT_GROUND) {
+				hasMetHardGround = true;
+			}
 			
 			formerYPosition = currentYPosition;
 			formerLowerYPosition = bound;
@@ -242,9 +252,33 @@ public  class Grapher {
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
 					   lowerFacingMarioCorner == Collision.HIT_WALL){
-				//TODO temp
-				//collisionDetection = Collision.HIT_WALL;
-				collisionDetection = Collision.HIT_CEILING;
+				collisionDetection = Collision.HIT_WALL;
+				isHittingWall = true;
+				//No break.
+			}
+		}
+		return collisionDetection;
+	}
+	
+	private static Collision descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition, Collision collisionDetection,
+												 SecondOrderPolynomial polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
+	boolean isHittingWall = false;		
+		for (short y = formerLowerYPosition; y <= Math.min(bound,GRID_HEIGHT); y++) {
+			Collision lowerFacingMarioCorner 	= lowerFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);
+			Collision upperFacingMarioCorner 	= upperFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
+			Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision(isHittingWall , y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
+			//As it is descending to the right, only worry about the two corners to the right, and the left lower one.
+			
+			if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
+					  (lowerFacingMarioCorner == Collision.HIT_GROUND || lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
+				collisionDetection = Collision.HIT_GROUND;
+				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				break;
+			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
+					   lowerFacingMarioCorner == Collision.HIT_WALL){
+				//It is purposefully made so that the hit wall will never stop, until the ground is hit.
+				
+				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				//No break.
 			}
@@ -253,7 +287,7 @@ public  class Grapher {
 	}
 	
 	private static boolean descendingPolynomial(short formerLowerYPosition, short bound, short currentXPosition,
-			                                    List<DirectedEdge> listOfEdges, SecondOrderPolynomial polynomial, Node startingPosition) {
+            List<DirectedEdge> listOfEdges, SecondOrderPolynomial polynomial, Node startingPosition) {
 		for (short y = formerLowerYPosition; y <= bound; y++) {
 			if (canMarioStandThere(currentXPosition, y)) { 
 				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
@@ -282,14 +316,16 @@ public  class Grapher {
 	 */
 	private static boolean isHittingWallOrGroundUpwards(short xPosition, short yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
+		//Needs yPosition-1, as else one will get an immediate collision with the ground, as mario starts on it.
 		boolean result = (isOnLevelMatrix(xPosition, (short) (yPosition -1))) && isSolid(observationGraph[xPosition][yPosition-1]);
 		return result;
 	}
 	
 	private static boolean isHittingWallOrGroundDownwards(short xPosition, short yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
-		boolean result = isOnLevelMatrix(xPosition, (short) (yPosition -1)) && 
-						(isSolid(observationGraph[xPosition][yPosition-1])   || isJumpThroughNode(observationGraph[xPosition][yPosition-1]));
+		//TODO removed yPosition-1
+		boolean result = isOnLevelMatrix(xPosition, (short) (yPosition)) && 
+						(isSolid(observationGraph[xPosition][yPosition])   || isJumpThroughNode(observationGraph[xPosition][yPosition]));
 		return result;
 	}
 	
@@ -339,7 +375,7 @@ public  class Grapher {
 		}
 	}
 
-	public static boolean canMarioStandThere(short coloumn,short row) {
+	public static boolean  canMarioStandThere(short coloumn,short row) {
 		return 0 < row && row < GRID_HEIGHT &&
 			   isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
 	}
@@ -423,10 +459,11 @@ public  class Grapher {
 			
 		} else {
 			//It can only hit a wall, or nothing, so:
-			if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
+			if (isHittingWallOrGroundDownwards(currentXPosition, (short) (y - 1))) {
 				return Collision.HIT_WALL;
+			} else {
+				return Collision.HIT_NOTHING;
 			}
-			return Collision.HIT_NOTHING;
 		}
 	}
 	
@@ -443,7 +480,9 @@ public  class Grapher {
 			//one only needs to check for ceiling collisions.
 			if (isHittingWallOrGroundUpwards((short)(currentXPosition-1),(short)(y-1))) {
 				return Collision.HIT_CEILING;
-			} else return Collision.HIT_NOTHING;
+			} else {
+				return Collision.HIT_NOTHING;
+			}
 		} else {
 			//it does not matter in the case of Mario going downwards:
 			return Collision.HIT_NOTHING;
@@ -463,14 +502,14 @@ public  class Grapher {
 			return Collision.HIT_NOTHING;
 		} else {
 			//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
-			if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
-				if (canMarioStandThere(currentXPosition, y)) {
+			if (isHittingWallOrGroundDownwards((short)(currentXPosition - 1), y)) {
+				if (canMarioStandThere((short)(currentXPosition - 1), y)) {
 					return Collision.HIT_GROUND;
 				} else {
 					//TODO i don't think this should be possible:
 					System.out.println("Logic error");
 				}
-			}
+			}else return Collision.HIT_NOTHING;
 		}
 		return null;
 	}

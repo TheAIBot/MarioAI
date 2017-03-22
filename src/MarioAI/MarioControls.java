@@ -41,7 +41,7 @@ public class MarioControls {
 	private static int xSpeedIndex = 0;
 
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		DirectedEdge next = path.get(0);
@@ -53,31 +53,57 @@ public class MarioControls {
 		return false;
 	}
 	
+	private static float oldX = 0;
+	private static boolean shouldBeJumping = false;
+	private static boolean first = false;
+	
 	// TODO Pending implementation of functionality for getting info about
 	// movement between nodes in Graph.
 	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final boolean canJump = observation.mayMarioJump();
 		DirectedEdge next = path.get(0);
 		
 		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
-			int fallTime = getFallingTime(next.target.y - next.getMaxY());
-			xAxisCounter = getXMovementTime(next.target.x - marioXPos, jumpCounter + fallTime);
-			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			missionSet = true;
+			first = true;
 		}
 
-		if (jumpCounter > 0) {
-			action[Mario.KEY_JUMP] = true;
-			jumpCounter--;
-		}
-		if (xAxisCounter > 0) {
-			action[movementDirection] = true;
-			xAxisCounter--;
+		if (missionSet) {
+			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
+			if (jumpCounter > 0) {
+				if (first) {
+					shouldBeJumping = true;
+					action[Mario.KEY_JUMP] = true;
+					first = false;
+				}
+				if (shouldBeJumping) {
+					if (!observation.isMarioOnGround()) {
+						action[Mario.KEY_JUMP] = true;
+					}
+					else {
+						first = true;
+					}
+				}
+				
+				//jumpCounter--;	
+			}
 		}
 		
+		float xDiff = marioXPos - oldX;
+		xSpeedIndex = (xDiff >= 0 ? 1 : -1) *  getSpeedIntFromDistance(Math.abs(xDiff));
+		movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+		
+		if (missionSet) {
+			int fallTime = getFallingTime(next.target.y - next.getMaxY());
+			xAxisCounter = getXMovementTime(next.target.x - marioXPos, jumpCounter + fallTime);
+			if (xAxisCounter > 0) {
+				action[movementDirection] = true;	
+			}
+			//xAxisCounter--;
+		}		
+		oldX = marioXPos;
 		missionSet = !(jumpCounter == 0 && xAxisCounter == 0);
 	}
 
@@ -101,11 +127,12 @@ public class MarioControls {
 				//speed is now 0
 				xSpeedIndex = 0;
 			}
-			while (distanceMoved < -neededXDistance) {
+			while (distanceMoved - getDriftingDistance(xSpeedIndex, time - steps)[0] < -neededXDistance) {
 				steps++;
 				xSpeedIndex--;
 				distanceMoved += getDistanceFromSpeedInt(-xSpeedIndex);
 			}
+			xSpeedIndex = -getSpeedIntFromDistance(getDriftingDistance(xSpeedIndex, time - steps)[1]);
 			return steps;
 		}
 		else if (neededXDistance > 0) {
@@ -123,6 +150,7 @@ public class MarioControls {
 				xSpeedIndex++;
 				distanceMoved += getDistanceFromSpeedInt(xSpeedIndex);
 			}
+			xSpeedIndex = getSpeedIntFromDistance(getDriftingDistance(xSpeedIndex, time - steps)[1]);
 			return steps;
 		}
 		else {
