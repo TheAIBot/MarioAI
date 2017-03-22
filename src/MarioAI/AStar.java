@@ -93,11 +93,12 @@ public final class AStar {
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current,neighborEdge);
+				MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
+				SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);// + neighborEdge.getWeight();
+				float tentativeGScore = current.gScore + movementInformation.getMoveTime();// + neighborEdge.getWeight();
 				if (!openSetMap.containsKey(sn.hashCode())) {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;

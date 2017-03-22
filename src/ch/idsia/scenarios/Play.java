@@ -49,7 +49,7 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        //options.setLevelRandSeed(42243);
+	        options.setLevelRandSeed(1);
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
@@ -58,7 +58,7 @@ public class Play {
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        
-	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
+	        //options.setLevelRandSeed(42243);(*) Includes a missing feature. Fall down.
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
 
