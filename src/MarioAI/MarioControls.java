@@ -107,6 +107,10 @@ public class MarioControls {
 		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 	
+	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
+		return getStepsAndSpeedAfterJump(edge.source.x, edge.source.y, edge.source, edge, speed);
+	}
+	
 	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		final int jumpTimeInTicks = getJumpTime(edge, startY);
 		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
