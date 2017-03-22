@@ -31,6 +31,7 @@ public class MarioControls {
 		
 	private static float oldX = 0;
 	private static int jumpTime = 0;
+	private static float currentXSpeed = 0;
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
@@ -39,7 +40,7 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
-			next = path.get(0);
+			if (path.size() > 0) next = path.get(0);
 			return true;
 		}
 		return false;
@@ -60,8 +61,8 @@ public class MarioControls {
 		jumpTime--;
 		
 	
-		final float speed = marioXPos - oldX;
-		final int xAxisCounter = getXMovementTime(next.target.x - marioXPos, speed, jumpTime);
+		currentXSpeed = marioXPos - oldX;
+		final int xAxisCounter = getXMovementTime(next.target.x - marioXPos, currentXSpeed, jumpTime);
 		if (xAxisCounter > 0) {
 			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
@@ -178,5 +179,10 @@ public class MarioControls {
 	
 	public static float getMaxV() {
 		return MAX_X_VELOCITY;
+	}
+
+
+	public static float getXVelocity() {
+		return currentXSpeed;
 	}	
 }
