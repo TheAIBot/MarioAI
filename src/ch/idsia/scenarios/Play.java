@@ -27,12 +27,12 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = false;
+        boolean loadLevel = true;
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
             //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
-            Environment observation = TestTools.loadLevel("flatWithBump.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("TestAStarJumpThinWall.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
