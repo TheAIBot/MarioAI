@@ -49,7 +49,11 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
+<<<<<<< HEAD
 	        options.setLevelRandSeed(42243);
+=======
+	        options.setLevelRandSeed(666);
+>>>>>>> refs/remotes/origin/dev
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);

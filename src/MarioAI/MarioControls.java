@@ -40,7 +40,11 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
+<<<<<<< HEAD
 			if (path.size() > 0) next = path.get(0);
+=======
+			next = path.get(0);
+>>>>>>> refs/remotes/origin/dev
 			return true;
 		}
 		return false;
@@ -181,8 +185,15 @@ public class MarioControls {
 		return MAX_X_VELOCITY;
 	}
 
+<<<<<<< HEAD
 
 	public static float getXVelocity() {
 		return currentXSpeed;
 	}	
+=======
+	public static float getXVelocity() {
+		return currentXSpeed;
+	}
+	
+>>>>>>> refs/remotes/origin/dev
 }
