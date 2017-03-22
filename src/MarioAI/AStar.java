@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
-import MarioAI.graph.Node;
-import MarioAI.graph.SpeedNode;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 
 //TODO
 //-Calculate time over edge
@@ -99,11 +100,12 @@ public final class AStar {
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current,neighborEdge);
+				MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
+				SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);
+				float tentativeGScore = current.gScore + movementInformation.getMoveTime();// + neighborEdge.getWeight();
 				if (!openSetMap.containsKey(sn.hashCode())) {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;

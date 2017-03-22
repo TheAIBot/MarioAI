@@ -10,8 +10,6 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestMarioMovements {
 	
-	private static final float ACCEPTED_DEVIATION = 0.0001f;
-	
 	@Test
 	public void testRightMovement() {
 		testRightSpeed(1);
@@ -37,15 +35,24 @@ public class TestMarioMovements {
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		float distanceMoved = 0;
+		float actualSpeed = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved += MarioControls.getDistanceFromSpeedInt(i);
+			actualSpeed = MarioControls.getNextTickSpeed(actualSpeed);
+			distanceMoved += actualSpeed;
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
 		float expectedYPos = startMarioYPos;
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
-			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + 
+					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
+					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
+		}
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).key.intValue() != speed) {
+			Assert.fail("Expected steps didn't match correct steps." + 
+					"\nExpected: " + speed + 
+					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
 		}
 	}
 	
@@ -87,21 +94,30 @@ public class TestMarioMovements {
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		float distanceMoved = 0;
+		float actualSpeed = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved -= MarioControls.getDistanceFromSpeedInt(i);
+			actualSpeed = -MarioControls.getNextTickSpeed(-actualSpeed);
+			distanceMoved += actualSpeed;
 		}
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
 		float expectedYPos = startMarioYPos;
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
-			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + 
+					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
+					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
+		}
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).key.intValue() != speed) {
+			Assert.fail("Expected steps didn't match correct steps." + 
+					"\nExpected: " + speed + 
+					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
 		}
 	}
 	
 	@Test
 	public void testDrifting() {
-		int[] speeds = new int[] {1};//, 2, 5, 10, 20, 30, 40, 50};
+		int[] speeds = new int[] {1, 2, 5, 10, 20, 30, 40, 50};
 		
 		for (int i = 0; i < speeds.length; i++) {
 			testDriftSpeed(speeds[i], 1);
@@ -133,21 +149,29 @@ public class TestMarioMovements {
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		float distanceMoved = 0;
+		float actualSpeed = 0;
 		for (int i = 1; i <= speed; i++) {
-			distanceMoved += MarioControls.getDistanceFromSpeedInt(i);
+			actualSpeed = MarioControls.getNextTickSpeed(actualSpeed);
+			distanceMoved += actualSpeed;
 		}
-		distanceMoved += MarioControls.getDriftingDistance(speed, driftTime)[0];
+		distanceMoved += MarioControls.getDriftingDistance(actualSpeed, driftTime).key.floatValue();
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
 		float expectedYPos = startMarioYPos;
 		
 		if (!withinAcceptableError(endMarioXPos, endMarioYPos, expectedXPos, expectedYPos)) {
-			Assert.fail("Mario Wasn't close enough to the expected position\nspeed: " + speed + "\ndrift: " + driftTime + "\nx: " + Math.abs(endMarioXPos - expectedXPos) + "\ny: " + Math.abs(endMarioYPos - expectedYPos));
+			Assert.fail("Mario Wasn't close enough to the expected position." + 
+					"\nspeed: " + speed + 
+					"\ndrift: " + driftTime + 
+					"\nxDiff: " + Math.abs(endMarioXPos - expectedXPos) + 
+					"\nyDiff: " + Math.abs(endMarioYPos - expectedYPos));
 		}
 	}
+
+	//public void testJumo
 	
 	private boolean withinAcceptableError(float x1, float y1, float x2, float y2) {
-		return 	Math.abs(x1 - x2) <= ACCEPTED_DEVIATION && 
-				Math.abs(y1 - y2) <= ACCEPTED_DEVIATION;
+		return 	Math.abs(x1 - x2) <= MarioControls.ACCEPTED_DEVIATION && 
+				Math.abs(y1 - y2) <= MarioControls.ACCEPTED_DEVIATION;
 	}
 }

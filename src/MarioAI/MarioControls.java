@@ -1,17 +1,19 @@
 package MarioAI;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
 	
-	private static float vx;
+	public static final float ACCEPTED_DEVIATION = 0.0002f;
 	
+	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.35f;
 	
@@ -27,66 +29,69 @@ public class MarioControls {
 		4.051875f, 
 		4.15625f 
 	};
-	private static final int deaccelerationSteps[][] = {
-		{Integer.MIN_VALUE, 0},
-		{ 1, 2},
-		{ 3, 4},
-		{ 5, 6},
-		{ 7, 11},
-		{12, 26},
-		{27, Integer.MAX_VALUE}
-	};
+		
+	private static float oldX = 0;
+	private static int jumpTime = 0;
+	private static float currentXSpeed = 0;
 	
-	private static int jumpCounter = 0;
-	private static int xAxisCounter = 0;
-	private static int movementDirection = 0;
-	private static boolean missionSet = false;
-	
-	private static int xSpeedIndex = 0;
-
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.5) {
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
 			next = path.get(0);
-			vx = path.get(0).getSpeedAfterTraversal(vx);
 			return true;
 		}
 		return false;
 	}
 	
-	// TODO Pending implementation of functionality for getting info about
-	// movement between nodes in Graph.
+	
 	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		final boolean canJump = observation.mayMarioJump();
-		DirectedEdge next = path.get(0);
-		
-		if (!missionSet && canJump) {
-			jumpCounter = getJumpTime(Math.round(marioYPos) - next.getMaxY());
-			int fallTime = getFallingTime(next.target.y - next.getMaxY());
-			xAxisCounter = getXMovementTime(next.target.x - marioXPos, jumpCounter + fallTime);
-			movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-			missionSet = true;
-		}
+		final DirectedEdge next = path.get(0);
 
-		if (jumpCounter > 0) {
+		if (jumpTime < 0) {
+			jumpTime = getJumpTime(next, marioYPos);
+		}
+		if (jumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
-			jumpCounter--;
 		}
-		if (xAxisCounter > 0) {
-			action[movementDirection] = true;
-			xAxisCounter--;
-		}
+		jumpTime--;
 		
-		missionSet = !(jumpCounter == 0 && xAxisCounter == 0);
+	
+		currentXSpeed = marioXPos - oldX;
+		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed).getXMovementTime();
+		if (xAxisCounter > 0) {
+			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+			action[movementDirection] = true;
+		}
+		oldX = marioXPos;
+	}
+	
+	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final DirectedEdge nextEdge = path.get(0);
+		
+		return (nextEdge.target.x == marioXPos &&
+				nextEdge.target.y > marioYPos &&
+				observation.isMarioOnGround());
+	}
+	
+	public static int getJumpTime(DirectedEdge next, float marioYPos) {
+		final float getJumpNodeHeight = next.getMaxY();
+		if (getJumpNodeHeight < Math.round(marioYPos)) {
+			final int jumpCounter = getJumpUpTime(getJumpNodeHeight);
+			final int fallTime = getFallingTime(next.target.y - next.getMaxY());
+			return jumpCounter + fallTime;
+		}
+		return 0;
 	}
 
-	private static int getJumpTime(float neededHeight) {
+	private static int getJumpUpTime(float neededHeight) {
 		for (int i = 0; i < heights.length; i++) {
 			if (heights[i] >= neededHeight) {
 				return i;
@@ -95,103 +100,100 @@ public class MarioControls {
 		return MAX_JUMP_TIME;
 	}
 	
-	private static int getXMovementTime(float neededXDistance, int time) {
-		if (neededXDistance < 0) {
-			float distanceMoved = 0;
-			int steps = 0;
-			if (xSpeedIndex > 0) {
-				steps = getDeaccelerationNeededSteps(xSpeedIndex);
-				distanceMoved = -getDeaccelerationDistanceMoved(xSpeedIndex);
+	private static int getFallingTime(final float fallingHeight) {
+		final double a = 0.08333333333;
+		final double b = 2400;
+		final double c = -0.7500000000;
+		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
+	}
+	
+	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
+		return getStepsAndSpeedAfterJump(edge.source.x, edge.source.y, edge.source, edge, speed);
+	}
+	
+	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
+		final int jumpTimeInTicks = getJumpTime(edge, startY);
+		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
+		return new MovementInformation(xMovementInformation.key, jumpTimeInTicks, xMovementInformation.value);
+	}
+	
+	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {
+		float distanceMoved = 0;
+		int steps = 0;
+		boolean speedIsNegative = speed < 0;
+		if ((neededXDistance < 0 && speed > 0) ||
+			(neededXDistance > 0 && speed < 0)) {
+			speed = Math.abs(speed);
+			
+			if (speed > 0) {
+				steps = getDeaccelerationNeededSteps(speed);
+				distanceMoved = -getDeaccelerationDistanceMoved(speed);
 				
 				//speed is now 0
-				xSpeedIndex = 0;
+				speed = 0;
+				//speed in future should now be reversed
+				speedIsNegative = !speedIsNegative;
 			}
-			while (distanceMoved < -neededXDistance) {
-				steps++;
-				xSpeedIndex--;
-				distanceMoved += getDistanceFromSpeedInt(-xSpeedIndex);
-			}
-			return steps;
 		}
-		else if (neededXDistance > 0) {
-			float distanceMoved = 0;
-			int steps = 0;
-			if (xSpeedIndex < 0) {
-				steps = getDeaccelerationNeededSteps(-xSpeedIndex);
-				distanceMoved = -getDeaccelerationDistanceMoved(-xSpeedIndex);
-				
-				//speed is now 0
-				xSpeedIndex = 0;
-			}
-			while (distanceMoved + getDriftingDistance(xSpeedIndex, time - steps)[0] < neededXDistance) {
-				steps++;
-				xSpeedIndex++;
-				distanceMoved += getDistanceFromSpeedInt(xSpeedIndex);
-			}
-			return steps;
+		else if (neededXDistance == 0) {
+			return new Pair<Integer, Float>(0, speed);
 		}
-		else {
-			return 0;
+		speed = Math.abs(speed);
+		neededXDistance = Math.abs(neededXDistance);
+		
+		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, time - steps).key.floatValue()) > ACCEPTED_DEVIATION) {
+			speed = getNextTickSpeed(speed);
+			distanceMoved += speed;
+			steps++;
 		}
+		//get end speed
+		speed = getDriftingDistance(speed, time - steps).value.floatValue();
+		return new Pair<Integer, Float>(steps, (speedIsNegative)? -1 * speed : speed);
 	}
 	
-	public static float getDistanceFromSpeedInt(int speed) {
-		final double a = -0.340909068708614;
-		final double b = -0.116533823678965;
-		final double c = 0.340909068708614;
-		return (float)(a * Math.exp(b * (double)speed) + c);
+	public static float getNextTickSpeed(final float speed) {
+		final float a = 0.8899999428459493f;
+		final float b = 0.03750000378899981f;
+		return a * speed + b;
 	}
 	
-	public static int getSpeedIntFromDistance(float distance) {
-		final double a = -8.581199590;
-		final double b = -2.933333524;
-		return (int)Math.round(a * Math.log(1 + b * distance));
-	}
-	
-	public static float getDeaccelerationDistanceMoved(int speed) {
+	public static float getDeaccelerationDistanceMoved(final float speed) {
 		final double a = 0.2606629227512888;
 		final double b = 4.161597216697656;
 		final double c = -0.342432087168023;
-		final double actualSpeed = getDistanceFromSpeedInt(speed);
 		//has an average error of 0.0072 in the speed range 5-50
-		return (float)(a * Math.exp(b * actualSpeed) + c);
+		return (float)(a * Math.exp(b * speed) + c);
 	}
 	
-	private static int getDeaccelerationNeededSteps(int speed) {
-		for (int i = 0; i < deaccelerationSteps.length; i++) {
-			if (deaccelerationSteps[i][0] <= speed && 
-				deaccelerationSteps[i][1] >= speed) {
-				return i;
-			}			
+	private static int getDeaccelerationNeededSteps(float speed) {
+		final float a = 0.6714839288108793f;
+		final float b = -0.11653327286299346f;
+		final float c = -0.3409108568136135f;
+		int steps = 0;
+		while(speed >= MIN_MARIO_SPEED) {
+			speed = (float) (a * Math.exp(b * steps)  + c);
+			steps++;
 		}
-		//if it ever happens then it should be visible with this
-		return Integer.MAX_VALUE;
+		return steps;
 	}
 	
-	public static float[] getDriftingDistance(int speed, int driftTime) {
-		final double a = getDistanceFromSpeedInt(speed);
+	public static Pair<Float, Float> getDriftingDistance(final float speed, final int driftTime) {
+		final double a = speed;
 		final double b = -0.11653355831586142;
 		final double c = -0.00000056420864292;
 		double driftDistance = 0;
 		double lastSpeed = a;
 		for (int i = 0; i < driftTime; i++) {
-			lastSpeed = a * Math.exp(b * (i + 1)) + c;
-			//mario stops if his speed is less than 0.03
-			final double MIN_MARIO_SPEED = 0.03;
-			if (lastSpeed <= MIN_MARIO_SPEED) {
+			final double currentSpeed = a * Math.exp(b * (i + 1)) + c;
+			
+			if (currentSpeed <= MIN_MARIO_SPEED) {
 				lastSpeed = 0;
 				break;
 			}
+			lastSpeed = currentSpeed;
 			driftDistance += lastSpeed;
 		}
-		return new float[] {(float)driftDistance, (float)lastSpeed};
-	}
-	
-	private static int getFallingTime(float fallingHeight) {
-		final double a = 0.08333333333;
-		final double b = 2400;
-		final double c = -0.7500000000;
-		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
+		return new Pair<Float, Float>((float)driftDistance, (float)lastSpeed);
 	}
 	
 	public static float getMaxV() {
@@ -199,11 +201,6 @@ public class MarioControls {
 	}
 
 	public static float getXVelocity() {
-		return vx;
-	}
-
-	public static void setVelocity(float velocity) {
-		MarioControls.vx = velocity;
-	}
-	
+		return currentXSpeed;
+	}	
 }

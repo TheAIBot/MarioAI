@@ -1,6 +1,7 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import MarioAI.Hasher;
+import MarioAI.graph.edges.DirectedEdge;
 
 public class SpeedNode implements Comparable<SpeedNode> {
 	

@@ -7,11 +7,13 @@ import java.util.List;
 
 import MarioAI.AStar;
 import MarioAI.FastAndFurious;
-import MarioAI.Running;
-import MarioAI.SecondOrderPolynomial;
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.nodes.Node;
+
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
@@ -19,7 +21,7 @@ public class TestAStar {
 	Agent agent;
 	Environment observation;
 	Graph graph;
-	final float delta = 0.05;
+	final float delta = 0.05f;
 	
 	public void setUp(String levelName) {
 		agent = new FastAndFurious();
