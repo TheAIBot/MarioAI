@@ -10,14 +10,9 @@ import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
 	
-<<<<<<< HEAD
-	private static float vx;
-	
-=======
 	public static final float ACCEPTED_DEVIATION = 0.0002f;
 	
 	private static final double MIN_MARIO_SPEED = 0.03;
->>>>>>> refs/remotes/origin/marioController
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.35f;
 	
@@ -192,10 +187,6 @@ public class MarioControls {
 
 	public static float getXVelocity() {
 		return vx;
-	}
-
-	public static void setVelocity(float velocity) {
-		MarioControls.vx = velocity;
 	}
 	
 }

@@ -8,21 +8,22 @@ import java.awt.Point;
 import java.awt.Stroke;
 import java.util.ArrayList;
 
-public class debugPoints {
+public class DebugPoints extends DebugDrawing {
 	private final Color color;
 	private final ArrayList<Point> points; 
 	private final int size;
 	
-	public debugPoints(Color color, ArrayList<Point> points) {
+	public DebugPoints(Color color, ArrayList<Point> points) {
 		this(color, points, 10);
 	}
 	
-	public debugPoints(Color color, ArrayList<Point> points, int size) {
+	public DebugPoints(Color color, ArrayList<Point> points, int size) {
 		this.color = color;
 		this.points = points;
 		this.size = size;
 	}
 	
+	@Override
 	public void draw(Graphics g) {
 		final Color defaultColor = g.getColor();
 		g.setColor(color);
