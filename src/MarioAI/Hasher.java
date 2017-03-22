@@ -21,9 +21,9 @@ public class Hasher {
 		short factor = (short) 10; // arbitrarily chosen value
 		//h = (a*P1 + b)*P2 + c
 		//return (int) ((x*31 + y)*59 + vx * factor);
-		return ((byte) (vx * factor) & 15) +
-			   (( x & 511) << 4 ) + 
-			   ((y & 15) << 13);
+		return ((byte) (vx * factor) & 0x800f) +
+			          (( x &    511) << 4) + 
+			          (( y &     15) << 13);
 	}
 	
 	private static int ll = 0;
