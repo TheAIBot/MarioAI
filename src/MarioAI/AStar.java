@@ -107,18 +107,6 @@ public final class AStar {
 				openSetMap.put(sn.hashCode(), sn);
 			}
 		}
-
-<<<<<<< HEAD
-=======
-		//TODO look at this and decide if is should be changed or removed
-		for (SpeedNode node : closedSetMap.values()) {
-			if ( node == null) continue;
-			node.gScore = 0;
-			node.fScore = 0;
-			node.parent = null;
-		}
-
->>>>>>> refs/remotes/origin/GraphingOfJustice
 		// No solution was found
 		return null;
 	}

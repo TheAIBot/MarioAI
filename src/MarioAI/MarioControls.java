@@ -79,15 +79,19 @@ public class MarioControls {
 		final DirectedEdge nextEdge = path.get(0);
 		
 		return (nextEdge.target.x == marioXPos &&
-				nextEdge.target.y > marioYPos &&
-				observation.isMarioOnGround());
+				observation.isMarioOnGround() &&
+				(nextEdge.target.y > marioYPos ||
+				 nextEdge.target.y < marioYPos));
 	}
 	
 	public static int getJumpTime(DirectedEdge next, float marioYPos) {
-		final float getJumpNodeHeight = next.getMaxY();
-		if (getJumpNodeHeight < Math.round(marioYPos)) {
-			final int jumpCounter = getJumpUpTime(getJumpNodeHeight);
-			final int fallTime = getFallingTime(next.target.y - next.getMaxY());
+		return getJumpTime(next.getMaxY(), next.target.y, marioYPos);
+	}
+	
+	public static int getJumpTime(float jumpToYPos, float targetYPos, float marioYPos) {
+		if (jumpToYPos > 0) {
+			final int jumpCounter = getJumpUpTime(jumpToYPos);
+			final int fallTime = getFallingTime(targetYPos - (marioYPos - jumpToYPos));
 			return jumpCounter + fallTime;
 		}
 		return 0;

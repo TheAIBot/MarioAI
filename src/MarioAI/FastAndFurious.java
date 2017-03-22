@@ -52,12 +52,8 @@ public class FastAndFurious implements Agent {
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
-<<<<<<< HEAD
-				//graph.printMatrix(observation);
-=======
 				graph.printMatrix(observation);
 				updatedLastFrame = true;
->>>>>>> refs/remotes/origin/GraphingOfJustice
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
 			if (DEBUG) {

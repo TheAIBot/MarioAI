@@ -31,13 +31,8 @@ public class Play {
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
-<<<<<<< HEAD
-            Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
-            //Environment observation = TestTools.loadLevel("platformJump.lvl", controller, true);
-=======
             //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
             Environment observation = TestTools.loadLevel("flatWithBump.lvl", controller, true);
->>>>>>> refs/remotes/origin/GraphingOfJustice
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
