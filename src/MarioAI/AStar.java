@@ -1,12 +1,10 @@
 package MarioAI;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
@@ -18,6 +16,12 @@ import MarioAI.graph.SpeedNode;
 //-Change heuristic
 //-Generate SpeedNodes based on current velocity and possible changes in velocity
 //-finish hash of speed nodes - DONE
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.environments.Environment;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 public final class AStar {
 
@@ -117,11 +121,10 @@ public final class AStar {
 		}
 
 		//TODO look at this and decide if is should be changed or removed
-		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
-		while (iter.hasNext() && iter.next().node.parent != null) {
-			iter.next().node.gScore = 0;
-			iter.next().node.fScore = 0;
-			iter.next().node.parent = null;
+		for (SpeedNode node : closedSetMap.values()) {
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
 		}
 
 		// No solution was found

@@ -50,5 +50,4 @@ public class Hasher {
 		//return b1 | b2 | b3 | b4;
 		return ll++;
 	}
-	
 }

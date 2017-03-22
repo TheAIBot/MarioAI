@@ -139,7 +139,7 @@ public  class Grapher {
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			//listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}		
 	}
 	
