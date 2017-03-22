@@ -1,5 +1,6 @@
 package MarioAI;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.graph.GraphMath;
@@ -64,6 +65,16 @@ public class MarioControls {
 			action[movementDirection] = true;
 		}
 		oldX = marioXPos;
+	}
+	
+	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final DirectedEdge nextEdge = path.get(0);
+		
+		return (nextEdge.target.x == marioXPos &&
+				nextEdge.target.y > marioYPos &&
+				observation.isMarioOnGround());
 	}
 	
 	public static int getJumpTime(DirectedEdge next, float marioYPos) {

@@ -113,7 +113,7 @@ public class DebugDraw {
 				allJumpingEdges.add(p);
 			}
 		}
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, allrunningEdges));
+		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, allrunningEdges, 12));
 		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
 
