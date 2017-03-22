@@ -6,6 +6,7 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.Surface;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
 public class Graph {
@@ -69,7 +70,7 @@ public class Graph {
 			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
 			saveColumn(columnIndex, columnToInsert);
 		}
-		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+		setMarioNode(observation);
 		maxMarioXPos = SIGHT_WIDTH / 2;
 	}
 
@@ -81,14 +82,23 @@ public class Graph {
 		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
 		if (change < 0) {
 			moveMatrixOneLeft(marioXPos);
-			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+			setMarioNode(observation);
 			return true;
 		} else if (change > 0) {
 			moveMatrixOneRight(observation, marioXPos, marioYPos);
-			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+			setMarioNode(observation);
 			return true;
 		}
 		return false;
+	}
+	
+	private void setMarioNode(final Environment observation) {
+		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		//limit mario y pos to a position inside the matrix
+		marioYPos = Math.min(Math.max(marioYPos, 0), LEVEL_HEIGHT - 1);
+		
+		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 	}
 
 	public Node getMarioNode(final Environment observation)
@@ -98,7 +108,14 @@ public class Graph {
 	
 	public Node[] getGoalNodes()
 	{
-		return levelMatrix[LEVEL_WIDTH - 1];
+		for (int x = levelMatrix.length - 1; x >= 0; x--) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				if (levelMatrix[x][y] != null) {
+					return levelMatrix[x];
+				}
+			}
+		}
+		throw new Error("No blocks was found in the matrix");
 	}
 	
 	

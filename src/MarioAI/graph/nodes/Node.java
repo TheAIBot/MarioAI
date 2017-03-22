@@ -1,9 +1,10 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import MarioAI.Hasher;
+import MarioAI.graph.edges.DirectedEdge;
 
 /**
  * Standard type of node

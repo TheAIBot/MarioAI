@@ -8,16 +8,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.GraphMath;
-import MarioAI.graph.Node;
-import MarioAI.graph.SpeedNode;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 
 //TODO
 //-Calculate time over edge
 //-Change heuristic
 //-Generate SpeedNodes based on current velocity and possible changes in velocity
 //-finish hash of speed nodes - DONE
+
+
+//Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
 
@@ -40,7 +44,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null), new SpeedNode(goal, 0, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null), new SpeedNode(goal, 0, null, null));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -96,11 +100,11 @@ public final class AStar {
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current);
+				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);
+				float tentativeGScore = current.gScore + neighborEdge.getTraversedTime(current.vx);// + neighborEdge.getWeight();
 				if (!openSetMap.containsKey(sn.hashCode())) {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;
@@ -114,6 +118,7 @@ public final class AStar {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					sn.ancestorEdge = neighborEdge;
 					openSet.add(sn);
 				}
 			}
@@ -121,10 +126,12 @@ public final class AStar {
 
 		//TODO look at this and decide if is should be changed or removed
 		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
-		while (iter.hasNext() && iter.next().node.parent != null) {
-			iter.next().node.gScore = 0;
-			iter.next().node.fScore = 0;
-			iter.next().node.parent = null;
+		while (iter.hasNext()) {
+			SpeedNode node = iter.next();
+			if (node == null) continue;
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
 		}
 
 		// No solution was found
