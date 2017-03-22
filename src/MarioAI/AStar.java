@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Node;
-import MarioAI.graph.SpeedNode;
+import MarioAI.graph.GraphMath;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
@@ -27,7 +29,7 @@ public final class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
-		Node goal = new Node((short) (start.x + 50), (short) 11, (byte) 3);
+		Node goal = new Node((short) (start.x + 50), (short) 2, (byte) 3);
 		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));

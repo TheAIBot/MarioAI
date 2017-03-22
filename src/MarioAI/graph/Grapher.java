@@ -2,15 +2,16 @@ package MarioAI.graph;
 
 import java.util.*;
 
-
-import MarioAI.Running;
-import MarioAI.SecondOrderPolynomial;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.nodes.Node;
 
 public  class Grapher {
 	private static final float JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 6;
-	private static final short GRID_HEIGHT = 15;
-	private static final short GRID_WIDTH = 22;
+	private static final float MAX_JUMP_RANGE = 4;
+	public static final short GRID_HEIGHT = 15;
+	public static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private static boolean[][] inRecursion = new boolean[GRID_WIDTH][GRID_WIDTH];
 	private static final short MARIO_JUMP_LENGHT = 5;
@@ -154,7 +155,7 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+		for (float jumpRange = 2; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
 			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
 		}
@@ -272,7 +273,8 @@ public  class Grapher {
 			if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
 					  (lowerFacingMarioCorner == Collision.HIT_GROUND || lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
 				collisionDetection = Collision.HIT_GROUND;
-				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				else listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition + ((direction.isLeftType())? 1: -1)][y],polynomial));
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
 					   lowerFacingMarioCorner == Collision.HIT_WALL){
@@ -324,9 +326,13 @@ public  class Grapher {
 	private static boolean isHittingWallOrGroundDownwards(short xPosition, short yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
 		//TODO removed yPosition-1
-		boolean result = isOnLevelMatrix(xPosition, (short) (yPosition)) && 
-						(isSolid(observationGraph[xPosition][yPosition])   || isJumpThroughNode(observationGraph[xPosition][yPosition]));
-		return result;
+		boolean isOnLevel = isOnLevelMatrix(xPosition, (short) (yPosition));
+		if (isOnLevel) {
+			boolean isAtSolidNode = isSolid(observationGraph[xPosition][yPosition]);
+			boolean isAtJumpthroughNode = isJumpThroughNode(observationGraph[xPosition][yPosition]);		
+			boolean result = isOnLevel &&  (isAtSolidNode  || isAtJumpthroughNode);
+			return isAtSolidNode || isAtJumpthroughNode;
+		} else return false;
 	}
 	
 	/***
@@ -397,7 +403,7 @@ public  class Grapher {
 	}
 	
 	private static boolean isJumpThroughNode(Node node) {
-		return (node != null && node.type == 11);
+		return (node != null && node.type == -11);
 	}
 		
 	private static Collision lowerFacingCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, 

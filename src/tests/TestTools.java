@@ -51,7 +51,7 @@ public class TestTools {
 		EvaluationOptions options = new CmdLineOptions(new String[0]);
 		options.setAgent(agent);
 		Task task = new ProgressTask(options);
-		options.setMaxFPS(true);
+		options.setMaxFPS(!showGUI);
 		options.setVisualization(showGUI);
 		options.setNumberOfTrials(1);
 		options.setMatlabFileName("");

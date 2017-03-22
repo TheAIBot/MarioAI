@@ -1,9 +1,10 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import MarioAI.Hasher;
+import MarioAI.graph.edges.DirectedEdge;
 
 /**
  * Standard type of node
@@ -61,6 +62,27 @@ public class Node extends SuperNode {
 		} else {
 			return false;
 		}
+	}
+	
+	public boolean containsEdgeWithTargetAndType(int xCoordinate, int yCoordinate, DirectedEdge type) {
+		for (DirectedEdge directedEdge : edges) {
+			if (directedEdge.target.x == xCoordinate && directedEdge.target.y == yCoordinate) {
+				if (directedEdge.getClass().equals(type.getClass())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public int getNumberOfEdgesOfType(DirectedEdge type) {
+		int count = 0;
+		for (DirectedEdge directedEdge : edges) {
+			if (directedEdge.getClass().equals(type.getClass())) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	@Override

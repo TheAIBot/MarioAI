@@ -8,26 +8,26 @@ import java.awt.Point;
 import java.awt.Stroke;
 import java.util.ArrayList;
 
-public class debugLines {
+public class DebugLines extends DebugDrawing {
 	private final Color color;
 	private final ArrayList<Point> lines; 
 	private final int size;
 	
-	public debugLines(Color color, ArrayList<Point> lines) {
+	public DebugLines(Color color, ArrayList<Point> lines) {
 		this(color, lines, 3);
 	}
 	
-	public debugLines(Color color, ArrayList<Point> lines, int size) {
+	public DebugLines(Color color, ArrayList<Point> lines, int size) {
 		this.color = color;
 		this.lines = lines;
 		this.size = size;
 	}
 	
-	public debugLines(Color color, Point point1, Point point2) {
+	public DebugLines(Color color, Point point1, Point point2) {
 		this(color, point1, point2, 1);
 	}
 	
-	public debugLines(Color color, Point point1, Point point2, int size) {
+	public DebugLines(Color color, Point point1, Point point2, int size) {
 		this.color = color;
 		lines = new ArrayList<Point>();
 		this.lines.add(point1);
@@ -35,6 +35,7 @@ public class debugLines {
 		this.size = size;
 	}
 	
+	@Override
 	public void draw(Graphics g) {
 		// need atleast two points to draw a line
 		if (lines.size() > 1) {

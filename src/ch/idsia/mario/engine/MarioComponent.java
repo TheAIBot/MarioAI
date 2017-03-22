@@ -22,9 +22,9 @@ import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
-
-import MarioAI.debugGraphics.debugLines;
-import MarioAI.debugGraphics.debugPoints;
+import MarioAI.debugGraphics.DebugDrawing;
+import MarioAI.debugGraphics.DebugLines;
+import MarioAI.debugGraphics.DebugPoints;
 import MarioAI.graph.Grapher;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
@@ -57,8 +57,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private Mario mario = null;
 	private LevelScene levelScene = null;
 	
-	private ArrayList<debugLines> debugLinesToDraw = new ArrayList<debugLines>(); 
-	private ArrayList<debugPoints> debugPointsToDraw = new ArrayList<debugPoints>();
+	private ArrayList<DebugDrawing> debugDrawingsToDraw = new ArrayList<DebugDrawing>();
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -165,8 +164,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			og.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 			scene.render(og, alpha);
-			((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
-			((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
+			((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 		}
 
 		boolean[] action = agent.getAction(this/* DummyEnvironment */);
@@ -279,8 +277,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			if (GlobalOptions.VisualizationOn) {
 				og.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 				scene.render(og, alpha);
-				((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
-				((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
+				((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -564,8 +561,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		return null;
 	}
 
-	public int getMarioMode() {
-		return mario.getMode();
+	public int getMarioStatus() {
+		return mario.getStatus();
 	}
 
 	public boolean isMarioCarrying() {
@@ -577,15 +574,14 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	}
 	
 	public void resetDebugGraphics() {
-		debugLinesToDraw.clear();
-		debugPointsToDraw.clear();
+		debugDrawingsToDraw.clear();
 	}
 	
-	public void addDebugLines(debugLines lines) {
-		debugLinesToDraw.add(lines);
+	public void addDebugDrawing(DebugDrawing drawing) {
+		debugDrawingsToDraw.add(drawing);
 	}
-	
-	public void addDebugPoints(debugPoints points) {
-		debugPointsToDraw.add(points);
+
+	public int getMarioMode() {
+		return mario.getMode();
 	}
 }
