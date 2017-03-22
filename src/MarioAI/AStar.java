@@ -20,6 +20,9 @@ import MarioAI.graph.nodes.SpeedNode;
 //-Generate SpeedNodes based on current velocity and possible changes in velocity
 //-finish hash of speed nodes - DONE
 
+
+//Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
+
 public final class AStar {
 
 	/**
@@ -33,7 +36,7 @@ public final class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
-		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
+		Node goal = new Node((short) (start.x + 50), (short) 11, (byte) 3);
 		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
@@ -41,7 +44,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, 0, null), new SpeedNode(goal, 0, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null), new SpeedNode(goal, 0, null, null));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -81,6 +84,10 @@ public final class AStar {
 		while (!openSet.isEmpty()) {
 			SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
+			if (current.vx < 0) {
+				System.out.println(current.fScore);
+			}
+			System.out.println(current.vx);
 
 			// If goal is reached return solution path
 			if (current.node.equals(goal.node)) {
@@ -93,8 +100,7 @@ public final class AStar {
 			// Explore each neighbor of current node
 			final List<DirectedEdge> neighborEdges = current.node.getEdges();
 			for (DirectedEdge neighborEdge : neighborEdges) {
-				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx),
-											 current);
+				SpeedNode sn = new SpeedNode(neighborEdge.target, neighborEdge.getSpeedAfterTraversal(current.vx), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode()))
 					continue;
 				// Distance from start to neighbor of current node
@@ -112,6 +118,7 @@ public final class AStar {
 					sn.parent = current;
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+					sn.ancestorEdge = neighborEdge;
 					openSet.add(sn);
 				}
 			}
@@ -119,10 +126,12 @@ public final class AStar {
 
 		//TODO look at this and decide if is should be changed or removed
 		Iterator<SpeedNode> iter = closedSetMap.values().iterator();
-		while (iter.hasNext() && iter.next().node.parent != null) {
-			iter.next().node.gScore = 0;
-			iter.next().node.fScore = 0;
-			iter.next().node.parent = null;
+		while (iter.hasNext()) {
+			SpeedNode node = iter.next();
+			if (node == null) continue;
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
 		}
 
 		// No solution was found
@@ -134,10 +143,10 @@ public final class AStar {
 	 * @param goal.node
 	 * @return the estimated cost of the cheapest path from current node to goal node
 	 */
-//	public static float heuristicFunction(final Node start, final Node goal) {
-//		// temp use distance (later should use time)
-//		return GraphMath.distanceBetween(start, goal);
-//	}
+	//	public static float heuristicFunction(final Node start, final Node goal) {
+	//		// temp use distance (later should use time)
+	//		return GraphMath.distanceBetween(start, goal);
+	//	}
 
 	/**
 	 * TODO refactor proper integration with xvelocity
@@ -148,8 +157,8 @@ public final class AStar {
 	 */
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		if (current.vx == 0) return 1000000f;
-		else return GraphMath.distanceBetween(current.node, goal.node)/current.vx;
+		//if (current.vx == 0) return 1000000f;
+		return timeToReachNode(goal, current);
 	}
 
 	/**
@@ -172,4 +181,27 @@ public final class AStar {
 		Collections.reverse(path);
 		return path;
 	}
+
+	/**
+	 * Using derived formula for time(v0,dist) from Maple (v2.5)
+	 * @param n1
+	 * @param n2
+	 * @return time to reach n2 from n1
+	 */
+	public static float timeToReachNode(SpeedNode n1, SpeedNode n2) {
+		float v0 = n1.vx;
+		if (v0 < 0) v0 = 0;
+		
+		float dist = Math.abs(n2.node.x - n1.node.x); //guard - should only be able to be positive in the first place
+		float d0 = Math.min(dist,5); //float d0 = dist <= 5 ? dist : 5f;
+		
+		float timeToReachDistanceUnder5Blocks = (float) (0.4734168362e1 - 0.2033398373e2 * v0 + 0.3650816449e1 * d0 - 0.1899556093e0 * Math.pow(d0 - 0.2e1, 0.2e1)
+				- 0.2561502720e1 * (d0 - 0.2e1) * (v0 - 0.15e0) + 0.2015956084e2 * Math.pow(v0 - 0.15e0, 0.2e1)
+				+ 0.4670562450e-1 * Math.pow(d0 - 0.2e1, 0.3e1) + 0.9447200685e0 * Math.pow(d0 - 0.2e1, 0.2e1) * (v0 - 0.15e0)
+				- 0.8877386747e1 * (d0 - 0.2e1) * Math.pow(v0 - 0.15e0, 0.2e1) + 0.1206780712e2 * Math.pow(v0 - 0.15e0, 0.3e1));
+		
+		if (dist <= 5) return timeToReachDistanceUnder5Blocks;
+		return timeToReachDistanceUnder5Blocks + (dist - 5f) / MarioControls.getMaxV(); 
+	}
+
 }
