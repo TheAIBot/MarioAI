@@ -21,7 +21,7 @@ public class TestAStar {
 	Agent agent;
 	Environment observation;
 	Graph graph;
-	final float delta = 0.05;
+	final float delta = 0.05f;
 	
 	public void setUp(String levelName) {
 		agent = new FastAndFurious();
