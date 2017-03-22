@@ -9,8 +9,12 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
-
+	
+	private static float vx;
+	
 	private static final int MAX_JUMP_TIME = 8;
+	private static final float MAX_X_VELOCITY = 0.35f;
+	
 	private static final float[] heights = new float[] { 
 		0,
 		0,
@@ -48,6 +52,7 @@ public class MarioControls {
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.5) {
 			path.remove(0);
 			next = path.get(0);
+			vx = path.get(0).getSpeedAfterTraversal(vx);
 			return true;
 		}
 		return false;
@@ -216,4 +221,17 @@ public class MarioControls {
 		final double c = -0.7500000000;
 		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
+	
+	public static float getMaxV() {
+		return MAX_X_VELOCITY;
+	}
+
+	public static float getXVelocity() {
+		return vx;
+	}
+
+	public static void setVelocity(float velocity) {
+		MarioControls.vx = velocity;
+	}
+	
 }
