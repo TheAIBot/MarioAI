@@ -1,4 +1,4 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import MarioAI.Hasher;
 

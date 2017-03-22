@@ -1,6 +1,7 @@
 package MarioAI;
 
-import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.SecondOrderPolynomial;
 
 public class Hasher {
 	

@@ -1,7 +1,6 @@
-package MarioAI;
+package MarioAI.graph.edges;
 
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Node;
+import MarioAI.graph.nodes.Node;
 
 public class SecondOrderPolynomial extends DirectedEdge {
 	private float a;
@@ -77,7 +76,7 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	
 	@Override
 	public float getMaxY() {
-		return topPointY - source.y;
+		return (topPointY - source.y);
 	}
 
 	public float getWeight() {

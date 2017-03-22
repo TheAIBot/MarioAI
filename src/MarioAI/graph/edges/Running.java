@@ -1,7 +1,6 @@
-package MarioAI;
+package MarioAI.graph.edges;
 
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.Node;
+import MarioAI.graph.nodes.Node;
 
 public class Running extends DirectedEdge{
 	

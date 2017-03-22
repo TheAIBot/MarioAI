@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.debugGraphics.DebugDraw;
-import MarioAI.graph.DirectedEdge;
 import MarioAI.graph.Graph;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.Grapher;
-import MarioAI.graph.Node;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -47,7 +47,7 @@ public class FastAndFurious implements Agent {
 			}
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				DebugDraw.drawEndNodes(observation, graph);
+				DebugDraw.drawEndNodes(observation, graph.getGoalNodes());
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
 				DebugDraw.drawNeighborPaths(observation, graph);
 				DebugDraw.drawReachableNodes(observation, graph);
@@ -55,15 +55,18 @@ public class FastAndFurious implements Agent {
 			}
 		}
 					
-		if (newestPath != null && newestPath.size() > 1) {
-			if (MarioControls.reachedNextNode(observation, newestPath)) {
+		if (newestPath != null && newestPath.size() > 0) {
+			if (MarioControls.reachedNextNode(observation, newestPath) || MarioControls.isPathInvalid(observation, newestPath)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
 			}
 			MarioControls.getNextAction(observation, newestPath, action);
-			if (DEBUG) DebugDraw.drawPath(observation, newestPath);
+			if (DEBUG) {
+				DebugDraw.drawPath(observation, newestPath);
+				DebugDraw.drawAction(observation, action);
+			}
 		}
 		tickCount++;
 		

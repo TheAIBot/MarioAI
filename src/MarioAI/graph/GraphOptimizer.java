@@ -1,5 +1,6 @@
 package MarioAI.graph;
 
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphOptimizer {
