@@ -12,12 +12,6 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 
-//TODO
-//-Calculate time over edge
-//-Change heuristic
-//-Generate SpeedNodes based on current velocity and possible changes in velocity
-//-finish hash of speed nodes - DONE
-
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
@@ -34,7 +28,7 @@ public final class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
-		Node goal = new Node((short) (start.x + 50), (short) 11, (byte) 3);
+		Node goal = new Node((short) (start.x + 50), (short) 2, (byte) 3);
 		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
@@ -114,6 +108,17 @@ public final class AStar {
 			}
 		}
 
+<<<<<<< HEAD
+=======
+		//TODO look at this and decide if is should be changed or removed
+		for (SpeedNode node : closedSetMap.values()) {
+			if ( node == null) continue;
+			node.gScore = 0;
+			node.fScore = 0;
+			node.parent = null;
+		}
+
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 		// No solution was found
 		return null;
 	}

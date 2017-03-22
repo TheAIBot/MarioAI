@@ -27,12 +27,17 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
+<<<<<<< HEAD
             Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
             //Environment observation = TestTools.loadLevel("platformJump.lvl", controller, true);
+=======
+            //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("flatWithBump.lvl", controller, true);
+>>>>>>> refs/remotes/origin/GraphingOfJustice
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
@@ -49,8 +54,16 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed(42243);
+	        options.setLevelRandSeed(1);
+	        //options.setLevelRandSeed(2);
+	        //options.setLevelRandSeed(41);
+	        //options.setLevelRandSeed(42);
+	        //options.setLevelRandSeed(650);
+	        //options.setLevelRandSeed(666);
+	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        
+	        //options.setLevelRandSeed(42243);(*) Includes a missing feature. Fall down.
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
 
