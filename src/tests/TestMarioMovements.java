@@ -49,7 +49,7 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0) != speed) {
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).key.intValue() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
 					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
@@ -108,7 +108,7 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0) != speed) {
+		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).key.intValue() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
 					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
@@ -154,7 +154,7 @@ public class TestMarioMovements {
 			actualSpeed = MarioControls.getNextTickSpeed(actualSpeed);
 			distanceMoved += actualSpeed;
 		}
-		distanceMoved += MarioControls.getDriftingDistance(actualSpeed, driftTime);
+		distanceMoved += MarioControls.getDriftingDistance(actualSpeed, driftTime).key.floatValue();
 		
 		float expectedXPos = startMarioXPos + distanceMoved;
 		float expectedYPos = startMarioYPos;
