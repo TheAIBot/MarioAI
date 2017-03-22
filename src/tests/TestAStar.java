@@ -5,6 +5,8 @@ import org.junit.*;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.graph.Graph;
