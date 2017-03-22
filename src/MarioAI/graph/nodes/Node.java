@@ -63,6 +63,27 @@ public class Node extends SuperNode {
 			return false;
 		}
 	}
+	
+	public boolean containsEdgeWithTargetAndType(int xCoordinate, int yCoordinate, DirectedEdge type) {
+		for (DirectedEdge directedEdge : edges) {
+			if (directedEdge.target.x == xCoordinate && directedEdge.target.y == yCoordinate) {
+				if (directedEdge.getClass().equals(type.getClass())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public int getNumberOfEdgesOfType(DirectedEdge type) {
+		int count = 0;
+		for (DirectedEdge directedEdge : edges) {
+			if (directedEdge.getClass().equals(type.getClass())) {
+				count++;
+			}
+		}
+		return count;
+	}
 
 	@Override
 	public int hashCode() {
