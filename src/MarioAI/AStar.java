@@ -113,8 +113,6 @@ public final class AStar {
 	}
 
 	/**
-	 * TODO refactor proper integration with xvelocity
-	 * 
 	 * @param current
 	 * @param goal
 	 * @return

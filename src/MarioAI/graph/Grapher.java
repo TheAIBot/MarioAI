@@ -69,7 +69,8 @@ public  class Grapher {
 			System.out.println();
 		}
 		//printView();
-		if(canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
+		if(isOnLevelMatrix((short) (GRID_WIDTH/2),marioNode.y) &&
+		   canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
 			connectNode(mario, (short) (GRID_WIDTH/2)); 
 		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");

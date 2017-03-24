@@ -31,7 +31,7 @@ public class Play {
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
-            Environment observation = TestTools.loadLevel("platformJump.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
