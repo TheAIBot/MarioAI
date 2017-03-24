@@ -107,10 +107,6 @@ public final class AStar {
 				openSetMap.put(sn.hashCode(), sn);
 			}
 		}
-<<<<<<< HEAD
-=======
-		
->>>>>>> refs/remotes/origin/AStar-Velocity
 		// No solution was found
 		return null;
 	}

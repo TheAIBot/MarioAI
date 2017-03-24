@@ -1,23 +1,15 @@
 package ch.idsia.scenarios;
 
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.AgentsPool;
 import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
-import ch.idsia.tools.ToolsConfigurator;
-import tests.TestAgent;
 import tests.TestTools;
-import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.environments.Environment;
-import ch.idsia.mario.simulation.SimulationOptions;
-
-import java.awt.*;
 
 import MarioAI.FastAndFurious;
-import MarioAI.graph.Grapher;
 /**
  * Created by IntelliJ IDEA.
  * User: julian
@@ -27,18 +19,12 @@ import MarioAI.graph.Grapher;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
-<<<<<<< HEAD
             //Agent controller = new FastAndFurious();
         	Agent controller = new HumanKeyboardAgent();
             //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
             Environment observation = TestTools.loadLevel("flatWithBump.lvl", controller, true);
-=======
-            Agent controller = new FastAndFurious();
-        	//Agent controller = new HumanKeyboardAgent();
-            Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
->>>>>>> refs/remotes/origin/AStar-Velocity
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

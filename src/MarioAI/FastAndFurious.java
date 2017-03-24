@@ -52,10 +52,6 @@ public class FastAndFurious implements Agent {
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
-<<<<<<< HEAD
-=======
-				//graph.printMatrix(observation);
->>>>>>> refs/remotes/origin/AStar-Velocity
 				graph.printMatrix(observation);
 				updatedLastFrame = true;
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
