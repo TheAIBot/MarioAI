@@ -1,5 +1,6 @@
 package ch.idsia.scenarios;
 
+import MarioAI.FastAndFurious;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
@@ -9,7 +10,6 @@ import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
 import ch.idsia.mario.environments.Environment;
 
-import MarioAI.FastAndFurious;
 /**
  * Created by IntelliJ IDEA.
  * User: julian
