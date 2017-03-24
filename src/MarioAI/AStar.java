@@ -107,13 +107,15 @@ public final class AStar {
 				openSetMap.put(sn.hashCode(), sn);
 			}
 		}
+<<<<<<< HEAD
+=======
+		
+>>>>>>> refs/remotes/origin/AStar-Velocity
 		// No solution was found
 		return null;
 	}
 
 	/**
-	 * TODO refactor proper integration with xvelocity
-	 * 
 	 * @param current
 	 * @param goal
 	 * @return
@@ -121,7 +123,8 @@ public final class AStar {
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
 		//if (current.vx == 0) return 1000000f;
-		return timeToReachNode(goal, current);
+		return MarioControls.getXMovementTime(goal.node.x - current.node.x, current.vx, 0).key;
+		//return timeToReachNode(goal, current);
 	}
 
 	/**
