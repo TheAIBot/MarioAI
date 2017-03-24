@@ -1,23 +1,15 @@
 package ch.idsia.scenarios;
 
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.AgentsPool;
 import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
-import ch.idsia.tools.ToolsConfigurator;
-import tests.TestAgent;
 import tests.TestTools;
-import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.environments.Environment;
-import ch.idsia.mario.simulation.SimulationOptions;
-
-import java.awt.*;
 
 import MarioAI.FastAndFurious;
-import MarioAI.graph.Grapher;
 /**
  * Created by IntelliJ IDEA.
  * User: julian
@@ -29,8 +21,8 @@ public class Play {
     public static void main(String[] args) {
         boolean loadLevel = false;
         if (loadLevel) {
-            Agent controller = new FastAndFurious();
-        	//Agent controller = new HumanKeyboardAgent();
+            //Agent controller = new FastAndFurious();
+        	Agent controller = new HumanKeyboardAgent();
             //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
             Environment observation = TestTools.loadLevel("flatWithBump.lvl", controller, true);
             TestTools.runWholeLevel(observation);
@@ -49,7 +41,7 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        //options.setLevelRandSeed(42243);
+	        options.setLevelRandSeed(3);
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
@@ -59,7 +51,7 @@ public class Play {
 	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(1);
+	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
 
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

@@ -3,6 +3,8 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.omg.CORBA.INTERNAL;
+
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
@@ -63,7 +65,7 @@ public class MarioControls {
 		
 	
 		currentXSpeed = marioXPos - oldX;
-		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed).getXMovementTime();
+		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed, jumpTime).getXMovementTime();
 		if (xAxisCounter > 0) {
 			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
@@ -77,15 +79,19 @@ public class MarioControls {
 		final DirectedEdge nextEdge = path.get(0);
 		
 		return (nextEdge.target.x == marioXPos &&
-				nextEdge.target.y > marioYPos &&
-				observation.isMarioOnGround());
+				observation.isMarioOnGround() &&
+				(nextEdge.target.y > marioYPos ||
+				 nextEdge.target.y < marioYPos));
 	}
 	
 	public static int getJumpTime(DirectedEdge next, float marioYPos) {
-		final float getJumpNodeHeight = next.getMaxY();
-		if (getJumpNodeHeight < Math.round(marioYPos)) {
-			final int jumpCounter = getJumpUpTime(getJumpNodeHeight);
-			final int fallTime = getFallingTime(next.target.y - next.getMaxY());
+		return getJumpTime(next.getMaxY(), next.target.y, marioYPos);
+	}
+	
+	public static int getJumpTime(float jumpToYPos, float targetYPos, float marioYPos) {
+		if (jumpToYPos > 0) {
+			final int jumpCounter = getJumpUpTime(jumpToYPos);
+			final int fallTime = getFallingTime(targetYPos - (marioYPos - jumpToYPos));
 			return jumpCounter + fallTime;
 		}
 		return 0;
@@ -113,6 +119,10 @@ public class MarioControls {
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		final int jumpTimeInTicks = getJumpTime(edge, startY);
+		return getStepsAndSpeedAfterJump(startX, startY, endNode, edge, speed, jumpTimeInTicks);
+	}
+	
+	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int jumpTimeInTicks) {
 		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
 		return new MovementInformation(xMovementInformation.key, jumpTimeInTicks, xMovementInformation.value);
 	}

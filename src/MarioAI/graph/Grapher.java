@@ -8,7 +8,7 @@ import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
 
 public  class Grapher {
-	private static final float JUMP_HEIGHT = 4;
+	private static final float MAX_JUMP_HEIGHT = 4;
 	private static final float MAX_JUMP_RANGE = 4;
 	public static final short GRID_HEIGHT = 15;
 	public static final short GRID_WIDTH = 22;
@@ -69,7 +69,8 @@ public  class Grapher {
 			System.out.println();
 		}
 		//printView();
-		if(canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
+		if(isOnLevelMatrix((short) (GRID_WIDTH/2),marioNode.y) &&
+		   canMarioStandThere((short) (GRID_WIDTH/2),marioNode.y))
 			connectNode(mario, (short) (GRID_WIDTH/2)); 
 		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
 		//System.out.println("The edges are ready!");
@@ -155,9 +156,11 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (float jumpRange = 2; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
-			polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, JUMP_HEIGHT);
-			jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
+		for (int jumpHeight = 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
+				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
+			}
 		}
 	}
 	
