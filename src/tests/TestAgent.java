@@ -17,19 +17,16 @@ public class TestAgent implements Agent {
 	public boolean[] getAction(Environment observation) {
 		boolean[] actions = new boolean[Environment.numberOfButtons];
 		
-		
-		
+		if (tick == TestTools.LEVEL_INIT_TICKS) {
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		}		
 		
 		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +  5;
 		int a3 =                             a1 +  20;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float xChange = currentXPos - prevX;
-		
-		if (tick == TestTools.LEVEL_INIT_TICKS) {
-			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		}
 		
 		if (tick > TestTools.LEVEL_INIT_TICKS && tick < a1) {
 			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
