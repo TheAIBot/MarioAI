@@ -8,6 +8,7 @@ import ch.idsia.mario.environments.Environment;
 public class TestAgent implements Agent {
 	private int tick = 0;	
 	private float prevX = 0;
+	private float prevY = 0;
 	private float startX = 0;
 	private float startY = 0;
 
@@ -20,33 +21,39 @@ public class TestAgent implements Agent {
 		if (tick == TestTools.LEVEL_INIT_TICKS) {
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			actions[Mario.KEY_RIGHT] = true;
 		}		
 		
-		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +  5;
+		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +   8;
 		int a3 =                             a1 +  20;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float currentYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		float xChange = currentXPos - prevX;
 		
 		if (tick > TestTools.LEVEL_INIT_TICKS && tick < a1) {
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
+			System.out.println(prevY - currentYPos);
 			//actions[Mario.KEY_RIGHT] = true;
 			actions[Mario.KEY_JUMP] = true;
+			actions[Mario.KEY_RIGHT] = true;
 		}
 		else if (tick == a1) {
 			//System.out.println("stop jumping");
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
+			System.out.println(prevY - currentYPos);
 			actions[Mario.KEY_JUMP] = false;
+			actions[Mario.KEY_RIGHT] = true;
 			//actions[Mario.KEY_RIGHT] = false;
 			//actions[Mario.KEY_LEFT] = true;
 			//actions[Mario.KEY_JUMP] = false;
 		}
 		else if (tick > a1 && tick < a3) {
-			System.out.println(startY - MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
+			System.out.println(prevY - currentYPos);
 			actions[Mario.KEY_JUMP] = false;
+			actions[Mario.KEY_RIGHT] = true;
 			//actions[Mario.KEY_LEFT] = true;
 		}
 		prevX = currentXPos;
+		prevY = currentYPos;
 		
 		
 		/*
@@ -86,7 +93,8 @@ public class TestAgent implements Agent {
 	
     public static void main(String[] args) {
         Agent controller = new TestAgent();
-        Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+        //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+        Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", controller, true);
         TestTools.runWholeLevel(observation);
     }
 
