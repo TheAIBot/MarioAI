@@ -56,6 +56,7 @@ public class FastAndFurious implements Agent {
 				updatedLastFrame = true;
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
+			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
 				DebugDraw.drawEndNodes(observation, graph.getGoalNodes());
@@ -74,6 +75,7 @@ public class FastAndFurious implements Agent {
 				}
 			}
 			MarioControls.getNextAction(observation, newestPath, action);
+
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
 				DebugDraw.drawAction(observation, action);

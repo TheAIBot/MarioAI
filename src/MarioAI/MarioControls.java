@@ -88,11 +88,43 @@ public class MarioControls {
 		return getJumpTime(next.getMaxY(), next.target.y, marioYPos);
 	}
 	
-	public static int getJumpTime(float jumpToYPos, float targetYPos, float marioYPos) {
-		if (jumpToYPos > 0) {
-			final int jumpCounter = getJumpUpTime(jumpToYPos);
-			final int fallTime = getFallingTime(targetYPos - (marioYPos - jumpToYPos));
-			return jumpCounter + fallTime;
+	public static int getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
+		if (targetJumpHeight > 0) {
+			final float jumpHeight = targetJumpHeight;
+			final float fallTo = targetYPos - marioYPos;
+			
+			//numbers are taken from mario class in the game
+			final float yJumpSpeed = 1.9f;
+			float jumpTime = 8;
+			float currentJumpHeight = 0;
+			int ticksJumped = 0;
+			
+			float prevYDelta = 0;
+			
+			//calculate ticks for jumping up to desired height
+			for (int i = 0; i < MAX_JUMP_TIME; i++) {
+				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
+				currentJumpHeight += prevYDelta;
+				jumpTime--;
+				ticksJumped++;
+				if (currentJumpHeight >= jumpHeight) {
+					break;
+				}
+			}
+			//calculate ticks for falling down
+			if (currentJumpHeight > fallTo) {
+				
+				while (currentJumpHeight > fallTo) {
+					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
+					currentJumpHeight += prevYDelta;
+					if (currentJumpHeight <= fallTo) {
+						break;
+					}
+					ticksJumped++;
+				}	
+			}
+			
+			return ticksJumped;
 		}
 		return 0;
 	}

@@ -23,7 +23,7 @@ public class TestAgent implements Agent {
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			actions[Mario.KEY_RIGHT] = true;
 		}		
-		
+		/*
 		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +   8;
 		int a3 =                             a1 +  20;
 		
@@ -54,12 +54,14 @@ public class TestAgent implements Agent {
 		}
 		prevX = currentXPos;
 		prevY = currentYPos;
+		*/
 		
 		
-		/*
 		switch (tick) {
 		case TestTools.LEVEL_INIT_TICKS:
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			break;
 		case TestTools.LEVEL_INIT_TICKS + 1:
 		case TestTools.LEVEL_INIT_TICKS + 2:
 		case TestTools.LEVEL_INIT_TICKS + 3:
@@ -72,6 +74,9 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 10:
 		case TestTools.LEVEL_INIT_TICKS + 11:
 		case TestTools.LEVEL_INIT_TICKS + 12:
+			System.out.println(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) - startY);
+			actions[Mario.KEY_RIGHT] = true;
+			break;
 		case TestTools.LEVEL_INIT_TICKS + 13:
 		case TestTools.LEVEL_INIT_TICKS + 14:
 		case TestTools.LEVEL_INIT_TICKS + 15:
@@ -81,10 +86,19 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 19:
 		case TestTools.LEVEL_INIT_TICKS + 20:
 		case TestTools.LEVEL_INIT_TICKS + 21:
+		case TestTools.LEVEL_INIT_TICKS + 22:
+		case TestTools.LEVEL_INIT_TICKS + 23:
+		case TestTools.LEVEL_INIT_TICKS + 24:
+		case TestTools.LEVEL_INIT_TICKS + 25:
+		case TestTools.LEVEL_INIT_TICKS + 26:
+		case TestTools.LEVEL_INIT_TICKS + 27:
+		case TestTools.LEVEL_INIT_TICKS + 28:
+		case TestTools.LEVEL_INIT_TICKS + 29:
 			actions[Mario.KEY_RIGHT] = true;
-			System.out.println(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()) - startX);
+			actions[Mario.KEY_JUMP] = true;
+			System.out.println(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) - startY);
 		}
-		*/
+		
 		
 		
 		tick++;
@@ -93,8 +107,8 @@ public class TestAgent implements Agent {
 	
     public static void main(String[] args) {
         Agent controller = new TestAgent();
-        //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
-        Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", controller, true);
+        Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+        //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", controller, true);
         TestTools.runWholeLevel(observation);
     }
 

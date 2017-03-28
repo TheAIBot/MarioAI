@@ -203,6 +203,7 @@ public class TestMarioMovements {
 			if (observation.isMarioOnGround()) {
 				break;
 			}
+			
 			expectedJumpTime++;
 		}
 		int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos);
