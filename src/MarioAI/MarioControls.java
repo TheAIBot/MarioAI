@@ -28,7 +28,6 @@ public class MarioControls {
 		DirectedEdge next = path.get(0);
 		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
 			path.remove(0);
-			next = path.get(0);
 			return true;
 		}
 		return false;
@@ -129,11 +128,11 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int ticksHoldingUp, int totalTicksJumped) {
-		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, totalTicksJumped);
-		return new MovementInformation(xMovementInformation.key, xMovementInformation.value, ticksHoldingUp, totalTicksJumped);
+		final XMovementInformation xMovementInfo = getXMovementTime((float)endNode.x - startX, speed, totalTicksJumped);
+		return new MovementInformation(xMovementInfo, ticksHoldingUp, totalTicksJumped);
 	}
 	
-	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {
+	public static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
 		boolean speedIsNegative = neededXDistance < 0;
@@ -152,7 +151,7 @@ public class MarioControls {
 			}
 		}
 		else if (neededXDistance == 0) {
-			return new Pair<Integer, Float>(0, speed);
+			return new XMovementInformation(0, speed, 0);
 		}
 		speed = Math.abs(speed);
 		neededXDistance = Math.abs(neededXDistance);
@@ -164,7 +163,7 @@ public class MarioControls {
 		}
 		//get end speed
 		speed = getDriftingDistance(speed, time - steps).value.floatValue();
-		return new Pair<Integer, Float>(steps, (speedIsNegative)? -1 * speed : speed);
+		return new XMovementInformation((speedIsNegative)? -1 * distanceMoved : distanceMoved, (speedIsNegative)? -1 * speed : speed, steps);
 	}
 	
 	public static float getNextTickSpeed(final float speed) {

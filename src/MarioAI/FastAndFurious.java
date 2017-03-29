@@ -58,8 +58,9 @@ public class FastAndFurious implements Agent {
 		}
 					
 		if (newestPath != null && newestPath.size() > 1) {
-			if (MarioControls.reachedNextNode(observation, newestPath) || MarioControls.isPathInvalid(observation, newestPath)) {
-				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
+			if (MarioControls.reachedNextNode(observation, newestPath) || 
+				MarioControls.isPathInvalid(observation, newestPath)) {
+				final List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}

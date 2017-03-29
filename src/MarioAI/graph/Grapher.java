@@ -14,7 +14,6 @@ public  class Grapher {
 	public static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private static boolean[][] inRecursion = new boolean[GRID_WIDTH][GRID_WIDTH];
-	private static final short MARIO_JUMP_LENGHT = 5;
 	private static final int MarioHeight = 2;
 	private static Node marioNode;
 	static int testPrintCounter = 24; // Rand value
@@ -48,6 +47,7 @@ public  class Grapher {
 	
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
+		/*
 		for (int i = 0; i < levelMatrix.length; i++) {
 			for (int j = 0; j < levelMatrix[i].length; j++) {
 				Node currentNode = levelMatrix[i][j];
@@ -60,6 +60,7 @@ public  class Grapher {
 				}
 			}
 		}
+		*/
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		Node oldMarioNode = marioNode;

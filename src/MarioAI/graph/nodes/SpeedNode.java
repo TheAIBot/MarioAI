@@ -5,21 +5,25 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 
 public class SpeedNode implements Comparable<SpeedNode> {
+	public final float SCORE_MULTIPLIER = 128;
 	
 	public final Node node;
 	public final float vx;
-	public float gScore;
-	public float fScore;
 	public final SpeedNode parent;
 	public final int hash;
 	public final DirectedEdge ancestorEdge;
+	public final float correctXPos;
 	
-	public SpeedNode(Node node, float vx, SpeedNode parent, DirectedEdge ancestorEdge) {
+	public float gScore;
+	public float fScore;
+	
+	public SpeedNode(Node node, float vx, SpeedNode parent, DirectedEdge ancestorEdge, float correctXPos) {
 		this.node = node;
 		this.vx = vx;
 		this.parent = parent;
 		gScore = fScore = 0;
 		this.ancestorEdge =ancestorEdge;
+		this.correctXPos = correctXPos;
 		this.hash = Hasher.hashSpeedNode(node.x, node.y, vx, ancestorEdge instanceof Running);
 	}
 	
@@ -28,8 +32,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		if (b == null) {
 			return false;
 		}
-		if (b instanceof Node) {
-			Node bb = (Node) b;
+		if (b instanceof SpeedNode) {
+			SpeedNode bb = (SpeedNode) b;
 			return bb.hashCode() == hashCode();
 		} else {
 			return false;
@@ -42,7 +46,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	public int compareTo(SpeedNode o) {
-		return (int) (this.fScore - o.fScore);
+		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
 	}
 
 }

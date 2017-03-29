@@ -18,18 +18,14 @@ public class Hasher {
 	 * @return
 	 */
 	public static int hashSpeedNode(short x, short y, float vx, boolean isRunningEdge) {
-		final short factor = (short) 1024; // arbitrarily chosen value
+		final short factor = (short) 10; // arbitrarily chosen value
 		//h = (a*P1 + b)*P2 + c
 		//return (int) ((x*31 + y)*59 + vx * factor);
 		int ff = (isRunningEdge) ? 1 << 31 : 0;
 		int a = (byte) (vx * factor) & 0x800f;
 		int b = (( x &    511) << 4);
 		int c = (( y &     15) << 13);
-		int hashCode = ((short) (vx * factor)) |
-			          (( x &    511) << 18) |
-			          (( y &     15) << 27) |
-			          ff;
-		//System.out.println("HashCode:" + hashCode);
+		int hashCode = a | b |c | ff;
 		return hashCode;
 	}
 	
@@ -55,7 +51,7 @@ public class Hasher {
 		final int b3 = ((int)edge.source.y  & 0x000000ff) << 16;
 		final int b4 = ((int)edge.source.x  & 0x000000ff) << 24;
 		
-		//return b1 | b2 | b3 | b4;
-		return ll++;
+		return b1 | b2 | b3 | b4;
+		//return ll++;
 	}
 }
