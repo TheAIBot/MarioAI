@@ -78,7 +78,7 @@ public class MarioControls {
 	public static Pair<Integer, Integer> getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final float jumpHeight = targetJumpHeight;
-			final float fallTo = targetYPos - marioYPos;
+			final float fallTo = targetYPos - Math.round(marioYPos);
 			
 			//numbers are taken from mario class in the game
 			final float yJumpSpeed = 1.9f;
