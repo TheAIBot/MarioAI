@@ -110,7 +110,7 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
-		return getStepsAndSpeedAfterJump(edge.source.x, edge.source.y, edge.source, edge, speed);
+		return getStepsAndSpeedAfterJump(edge.source.x, edge.source.y, edge.target, edge, speed);
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -126,7 +126,7 @@ public class MarioControls {
 	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
-		boolean speedIsNegative = speed < 0;
+		boolean speedIsNegative = neededXDistance < 0;
 		if ((neededXDistance < 0 && speed > 0) ||
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
