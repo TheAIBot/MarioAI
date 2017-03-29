@@ -85,7 +85,7 @@ public final class AStar {
 
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
-			System.out.println(openSet.size());
+			//System.out.println(openSet.size());
 
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {

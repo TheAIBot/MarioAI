@@ -55,13 +55,14 @@ public class MarioControls {
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge next = path.get(0);
 
-		if (jumpTime < 0) {
+		if (jumpTime < 0 && observation.isMarioOnGround()) {
 			jumpTime = getJumpTime(next, marioYPos);
 		}
 		if (jumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
 		}
 		jumpTime--;
+		System.out.println(jumpTime);
 		
 	
 		currentXSpeed = marioXPos - oldX;
