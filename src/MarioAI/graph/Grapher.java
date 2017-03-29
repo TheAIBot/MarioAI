@@ -140,12 +140,13 @@ public  class Grapher {
 	public static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
-		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (int jumpHeight = 4; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = 3; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
+				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT, listOfEdges); //TODO ERROR if removed on shortdeadend
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
+				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT, listOfEdges);					
 			}
 		}
 	}
@@ -170,7 +171,7 @@ public  class Grapher {
 				collisionDetection != Collision.HIT_CEILING &&
 			   !polynomial.isPastTopPoint(nodeColoumn, (short) (currentXPosition + xPositionOffsetForJump)) &&
 			   isWithinView((short) (currentXPosition + xPositionOffsetForJump))) {
-			currentXPosition++;			
+			currentXPosition = (short)( currentXPosition + ((direction.isLeftType())?-1:1));			
 			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
 			if (polynomial.isPastTopPoint(nodeColoumn, (short)(currentXPosition + xPositionOffsetForJump))) { 
 				//Up to the max height of the polynomial!
@@ -195,15 +196,17 @@ public  class Grapher {
 		
 		
 		//Downwards:
-		if (polynomial.getTopPointX() < currentXPosition) {
+		if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
 			currentXPosition--; //The toppunkt was in the current block (and not ending there).
 			//Therefore the downward going part of that block needs to be checked.
+		} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
+			currentXPosition++; //other way around
 		}
 		currentJumpDirection = (direction.isLeftType())? JumpDirection.LEFT_DOWNWARDS: JumpDirection.RIGHT_DOWNWARDS;
 		while (!hasMetHardGround &&
 				isWithinView((short) (currentXPosition + xPositionOffsetForJump))) { //Doesen't take falling down into a hole into account.
 			
-			currentXPosition++;					
+			currentXPosition = (short)( currentXPosition + ((direction.isLeftType())?-1:1));						
 			currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);
 			//First rounded to 1/64.	
 			currentLowerYPosition = (short) (Math.round(currentYPosition*64)/64); //Automatic flooring included!			
@@ -262,7 +265,8 @@ public  class Grapher {
 			if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
 					  (lowerFacingMarioCorner == Collision.HIT_GROUND || lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
 				collisionDetection = Collision.HIT_GROUND;
-				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	listOfEdges.add(
+											 new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
 				else listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition + ((direction.isLeftType())? 1: -1)][y],polynomial));
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
@@ -338,7 +342,7 @@ public  class Grapher {
 	*/
 		
 	private static boolean isWithinView(short xPosition) { //TODO Rename, curtesy of +1
-		return xPosition < GRID_WIDTH && xPosition >= 0;
+		return xPosition < GRID_WIDTH && xPosition > 0;
 	}
 	
 	private static Node getFallDownPosition(short coloumn, short row) {
@@ -397,10 +401,12 @@ public  class Grapher {
 		
 	private static Collision lowerFacingCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, 
 														short currentXPosition, Collision collisionDetection, JumpDirection direction) {
+		/*
 		if (direction.isLeftType()) {
 			//Substracts 1 as normally currentXPosition gives the right most corner.
 			currentXPosition--;
 		} //Else it is the right going type, and nothing should be changed.
+		*/
 		if (direction.isUpwardsType()) { 
 			//In the case one is going upwards, one should not check for any other type of collisions, 
 			//than those originating from wall collisions.
@@ -435,10 +441,10 @@ public  class Grapher {
 
 	private static Collision upperFacingCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, 
 													   short currentXPosition, Collision collisionDetection, JumpDirection direction) {
-		if (direction.isLeftType()) {
+		/*if (direction.isLeftType()) {
 			//Subtracts 1 as normally currentXPosition gives the right most corner.
 			currentXPosition--;
-		}
+		}*/
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
