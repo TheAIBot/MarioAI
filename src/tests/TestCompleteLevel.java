@@ -13,7 +13,7 @@ public class TestCompleteLevel {
 	Environment observation;
 	Graph graph;
 	
-	public void setUp(String levelName) {
+	public void setup(String levelName) {
 		agent = new FastAndFurious();
 		observation = TestTools.loadLevel("src/tests/testLevels/" + levelName + ".lvl", agent);
 		
@@ -26,12 +26,26 @@ public class TestCompleteLevel {
 	/**
 	 * Test if A Star returns path with only Running Directed Edges on a flat level
 	 */
-	@Test
-	public void testCompleteFlatLevel() {
-		setUp("flat");
+	public void testLevel(String path) {
+		setup(path);
 		TestTools.runWholeLevel(observation);
-		
 	}
+	
+	@Test
+	public void testFlat() {
+		testLevel("flat");
+	}
+	
+	@Test
+	public void testPit() {
+		testLevel("pit12345");
+	}
+	
+	@Test
+	public void testStaircase() {
+		testLevel("staircase");
+	}
+	
 	
 }
 
