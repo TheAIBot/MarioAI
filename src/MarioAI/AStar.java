@@ -100,6 +100,7 @@ public final class AStar {
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
 				//System.out.println("XSPEED:" + movementInformation.getEndSpeed());
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge);
+
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
 				}
@@ -116,7 +117,6 @@ public final class AStar {
 				openSetMap.put(sn.hashCode(), sn);
 			}
 		}
-		
 		// No solution was found
 		return null;
 	}
