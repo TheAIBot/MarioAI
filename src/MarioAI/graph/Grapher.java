@@ -42,37 +42,10 @@ public  class Grapher {
 			}	
 		}
 		testPrintCounter++;
-
-	}
-	
-<<<<<<< HEAD
-	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
-		observationGraph = levelMatrix;
-		/*
-=======
-	public static void clearAllEdges(Node[][] levelMatrix) {
->>>>>>> refs/remotes/origin/GraphingOfJustice
-		for (int i = 0; i < levelMatrix.length; i++) {
-			for (int j = 0; j < levelMatrix[i].length; j++) {
-				Node currentNode = levelMatrix[i][j];
-				if (currentNode != null) {
-					currentNode.deleteAllEdges();
-					currentNode.fScore=0;
-					currentNode.gScore=0;
-					currentNode.parent = null;
-					currentNode.ancestorEdge = null;
-				}
-			}
-		}
-<<<<<<< HEAD
-		*/
-=======
 	}
 	
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
-		clearAllEdges(levelMatrix);
->>>>>>> refs/remotes/origin/GraphingOfJustice
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		Node oldMarioNode = marioNode;
@@ -169,11 +142,7 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-<<<<<<< HEAD
-		for (int jumpHeight = (int) MAX_JUMP_HEIGHT; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
-=======
 		for (int jumpHeight = 4; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
->>>>>>> refs/remotes/origin/GraphingOfJustice
 			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
