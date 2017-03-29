@@ -82,6 +82,8 @@ public class TestAStar {
 		// TODO Bug: Mario thinks he can jump through one layer wall
 		// TODO Bug: Mario not finding path at first A* call (in the next call, however, he finds the solution path)
 	}
+
+	
 }
 
 

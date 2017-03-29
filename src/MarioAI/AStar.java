@@ -37,8 +37,8 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null), 
-										   new SpeedNode(goal, 0, null, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null, start.x), 
+										   new SpeedNode(goal, 0, null, null, goal.x));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -76,14 +76,9 @@ public final class AStar {
 		start.fScore = heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
-//			Object[] sortedOpenSet = openSet.toArray();
-//			Arrays.sort(sortedOpenSet);
-//			System.out.println(sortedOpenSet.toString());
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
-			
-			
-			
+						
 			// If goal is reached return solution path
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
@@ -93,13 +88,11 @@ public final class AStar {
 			closedSetMap.put(current.hashCode(), current);
 			System.out.println(openSet.size());
 			
-			int meh = current.node.getEdges().size();
-			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
-				//System.out.println("XSPEED:" + movementInformation.getEndSpeed());
-				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge);
+				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
+				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
 
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
@@ -112,7 +105,7 @@ public final class AStar {
 				}
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
 				openSet.add(sn);
 				openSetMap.put(sn.hashCode(), sn);
 			}
@@ -129,7 +122,7 @@ public final class AStar {
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
 		//if (current.vx == 0) return 1000000f;
-		return MarioControls.getXMovementTime(goal.node.x - current.node.x, current.vx, 0).key;
+		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
 		//return timeToReachNode(goal, current);
 	}
 

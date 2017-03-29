@@ -23,8 +23,8 @@ public class TestAgent implements Agent {
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			actions[Mario.KEY_RIGHT] = true;
 		}		
-		/*
-		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +   8;
+		
+		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +  50;
 		int a3 =                             a1 +  20;
 		
 		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -32,31 +32,34 @@ public class TestAgent implements Agent {
 		float xChange = currentXPos - prevX;
 		
 		if (tick > TestTools.LEVEL_INIT_TICKS && tick < a1) {
-			System.out.println(prevY - currentYPos);
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
 			//actions[Mario.KEY_RIGHT] = true;
-			actions[Mario.KEY_JUMP] = true;
+			//actions[Mario.KEY_JUMP] = true;
 			actions[Mario.KEY_RIGHT] = true;
 		}
 		else if (tick == a1) {
 			//System.out.println("stop jumping");
-			System.out.println(prevY - currentYPos);
-			actions[Mario.KEY_JUMP] = false;
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
+			//actions[Mario.KEY_JUMP] = false;
 			actions[Mario.KEY_RIGHT] = true;
 			//actions[Mario.KEY_RIGHT] = false;
 			//actions[Mario.KEY_LEFT] = true;
 			//actions[Mario.KEY_JUMP] = false;
 		}
 		else if (tick > a1 && tick < a3) {
-			System.out.println(prevY - currentYPos);
-			actions[Mario.KEY_JUMP] = false;
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
+			//actions[Mario.KEY_JUMP] = false;
 			actions[Mario.KEY_RIGHT] = true;
 			//actions[Mario.KEY_LEFT] = true;
 		}
 		prevX = currentXPos;
 		prevY = currentYPos;
-		*/
 		
 		
+		/*
 		switch (tick) {
 		case TestTools.LEVEL_INIT_TICKS:
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -99,7 +102,7 @@ public class TestAgent implements Agent {
 			System.out.println(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) - startY);
 		}
 		
-		
+		*/
 		
 		tick++;
 		return actions;

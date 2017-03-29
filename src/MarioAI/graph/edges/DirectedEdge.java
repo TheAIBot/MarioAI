@@ -32,7 +32,7 @@ public abstract class DirectedEdge {
 	
 	@Override
 	public String toString() {
-		return "[" + target.x + " : " + target.y + "]";
+		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + "\n";
 	}
 	
 	/**
@@ -43,5 +43,6 @@ public abstract class DirectedEdge {
 	public abstract float getTraversedTime(float v0);
 	
 	public abstract float getSpeedAfterTraversal(float v0);
+	
 	
 }
