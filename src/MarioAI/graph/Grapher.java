@@ -44,8 +44,24 @@ public  class Grapher {
 		testPrintCounter++;
 	}
 	
+	public static void clearAllEdges(Node[][] levelMatrix) {
+		for (int i = 0; i < levelMatrix.length; i++) {
+			for (int j = 0; j < levelMatrix[i].length; j++) {
+				Node currentNode = levelMatrix[i][j];
+				if (currentNode != null) {
+					currentNode.deleteAllEdges();
+					currentNode.fScore=0;
+					currentNode.gScore=0;
+					currentNode.parent = null;
+					currentNode.ancestorEdge = null;
+				}
+			}
+		}
+	}
+	
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
+		clearAllEdges(levelMatrix);
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		Node oldMarioNode = marioNode;
@@ -507,8 +523,9 @@ public  class Grapher {
 				if (canMarioStandThere((short)(currentXPosition - 1), y)) {
 					return Collision.HIT_GROUND;
 				} else {
+					return null;
 					//TODO i don't think this should be possible:
-					throw new Error("Logic error on corner collision detection");
+					//throw new Error("Logic error on corner collision detection");
 				}
 			}else return Collision.HIT_NOTHING;
 		}
