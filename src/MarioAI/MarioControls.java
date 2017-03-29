@@ -3,8 +3,6 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.omg.CORBA.INTERNAL;
-
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
@@ -18,19 +16,6 @@ public class MarioControls {
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.35f;
-	
-	private static final float[] heights = new float[] { 
-		0,
-		0,
-		1.632164f, 
-		2.4634132f, 
-		2.9610314f, 
-		3.3680468f, 
-		3.6599998f, 
-		3.9153123f, 
-		4.051875f, 
-		4.15625f 
-	};
 		
 	private static float oldX = 0;
 	private static int jumpTime = 0;
@@ -128,22 +113,6 @@ public class MarioControls {
 			return ticksJumped;
 		}
 		return 0;
-	}
-
-	private static int getJumpUpTime(float neededHeight) {
-		for (int i = 0; i < heights.length; i++) {
-			if (heights[i] >= neededHeight) {
-				return i;
-			}
-		}
-		return MAX_JUMP_TIME;
-	}
-	
-	private static int getFallingTime(final float fallingHeight) {
-		final double a = 0.08333333333;
-		final double b = 2400;
-		final double c = -0.7500000000;
-		return (int)Math.ceil(a * Math.sqrt(b * fallingHeight + 81) + c);
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
