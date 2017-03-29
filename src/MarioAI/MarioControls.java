@@ -50,7 +50,7 @@ public class MarioControls {
 			action[Mario.KEY_JUMP] = true;
 		}
 		jumpTime--;
-		System.out.println(jumpTime);
+		//System.out.println(jumpTime);
 		
 	
 		if (moveInfo.getXMovementTime() > 0) {
@@ -117,8 +117,8 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 	
-	public static MovementInformation getMovementInformationFromEdge(DirectedEdge edge, float speed) {
-		return getMovementInformationFromEdge(edge.source.x, edge.source.y, edge.source, edge, speed);
+	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
+		return getMovementInformationFromEdge(edge.source.x, edge.source.y, edge.target, edge, speed);
 	}
 	
 	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -136,7 +136,7 @@ public class MarioControls {
 	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
-		boolean speedIsNegative = speed < 0;
+		boolean speedIsNegative = neededXDistance < 0;
 		if ((neededXDistance < 0 && speed > 0) ||
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
