@@ -13,7 +13,7 @@ public class TestCompleteLevel {
 	Environment observation;
 	Graph graph;
 	
-	public void setup(String levelName) {
+	public void setUp(String levelName) {
 		agent = new FastAndFurious();
 		observation = TestTools.loadLevel(levelName + ".lvl", agent);
 		
@@ -24,7 +24,7 @@ public class TestCompleteLevel {
 	}
 	
 	public void testLevel(String path) {
-		setup(path);
+		setUp(path);
 		TestTools.runWholeLevel(observation);
 	}
 	

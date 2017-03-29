@@ -24,7 +24,7 @@ public class TestAStar {
 	Graph graph;
 	final float delta = 0.05f;
 	
-	public void setup(String levelName) {
+	public void setUp(String levelName) {
 		agent = new FastAndFurious();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent);
 		
@@ -39,7 +39,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarRunning() {
-		setup("flat");
+		setUp("flat");
 		
 		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		assertTrue(path != null);
@@ -65,7 +65,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setup("TestAStarJump");
+		setUp("TestAStarJump");
 		
 		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 		assertTrue(path != null);
