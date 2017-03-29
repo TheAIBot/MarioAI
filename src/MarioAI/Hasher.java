@@ -17,13 +17,20 @@ public class Hasher {
 	 * @param vx
 	 * @return
 	 */
-	public static int hashSpeedNode(short x, short y, float vx) {
-		final short factor = (short) 10; // arbitrarily chosen value
+	public static int hashSpeedNode(short x, short y, float vx, boolean isRunningEdge) {
+		final short factor = (short) 1024; // arbitrarily chosen value
 		//h = (a*P1 + b)*P2 + c
 		//return (int) ((x*31 + y)*59 + vx * factor);
-		return ((byte) (vx * factor) & 0x800f) +
-			          (( x &    511) << 4) + 
-			          (( y &     15) << 13);
+		int ff = (isRunningEdge) ? 1 << 31 : 0;
+		int a = (byte) (vx * factor) & 0x800f;
+		int b = (( x &    511) << 4);
+		int c = (( y &     15) << 13);
+		int hashCode = ((short) (vx * factor)) |
+			          (( x &    511) << 18) |
+			          (( y &     15) << 27) |
+			          ff;
+		System.out.println("HashCode:" + hashCode);
+		return hashCode;
 	}
 	
 	private static int ll = 0;
