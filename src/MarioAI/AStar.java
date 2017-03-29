@@ -129,8 +129,7 @@ public final class AStar {
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
 		//if (current.vx == 0) return 1000000f;
-		return MarioControls.getXMovementTime(goal.node.x - current.node.x, current.vx, 0).key;
-		//return timeToReachNode(goal, current);
+		return timeToReachNode(goal, current);
 	}
 
 	/**
