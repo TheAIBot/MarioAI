@@ -206,7 +206,7 @@ public class TestMarioMovements {
 			
 			expectedJumpTime++;
 		}
-		int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos);
+		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos).value;
 		if (receivedJumpTime != expectedJumpTime) {
 			Assert.fail("Expected jump time wasn't the same as the received one." + 
 						"\nExpected: " + expectedJumpTime + 

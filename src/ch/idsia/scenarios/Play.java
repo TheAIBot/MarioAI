@@ -19,7 +19,7 @@ import ch.idsia.mario.environments.Environment;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
@@ -28,12 +28,7 @@ public class Play {
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
-			//Agent controller = new TestAgent();
-	        //Agent controller = new HumanKeyboardAgent();
-	        /*if (args.length > 0) {
-	            controller = AgentsPool.load (args[0]);
-	            AgentsPool.addAgent(controller);
-	        }*/
+	        
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
 	        Task task = new ProgressTask(options);

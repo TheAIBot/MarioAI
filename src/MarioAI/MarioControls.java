@@ -39,20 +39,21 @@ public class MarioControls {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge next = path.get(0);
+		
+		currentXSpeed = marioXPos - oldX;
+		final MovementInformation moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
 
 		if (jumpTime < 0 && observation.isMarioOnGround()) {
-			jumpTime = getJumpTime(next, marioYPos);
+			jumpTime = moveInfo.getTicksHoldingJump();
 		}
-		if (jumpTime > 0) {
+		else if (jumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
 		}
 		jumpTime--;
 		System.out.println(jumpTime);
 		
 	
-		currentXSpeed = marioXPos - oldX;
-		final int xAxisCounter = getStepsAndSpeedAfterJump(marioXPos, marioYPos, next.target, next, currentXSpeed, jumpTime).getXMovementTime();
-		if (xAxisCounter > 0) {
+		if (moveInfo.getXMovementTime() > 0) {
 			final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 			action[movementDirection] = true;
 		}
@@ -70,11 +71,11 @@ public class MarioControls {
 				 nextEdge.target.y < marioYPos));
 	}
 	
-	public static int getJumpTime(DirectedEdge next, float marioYPos) {
+	public static Pair<Integer, Integer> getJumpTime(DirectedEdge next, float marioYPos) {
 		return getJumpTime(next.getMaxY(), next.target.y, marioYPos);
 	}
 	
-	public static int getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
+	public static Pair<Integer, Integer> getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final float jumpHeight = targetJumpHeight;
 			final float fallTo = targetYPos - marioYPos;
@@ -83,8 +84,8 @@ public class MarioControls {
 			final float yJumpSpeed = 1.9f;
 			float jumpTime = 8;
 			float currentJumpHeight = 0;
-			int ticksJumped = 0;
-			
+			int totalTicksJumped = 0;
+			int ticksHoldingJump = 0;
 			float prevYDelta = 0;
 			
 			//calculate ticks for jumping up to desired height
@@ -92,7 +93,8 @@ public class MarioControls {
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				jumpTime--;
-				ticksJumped++;
+				totalTicksJumped++;
+				ticksHoldingJump++;
 				if (currentJumpHeight >= jumpHeight) {
 					break;
 				}
@@ -106,27 +108,29 @@ public class MarioControls {
 					if (currentJumpHeight <= fallTo) {
 						break;
 					}
-					ticksJumped++;
+					totalTicksJumped++;
 				}	
 			}
 			
-			return ticksJumped;
+			return new Pair<Integer, Integer>(ticksHoldingJump, totalTicksJumped);
 		}
-		return 0;
+		return new Pair<Integer, Integer>(0, 0);
 	}
 	
-	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
-		return getStepsAndSpeedAfterJump(edge.source.x, edge.source.y, edge.source, edge, speed);
+	public static MovementInformation getMovementInformationFromEdge(DirectedEdge edge, float speed) {
+		return getMovementInformationFromEdge(edge.source.x, edge.source.y, edge.source, edge, speed);
 	}
 	
-	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
-		final int jumpTimeInTicks = getJumpTime(edge, startY);
-		return getStepsAndSpeedAfterJump(startX, startY, endNode, edge, speed, jumpTimeInTicks);
+	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
+		final Pair<Integer, Integer> jumpInfo = getJumpTime(edge, startY);
+		final int ticksHoldingUp = jumpInfo.key;
+		final int totalTicksJumped = jumpInfo.value;
+		return getMovementInformationFromEdge(startX, startY, endNode, edge, speed, ticksHoldingUp, totalTicksJumped);
 	}
 	
-	public static MovementInformation getStepsAndSpeedAfterJump(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int jumpTimeInTicks) {
-		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, jumpTimeInTicks);
-		return new MovementInformation(xMovementInformation.key, jumpTimeInTicks, xMovementInformation.value);
+	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int ticksHoldingUp, int totalTicksJumped) {
+		Pair<Integer, Float> xMovementInformation = getXMovementTime((float)endNode.x - startX, speed, totalTicksJumped);
+		return new MovementInformation(xMovementInformation.key, xMovementInformation.value, ticksHoldingUp, totalTicksJumped);
 	}
 	
 	public static Pair<Integer, Float> getXMovementTime(float neededXDistance, float speed, final int time) {

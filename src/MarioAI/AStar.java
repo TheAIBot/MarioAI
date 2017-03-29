@@ -89,7 +89,7 @@ public final class AStar {
 
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
-				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
+				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(neighborEdge, current.vx);
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
