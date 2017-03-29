@@ -2,14 +2,21 @@ package ch.idsia.scenarios;
 
 import MarioAI.FastAndFurious;
 import ch.idsia.ai.agents.Agent;
+<<<<<<< HEAD
 import ch.idsia.ai.agents.human.HumanKeyboardAgent;
+=======
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
+import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
+<<<<<<< HEAD
 import ch.idsia.mario.environments.Environment;
 
+=======
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 /**
  * Created by IntelliJ IDEA.
  * User: julian
@@ -36,7 +43,11 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
+<<<<<<< HEAD
 	        options.setLevelRandSeed(3);
+=======
+	        options.setLevelRandSeed(2);
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);

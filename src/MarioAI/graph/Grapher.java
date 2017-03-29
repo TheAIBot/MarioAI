@@ -9,7 +9,7 @@ import MarioAI.graph.nodes.Node;
 
 public  class Grapher {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 4;
+	private static final float MAX_JUMP_RANGE = 5;
 	public static final short GRID_HEIGHT = 15;
 	public static final short GRID_WIDTH = 22;
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
@@ -45,9 +45,13 @@ public  class Grapher {
 
 	}
 	
+<<<<<<< HEAD
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
 		/*
+=======
+	public static void clearAllEdges(Node[][] levelMatrix) {
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 		for (int i = 0; i < levelMatrix.length; i++) {
 			for (int j = 0; j < levelMatrix[i].length; j++) {
 				Node currentNode = levelMatrix[i][j];
@@ -60,7 +64,15 @@ public  class Grapher {
 				}
 			}
 		}
+<<<<<<< HEAD
 		*/
+=======
+	}
+	
+	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
+		observationGraph = levelMatrix;
+		clearAllEdges(levelMatrix);
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		Node oldMarioNode = marioNode;
@@ -152,12 +164,16 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-	private static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
+	public static void getPolynomialReachingEdges(Node startingNode, short nodeColoumn, List<DirectedEdge> listOfEdges) {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
+<<<<<<< HEAD
 		for (int jumpHeight = (int) MAX_JUMP_HEIGHT; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+=======
+		for (int jumpHeight = 4; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						
@@ -353,7 +369,7 @@ public  class Grapher {
 	*/
 		
 	private static boolean isWithinView(short xPosition) { //TODO Rename, curtesy of +1
-		return xPosition + 1 < GRID_WIDTH && xPosition > 0;
+		return xPosition < GRID_WIDTH && xPosition >= 0;
 	}
 	
 	private static Node getFallDownPosition(short coloumn, short row) {
@@ -517,11 +533,10 @@ public  class Grapher {
 					return Collision.HIT_GROUND;
 				} else {
 					//TODO i don't think this should be possible:
-					System.out.println("Logic error");
+					throw new Error("Logic error on corner collision detection");
 				}
 			}else return Collision.HIT_NOTHING;
 		}
-		return null;
 	}
 	
 }
