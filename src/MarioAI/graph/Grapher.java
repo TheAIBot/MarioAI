@@ -156,7 +156,7 @@ public  class Grapher {
 		//TODO Polynomial bounding conditions.
 		JumpDirection direction = JumpDirection.RIGHT;
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (int jumpHeight = 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = (int) MAX_JUMP_HEIGHT; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, listOfEdges);						

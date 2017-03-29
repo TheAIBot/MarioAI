@@ -29,7 +29,7 @@ public class Hasher {
 			          (( x &    511) << 18) |
 			          (( y &     15) << 27) |
 			          ff;
-		System.out.println("HashCode:" + hashCode);
+		//System.out.println("HashCode:" + hashCode);
 		return hashCode;
 	}
 	
