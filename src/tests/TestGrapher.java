@@ -44,19 +44,21 @@ public class TestGrapher {
 		Graph graph = new Graph();
 		graph.createStartGraph(observation);
 		this.marioNode = graph.getMarioNode(observation);
-		Grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
 		return graph;		
 	}
 	
 	@Test
 	public void testCorrectMarioStartPosition() {
 		Graph graph = getStartLevelWorld("flat.lvl");
+		Grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
 		fail("Test not added yet");
 		
 	}
 	
 	public Graph flatlandWorld() {
-		return getStartLevelWorld("flat.lvl");
+		Graph graph = getStartLevelWorld("flat.lvl");
+		Grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
+		return graph;
 	}
 	
 	public Graph totalFlatland() {
@@ -128,7 +130,19 @@ public class TestGrapher {
 	public void testCanJumpLeft() {
 		Graph graph = totalFlatland();
 		Node[][] level = graph.getLevelMatrix();
-		fail("Not implemented yet");
+		boolean[] possibleJumpLenghts = new boolean[5];//5 for the five different jump lengths
+		for (DirectedEdge edge : marioNode.edges) {
+			if (edge instanceof SecondOrderPolynomial) {
+				SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
+				if (marioNode.x > polynomialEdge.target.x) { //Goes rightwards
+					int index = (marioNode.x - polynomialEdge.target.x ) - 1;
+					possibleJumpLenghts[index] = true;
+				}
+			}		
+		}
+		for (int i = 0; i < possibleJumpLenghts.length; i++) {
+			assertTrue(possibleJumpLenghts[i]);
+		}
 	}
 	
 	@Test
@@ -157,7 +171,6 @@ public class TestGrapher {
 					
 	}
 	
-
 	@Test
 	public void testJumpLeftOverWall() { 
 		fail("Not implemented yet");
@@ -181,7 +194,8 @@ public class TestGrapher {
 		Node[][] world = graph.getLevelMatrix();
 		//adding the walls:
 		final int WALL_HEIGHT = 4;
-		for (short i = 1; i <= 3; i++) {
+		for (short i = -1; i <= 3; i++) {
+			if (i == 0) continue;
 			boolean hasJumpedAgainstWall = false;
 			addWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
 			Grapher.clearAllEdges(world);
@@ -193,7 +207,11 @@ public class TestGrapher {
 					SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
 					//It has only jumped along the wall, if the height of the jump without collision at the wall,
 					//is less than the walls height.
-					if (polynomialEdge.f(11 + i)< (marioNode.y + WALL_HEIGHT) && 
+					if (edge.target == null) {
+						System.out.println("Error");
+						
+					}
+					if (polynomialEdge.f(11 + i) < (marioNode.y + WALL_HEIGHT) && 
 						edge.target.x == getXPositionFromColoumn(11+i) && 
 						edge.target.y == marioNode.y - WALL_HEIGHT) {
 						//Minus or plus because of f gives height according to higher up=greater y.

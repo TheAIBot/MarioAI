@@ -30,20 +30,11 @@ public class FastAndFurious implements Agent {
 	public void reset() {
 	}
 
-	boolean updatedLastFrame = false;
-	int updateCount  = 0;
-	
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
 
-		if (updatedLastFrame) {
-			System.out.println();
-			updateCount++;
-			updatedLastFrame = false;
-		}
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			updatedLastFrame = true;
 			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 			if (path != null) {
@@ -52,10 +43,10 @@ public class FastAndFurious implements Agent {
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
-				graph.printMatrix(observation);
-				updatedLastFrame = true;
+				//graph.printMatrix(observation);
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			}
+			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
 				DebugDraw.drawEndNodes(observation, graph.getGoalNodes());
@@ -66,14 +57,17 @@ public class FastAndFurious implements Agent {
 			}
 		}
 					
-		if (newestPath != null && newestPath.size() > 1) {
+		if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
 			if (MarioControls.reachedNextNode(observation, newestPath) || MarioControls.isPathInvalid(observation, newestPath)) {
 				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
 				if (path != null) {
 					newestPath = path;
 				}
 			}
-			MarioControls.getNextAction(observation, newestPath, action);
+			if (newestPath.size() > 0) {
+				MarioControls.getNextAction(observation, newestPath, action);				
+			}
+
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
 				DebugDraw.drawAction(observation, action);

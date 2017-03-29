@@ -2,28 +2,34 @@ package MarioAI;
 
 public class MovementInformation {
 	private final int xMovementTicks;
-	private final int jumpTicks;
 	private final float endSpeed;
+	private final int ticksHoldingJump;
+	private final int totalTicksJumped;
 	
-	public MovementInformation(int xMovementTicks, int jumpTicks, float endSpeed) {
+	public MovementInformation(int xMovementTicks, float endSpeed, int ticksHoldingJump, int totalTicksJumped) {
 		this.xMovementTicks = xMovementTicks;
-		this.jumpTicks = jumpTicks;
 		this.endSpeed = endSpeed;
+		this.ticksHoldingJump = ticksHoldingJump;
+		this.totalTicksJumped = totalTicksJumped;
 	}
 	
 	public int getXMovementTime() {
 		return xMovementTicks;
 	}
 	
-	public int getJumpTime() {
-		return jumpTicks;
-	}
-	
 	public float getEndSpeed() {
 		return endSpeed;
 	}
 	
+	public int getTicksHoldingJump() {
+		return ticksHoldingJump;
+	}
+	
+	public int getTotalTicksJumped() {
+		return totalTicksJumped;
+	}
+	
 	public int getMoveTime() {
-		return Math.max(xMovementTicks, jumpTicks);
+		return Math.max(xMovementTicks, totalTicksJumped);
 	}
 }

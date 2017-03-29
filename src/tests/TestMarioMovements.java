@@ -167,8 +167,53 @@ public class TestMarioMovements {
 					"\nyDiff: " + Math.abs(endMarioYPos - expectedYPos));
 		}
 	}
+	
+	@Test
+	public void testJumps() {
+		testJumpTime(0);
+		testJumpTime(0.1f);
+		testJumpTime(0.2f);
+		testJumpTime(0.5f);
+		testJumpTime(1);
+		testJumpTime(1.5f);
+		testJumpTime(1.645f);
+		testJumpTime(3.4f);
+		testJumpTime(4);
+		testJumpTime(5.6f);
+	}
 
-	//public void testJumo
+	private void testJumpTime(float jumpHeight) {
+		final UnitTestAgent agent = new UnitTestAgent();		
+		Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		boolean upTime = true;
+		int expectedJumpTime = 0;
+		while (true) {
+			final float currentMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			if (startMarioYPos - jumpHeight < currentMarioYPos && upTime) {
+				agent.action[Mario.KEY_JUMP] = true;
+			}
+			else {
+				agent.action[Mario.KEY_JUMP] = false;
+				upTime = false;
+			}
+			TestTools.runOneTick(observation);
+			
+			if (observation.isMarioOnGround()) {
+				break;
+			}
+			
+			expectedJumpTime++;
+		}
+		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos).value;
+		if (receivedJumpTime != expectedJumpTime) {
+			Assert.fail("Expected jump time wasn't the same as the received one." + 
+						"\nExpected: " + expectedJumpTime + 
+						"\nReceived: " + receivedJumpTime + 
+						"\nJump height: " + jumpHeight);
+		}
+	}
 	
 	private boolean withinAcceptableError(float x1, float y1, float x2, float y2) {
 		return 	Math.abs(x1 - x2) <= MarioControls.ACCEPTED_DEVIATION && 

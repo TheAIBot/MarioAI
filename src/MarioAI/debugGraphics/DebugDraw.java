@@ -61,16 +61,16 @@ public class DebugDraw {
 	}
 
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
-		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
+ 		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix = graph.getLevelMatrix();
 
 		int groundYLevel = marioYPos;
-		while (groundYLevel < LEVEL_HEIGHT && levelMatrix[marioXPos][groundYLevel] == null) {
+		while (groundYLevel >= 0 && groundYLevel < LEVEL_HEIGHT && levelMatrix[marioXPos][groundYLevel] == null) {
 			groundYLevel++;
 		}
 
-		if (groundYLevel < LEVEL_HEIGHT) {
+		if (groundYLevel >= 0 && groundYLevel < LEVEL_HEIGHT) {
 			final Node groundNode = levelMatrix[marioXPos][groundYLevel];
 			if (groundNode != null) {
 				ArrayList<Point> neighbors = new ArrayList<Point>();
@@ -209,6 +209,7 @@ public class DebugDraw {
 				Mario.KEY_RIGHT,
 				Mario.KEY_JUMP
 		};
+		
 		Point size = new Point((int)(BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER, (int)(BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER);
 		
 		for (int i = 0; i < keys.length; i++) {

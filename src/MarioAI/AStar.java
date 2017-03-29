@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
@@ -37,7 +36,8 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null), new SpeedNode(goal, 0, null, null));
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null), 
+										   new SpeedNode(goal, 0, null, null));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -75,12 +75,8 @@ public final class AStar {
 		start.fScore = heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
-			SpeedNode current = openSet.remove();
+			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
-			if (current.vx < 0) {
-				System.out.println(current.fScore);
-			}
-			System.out.println(current.vx);
 
 			// If goal is reached return solution path
 			if (current.node.equals(goal.node)) {
@@ -89,68 +85,39 @@ public final class AStar {
 
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
+			//System.out.println(openSet.size());
 
 			// Explore each neighbor of current node
-			final List<DirectedEdge> neighborEdges = current.node.getEdges();
-			for (DirectedEdge neighborEdge : neighborEdges) {
-				MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
-				SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
-				if (closedSetMap.containsKey(sn.hashCode()))
+			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(neighborEdge, current.vx);
+				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
+				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
-				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + movementInformation.getMoveTime();// + neighborEdge.getWeight();
-				if (!openSetMap.containsKey(sn.hashCode())) {
-					sn.parent = current;
-					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
-					openSet.add(sn);
-				} else if (tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
-					continue;
-				} else {
-					// Update values
-					openSet.remove(sn);
-					sn.parent = current;
-					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal);
-					sn.ancestorEdge = neighborEdge;
-					openSet.add(sn);
 				}
+				// Distance from start to neighbor of current node
+				final float tentativeGScore = current.gScore + movementInformation.getMoveTime();
+				if (openSetMap.containsKey(sn.hashCode()) &&
+					tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
+					continue;
+				}
+				openSet.remove(sn);
+				sn.gScore = tentativeGScore;
+				sn.fScore = sn.gScore + heuristicFunction(sn, goal);
+				openSet.add(sn);
+				openSetMap.put(sn.hashCode(), sn);
 			}
 		}
-
-		//TODO look at this and decide if is should be changed or removed
-		for (SpeedNode node : closedSetMap.values()) {
-			if ( node == null) continue;
-			node.gScore = 0;
-			node.fScore = 0;
-			node.parent = null;
-		}
-
 		// No solution was found
 		return null;
 	}
 
 	/**
-	 * @param start
-	 * @param goal.node
-	 * @return the estimated cost of the cheapest path from current node to goal node
-	 */
-	//	public static float heuristicFunction(final Node start, final Node goal) {
-	//		// temp use distance (later should use time)
-	//		return GraphMath.distanceBetween(start, goal);
-	//	}
-
-	/**
-	 * TODO refactor proper integration with xvelocity
-	 * 
 	 * @param current
 	 * @param goal
 	 * @return
 	 */
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		//if (current.vx == 0) return 1000000f;
-		return timeToReachNode(goal, current);
+		return MarioControls.getXMovementTime(goal.node.x - current.node.x, current.vx, 0).key;
 	}
 
 	/**

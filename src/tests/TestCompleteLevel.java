@@ -15,7 +15,7 @@ public class TestCompleteLevel {
 	
 	public void setUp(String levelName) {
 		agent = new FastAndFurious();
-		observation = TestTools.loadLevel("src/tests/testLevels/" + levelName + ".lvl", agent);
+		observation = TestTools.loadLevel(levelName + ".lvl", agent);
 		
 		TestTools.runOneTick(observation);
 		graph = new Graph();
@@ -23,15 +23,32 @@ public class TestCompleteLevel {
 		Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
-	/**
-	 * Test if A Star returns path with only Running Directed Edges on a flat level
-	 */
-	@Test
-	public void testCompleteFlatLevel() {
-		setUp("flat");
+	public void testLevel(String path) {
+		setUp(path);
 		TestTools.runWholeLevel(observation);
-		
+	}
+	
+	@Test
+	public void testFlat() {
+		testLevel("flat");
+	}
+	
+	@Test
+	public void testPit() {
+		testLevel("pit12345");
+	}
+	
+	@Test
+	public void testStaircase() {
+		testLevel("staircase");
+	}
+	
+	@Test
+	public void testDeadend() {
+		testLevel("deadend");
 	}
 	
 }
+
+
 
