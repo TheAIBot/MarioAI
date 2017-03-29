@@ -1,23 +1,13 @@
 package ch.idsia.scenarios;
 
+import MarioAI.FastAndFurious;
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.AgentsPool;
-import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
+import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
-import ch.idsia.tools.ToolsConfigurator;
-import tests.TestAgent;
 import tests.TestTools;
-import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.environments.Environment;
-import ch.idsia.mario.simulation.SimulationOptions;
-
-import java.awt.*;
-
-import MarioAI.FastAndFurious;
-import MarioAI.graph.Grapher;
 /**
  * Created by IntelliJ IDEA.
  * User: julian
@@ -49,7 +39,7 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed(1);
+	        options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
