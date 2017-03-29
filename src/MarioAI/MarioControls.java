@@ -5,6 +5,7 @@ import java.util.List;
 
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -114,6 +115,25 @@ public class MarioControls {
 			return new Pair<Integer, Integer>(ticksHoldingJump, totalTicksJumped);
 		}
 		return new Pair<Integer, Integer>(0, 0);
+	}
+	
+	public static boolean canMarioUseEdge(DirectedEdge edge, float speed) {
+		if (edge instanceof Running) {
+			return true;
+		}
+		float distanceToMove = edge.target.x - edge.source.x;
+		if (!((distanceToMove < 0 && speed < 0) ||
+			(distanceToMove > 0 && speed > 0))) {
+			return false;
+		}
+		int ticksJumping = getJumpTime(edge, edge.source.y).value;
+		float distanceMoved = 0;
+		speed = Math.abs(speed);
+		for (int i = 0; i < ticksJumping; i++) {
+			speed = getNextTickSpeed(speed);
+			distanceMoved += speed;
+		}
+		return (distanceMoved >= Math.abs(edge.target.x - edge.source.x));
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {

@@ -38,7 +38,7 @@ public class Play {
 	        options.setMatlabFileName("");
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
-	        //options.setLevelRandSeed(42);
+	        options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);

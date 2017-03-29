@@ -90,6 +90,10 @@ public final class AStar {
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+				if (!MarioControls.canMarioUseEdge(neighborEdge, current.vx)) {
+					continue;
+				}
+				
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
