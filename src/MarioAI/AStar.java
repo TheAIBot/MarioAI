@@ -120,14 +120,10 @@ public final class AStar {
 	 * @return
 	 */
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-<<<<<<< HEAD
 		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
 		//if (current.vx == 0) return 1000000f;
 		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
 		//return timeToReachNode(goal, current);
-=======
-		return MarioControls.getXMovementTime(goal.node.x - current.node.x, current.vx, 0).key;
->>>>>>> refs/remotes/origin/GraphingOfJustice
 	}
 
 	/**
