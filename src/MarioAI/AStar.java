@@ -1,6 +1,7 @@
 package MarioAI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -75,9 +76,14 @@ public final class AStar {
 		start.fScore = heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
+//			Object[] sortedOpenSet = openSet.toArray();
+//			Arrays.sort(sortedOpenSet);
+//			System.out.println(sortedOpenSet.toString());
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
-
+			
+			
+			
 			// If goal is reached return solution path
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
@@ -86,11 +92,14 @@ public final class AStar {
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
 			System.out.println(openSet.size());
-
+			
+			int meh = current.node.getEdges().size();
+			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
-				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,neighborEdge);
+				//System.out.println("XSPEED:" + movementInformation.getEndSpeed());
+				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge);
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
 				}

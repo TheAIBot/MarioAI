@@ -2,6 +2,7 @@ package MarioAI.graph.nodes;
 
 import MarioAI.Hasher;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
 
 public class SpeedNode implements Comparable<SpeedNode> {
 	
@@ -19,7 +20,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.parent = parent;
 		gScore = fScore = 0;
 		this.ancestorEdge =ancestorEdge;
-		this.hash = Hasher.hashSpeedNode(node.x, node.y, vx);
+		this.hash = Hasher.hashSpeedNode(node.x, node.y, vx, ancestorEdge instanceof Running);
 	}
 	
 	@Override
