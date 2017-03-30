@@ -61,5 +61,4 @@ public class DebugLines extends DebugDrawing {
 			g.drawLine(start.x, start.y, end.x, end.y);
 		}
 	}
-
 }

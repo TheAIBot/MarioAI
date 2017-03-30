@@ -70,6 +70,7 @@ public class FastAndFurious implements Agent {
 
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
+				DebugDraw.drawPathEdgeTypes(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
 			}
 		}

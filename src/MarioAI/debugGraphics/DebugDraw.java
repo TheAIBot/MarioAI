@@ -55,9 +55,26 @@ public class DebugDraw {
 			}
 		}
 
-		((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.RED, pathLines));
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.DARK_GRAY, pathCirclesPolynomial));
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.RED, pathCirclesRunning));
+		addDebugDrawing(observation, new DebugLines(Color.RED, pathLines));
+		addDebugDrawing(observation, new DebugPoints(Color.DARK_GRAY, pathCirclesPolynomial));
+		addDebugDrawing(observation, new DebugPoints(Color.RED, pathCirclesRunning));
+	}
+	
+	public static void drawPathEdgeTypes(final Environment observation, final List<DirectedEdge> path) {
+		final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
+		final Point2D.Float topStringPosition = new Point2D.Float((marioXPos + 7), 1f);
+		final float distanceBetweenStrings = 0.4f;
+		
+		for (DirectedEdge directedEdge : path) {
+			Point2D.Float stringPos = new Point2D.Float(topStringPosition.x, topStringPosition.y);
+			convertLevelPointToOnScreenPoint(observation, stringPos);
+			Point correctedPos = new Point((int)stringPos.x, (int)stringPos.y);
+			
+			String typeName = (directedEdge instanceof Running) ? "Running" : "Jumping";
+			addDebugDrawing(observation, new DebugString(typeName, correctedPos));
+			
+			topStringPosition.y += distanceBetweenStrings;
+		}
 	}
 
 	public static void drawBlockBeneathMarioNeighbors(final Environment observation, Graph graph) {
@@ -81,7 +98,7 @@ public class DebugDraw {
 					neighbors.add(neighborPoint);
 				}
 
-				((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, neighbors));
+				addDebugDrawing(observation, new DebugPoints(Color.BLACK, neighbors));
 			}
 		}
 	}
@@ -113,8 +130,8 @@ public class DebugDraw {
 				allJumpingEdges.add(p);
 			}
 		}
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLACK, allrunningEdges, 12));
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.WHITE, allJumpingEdges, 6));
+		addDebugDrawing(observation, new DebugPoints(Color.BLACK, allrunningEdges, 12));
+		addDebugDrawing(observation, new DebugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
 
 	public static void drawNeighborPaths(final Environment observation, Graph graph) {
@@ -137,10 +154,10 @@ public class DebugDraw {
 					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
 					convertLevelPointToOnScreenPoint(observation, pTarget);
 					if (pSource.y >= pTarget.y) {
-						((MarioComponent)observation).addDebugDrawing(new DebugLines(Color.GREEN, pSource,pTarget));
+						addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource,pTarget));
 					}
 					else {
-						((MarioComponent)observation).addDebugDrawing(new DebugLines(Color.ORANGE, pSource,pTarget));
+						addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource,pTarget));
 					}
 				}		
 			}
@@ -160,15 +177,9 @@ public class DebugDraw {
 			convertLevelPointToOnScreenPoint(observation, p);
 			allEndPoints.add(p);
 		}
-		((MarioComponent) observation).addDebugDrawing(new DebugPoints(Color.BLUE, allEndPoints, 12));
+		addDebugDrawing(observation, new DebugPoints(Color.BLUE, allEndPoints, 12));
 	}
 
-	/**
-	 * Draw reachable nodes from Mario's current position
-	 * 
-	 * @param observation
-	 * @param graph
-	 */
 	public static void drawReachableNodes(final Environment observation, Graph graph) {
 		Node mario = graph.getMarioNode(observation);
 		List<DirectedEdge> edges = mario.getEdges();
@@ -182,9 +193,9 @@ public class DebugDraw {
 				Point pTarget = new Point(directedEdge.target.x, directedEdge.target.y);
 				convertLevelPointToOnScreenPoint(observation, pTarget);
 				if (pSource.y >= pTarget.y) {
-					((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.GREEN, pSource, pTarget));
+					addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource, pTarget));
 				} else {
-					((MarioComponent) observation).addDebugDrawing(new DebugLines(Color.ORANGE, pSource, pTarget));
+					addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource, pTarget));
 				}
 			}
 		}
@@ -224,9 +235,8 @@ public class DebugDraw {
 				startsRed.add(keyPosition);
 				sizesRed.add(size);
 			}
-			
-			((MarioComponent) observation).addDebugDrawing(new DebugSquare(Color.GREEN, startsGreen, sizesGreen));
-			((MarioComponent) observation).addDebugDrawing(new DebugSquare(Color.RED, startsRed, sizesRed));
+			addDebugDrawing(observation, new DebugSquare(Color.GREEN, startsGreen, sizesGreen));
+			addDebugDrawing(observation, new DebugSquare(Color.RED, startsRed, sizesRed));
 		}
 	}
 
@@ -244,4 +254,7 @@ public class DebugDraw {
 		point.y = (((marioYPos * BLOCK_PIXEL_SIZE) + ((point.y - marioYPos) * BLOCK_PIXEL_SIZE)) - (BLOCK_PIXEL_SIZE / 2)) * Art.SIZE_MULTIPLIER;
 	}
 
+	private static void addDebugDrawing(Environment observation, DebugDrawing drawing){
+		((MarioComponent) observation).addDebugDrawing(drawing);
+	}
 }
