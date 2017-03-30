@@ -170,25 +170,24 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testJumps() {
-		testJumpTime(0);
-		testJumpTime(0.1f);
-		testJumpTime(0.2f);
-		testJumpTime(0.5f);
-		testJumpTime(1);
-		testJumpTime(1.5f);
-		testJumpTime(1.645f);
-		testJumpTime(3.4f);
-		testJumpTime(4);
-		testJumpTime(5.6f);
+		for (int i = -4; i <= 6; i++) {
+			testJumpTime(1, i);
+			testJumpTime(1.5f, i);
+			testJumpTime(1.645f, i);
+			testJumpTime(3.4f, i);
+			testJumpTime(4, i);
+			testJumpTime(5.6f, i);
+		}	
 	}
-
-	private void testJumpTime(float jumpHeight) {
+	private void testJumpTime(float jumpHeight, int heightDifference) {
 		final UnitTestAgent agent = new UnitTestAgent();		
-		Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		String levelPath = "jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl";
+		Environment observation = TestTools.loadLevel(levelPath, agent, true);
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		boolean upTime = true;
 		int expectedJumpTime = 0;
+		agent.action[Mario.KEY_RIGHT] = true;
 		while (true) {
 			final float currentMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			if (startMarioYPos - jumpHeight < currentMarioYPos && upTime) {
@@ -206,12 +205,16 @@ public class TestMarioMovements {
 			
 			expectedJumpTime++;
 		}
-		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos).value;
+		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		
+		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, endMarioYPos, startMarioYPos).value;
 		if (receivedJumpTime != expectedJumpTime) {
 			Assert.fail("Expected jump time wasn't the same as the received one." + 
 						"\nExpected: " + expectedJumpTime + 
 						"\nReceived: " + receivedJumpTime + 
-						"\nJump height: " + jumpHeight);
+						"\nJump height: " + jumpHeight + 
+						"\npath: " + levelPath);
 		}
 	}
 	

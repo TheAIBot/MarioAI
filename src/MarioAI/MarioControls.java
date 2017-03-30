@@ -144,11 +144,11 @@ public class MarioControls {
 		final Pair<Integer, Integer> jumpInfo = getJumpTime(edge, startY);
 		final int ticksHoldingUp = jumpInfo.key;
 		final int totalTicksJumped = jumpInfo.value;
-		return getMovementInformationFromEdge(startX, startY, endNode, edge, speed, ticksHoldingUp, totalTicksJumped);
+		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, ticksHoldingUp, totalTicksJumped);
 	}
 	
-	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int ticksHoldingUp, int totalTicksJumped) {
-		final XMovementInformation xMovementInfo = getXMovementTime((float)endNode.x - startX, speed, totalTicksJumped);
+	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, int ticksHoldingUp, int totalTicksJumped) {
+		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, totalTicksJumped);
 		return new MovementInformation(xMovementInfo, ticksHoldingUp, totalTicksJumped);
 	}
 	
