@@ -90,7 +90,7 @@ public final class AStar {
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
-				if (!MarioControls.canMarioUseEdge(neighborEdge, current.vx)) {
+				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
 					continue;
 				}
 				

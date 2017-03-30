@@ -95,4 +95,9 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		// TODO Auto-generated method stub
 		return v0;
 	}
+
+	public void setTopPoint(float x, float y) {
+		topPointX = x;
+		topPointY = y;
+	}
 }

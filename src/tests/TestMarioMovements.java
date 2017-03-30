@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
+import MarioAI.MovementInformation;
+import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -170,19 +173,33 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testJumps() {
-		for (int i = -4; i <= 6; i++) {
+		for (int i = 6; i >= 0; i--) {
 			testJumpTime(1, i);
 			testJumpTime(1.5f, i);
 			testJumpTime(1.645f, i);
 			testJumpTime(3.4f, i);
 			testJumpTime(4, i);
 			testJumpTime(5.6f, i);
-		}	
+		}
+		
+		testJumpTime(1.5f, -1);
+		testJumpTime(3.4f, -1);
+		testJumpTime(5.6f, -1);
+		
+		testJumpTime(3.4f, -2);
+		testJumpTime(5.6f, -2);
+		
+		testJumpTime(3.4f, -3);
+		testJumpTime(5.6f, -3);
+		
+		testJumpTime(4.0f, -4);
+		testJumpTime(5.6f, -4);
 	}
 	private void testJumpTime(float jumpHeight, int heightDifference) {
 		final UnitTestAgent agent = new UnitTestAgent();		
 		String levelPath = "jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl";
-		Environment observation = TestTools.loadLevel(levelPath, agent, true);
+		Environment observation = TestTools.loadLevel(levelPath, agent, false);
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		boolean upTime = true;
@@ -198,17 +215,23 @@ public class TestMarioMovements {
 				upTime = false;
 			}
 			TestTools.runOneTick(observation);
+			expectedJumpTime++;
 			
 			if (observation.isMarioOnGround()) {
 				break;
 			}
-			
-			expectedJumpTime++;
 		}
+		final float endMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
+		final Node startNode = new Node((short)startMarioXPos, (short)Math.round(startMarioYPos), (byte)0);
+		final Node endNode   = new Node((short)endMarioXPos  , (short)Math.round(endMarioYPos)  , (byte)0);
+		SecondOrderPolynomial edge = new SecondOrderPolynomial(startNode, endNode);
 		
-		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, endMarioYPos, startMarioYPos).value;
+		edge.setTopPoint(0, Math.round(startMarioYPos) + jumpHeight);
+		MovementInformation moveInfo = MarioControls.getStepsAndSpeedAfterJump(edge, 0);
+		
+		final int receivedJumpTime = moveInfo.getTotalTicksJumped();
 		if (receivedJumpTime != expectedJumpTime) {
 			Assert.fail("Expected jump time wasn't the same as the received one." + 
 						"\nExpected: " + expectedJumpTime + 

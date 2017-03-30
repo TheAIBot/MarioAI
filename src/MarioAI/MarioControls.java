@@ -50,7 +50,6 @@ public class MarioControls {
 			action[Mario.KEY_JUMP] = true;
 		}
 		jumpTime--;
-		//System.out.println(jumpTime);
 		
 	
 		if (moveInfo.getXMovementTime() > 0) {
@@ -78,7 +77,7 @@ public class MarioControls {
 	public static Pair<Integer, Integer> getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final float jumpHeight = targetJumpHeight;
-			final float fallTo = targetYPos - Math.round(marioYPos);
+			final float fallTo = Math.round(marioYPos) - targetYPos;
 			
 			//numbers are taken from mario class in the game
 			final float yJumpSpeed = 1.9f;
@@ -90,6 +89,7 @@ public class MarioControls {
 			
 			//calculate ticks for jumping up to desired height
 			for (int i = 0; i < MAX_JUMP_TIME; i++) {
+				//math derived from mario code
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				jumpTime--;
@@ -103,6 +103,7 @@ public class MarioControls {
 			if (currentJumpHeight > fallTo) {
 				
 				while (currentJumpHeight > fallTo) {
+					//math derived from mario code
 					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
 					currentJumpHeight += prevYDelta;
 					if (currentJumpHeight <= fallTo) {
@@ -111,29 +112,30 @@ public class MarioControls {
 					totalTicksJumped++;
 				}	
 			}
-			
+			totalTicksJumped++;
 			return new Pair<Integer, Integer>(ticksHoldingJump, totalTicksJumped);
 		}
 		return new Pair<Integer, Integer>(0, 0);
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float speed) {
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed) {
 		if (edge instanceof Running) {
 			return true;
 		}
-		float distanceToMove = edge.target.x - edge.source.x;
+		final float distanceToMove = edge.target.x - edge.source.x;
 		if (!((distanceToMove < 0 && speed < 0) ||
 			(distanceToMove > 0 && speed > 0))) {
 			return false;
 		}
-		int ticksJumping = getJumpTime(edge, edge.source.y).value;
+		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
 		float distanceMoved = 0;
 		speed = Math.abs(speed);
 		for (int i = 0; i < ticksJumping; i++) {
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
 		}
-		return (distanceMoved >= Math.abs(edge.target.x - edge.source.x));
+		//+ 0.5f to make it the center of the block instead of the edge
+		return (distanceMoved >= Math.abs(currentXPos - (edge.source.x)));
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
