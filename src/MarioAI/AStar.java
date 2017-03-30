@@ -90,6 +90,9 @@ public final class AStar {
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+				//make sure the edge is possible to use
+				//all Running edges are possible
+				//not all jumps are possible
 				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
 					continue;
 				}
@@ -98,15 +101,25 @@ public final class AStar {
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
 
+				//a similar enough node has already been run through
+				//no need to add this one at that point
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
 				}
+				
 				// Distance from start to neighbor of current node
 				final float tentativeGScore = current.gScore + movementInformation.getMoveTime();
+				
+				//is a similar enough node exists and that has a better g score
+				//then there is no need to add this edge as it's worse than the
+				//current one
 				if (openSetMap.containsKey(sn.hashCode()) &&
 					tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
 					continue;
 				}
+				
+				//update the edges position in the priority queue
+				//by updating the scores and taking it in and out of the queue.
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
 				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
