@@ -198,12 +198,8 @@ public class TestGrapher {
 			if (i == 0) continue;
 			boolean hasJumpedAgainstWall = false;
 			addWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
-<<<<<<< HEAD
-			Grapher.setMovementEdges(world, marioNode);
-=======
 			//Grapher.clearAllEdges(world);
 			//Grapher.setMovementEdges(world, marioNode);
->>>>>>> refs/remotes/origin/GraphingOfJustice
 			List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
 			Grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);
 			for (DirectedEdge edge : newEdges) {
