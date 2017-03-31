@@ -85,3 +85,4 @@ bin/ch/idsia/scenarios/Play.class
 bin/ch/idsia/scenarios/Play.class
 *.class
 *.class
+bin/MarioAI/graph/Grapher.class
