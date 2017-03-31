@@ -14,8 +14,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	// possible to reach,
 	// even though it is only one it should be possible to reach. Mario changing
 	// position in the air can compensate for this.
-	private short ceiledTopPointX;
-	private short ceiledTopPointY; // Ceildes coordinates of the toppunkt
+	private int ceiledTopPointX;
+	private int ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	
 	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
 		super(source, target);
@@ -36,14 +36,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	//
-	public void setToJumpPolynomial(Node startingPosition, short nodeColoumn, float jumpRange, float jumpHeight) {
+	public void setToJumpPolynomial(Node startingPosition, int nodeColoumn, float jumpRange, float jumpHeight) {
 		a = -4 * jumpHeight / (jumpRange * jumpRange);
 		b = (8 * nodeColoumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);
 		c = (-4 * nodeColoumn * (nodeColoumn + jumpRange) * jumpHeight + startingPosition.y * jumpRange * jumpRange) / (jumpRange * jumpRange);
 		setTopPoint();
 	}
 
-	public boolean isPastTopPoint(short startPosition, short currentPosition) {
+	public boolean isPastTopPoint(int startPosition, int currentPosition) {
 		return (startPosition <= topPointX && topPointX <= currentPosition || startPosition >= topPointX && topPointX >= currentPosition);
 	}
 
