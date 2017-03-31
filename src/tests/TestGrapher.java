@@ -194,11 +194,16 @@ public class TestGrapher {
 		Node[][] world = graph.getLevelMatrix();
 		//adding the walls:
 		final int WALL_HEIGHT = 4;
-		for (short i = -1; i <= 3; i++) {
+		for (short i = -3; i <= 3; i++) {
 			if (i == 0) continue;
 			boolean hasJumpedAgainstWall = false;
 			addWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
+<<<<<<< HEAD
 			Grapher.setMovementEdges(world, marioNode);
+=======
+			//Grapher.clearAllEdges(world);
+			//Grapher.setMovementEdges(world, marioNode);
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 			List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
 			Grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);
 			for (DirectedEdge edge : newEdges) {

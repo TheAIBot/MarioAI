@@ -157,7 +157,7 @@ public  class Grapher {
 		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
 		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (int jumpHeight = 3; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = 4; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (float jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT, listOfEdges); //TODO ERROR if removed on shortdeadend
@@ -201,9 +201,10 @@ public  class Grapher {
 			collisionDetection = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
 													 polynomial, currentJumpDirection, startingNode, listOfEdges);	
 			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition--;
-				xPositionOffsetForJump++;
-			} else if (collisionDetection == Collision.HIT_GROUND || collisionDetection == Collision.HIT_CEILING) {
+				currentXPosition = (short)( currentXPosition + ((direction.isLeftType())?1:-1));
+				xPositionOffsetForJump = (short)( xPositionOffsetForJump + ((direction.isLeftType())?-1:1));
+			} else if (collisionDetection == Collision.HIT_GROUND || 
+					   collisionDetection == Collision.HIT_CEILING) {
 				hasMetHardGround = true;
 			}
 			formerYPosition = currentYPosition;
@@ -232,8 +233,8 @@ public  class Grapher {
 			collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
 					 								  polynomial, currentJumpDirection, startingNode, listOfEdges);				
 			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition--;
-				xPositionOffsetForJump++;
+				currentXPosition = (short)( currentXPosition + ((direction.isLeftType())?1:-1));
+				xPositionOffsetForJump = (short)( xPositionOffsetForJump + ((direction.isLeftType())?-1:1));
 			} else if (collisionDetection == Collision.HIT_GROUND) {
 				hasMetHardGround = true;
 			}
@@ -427,16 +428,10 @@ public  class Grapher {
 			//In the case one is going upwards, one should not check for any other type of collisions, 
 			//than those originating from wall collisions.
 			if (isHittingWallOrGroundUpwards(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
-				/*
-				if(isAir(currentXPosition, (short)(y-MarioHeight)) && collisionDetection == Collision.HIT_WALL) {
-					return Collision.HIT_GROUND;
-				}
-				*/
-				//TODO there might be an error above, if one moves to the right, 
-				//so that one ends in a position that can be confused with hitting a wall.
 				return Collision.HIT_WALL;
 			} else {
-				if (isAir(currentXPosition, (short)(y-MarioHeight)) && collisionDetection == Collision.HIT_WALL) {
+				if (isAir(currentXPosition, (short)(y-MarioHeight)) && 
+					collisionDetection == Collision.HIT_WALL) {
 					return Collision.HIT_GROUND;
 				} else return Collision.HIT_NOTHING;			
 			}
@@ -487,15 +482,13 @@ public  class Grapher {
 	private static Collision upperOppositeCornerCollision(boolean isHittingWall, short y, short formerLowerYPosition, 
 													  	  short currentXPosition, Collision collisionDetection, JumpDirection direction) {
 		if (direction.isLeftType()) {
-			//Plus one to the current x position if one is going left, 
-			//as currentXPosition gives the column of the rightmost corner,
-			//and this is taken into account later in the code, by subtracting it by 1.
+			//TODO describe why:
 			currentXPosition++;
-		}
+		} else currentXPosition--;
 		if (direction.isUpwardsType()) {
 			//If Mario is going upwards, and since this is the opposite corner of the way he is going, 
 			//one only needs to check for ceiling collisions.
-			if (isHittingWallOrGroundUpwards((short)(currentXPosition-1),(short)(y-1))) {
+			if (isHittingWallOrGroundUpwards((short)(currentXPosition),(short)(y-1))) {
 				return Collision.HIT_CEILING;
 			} else {
 				return Collision.HIT_NOTHING;
@@ -510,17 +503,16 @@ public  class Grapher {
 		  	  short currentXPosition, Collision collisionDetection, JumpDirection direction) {
 		
 		if (direction.isLeftType()) {
-			//Plus one to the current x position if one is going left, 
-			//as currentXPosition gives the column of the rightmost corner,
-			//and this is taken into account later in the code, by subtracting it by 1.
+			//TODO explain why ++ or --
 			currentXPosition++;
-		}if (direction.isUpwardsType()) {
+		} else currentXPosition--; 
+		if (direction.isUpwardsType()) {
 			//This should never be called when Mario is going upwards, as it won't affect anything.
-			return Collision.HIT_NOTHING;
+			throw new Error("ERROR: lowerOppositeCornerCollision shouldnt be called when mario is going upwards");
 		} else {
 			//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
-			if (isHittingWallOrGroundDownwards((short)(currentXPosition - 1), y)) {
-				if (canMarioStandThere((short)(currentXPosition - 1), y)) {
+			if (isHittingWallOrGroundDownwards((short)(currentXPosition), y)) {
+				if (canMarioStandThere((short)(currentXPosition), y)) {
 					return Collision.HIT_GROUND;
 				} else {
 					return null;
