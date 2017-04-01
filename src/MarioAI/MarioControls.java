@@ -20,6 +20,7 @@ public class MarioControls {
 		
 	private static float oldX = 0;
 	private static int jumpTime = 0;
+	private static int holdJumpTime = 0;
 	private static float currentXSpeed = 0;
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
@@ -41,13 +42,22 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		final MovementInformation moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		MovementInformation moveInfo;
+		if (jumpTime <= 0) {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		}
+		else {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target.x, currentXSpeed, holdJumpTime, jumpTime);
+		}
+		
 
 		if (jumpTime < 0 && observation.isMarioOnGround()) {
-			jumpTime = moveInfo.getTicksHoldingJump();
+			jumpTime = moveInfo.getTotalTicksJumped();
+			holdJumpTime = moveInfo.getTicksHoldingJump();
 		}
-		else if (jumpTime > 0) {
+		if (holdJumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
+			holdJumpTime--;
 		}
 		jumpTime--;
 		
