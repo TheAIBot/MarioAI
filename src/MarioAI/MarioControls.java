@@ -17,11 +17,19 @@ public class MarioControls {
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.35f;
+	private static final float MARIO_START_X_POS = 2f;
 		
-	private static float oldX = 0;
+	private static float oldX = MARIO_START_X_POS;
 	private static int jumpTime = 0;
 	private static int holdJumpTime = 0;
 	private static float currentXSpeed = 0;
+	
+	public static void reset() {
+		oldX = MARIO_START_X_POS;
+		jumpTime = 0;
+		holdJumpTime = 0;
+		currentXSpeed = 0;
+	}
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());

@@ -31,6 +31,8 @@ public interface Simulation
 //    public MarioComponent getMarioComponent();
     
     public MarioComponent setLevel(Level level);
+    
+    public MarioComponent setRandomLevel();
 
     public EvaluationInfo simulateOneLevel();
 }

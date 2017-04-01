@@ -28,6 +28,7 @@ public class FastAndFurious implements Agent {
 	private static final boolean DEBUG = true;
 
 	public void reset() {
+		MarioControls.reset();
 	}
 
 	public boolean[] getAction(Environment observation) {

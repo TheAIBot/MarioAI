@@ -30,6 +30,13 @@ public class ProgressTask implements Task {
       Evaluator evaluator = new Evaluator(options);
       return evaluator.loadLevel(level, controller);
     }
+    
+    public MarioComponent setRandomLevel(Agent controller)
+    {
+      options.setAgent(controller);
+      Evaluator evaluator = new Evaluator(options);
+      return evaluator.setRandomLevel(controller);
+    }
 
     public double[] evaluate(Agent controller) {
         double distanceTravelled = 0;
