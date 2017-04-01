@@ -32,17 +32,17 @@ public class Play {
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
 	        Task task = new ProgressTask(options);
-	        options.setMaxFPS(false);
+	        options.setMaxFPS(true);
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
-	        options.setLevelRandSeed(650);
+	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);
