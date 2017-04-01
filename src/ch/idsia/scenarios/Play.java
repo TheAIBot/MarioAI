@@ -19,12 +19,12 @@ import tests.TestTools;
 public class Play {
 
     public static void main(String[] args) {
-        boolean loadLevel = true;
+        boolean loadLevel = false;
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
-            //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
-            Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
+            //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

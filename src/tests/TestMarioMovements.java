@@ -204,11 +204,13 @@ public class TestMarioMovements {
 		
 		boolean upTime = true;
 		int expectedJumpTime = 0;
+		int expectedTicksHeldUp = 0;
 		agent.action[Mario.KEY_RIGHT] = true;
 		while (true) {
 			final float currentMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			if (startMarioYPos - jumpHeight < currentMarioYPos && upTime) {
 				agent.action[Mario.KEY_JUMP] = true;
+				expectedTicksHeldUp++;
 			}
 			else {
 				agent.action[Mario.KEY_JUMP] = false;
@@ -221,6 +223,9 @@ public class TestMarioMovements {
 				break;
 			}
 		}
+		//can't hold jump for more than 8 ticks
+		expectedTicksHeldUp = Math.min(expectedTicksHeldUp, 8);
+		
 		final float endMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
@@ -232,10 +237,14 @@ public class TestMarioMovements {
 		MovementInformation moveInfo = MarioControls.getStepsAndSpeedAfterJump(edge, 0);
 		
 		final int receivedJumpTime = moveInfo.getTotalTicksJumped();
-		if (receivedJumpTime != expectedJumpTime) {
+		final int receivedHoldJump = moveInfo.getTicksHoldingJump();
+		if (receivedJumpTime != expectedJumpTime ||
+			receivedHoldJump != expectedTicksHeldUp) {
 			Assert.fail("Expected jump time wasn't the same as the received one." + 
-						"\nExpected: " + expectedJumpTime + 
-						"\nReceived: " + receivedJumpTime + 
+						"\nExpected jump time: " + expectedJumpTime + 
+						"\nReceived jump time: " + receivedJumpTime + 
+						"\nExpected hold jump: " + expectedTicksHeldUp + 
+						"\nReceived hold jump: " + receivedHoldJump + 
 						"\nJump height: " + jumpHeight + 
 						"\npath: " + levelPath);
 		}
