@@ -27,8 +27,8 @@ public class MarioControls {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
+		final DirectedEdge next = path.get(0);
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
 			path.remove(0);
 			return true;
 		}
@@ -145,7 +145,7 @@ public class MarioControls {
 			distanceMoved += speed;
 		}
 		//+ 0.5f to make it the center of the block instead of the edge
-		return (distanceMoved >= Math.abs(currentXPos - (edge.source.x)));
+		return (distanceMoved >= Math.abs(distanceToMove));
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {

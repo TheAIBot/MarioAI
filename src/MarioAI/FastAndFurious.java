@@ -64,9 +64,7 @@ public class FastAndFurious implements Agent {
 					newestPath = path;
 				}
 			}
-			if (newestPath.size() > 0) {
-				MarioControls.getNextAction(observation, newestPath, action);				
-			}
+			MarioControls.getNextAction(observation, newestPath, action);
 
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
