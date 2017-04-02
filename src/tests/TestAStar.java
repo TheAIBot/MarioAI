@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import MarioAI.AStar;
 import MarioAI.FastAndFurious;
+import MarioAI.astar.AStar;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;

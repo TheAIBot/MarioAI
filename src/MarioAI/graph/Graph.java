@@ -6,11 +6,15 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.Surface;
+import MarioAI.astar.Action;
+import MarioAI.astar.Problem;
+import MarioAI.astar.SearchNode;
+import MarioAI.astar.State;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
-import MarioAI.graph.Grapher;
 
-public class Graph {
+public class Graph extends Problem {
+	
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
@@ -199,5 +203,37 @@ public class Graph {
 	
 	public int getMaxMarioXPos() {
 		return maxMarioXPos;
+	}
+	
+	// --- NEW METHODS ---
+
+	@Override
+	public List<Action> actions(State state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SearchNode childNode(SearchNode node, Action action) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double pathCost(SearchNode n1, SearchNode n2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double heuristicFunction(SearchNode node, SearchNode goal) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean goalTest(State goal) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

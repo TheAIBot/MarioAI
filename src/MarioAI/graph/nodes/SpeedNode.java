@@ -1,10 +1,14 @@
 package MarioAI.graph.nodes;
 
+import java.util.List;
+
 import MarioAI.Hasher;
+import MarioAI.astar.Action;
+import MarioAI.astar.State;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 
-public class SpeedNode implements Comparable<SpeedNode> {
+public class SpeedNode implements Comparable<SpeedNode>, State {
 	public final float SCORE_MULTIPLIER = 128;
 	
 	public final Node node;
@@ -47,6 +51,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public int compareTo(SpeedNode o) {
 		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
+	}
+
+	public List<Action> getPossibleActions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.astar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import MarioAI.MarioControls;
+import MarioAI.MovementInformation;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+import main.Action;
+import main.SearchNode;
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
@@ -61,26 +65,29 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal) {
+	public static List<DirectedEdge> runAStar(Problem problem) {
 		// Set of nodes already explored
 		final Map<Integer, SpeedNode> closedSetMap = new HashMap<Integer, SpeedNode>();
 		// Set of nodes yet to be explored
 		final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 		final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+		
+		SearchNode start = new SearchNode(problem.initialState);
+		SearchNode goal = new SearchNode(problem.goalState);
 
 		// Initialization
 		openSet.add(start);
 		openSetMap.put(start.hashCode(), start);
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
-		start.fScore = heuristicFunction(start, goal);
+		start.fScore = problem.heuristicFunction(start, goal);
 
 		while (!openSet.isEmpty()) {
-			final SpeedNode current = openSet.remove();
+			final SearchNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
 						
 			// If goal is reached return solution path
-			if (current.node.equals(goal.node)) {
+			if (problem.goalTest(current.state)) {
 				return reconstructPath(current);
 			}
 
@@ -89,7 +96,8 @@ public final class AStar {
 			System.out.println(openSet.size());
 			
 			// Explore each neighbor of current node
-			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+			for (Action action : problem.actions(node.state)) {
+				SearchNode child = problem.childNode(node, action);
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
@@ -98,14 +106,14 @@ public final class AStar {
 					continue;
 				}
 				// Distance from start to neighbor of current node
-				final float tentativeGScore = current.gScore + movementInformation.getMoveTime();
+				final float tentativeGScore = current.gScore + problem.pathCost(node, child); //movementInformation.getMoveTime();
 				if (openSetMap.containsKey(sn.hashCode()) &&
 					tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
 					continue;
 				}
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+				sn.fScore = sn.gScore + problem.heuristicFunction(child sn, goal) + neighborEdge.getWeight();
 				openSet.add(sn);
 				openSetMap.put(sn.hashCode(), sn);
 			}
@@ -119,12 +127,12 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		//if (current.vx == 0) return 1000000f;
-		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
-		//return timeToReachNode(goal, current);
-	}
+//	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
+//		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
+//		//if (current.vx == 0) return 1000000f;
+//		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
+//		//return timeToReachNode(goal, current);
+//	}
 
 	/**
 	 * @param current
@@ -153,20 +161,20 @@ public final class AStar {
 	 * @param n2
 	 * @return time to reach n2 from n1
 	 */
-	public static float timeToReachNode(SpeedNode n1, SpeedNode n2) {
-		float v0 = n1.vx;
-		if (v0 < 0) v0 = 0;
-		
-		float dist = Math.abs(n2.node.x - n1.node.x); //guard - should only be able to be positive in the first place
-		float d0 = Math.min(dist,5); //float d0 = dist <= 5 ? dist : 5f;
-		
-		float timeToReachDistanceUnder5Blocks = (float) (0.4734168362e1 - 0.2033398373e2 * v0 + 0.3650816449e1 * d0 - 0.1899556093e0 * Math.pow(d0 - 0.2e1, 0.2e1)
-				- 0.2561502720e1 * (d0 - 0.2e1) * (v0 - 0.15e0) + 0.2015956084e2 * Math.pow(v0 - 0.15e0, 0.2e1)
-				+ 0.4670562450e-1 * Math.pow(d0 - 0.2e1, 0.3e1) + 0.9447200685e0 * Math.pow(d0 - 0.2e1, 0.2e1) * (v0 - 0.15e0)
-				- 0.8877386747e1 * (d0 - 0.2e1) * Math.pow(v0 - 0.15e0, 0.2e1) + 0.1206780712e2 * Math.pow(v0 - 0.15e0, 0.3e1));
-		
-		if (dist <= 5) return timeToReachDistanceUnder5Blocks;
-		return timeToReachDistanceUnder5Blocks + (dist - 5f) / MarioControls.getMaxV(); 
-	}
+//	public static float timeToReachNode(SpeedNode n1, SpeedNode n2) {
+//		float v0 = n1.vx;
+//		if (v0 < 0) v0 = 0;
+//		
+//		float dist = Math.abs(n2.node.x - n1.node.x); //guard - should only be able to be positive in the first place
+//		float d0 = Math.min(dist,5); //float d0 = dist <= 5 ? dist : 5f;
+//		
+//		float timeToReachDistanceUnder5Blocks = (float) (0.4734168362e1 - 0.2033398373e2 * v0 + 0.3650816449e1 * d0 - 0.1899556093e0 * Math.pow(d0 - 0.2e1, 0.2e1)
+//				- 0.2561502720e1 * (d0 - 0.2e1) * (v0 - 0.15e0) + 0.2015956084e2 * Math.pow(v0 - 0.15e0, 0.2e1)
+//				+ 0.4670562450e-1 * Math.pow(d0 - 0.2e1, 0.3e1) + 0.9447200685e0 * Math.pow(d0 - 0.2e1, 0.2e1) * (v0 - 0.15e0)
+//				- 0.8877386747e1 * (d0 - 0.2e1) * Math.pow(v0 - 0.15e0, 0.2e1) + 0.1206780712e2 * Math.pow(v0 - 0.15e0, 0.3e1));
+//		
+//		if (dist <= 5) return timeToReachDistanceUnder5Blocks;
+//		return timeToReachDistanceUnder5Blocks + (dist - 5f) / MarioControls.getMaxV(); 
+//	}
 
 }

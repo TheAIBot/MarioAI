@@ -1,9 +1,10 @@
 package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
+import MarioAI.astar.Action;
 import MarioAI.graph.nodes.Node;
 
-public abstract class DirectedEdge {
+public abstract class DirectedEdge implements Action {
 	public Node source; 
 	public Node target;
 	private int hash;

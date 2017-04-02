@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.astar.AStar;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.graph.Graph;
 import MarioAI.graph.GraphMath;
