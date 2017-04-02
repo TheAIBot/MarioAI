@@ -60,7 +60,7 @@ public class testMassLevels {
 				Files.createFile(filePath);
 			}
 			
-			final String toAppend = wins + ", " + losses + ", " + crashes;
+			final String toAppend = wins + ", " + losses + ", " + crashes + "\n";
 		    Files.write(filePath, toAppend.getBytes(), StandardOpenOption.APPEND);
 		}catch (IOException e) {
 			
