@@ -1,5 +1,11 @@
 package tests;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,6 +51,19 @@ public class testMassLevels {
 				losses++;
 			}
 			System.out.println(i);
+		}
+		
+		try {
+			final Path filePath = Paths.get("MassLevelsResults.txt");
+			
+			if (!Files.exists(filePath)) {
+				Files.createFile(filePath);
+			}
+			
+			final String toAppend = wins + ", " + losses + ", " + crashes;
+		    Files.write(filePath, toAppend.getBytes(), StandardOpenOption.APPEND);
+		}catch (IOException e) {
+			
 		}
 		
 		if (losses != 0) {
