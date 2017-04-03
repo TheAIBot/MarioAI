@@ -1,13 +1,15 @@
 package tests;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
-import MarioAI.Graph;
 import MarioAI.MarioMethods;
-import MarioAI.Node;
-
+import MarioAI.graph.Graph;
+import MarioAI.graph.nodes.Node;
+import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
+import ch.idsia.ai.agents.ai.ForwardAgent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphTests {
@@ -16,9 +18,8 @@ public class GraphTests {
 	public void testLevelMatrixCreation()
 	{
 		BasicAIAgent agent = new BasicAIAgent("");
-		Environment observation = TestTools.loadLevel("src/tests/testLevels/flat.lvl", agent);
+		Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		TestTools.runOneTick(observation);
 		Graph graph = new Graph();
 		graph.createStartGraph(observation);
 		
@@ -30,11 +31,33 @@ public class GraphTests {
 			Assert.fail("Maps were not the same");
 		}
 	}
+	/*
+	@Test
+	public void testLevelMatrixMovement()
+	{
+		Agent agent = new ForwardAgent();
+		Environment observation = TestTools.loadLevel("src/tests/testLevels/testGraphMovement.lvl", agent);
+		
+		do {
+			TestTools.runOneTick(observation);
+			Graph graph = new Graph();
+			graph.createStartGraph(observation);
+			
+			final byte[][] levelMap = TestTools.getLevelMap(observation);
+			final Node[][] nodeMap = graph.getLevelMatrix();
+			final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+			final int nodeMapStartX = 11 - marioXPos;
+			if (!isLevelMapAndNodeMapTheSame(levelMap, Math.max(0, marioXPos - 11), nodeMap, nodeMapStartX)) {
+				Assert.fail("Maps were not the same");
+			}
+		} while (observation.getMarioMode() == Mario.STATUS_RUNNING);
+	}
+	*/
 	
 	private boolean isLevelMapAndNodeMapTheSame(final byte[][] levelMap, final int levelMapStartX, final Node[][] nodeMap, final int nodeMapStartX)
 	{
 		for (int x = 0; x < nodeMap.length - nodeMapStartX; x++) {
-			for (int y = 0; y < nodeMap[0].length; y++) {
+			for (int y = 0; y < nodeMap[0].length - levelMapStartX; y++) {
 				final byte levelByte = levelMap[x + levelMapStartX][y];
 				final Node nodeMapNode = nodeMap[x + nodeMapStartX][y];
 				

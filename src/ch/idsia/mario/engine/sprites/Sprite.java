@@ -1,5 +1,6 @@
 package ch.idsia.mario.engine.sprites;
 
+import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.level.SpriteTemplate;
 
@@ -66,7 +67,7 @@ public class Sprite
         int yPixel = (int)y-yPicO;
 
 
-        og.drawImage(sheet[xPic][yPic], xPixel+(xFlipPic?wPic:0), yPixel+(yFlipPic?hPic:0), xFlipPic?-wPic:wPic, yFlipPic?-hPic:hPic, null);
+        og.drawImage(sheet[xPic][yPic], (xPixel+(xFlipPic?wPic:0)) * Art.SIZE_MULTIPLIER, (yPixel+(yFlipPic?hPic:0)) * Art.SIZE_MULTIPLIER, (xFlipPic?-wPic:wPic) * Art.SIZE_MULTIPLIER, (yFlipPic?-hPic:hPic) * Art.SIZE_MULTIPLIER, null);
         if (GlobalOptions.Labels)
             og.drawString("" + xPixel + "," + yPixel, xPixel, yPixel);
     }
