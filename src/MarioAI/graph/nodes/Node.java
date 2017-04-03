@@ -2,8 +2,10 @@ package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import MarioAI.Hasher;
+import MarioAI.astar.Action;
 import MarioAI.graph.edges.DirectedEdge;
 
 /**
@@ -93,6 +95,11 @@ public class Node extends SuperNode {
 	@Override
 	public String toString() {
 		return "[" + x + " : " + y + "]";
+	}
+
+	public List<Action> getPossibleActions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

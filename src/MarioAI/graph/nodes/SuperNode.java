@@ -2,15 +2,14 @@ package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 
+import MarioAI.astar.State;
 import MarioAI.graph.edges.DirectedEdge;
 
 /**
  * Represents every possible type of node being valid input for the A* search algorithm
  */
-public abstract class SuperNode implements Comparable<SuperNode> {
+public abstract class SuperNode implements Comparable<SuperNode>, State {
 	//public HashMap<Integer, Node> neighborMap = new HashMap<Integer,Node>();
 	//public ArrayList<Node> neighbors = new ArrayList<Node>(); // previously called edges
 	

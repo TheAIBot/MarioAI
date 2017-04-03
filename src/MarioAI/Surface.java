@@ -2,6 +2,7 @@ package MarioAI;
 
 import java.util.*;
 
+import MarioAI.astar.Action;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SuperNode;
@@ -75,6 +76,11 @@ public class Surface extends SuperNode {
 
 	@Override
 	public ArrayList<DirectedEdge> getEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Action> getPossibleActions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
