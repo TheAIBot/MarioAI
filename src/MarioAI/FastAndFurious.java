@@ -21,7 +21,7 @@ import ch.idsia.mario.environments.Environment;
  */
 public class FastAndFurious implements Agent {
 
-	private static final String name = "The painkiller";
+	private static final String name = "The Nightshade";
 	private final Graph graph = new Graph();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;

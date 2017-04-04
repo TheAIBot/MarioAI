@@ -40,9 +40,9 @@ public final class AStar {
 			}
 		}
 
-		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null, start.x), 
 										   new SpeedNode(goal, 0, null, null, goal.x));
+		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -96,8 +96,8 @@ public final class AStar {
 			System.out.println(openSet.size());
 			
 			// Explore each neighbor of current node
-			for (Action action : problem.actions(node.state)) {
-				SearchNode child = problem.childNode(node, action);
+			for (Action action : problem.actions(current.state)) {
+				SearchNode child = problem.childNode(current, action);
 				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
@@ -106,14 +106,14 @@ public final class AStar {
 					continue;
 				}
 				// Distance from start to neighbor of current node
-				final float tentativeGScore = current.gScore + problem.pathCost(node, child); //movementInformation.getMoveTime();
+				final float tentativeGScore = (float) (current.gScore + problem.pathCost(current, child)); //movementInformation.getMoveTime();
 				if (openSetMap.containsKey(sn.hashCode()) &&
 					tentativeGScore >= openSetMap.get(sn.hashCode()).gScore) {
 					continue;
 				}
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + problem.heuristicFunction(child sn, goal) + neighborEdge.getWeight();
+				sn.fScore = sn.gScore + problem.heuristicFunction(child, goal) + neighborEdge.getWeight(); //child substitued for sn
 				openSet.add(sn);
 				openSetMap.put(sn.hashCode(), sn);
 			}
