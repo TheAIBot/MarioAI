@@ -25,7 +25,8 @@ public class testMassLevels {
 		int crashes = 0;
 		
 		for (int i = 0; i < 1000; i++) {
-			Agent agent = new FastAndFurious();
+			FastAndFurious agent = new FastAndFurious();
+			agent.DEBUG = false;
 			Environment observation = TestTools.loadRandomLevel(agent);
 			
 			try {
@@ -38,6 +39,9 @@ public class testMassLevels {
 					}
 				}
 			} catch (Exception e) {
+				crashes++;
+				continue;
+			} catch (Error e) {
 				crashes++;
 				continue;
 			}
