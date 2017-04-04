@@ -16,7 +16,7 @@ public class MarioControls {
 	
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
-	private static final float MAX_X_VELOCITY = 0.35f;
+	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 2f;
 		
 	private static float oldX = MARIO_START_X_POS;
@@ -142,7 +142,7 @@ public class MarioControls {
 		}
 		final float distanceToMove = edge.target.x - edge.source.x;
 		if (!((distanceToMove < 0 && speed < 0) ||
-			(distanceToMove > 0 && speed > 0))) {
+			  (distanceToMove > 0 && speed > 0))) {
 			return false;
 		}
 		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
