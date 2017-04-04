@@ -173,72 +173,58 @@ public  class Grapher {
 		//Starts of from Mario's initial position:
 		int currentXPosition = nodeColoumn;
 		int xPositionOffsetForJump = 0;
-		
 		int formerLowerYPosition = startingNode.y;
-		
 		Collision collisionDetection = Collision.HIT_NOTHING;
 		//Gives the current direction of the jump:
 		JumpDirection currentJumpDirection = direction;
-		//Get upwards moving part:
-		//Primarily collision detection.
-		while ((collisionDetection != Collision.HIT_GROUND)&&
-				collisionDetection != Collision.HIT_CEILING &&
-			   !polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump) &&
-			   isWithinView(currentXPosition + xPositionOffsetForJump)) 
-		{
-			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();			
-			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			float currentYPosition;
-			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition + xPositionOffsetForJump)) { 
-				//Up to the max height of the polynomial!
-				currentYPosition = polynomial.getTopPointY(); 						
-			} else {//Else up to the current height of the polynomial.
-				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);				
+
+		
+		boolean hasAlreadyPassedTopPoint = false;
+		boolean isPastTopPoint = false;
+		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
+			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();	
+			
+			if (isPastTopPoint && !hasAlreadyPassedTopPoint) {
+				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
+					currentXPosition--; //The toppunkt was in the current block (and not ending there).
+					//Therefore the downward going part of that block needs to be checked.
+				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
+					currentXPosition++;
+				}
+				currentJumpDirection = direction.getOppositeVerticalDirection();
+				
+				hasAlreadyPassedTopPoint = true;
 			}
+			
+			float currentYPosition;
+			if (!isPastTopPoint) {
+				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump));
+			}
+			else {
+				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);	
+			}
+			
 			final int bound = getBounds(startingNode, (int)currentYPosition); 
-			collisionDetection = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
-													 polynomial, currentJumpDirection, startingNode, listOfEdges);	
+			
+			if (!isPastTopPoint) {
+				collisionDetection = ascendingPolynomial (formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, currentJumpDirection, startingNode, listOfEdges);	
+			}
+			else {
+				collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, currentJumpDirection, startingNode, listOfEdges);				
+			}
+			
+			
+			
 			if (collisionDetection == Collision.HIT_WALL) {
 				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
 				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
 			} 
-			else if (collisionDetection == Collision.HIT_GROUND || 
+			else if (collisionDetection == Collision.HIT_GROUND ||
 					 collisionDetection == Collision.HIT_CEILING) {
 				return;
 			}
-			formerLowerYPosition = bound;
-		}
-		
-		
-		//Downwards:
-		if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
-			currentXPosition--; //The toppunkt was in the current block (and not ending there).
-			//Therefore the downward going part of that block needs to be checked.
-		} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
-			currentXPosition++; //other way around
-		}
-		
-		boolean hasMetHardGround = false;
-		
-		currentJumpDirection = direction.getOppositeVerticalDirection();
-		while (!hasMetHardGround && isWithinView(currentXPosition + xPositionOffsetForJump)) 
-		{ //Doesen't take falling down into a hole into account.
 			
-			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();						
-			float currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);			
-			// TODO change to take the sign into account
-			final int bound = getBounds(startingNode, (int)currentYPosition); 	
-			
-			collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
-					 								  polynomial, currentJumpDirection, startingNode, listOfEdges);				
-			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
-				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
-			} 
-			else if (collisionDetection == Collision.HIT_GROUND) {
-				hasMetHardGround = true;
-			}
-			
+			isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
 			formerLowerYPosition = bound;
 		}
 	}
@@ -327,8 +313,8 @@ public  class Grapher {
 		}
 	}
 		
-	private static boolean isWithinView(int xPosition) { //TODO Rename, curtesy of +1
-		return xPosition < GRID_WIDTH && xPosition > 0;
+	private static boolean isWithinView(int xPosition) {
+		return xPosition < GRID_WIDTH && xPosition >= 0;
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
