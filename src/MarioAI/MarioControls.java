@@ -16,18 +16,27 @@ public class MarioControls {
 	
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
-	private static final float MAX_X_VELOCITY = 0.35f;
+	private static final float MAX_X_VELOCITY = 0.351f;
+	private static final float MARIO_START_X_POS = 2f;
 		
-	private static float oldX = 0;
+	private static float oldX = MARIO_START_X_POS;
 	private static int jumpTime = 0;
+	private static int holdJumpTime = 0;
 	private static float currentXSpeed = 0;
+	
+	public static void reset() {
+		oldX = MARIO_START_X_POS;
+		jumpTime = 0;
+		holdJumpTime = 0;
+		currentXSpeed = 0;
+	}
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
+		final DirectedEdge next = path.get(0);
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
 			path.remove(0);
 			return true;
 		}
@@ -41,13 +50,22 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		final MovementInformation moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		MovementInformation moveInfo;
+		if (jumpTime <= 0) {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		}
+		else {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target.x, currentXSpeed, holdJumpTime, jumpTime);
+		}
+		
 
 		if (jumpTime < 0 && observation.isMarioOnGround()) {
-			jumpTime = moveInfo.getTicksHoldingJump();
+			jumpTime = moveInfo.getTotalTicksJumped();
+			holdJumpTime = moveInfo.getTicksHoldingJump();
 		}
-		else if (jumpTime > 0) {
+		if (holdJumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
+			holdJumpTime--;
 		}
 		jumpTime--;
 		
@@ -124,7 +142,7 @@ public class MarioControls {
 		}
 		final float distanceToMove = edge.target.x - edge.source.x;
 		if (!((distanceToMove < 0 && speed < 0) ||
-			(distanceToMove > 0 && speed > 0))) {
+			  (distanceToMove > 0 && speed > 0))) {
 			return false;
 		}
 		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
@@ -135,7 +153,7 @@ public class MarioControls {
 			distanceMoved += speed;
 		}
 		//+ 0.5f to make it the center of the block instead of the edge
-		return (distanceMoved >= Math.abs(currentXPos - (edge.source.x)));
+		return (distanceMoved >= Math.abs(distanceToMove));
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {

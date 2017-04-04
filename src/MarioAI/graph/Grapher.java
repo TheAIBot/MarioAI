@@ -10,13 +10,14 @@ import MarioAI.graph.nodes.Node;
 public  class Grapher {
 	private static final float MAX_JUMP_HEIGHT = 4;
 	private static final float MAX_JUMP_RANGE = 5;
-	public static final int GRID_HEIGHT = 15;
-	public static final int GRID_WIDTH = 22;
+	public  static final int GRID_HEIGHT = 15;
+	public  static final int GRID_WIDTH = 22;
+	private static final int MarioHeight = 2;
+	
 	private static Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private static boolean[][] inRecursion = new boolean[GRID_WIDTH][GRID_WIDTH];
-	private static final int MarioHeight = 2;
 	private static Node marioNode;
-	static int testPrintCounter = 24; // Rand value
+	private static int testPrintCounter = 24; // Rand value
 
 	public static void printView() {
 		testPrintCounter = testPrintCounter % 240;
@@ -61,14 +62,14 @@ public  class Grapher {
 	
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
-		clearAllEdges(levelMatrix);
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
+		clearAllEdges(levelMatrix);
 		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
 		Node oldMarioNode = marioNode;
 		marioNode = mario;
 		mario.deleteAllEdges();
 		if (mario.x >= 160) {
-			System.out.println();
+			//System.out.println();
 		}
 		//printView();
 		if(isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) &&

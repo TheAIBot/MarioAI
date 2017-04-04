@@ -61,4 +61,9 @@ public class StochasticProgressTask implements Task {
 		return null;
 	}
 
+	public MarioComponent setRandomLevel(Agent controller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

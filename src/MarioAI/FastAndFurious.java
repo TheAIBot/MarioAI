@@ -25,9 +25,10 @@ public class FastAndFurious implements Agent {
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
 	
-	private static final boolean DEBUG = true;
+	public boolean DEBUG = true;
 
 	public void reset() {
+		MarioControls.reset();
 	}
 
 	public boolean[] getAction(Environment observation) {
@@ -36,10 +37,7 @@ public class FastAndFurious implements Agent {
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-			if (path != null) {
-				newestPath = path;
-			}
+			newestPath = getPath(observation);
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
@@ -49,7 +47,7 @@ public class FastAndFurious implements Agent {
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				DebugDraw.drawEndNodes(observation, graph.getGoalNodes());
+				DebugDraw.drawEndNodes(observation, graph.getGoalNodes(0));
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
 				DebugDraw.drawNeighborPaths(observation, graph);
 				DebugDraw.drawReachableNodes(observation, graph);
@@ -58,15 +56,10 @@ public class FastAndFurious implements Agent {
 		}
 		
 		if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
-			if (MarioControls.reachedNextNode(observation, newestPath)) {
-				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-				if (path != null) {
-					newestPath = path;
-				}
+			if (MarioControls.reachedNextNode(observation, newestPath) || MarioControls.isPathInvalid(observation, newestPath)) {
+				newestPath = getPath(observation);
 			}
-			if (newestPath.size() > 0) {
-				MarioControls.getNextAction(observation, newestPath, action);				
-			}
+			MarioControls.getNextAction(observation, newestPath, action);
 
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
@@ -74,17 +67,20 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawAction(observation, action);
 			}
 		}
-		if (newestPath != null) {
-			if (MarioControls.isPathInvalid(observation, newestPath)) {
-				List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes());
-				if (path != null) {
-					newestPath = path;
-				}
-			}
-		}
 		tickCount++;
 		
 		return action;
+	}
+	
+	private List<DirectedEdge> getPath(Environment observation) {
+		for (int i = 0; i < 11; i++) {
+			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(i));
+			if (path != null) {
+				//System.out.println(i);
+				return  path;
+			}					
+		}
+		throw new Error("Failed to find a path");
 	}
 
 	public AGENT_TYPE getType() {
