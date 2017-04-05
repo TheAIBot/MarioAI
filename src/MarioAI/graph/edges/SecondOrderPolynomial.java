@@ -1,5 +1,6 @@
 package MarioAI.graph.edges;
 
+import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public class SecondOrderPolynomial extends DirectedEdge {
@@ -14,8 +15,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	// possible to reach,
 	// even though it is only one it should be possible to reach. Mario changing
 	// position in the air can compensate for this.
-	private int ceiledTopPointX;
-	private int ceiledTopPointY; // Ceildes coordinates of the toppunkt
+	public int ceiledTopPointX; //TODO change to private after tests.
+	public int ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	
 	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
 		super(source, target);
@@ -26,6 +27,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		topPointY = polynomial.topPointY;
 		ceiledTopPointX = polynomial.ceiledTopPointX;
 		ceiledTopPointY = polynomial.ceiledTopPointY;
+		//Needs to be rehashed, as the hash should depend on the height of the jump:
+		reHash();
 	}
 
 	public SecondOrderPolynomial(Node source, Node target) {
@@ -100,4 +103,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		topPointX = x;
 		topPointY = y;
 	}
+
+	@Override
+	public int getExtraEdgeHashcode() {
+		int jumpType = 1; //it is a jump edge type
+		//Its jump height. Max is 4 min is 0, giving 3 bits. Here we allow 4.
+		int jumpHeight = ((ceiledTopPointY - source.y) & 0xf) << 1;		
+		return jumpType | jumpHeight;
+	}
+
+	
 }

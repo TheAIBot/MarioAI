@@ -13,9 +13,27 @@ public abstract class DirectedEdge {
 		this.target = target;
 		hash = Hasher.hashEdge(this);
 	}
-
+	
+	public void reHash() {
+		hash = Hasher.hashEdge(this);		
+	}
+	
+	@Override
 	public int hashCode() {
 		return hash;
+	}
+	
+	@Override
+	public boolean equals(Object b) {
+		if (b == null) {
+			return false;
+		}
+		if (b instanceof DirectedEdge) {
+			DirectedEdge bb = (DirectedEdge) b;
+			return bb.hashCode() == hashCode();
+		} else {
+			return false;
+		}
 	}
 	
 	//public abstract int motionTypeID();
@@ -43,6 +61,8 @@ public abstract class DirectedEdge {
 	public abstract float getTraversedTime(float v0);
 	
 	public abstract float getSpeedAfterTraversal(float v0);
+
+	public abstract int getExtraEdgeHashcode();
 	
 	
 }
