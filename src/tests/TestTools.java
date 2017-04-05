@@ -70,6 +70,14 @@ public class TestTools {
 	}
 	
 	public static Environment loadRandomLevel(Agent agent, boolean showGUI) {		
+		return loadLevelWithSeed(agent, (int) (Math.random () * Integer.MAX_VALUE), showGUI);
+	}
+	
+	public static Environment loadLevelWithSeed(Agent agent, int seed) {
+		return loadLevelWithSeed(agent, seed, false);
+	}
+	
+	public static Environment loadLevelWithSeed(Agent agent, int seed, boolean showGUI) {
 		EvaluationOptions options = new CmdLineOptions(new String[0]);
 		options.setAgent(agent);
 		Task task = new ProgressTask(options);
@@ -77,7 +85,7 @@ public class TestTools {
 		options.setVisualization(showGUI);
 		options.setNumberOfTrials(1);
 		options.setMatlabFileName("");
-		options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+		options.setLevelRandSeed(seed);
 		options.setLevelDifficulty(-1);
 		task.setOptions(options);
 

@@ -21,8 +21,6 @@ public class Graph {
 	private static final int LEVEL_LEFT_X_POS = -(SIGHT_WIDTH / 2);
 	private static final int LEVEL_RIGHT_X_POS = -LEVEL_LEFT_X_POS;
 
-	@SuppressWarnings("unchecked") 
-	private final ArrayList<Surface>[] surfaces = (ArrayList<Surface>[]) new ArrayList[LEVEL_HEIGHT]; // pending implementation 
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
@@ -114,11 +112,12 @@ public class Graph {
 	
 	public Node[] getGoalNodes(int validColumnsToIgnore)
 	{
-		for (int x = levelMatrix.length - 1; x >= 0; x--) {
-			for (int y = 0; y < levelMatrix[x].length; y++) {
-				if (levelMatrix[x][y] != null) {
+		for (int x = maxMarioXPos; x >= 0; x--) {
+			Node[] column = getColumn(x);
+			for (int y = 0; y < column.length; y++) {
+				if (column[y] != null) {
 					if (validColumnsToIgnore == 0) {
-						return levelMatrix[x];
+						return column;
 					}
 					else {
 						validColumnsToIgnore--;

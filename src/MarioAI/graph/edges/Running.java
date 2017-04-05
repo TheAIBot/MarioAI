@@ -1,5 +1,6 @@
 package MarioAI.graph.edges;
 
+import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public class Running extends DirectedEdge{
@@ -8,12 +9,17 @@ public class Running extends DirectedEdge{
 
 	public Running(Node source, Node target) {
 		super(source, target);
-		if (target != null && target.x < source.x) dir = -1;
-		else dir = 1;
+		if (target != null && target.x < source.x) {
+			dir = -1;
+		}
+		else {
+			dir = 1;
+		}
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	@Override
-	public float getMaxY() {
+	public int getMaxY() {
 		return 0;
 	}
 
@@ -31,6 +37,11 @@ public class Running extends DirectedEdge{
 	public float getSpeedAfterTraversal(float v0) {
 		if (dir == -1) System.out.println("HER: " +  (0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3)));
 		return (float) ((0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3)));
+	}
+
+	@Override
+	protected int getExtraEdgeHashcode() {
+		return 0; //0 represents it being a running edge. Nothing else needed.
 	}
 
 }

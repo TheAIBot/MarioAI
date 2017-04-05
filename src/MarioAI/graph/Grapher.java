@@ -63,21 +63,28 @@ public  class Grapher {
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
-		clearAllEdges(levelMatrix);
-		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
+		//clearAllEdges(levelMatrix);
 		Node oldMarioNode = marioNode;
 		marioNode = mario;
 		mario.deleteAllEdges();
-		if (mario.x >= 160) {
-			//System.out.println();
-		}
 		//printView();
+		//For mario:
 		if(isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) &&
 		   canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
 			connectNode(mario, GRID_WIDTH / 2); 
 		}
-		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
-		//System.out.println("The edges are ready!");
+		//For the rest of the level matrix:
+
+		for (int i = 0; i < observationGraph.length; i++) {
+			for (int j = 0; j < observationGraph[i].length; j++) {
+				if (isOnLevelMatrix(i, j) &&
+				    canMarioStandThere(i,j) && 
+				    observationGraph[i][j] != null) {
+				   connectNode(observationGraph[i][j], i); 
+				}
+			}
+		}
+		
 	}
 	
 	private static void connectNode(Node node, int coloumn) {
@@ -94,26 +101,8 @@ public  class Grapher {
 				isOnLevelMatrix(connectingEdge.target, marioNode) && 
 				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); 
-				//TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
-		}
-		// Recursion over the reachable nodes:
-		for (DirectedEdge neighborEdge : node.edges)  { 
-			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
-			 * It must be possible to only calculate what is necessary.
-			 */
-			if (neighborEdge.target.ancestorEdge == null) {
-				neighborEdge.target.ancestorEdge = neighborEdge;
-			}
-			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
-				int neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
-				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
-					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
-					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
-					//Because of the structure, it is a depth first search.
-				}				
-			}
-		}
+		}		
 	}
 	
 	private static boolean isOnLevelMatrix(Node position, Node marioNode) {
@@ -155,10 +144,8 @@ public  class Grapher {
 	 * @return
 	 */
 	public static void getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
-		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
-		//TODO Polynomial bounding conditions.
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (int jumpHeight = 0; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges); //TODO ERROR if removed on shortdeadend
@@ -339,6 +326,7 @@ public  class Grapher {
 		//return node != null;
 		return node != null && node.type != -11;// TODO(*) Fix
 	}
+	
 	
 	private static boolean isAir(int coloumn, int row) {
 		//return node != null;

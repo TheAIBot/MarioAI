@@ -174,12 +174,12 @@ public class TestMarioMovements {
 	@Test
 	public void testJumps() {
 		for (int i = 6; i >= 0; i--) {
-			testJumpTime(1, i);
-			testJumpTime(1.5f, i);
+			testJumpTime(1     , i);
+			testJumpTime(1.5f  , i);
 			testJumpTime(1.645f, i);
-			testJumpTime(3.4f, i);
-			testJumpTime(4, i);
-			testJumpTime(5.6f, i);
+			testJumpTime(3.4f  , i);
+			testJumpTime(4     , i);
+			testJumpTime(5.6f  , i);
 		}
 		
 		testJumpTime(1.5f, -1);
@@ -217,11 +217,10 @@ public class TestMarioMovements {
 				upTime = false;
 			}
 			TestTools.runOneTick(observation);
-			expectedJumpTime++;
-			
 			if (observation.isMarioOnGround()) {
 				break;
 			}
+			expectedJumpTime++;
 		}
 		//can't hold jump for more than 8 ticks
 		expectedTicksHeldUp = Math.min(expectedTicksHeldUp, 8);

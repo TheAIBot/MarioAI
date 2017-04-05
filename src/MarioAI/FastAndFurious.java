@@ -1,18 +1,12 @@
 package MarioAI;
 
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.graph.Graph;
-import MarioAI.graph.GraphMath;
 import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.mario.engine.MarioComponent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 /**
@@ -42,7 +36,9 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
 				//graph.printMatrix(observation);
+				long startTime = System.currentTimeMillis();
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				//System.out.println(System.currentTimeMillis() - startTime);
 			}
 			
 			if (DEBUG) {
@@ -56,7 +52,8 @@ public class FastAndFurious implements Agent {
 		}
 		
 		if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
-			if (MarioControls.reachedNextNode(observation, newestPath) || MarioControls.isPathInvalid(observation, newestPath)) {
+			if (MarioControls.reachedNextNode(observation, newestPath) || 
+				MarioControls.isPathInvalid(observation, newestPath)) {
 				newestPath = getPath(observation);
 			}
 			MarioControls.getNextAction(observation, newestPath, action);
@@ -73,14 +70,11 @@ public class FastAndFurious implements Agent {
 	}
 	
 	private List<DirectedEdge> getPath(Environment observation) {
-		for (int i = 0; i < 11; i++) {
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(i));
-			if (path != null) {
-				//System.out.println(i);
-				return  path;
-			}					
-		}
-		throw new Error("Failed to find a path");
+		long startTime = System.currentTimeMillis();
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
+		
+		//System.out.println(System.currentTimeMillis() - startTime);
+		return (path == null)? newestPath : path;
 	}
 
 	public AGENT_TYPE getType() {

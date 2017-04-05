@@ -10,22 +10,17 @@ import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: May 5, 2009
- * Time: 12:46:43 PM
- */
 public class Play {
 
-    public static void main(String[] args) {
-        boolean loadLevel = false;
-        if (loadLevel) {
-            Agent controller = new FastAndFurious();
-        	//Agent controller = new HumanKeyboardAgent();
-            Environment observation = TestTools.loadLevel("jumpLevels/2Width.lvl", controller, true);
-            //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
-            TestTools.runWholeLevel(observation);
+	public static void main(String[] args) {
+		boolean loadLevel = true;
+		if (loadLevel) {
+			Agent controller = new FastAndFurious();
+			// Agent controller = new HumanKeyboardAgent();
+			Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
+			// Environment observation = TestTools.loadLevel("flat.lvl",
+			// controller, true);
+			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
 	        
@@ -42,14 +37,12 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
+	        //options.setLevelRandSeed(997358590);
 	        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
-
-	        System.out.println ("Score: " + task.evaluate (controller)[0]);
-			
 		}
-    }
+	}
 }
