@@ -26,6 +26,7 @@ public class Graph {
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
+	private boolean goalNodesChanged = false;
 	//private int levelOffSet; // number of nodes moved to the right on the level
 
 	public Node[][] getLevelMatrix(){
@@ -34,10 +35,6 @@ public class Graph {
 	
 	public void printMatrix(Environment observation)
 	{
-//		if (marioNode != null) {
-//			//System.out.println(levelOffSet + "," + marioNode.x + "," + marioNode.y);
-//		}
-
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
@@ -71,6 +68,7 @@ public class Graph {
 		}
 		setMarioNode(observation);
 		maxMarioXPos = SIGHT_WIDTH / 2;
+		goalNodesChanged = true;
 	}
 
 	public boolean updateMatrix(final Environment observation) {
@@ -78,7 +76,9 @@ public class Graph {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final int change = marioXPos - oldMarioXPos;
 		oldMarioXPos = marioXPos;
-		maxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
+		int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
+		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
+		maxMarioXPos = newMaxMarioXPos;
 		if (change < 0) {
 			moveMatrixOneLeft(marioXPos);
 			setMarioNode(observation);
@@ -205,5 +205,13 @@ public class Graph {
 	
 	public int getMaxMarioXPos() {
 		return maxMarioXPos;
+	}
+	
+	public boolean goalNodesChanged() {
+		return goalNodesChanged;
+	}
+	
+	public void setGoalNodesChanged(boolean value) {
+		goalNodesChanged = value;
 	}
 }

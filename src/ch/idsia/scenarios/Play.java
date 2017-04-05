@@ -13,12 +13,12 @@ import tests.TestTools;
 public class Play {
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
 			Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
-			// Environment observation = TestTools.loadLevel("flat.lvl",
+			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
@@ -43,6 +43,8 @@ public class Play {
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
+	        
+	        System.out.println ("Score: " + task.evaluate (controller)[0]);
 		}
 	}
 }

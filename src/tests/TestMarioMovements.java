@@ -198,7 +198,7 @@ public class TestMarioMovements {
 	private void testJumpTime(float jumpHeight, int heightDifference) {
 		final UnitTestAgent agent = new UnitTestAgent();		
 		String levelPath = "jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl";
-		Environment observation = TestTools.loadLevel(levelPath, agent, false);
+		Environment observation = TestTools.loadLevel(levelPath, agent, true);
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		

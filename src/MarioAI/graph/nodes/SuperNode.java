@@ -16,6 +16,7 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 	
 	public HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer,DirectedEdge>();
 	public ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
+	private boolean allEdgesMade = false;
 	
 	public float gScore; // g(n) for current node - cost of path from start node to this node
 	public float fScore; // f(n) for current node - cost estimate of going through this node on cheapest path to the goal node
@@ -31,4 +32,11 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 		return (int) (o.fScore * SCORE_MULTIPLIER - this.fScore * SCORE_MULTIPLIER);
 	}
 	
+	public boolean getAllEdgesMade() {
+		return allEdgesMade;
+	}
+	
+	public void setAllEdgesMade(boolean value) {
+		allEdgesMade = value;
+	}
 }

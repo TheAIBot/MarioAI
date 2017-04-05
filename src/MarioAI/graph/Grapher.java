@@ -79,7 +79,8 @@ public  class Grapher {
 			for (int j = 0; j < observationGraph[i].length; j++) {
 				if (isOnLevelMatrix(i, j) &&
 				    canMarioStandThere(i,j) && 
-				    observationGraph[i][j] != null) {
+				    observationGraph[i][j] != null &&
+				    !observationGraph[i][j].getAllEdgesMade()) {
 				   connectNode(observationGraph[i][j], i); 
 				}
 			}
@@ -121,20 +122,33 @@ public  class Grapher {
 
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, int nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
+		boolean foundAllEdges = true;
 		//Three different ways to find the reachable nodes from a given position:
-		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		foundAllEdges = foundAllEdges && getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
-		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		foundAllEdges = foundAllEdges && getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		
+		if (foundAllEdges) {
+			startingNode.setAllEdgesMade(true);
+		}
 		return listOfEdges;
 	}
 	
-	private static void getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+	private static boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+		boolean foundAllEdges = true;
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
+		else {
+			foundAllEdges = false;
+		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
-		}		
+		}
+		else {
+			foundAllEdges = false;
+		}
+		return foundAllEdges;
 	}
 	
 	/*** Finds the possible places that mario can jump to, from the given position, 
@@ -143,20 +157,22 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-	public static void getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+	public static boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
+		boolean foundAllEdges = true;
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges); //TODO ERROR if removed on shortdeadend
+				foundAllEdges = foundAllEdges && jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges); //TODO ERROR if removed on shortdeadend
 				
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges);					
+				foundAllEdges = foundAllEdges && jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges);					
 			}
 		}
+		return foundAllEdges;
 	}
 	
-	private static void jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
+	private static boolean jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
 		//Starts of from Mario's initial position:
 		int currentXPosition = nodeColoumn;
 		int xPositionOffsetForJump = 0;
@@ -203,14 +219,16 @@ public  class Grapher {
 			if (collisionDetection == Collision.HIT_WALL) {
 				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
 				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
-			} else if (collisionDetection == Collision.HIT_GROUND ||
-					   collisionDetection == Collision.HIT_CEILING) {
-				return;
+			} else if (collisionDetection == Collision.HIT_CEILING) {
+				return false;
+			} else if (collisionDetection == Collision.HIT_GROUND) {
+				return true;
 			}
 			
 			isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
 			formerLowerYPosition = bound;
 		}
+		return false;
 	}
 		
 	private static Collision ascendingPolynomial(int formerLowerYPosition, int bound, int currentXPosition, Collision collisionDetection,
