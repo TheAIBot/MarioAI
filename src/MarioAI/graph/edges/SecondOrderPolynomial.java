@@ -20,22 +20,29 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	
 	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
 		super(source, target);
-		a = polynomial.a;
-		b = polynomial.b;
-		c = polynomial.c;
-		topPointX = polynomial.topPointX;
-		topPointY = polynomial.topPointY;
-		ceiledTopPointX = polynomial.ceiledTopPointX;
-		ceiledTopPointY = polynomial.ceiledTopPointY;
+		this.a = polynomial.a;
+		this.b = polynomial.b;
+		this.c = polynomial.c;
+		this.topPointX = polynomial.topPointX;
+		this.topPointY = polynomial.topPointY;
+		this.ceiledTopPointX = polynomial.ceiledTopPointX;
+		this.ceiledTopPointY = polynomial.ceiledTopPointY;
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 		//Needs to be rehashed, as the hash should depend on the height of the jump:
-		reHash();
 	}
 
 	public SecondOrderPolynomial(Node source, Node target) {
 		super(source, target);
-		a = 0;
-		b = 0;
-		c = 0;
+		this.a = 0;
+		this.b = 0;
+		this.c = 0;
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
+	}
+	
+	public SecondOrderPolynomial(Node source, Node target, int ceiledTopPointY) {
+		this(source, target);
+		this.ceiledTopPointY = ceiledTopPointY;
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	//
@@ -78,8 +85,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 	
 	@Override
-	public float getMaxY() {
-		return (topPointY - source.y);
+	public int getMaxY() {
+		return ceiledTopPointY - (int)source.y;
 	}
 
 	public float getWeight() {
@@ -105,11 +112,12 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	@Override
-	public int getExtraEdgeHashcode() {
-		int jumpType = 1; //it is a jump edge type
-		//Its jump height. Max is 4 min is 0, giving 3 bits. Here we allow 4.
-		int jumpHeight = ((ceiledTopPointY - source.y) & 0xf) << 1;		
-		return jumpType | jumpHeight;
+	protected int getExtraEdgeHashcode() {
+		final int jumpType = 1; //it is a jump edge type
+		//Its jump height. Max is 4 min is 0, giving 3 bits.
+		//3 plus 1 but for jump type 
+		final int jumpHeight = (getMaxY() & 0xf) << 1;		
+		return jumpHeight | jumpType;
 	}
 
 	

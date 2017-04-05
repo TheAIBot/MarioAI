@@ -4,18 +4,13 @@ import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public abstract class DirectedEdge {
-	public Node source; 
-	public Node target;
-	private int hash;
+	public final Node source; 
+	public final Node target;
+	protected int hash;
 	
 	public DirectedEdge(Node source, Node target) {
 		this.source = source;
 		this.target = target;
-		hash = Hasher.hashEdge(this);
-	}
-	
-	public void reHash() {
-		hash = Hasher.hashEdge(this);		
 	}
 	
 	@Override
@@ -36,15 +31,7 @@ public abstract class DirectedEdge {
 		}
 	}
 	
-	//public abstract int motionTypeID();
-	//public abstract int getXAccelleration();
-	//public abstract int getYAccelleration();
-	//public abstract int getTimespan();
-	
-
-	//public abstract void getActionPatern();
-	
-	public abstract float getMaxY();
+	public abstract int getMaxY();
 	
 	public abstract float getWeight();
 	
@@ -62,7 +49,7 @@ public abstract class DirectedEdge {
 	
 	public abstract float getSpeedAfterTraversal(float v0);
 
-	public abstract int getExtraEdgeHashcode();
+	protected abstract int getExtraEdgeHashcode();
 	
 	
 }

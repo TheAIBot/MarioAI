@@ -33,7 +33,7 @@ public class Hasher {
 
 	private static int ll = 0;
 
-	public static int hashEdge(DirectedEdge edge) {
+	public static int hashEdge(DirectedEdge edge, int extraHash) {
 		//TODO It does not handle wall jumps properly. Look at later.
 
 		//TODO remember using isJumpEdge
@@ -58,7 +58,7 @@ public class Hasher {
 		
 		//Unique edge information to add to the hash.
 		//Includes things like if it is an jump edge or running edge, and things like that.
-		final int b5 = edge.getExtraEdgeHashcode() << position5; 
+		final int b5 = extraHash << position5; 
 		return b1 | b2 | b3 | b4 | b5;
 		//return ll++;
 	}
