@@ -69,12 +69,16 @@ public class FastAndFurious implements Agent {
 	
 	private List<DirectedEdge> getPath(Environment observation) {
 		for (int i = 0; i < 11; i++) {
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(i));
+			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
 			if (path != null) {
 				return  path;
 			}					
 		}
 		return newestPath;
+<<<<<<< HEAD
+=======
+		//throw new Error("Failed to find a path");
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 	}
 
 	public AGENT_TYPE getType() {

@@ -263,5 +263,141 @@ public class TestGrapher {
 			}
 		}
 		
+<<<<<<< HEAD
 	}	
+=======
+	}
+		
+	@Test 
+	public void testAlwaysSameResultOnSetEdges() {
+		//Should get the same result doing multiple set edges on a given level matrix.
+		Graph graph1 = totalFlatland();
+		Node[][] world1 = graph1.getLevelMatrix();
+		
+		Graph graph2 = totalFlatland();
+		Node[][] world2 = graph2.getLevelMatrix();
+		Grapher.setMovementEdges(world1, marioNode);
+		//And multiple times:
+		Grapher.setMovementEdges(world2, marioNode);
+		Grapher.setMovementEdges(world2, marioNode);
+		
+		//Asserting that the result is the same for the two matrixes:
+		for (int i = 0; i < world2.length; i++) {
+			for (int j = 0; j < world2[i].length; j++) {
+				if (world1[i][j] == null && world2[i][j] == null) {
+					continue;
+				} else if (world1[i][j] == null && world2[i][j] == null) fail();
+				//The number of edges going out from a given Node should be the same:
+				assertEquals(world1[i][j].edges.size(), world2[i][j].edges.size());
+				//All edges in one list should also be in the other list:
+				for (DirectedEdge edge : world2[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world1[i][j].edges.contains(edge));
+				}
+				//And the outher way around:
+				for (DirectedEdge edge : world1[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world2[i][j].edges.contains(edge));
+				}
+			}
+		}
+		
+		
+	}
+	
+	@Test
+	public void testNoOverlapJumpHashingAndRunningHashing() {
+		List<Integer> allJumpingEdgesList = getAllPossibleJumpingEdgeHashcodes();
+		List<Integer> allRunningEdges = getAllPossibleRunningEdgeHashcodes();
+		HashSet<Integer> allEdgesHashed = new HashSet<Integer>();
+		allEdgesHashed.addAll(allJumpingEdgesList);
+		allEdgesHashed.addAll(allRunningEdges);
+		assertEquals(allJumpingEdgesList.size() + allRunningEdges.size(), allEdgesHashed.size());
+		
+	}
+
+	@Test
+	public void testProperJumpEdgeHashing() {
+		//Because of the small state space, brute force over the statespace will be used to check its correctness.
+		List<Integer> allJumpingEdgesHashcodes = getAllPossibleJumpingEdgeHashcodes();
+		HashSet<Integer> allRuningEdgesHashed = new HashSet<Integer>();
+		for (Integer edgeHash : allJumpingEdgesHashcodes) {
+			allRuningEdgesHashed.add(edgeHash);
+		}
+		//They are all unique, so the size of the HashMap should be the same.
+		assertEquals(allJumpingEdgesHashcodes.size(), allRuningEdgesHashed.size());
+		//If we do it again, we should get the same list:
+		allJumpingEdgesHashcodes = getAllPossibleJumpingEdgeHashcodes();
+		allRuningEdgesHashed.addAll(allJumpingEdgesHashcodes);
+		assertEquals(allJumpingEdgesHashcodes.size(), allRuningEdgesHashed.size());
+	}
+	
+	private List<Integer> getAllPossibleJumpingEdgeHashcodes() {
+		int limitY = 15;
+		int limitX = 32;
+		int limitJumpHeight = 4;
+		ArrayList<Integer> allRunningEdgesHashes = new ArrayList<Integer>();
+		
+		//The source:
+		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
+			for (short sourceX = 0; sourceX <= limitX; sourceX++) {			
+				
+				//The target:				
+				for (short targetY = 0; targetY <= limitY; targetY++) {
+					for (short targetX = 0; targetX <= limitX; targetX++) {		
+						
+						//The different possible jump heights
+						for (int JumpHeight = 0; JumpHeight <= limitJumpHeight; JumpHeight++) {
+							//Type does not matter
+							Node source = new Node(sourceX, sourceY, (byte)10);
+							Node target = new Node(targetX, targetY, (byte)10);
+							SecondOrderPolynomial newPolynomial = new SecondOrderPolynomial(source,target);
+							newPolynomial.ceiledTopPointY = sourceY+JumpHeight;
+							newPolynomial.reHash();//important to rehash it now when its jump height has been registered.
+							allRunningEdgesHashes.add(newPolynomial.hashCode());
+						}						
+					}
+				}			
+			}
+		}
+		assertEquals((limitY+1)*(limitY+1)*(limitX+1)*(limitX+1)*(limitJumpHeight+1), allRunningEdgesHashes.size() );
+		return allRunningEdgesHashes;
+	}
+
+	@Test
+	public void testProperRunningEdgeHashing() {		
+		//Because of the small state space, brute force over the statespace will be used to check its correctness.
+		List<Integer> allRunningEdgesList = getAllPossibleRunningEdgeHashcodes();
+		HashSet<Integer> allRuningEdgesHashed = new HashSet<Integer>(allRunningEdgesList);
+		//They are all unique, so the size of the HashMap should be the same.
+		assertEquals(allRunningEdgesList.size(), allRuningEdgesHashed.size());
+		//If we do it again, we should get the same list:
+		allRunningEdgesList = getAllPossibleRunningEdgeHashcodes();
+		allRuningEdgesHashed.addAll(allRunningEdgesList);
+		assertEquals(allRunningEdgesList.size(), allRuningEdgesHashed.size());
+	}
+
+	private ArrayList<Integer> getAllPossibleRunningEdgeHashcodes() {
+		int limitY = 15;
+		int limitX = 32;
+		ArrayList<Integer> allRunningEdgesHashcodes = new ArrayList<Integer>();
+		//The source:
+		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
+			for (short sourceX = 0; sourceX <= limitX; sourceX++) {			
+				//The target:				
+				for (short targetY = 0; targetY <= limitY; targetY++) {
+					for (short targetX = 0; targetX <= limitX; targetX++) {
+						//Type does not matter
+						allRunningEdgesHashcodes.add(new Running(new Node(sourceX, sourceY, (byte)10), 
+								                        new Node(targetX, targetY, (byte)10)).hashCode());
+					}
+				}				
+			}
+		}
+		assertEquals((limitY+1)*(limitY+1)*(limitX+1)*(limitX+1), allRunningEdgesHashcodes.size() );
+		return allRunningEdgesHashcodes;
+	}
+	
+	
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 }

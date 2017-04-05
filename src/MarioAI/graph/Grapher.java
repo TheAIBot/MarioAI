@@ -68,10 +68,22 @@ public  class Grapher {
 		marioNode = mario;
 		mario.deleteAllEdges();
 		//printView();
+		//For mario:
 		if(isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) &&
 		   canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
 			connectNode(mario, GRID_WIDTH / 2); 
 		}
+		//For the rest of the level matrix:
+
+		for (int i = 0; i < observationGraph.length; i++) {
+			for (int j = 0; j < observationGraph[i].length; j++) {
+				if   (isOnLevelMatrix(i, j) &&
+				      canMarioStandThere(i,j)) {
+				   connectNode(observationGraph[i][j], i); 
+				}
+			}
+		}
+		
 	}
 	
 	private static void connectNode(Node node, int coloumn) {
@@ -88,26 +100,27 @@ public  class Grapher {
 				isOnLevelMatrix(connectingEdge.target, marioNode) && 
 				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); 
-				//TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
 		}
-		// Recursion over the reachable nodes:
-		for (DirectedEdge neighborEdge : node.edges)  { 
-			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
-			 * It must be possible to only calculate what is necessary.
-			 */
-			if (neighborEdge.target.ancestorEdge == null) {
-				neighborEdge.target.ancestorEdge = neighborEdge;
-			}
-			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
-				int neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
-				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
-					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
-					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
-					//Because of the structure, it is a depth first search.
-				}				
-			}
-		}
+		
+//		// Recursion over the reachable nodes:
+//		for (DirectedEdge neighborEdge : node.edges)  { 
+//			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
+//			 * It must be possible to only calculate what is necessary.
+//			 */
+//			if (neighborEdge.target.ancestorEdge == null) {
+//				neighborEdge.target.ancestorEdge = neighborEdge;
+//			}
+//			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
+//				int neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
+//				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
+//					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
+//					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
+//					//Because of the structure, it is a depth first search.
+//				}				
+//			}
+//		}
+		
 	}
 	
 	private static boolean isOnLevelMatrix(Node position, Node marioNode) {
@@ -331,6 +344,7 @@ public  class Grapher {
 		//return node != null;
 		return node != null && node.type != -11;// TODO(*) Fix
 	}
+	
 	
 	private static boolean isAir(int coloumn, int row) {
 		//return node != null;

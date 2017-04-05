@@ -12,6 +12,7 @@ import tests.TestTools;
 
 public class Play {
 
+<<<<<<< HEAD
     public static void main(String[] args) {
         boolean loadLevel = false;
         if (loadLevel) {
@@ -20,6 +21,17 @@ public class Play {
             Environment observation = TestTools.loadLevel("jumpLevels/3Width.lvl", controller, true);
             //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
             TestTools.runWholeLevel(observation);
+=======
+	public static void main(String[] args) {
+		boolean loadLevel = true;
+		if (loadLevel) {
+			Agent controller = new FastAndFurious();
+			// Agent controller = new HumanKeyboardAgent();
+			Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
+			// Environment observation = TestTools.loadLevel("flat.lvl",
+			// controller, true);
+			TestTools.runWholeLevel(observation);
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 		} else {
 	        Agent controller = new FastAndFurious();
 	        

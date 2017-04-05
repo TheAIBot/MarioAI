@@ -112,11 +112,12 @@ public class Graph {
 	
 	public Node[] getGoalNodes(int validColumnsToIgnore)
 	{
-		for (int x = levelMatrix.length - 1; x >= 0; x--) {
-			for (int y = 0; y < levelMatrix[x].length; y++) {
-				if (levelMatrix[x][y] != null) {
+		for (int x = maxMarioXPos; x >= 0; x--) {
+			Node[] column = getColumn(x);
+			for (int y = 0; y < column.length; y++) {
+				if (column[y] != null) {
 					if (validColumnsToIgnore == 0) {
-						return levelMatrix[x];
+						return column;
 					}
 					else {
 						validColumnsToIgnore--;
