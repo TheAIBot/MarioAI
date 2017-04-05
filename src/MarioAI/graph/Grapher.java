@@ -182,7 +182,7 @@ public  class Grapher {
 		boolean hasAlreadyPassedTopPoint = false;
 		boolean isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);;
 		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
-			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();	
+			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();
 			
 			if (isPastTopPoint && !hasAlreadyPassedTopPoint) {
 				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
@@ -191,36 +191,33 @@ public  class Grapher {
 				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
 					currentXPosition++;
 				}
-				currentJumpDirection = direction.getOppositeVerticalDirection();
-				
+				currentJumpDirection = direction.getOppositeVerticalDirection();				
 				hasAlreadyPassedTopPoint = true;
 			}
 			
 			float currentYPosition;
 			if (!isPastTopPoint) {
 				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump));
-			}
-			else {
+			} else {
 				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);	
 			}
-			
+			//The bound is the bounded value for the next y position -> rounded down.
+			//This converts the next y value from (high value = higher up on the level) to (high value = lower on the level)
 			final int bound = getBounds(startingNode, (int)currentYPosition); 
 			
 			if (!isPastTopPoint) {
-				collisionDetection = ascendingPolynomial (formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, currentJumpDirection, startingNode, listOfEdges);	
+				collisionDetection = ascendingPolynomial (formerLowerYPosition, bound, currentXPosition, collisionDetection, 
+														  polynomial, currentJumpDirection, startingNode, listOfEdges);	
+			} else {
+				collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
+						                                  polynomial, currentJumpDirection, startingNode, listOfEdges);		
 			}
-			else {
-				collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, currentJumpDirection, startingNode, listOfEdges);				
-			}
-			
-			
 			
 			if (collisionDetection == Collision.HIT_WALL) {
 				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
 				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
-			} 
-			else if (collisionDetection == Collision.HIT_GROUND ||
-					 collisionDetection == Collision.HIT_CEILING) {
+			} else if (collisionDetection == Collision.HIT_GROUND ||
+					   collisionDetection == Collision.HIT_CEILING) {
 				return;
 			}
 			
@@ -238,8 +235,7 @@ public  class Grapher {
 			final Collision upperOppositeMarioCorner = upperOppositeCornerCollision(y, currentXPosition, direction);	
 			//As it is ascending to the right, only worry about the two corners to the right
 			if (upperOppositeMarioCorner == Collision.HIT_CEILING  || 
-				upperFacingMarioCorner == Collision.HIT_CEILING) 
-			{
+				upperFacingMarioCorner == Collision.HIT_CEILING){
 				collisionDetection = Collision.HIT_CEILING;
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
@@ -278,7 +274,7 @@ public  class Grapher {
 					listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[groundXPos][y], polynomial));
 				}
 				break;
-			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
+			} else if (upperFacingMarioCorner == Collision.HIT_WALL || 
 					   lowerFacingMarioCorner == Collision.HIT_WALL) {
 				//It is purposefully made so that the hit wall will never stop, until the ground is hit.
 				
