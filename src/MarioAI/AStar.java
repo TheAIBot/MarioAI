@@ -97,8 +97,17 @@ public final class AStar {
 					continue;
 				}
 				
-				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
+				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, neighborEdge.target, neighborEdge, current.vx);
+				
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
+				
+				//in a jump it's possible to jump too far
+				//and there is nothing that mario can do about it
+				//this should maybe be removed in the future
+				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)) {
+					continue;
+				}
+				
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
 
 				//a similar enough node has already been run through
