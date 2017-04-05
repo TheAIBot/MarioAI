@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
+import MarioAI.MovementInformation;
+import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -170,48 +173,80 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testJumps() {
-		testJumpTime(0);
-		testJumpTime(0.1f);
-		testJumpTime(0.2f);
-		testJumpTime(0.5f);
-		testJumpTime(1);
-		testJumpTime(1.5f);
-		testJumpTime(1.645f);
-		testJumpTime(3.4f);
-		testJumpTime(4);
-		testJumpTime(5.6f);
+		for (int i = 6; i >= 0; i--) {
+			testJumpTime(1, i);
+			testJumpTime(1.5f, i);
+			testJumpTime(1.645f, i);
+			testJumpTime(3.4f, i);
+			testJumpTime(4, i);
+			testJumpTime(5.6f, i);
+		}
+		
+		testJumpTime(1.5f, -1);
+		testJumpTime(3.4f, -1);
+		testJumpTime(5.6f, -1);
+		
+		testJumpTime(3.4f, -2);
+		testJumpTime(5.6f, -2);
+		
+		testJumpTime(3.4f, -3);
+		testJumpTime(5.6f, -3);
+		
+		testJumpTime(4.0f, -4);
+		testJumpTime(5.6f, -4);
 	}
-
-	private void testJumpTime(float jumpHeight) {
+	private void testJumpTime(float jumpHeight, int heightDifference) {
 		final UnitTestAgent agent = new UnitTestAgent();		
-		Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		String levelPath = "jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl";
+		Environment observation = TestTools.loadLevel(levelPath, agent, false);
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		boolean upTime = true;
 		int expectedJumpTime = 0;
+		int expectedTicksHeldUp = 0;
+		agent.action[Mario.KEY_RIGHT] = true;
 		while (true) {
 			final float currentMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			if (startMarioYPos - jumpHeight < currentMarioYPos && upTime) {
 				agent.action[Mario.KEY_JUMP] = true;
+				expectedTicksHeldUp++;
 			}
 			else {
 				agent.action[Mario.KEY_JUMP] = false;
 				upTime = false;
 			}
 			TestTools.runOneTick(observation);
+			expectedJumpTime++;
 			
 			if (observation.isMarioOnGround()) {
 				break;
 			}
-			
-			expectedJumpTime++;
 		}
-		final int receivedJumpTime = MarioControls.getJumpTime(jumpHeight, startMarioYPos, startMarioYPos).value;
-		if (receivedJumpTime != expectedJumpTime) {
+		//can't hold jump for more than 8 ticks
+		expectedTicksHeldUp = Math.min(expectedTicksHeldUp, 8);
+		
+		final float endMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float endMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		final Node startNode = new Node((short)startMarioXPos, (short)Math.round(startMarioYPos), (byte)0);
+		final Node endNode   = new Node((short)endMarioXPos  , (short)Math.round(endMarioYPos)  , (byte)0);
+		SecondOrderPolynomial edge = new SecondOrderPolynomial(startNode, endNode);
+		
+		edge.setTopPoint(0, Math.round(startMarioYPos) + jumpHeight);
+		MovementInformation moveInfo = MarioControls.getStepsAndSpeedAfterJump(edge, 0);
+		
+		final int receivedJumpTime = moveInfo.getTotalTicksJumped();
+		final int receivedHoldJump = moveInfo.getTicksHoldingJump();
+		if (receivedJumpTime != expectedJumpTime ||
+			receivedHoldJump != expectedTicksHeldUp) {
 			Assert.fail("Expected jump time wasn't the same as the received one." + 
-						"\nExpected: " + expectedJumpTime + 
-						"\nReceived: " + receivedJumpTime + 
-						"\nJump height: " + jumpHeight);
+						"\nExpected jump time: " + expectedJumpTime + 
+						"\nReceived jump time: " + receivedJumpTime + 
+						"\nExpected hold jump: " + expectedTicksHeldUp + 
+						"\nReceived hold jump: " + receivedHoldJump + 
+						"\nJump height: " + jumpHeight + 
+						"\npath: " + levelPath);
 		}
 	}
 	

@@ -65,6 +65,27 @@ public class TestTools {
 		return environment;
 	}
 	
+	public static Environment loadRandomLevel(Agent agent) {
+		return loadRandomLevel(agent, false);
+	}
+	
+	public static Environment loadRandomLevel(Agent agent, boolean showGUI) {		
+		EvaluationOptions options = new CmdLineOptions(new String[0]);
+		options.setAgent(agent);
+		Task task = new ProgressTask(options);
+		options.setMaxFPS(!showGUI);
+		options.setVisualization(showGUI);
+		options.setNumberOfTrials(1);
+		options.setMatlabFileName("");
+		options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+		options.setLevelDifficulty(-1);
+		task.setOptions(options);
+
+		Environment environment = (Environment) task.setRandomLevel(agent);
+		waitForLevelInit(environment);
+		return environment;
+	}
+	
 	public static void unloadLevel(Environment observation) {
 		JFrame window = (JFrame) SwingUtilities.windowForComponent((MarioComponent) observation);
 		window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));

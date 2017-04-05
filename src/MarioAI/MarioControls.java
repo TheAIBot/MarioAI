@@ -5,6 +5,7 @@ import java.util.List;
 
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -15,18 +16,27 @@ public class MarioControls {
 	
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
-	private static final float MAX_X_VELOCITY = 0.35f;
+	private static final float MAX_X_VELOCITY = 0.351f;
+	private static final float MARIO_START_X_POS = 2f;
 		
-	private static float oldX = 0;
+	private static float oldX = MARIO_START_X_POS;
 	private static int jumpTime = 0;
+	private static int holdJumpTime = 0;
 	private static float currentXSpeed = 0;
+	
+	public static void reset() {
+		oldX = MARIO_START_X_POS;
+		jumpTime = 0;
+		holdJumpTime = 0;
+		currentXSpeed = 0;
+	}
 	
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= 0.2) {
+		final DirectedEdge next = path.get(0);
+		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
 			path.remove(0);
 			return true;
 		}
@@ -40,16 +50,24 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		final MovementInformation moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		MovementInformation moveInfo;
+		if (jumpTime <= 0) {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+		}
+		else {
+			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target.x, currentXSpeed, holdJumpTime, jumpTime);
+		}
+		
 
 		if (jumpTime < 0 && observation.isMarioOnGround()) {
-			jumpTime = moveInfo.getTicksHoldingJump();
+			jumpTime = moveInfo.getTotalTicksJumped();
+			holdJumpTime = moveInfo.getTicksHoldingJump();
 		}
-		else if (jumpTime > 0) {
+		if (holdJumpTime > 0) {
 			action[Mario.KEY_JUMP] = true;
+			holdJumpTime--;
 		}
 		jumpTime--;
-		//System.out.println(jumpTime);
 		
 	
 		if (moveInfo.getXMovementTime() > 0) {
@@ -77,7 +95,7 @@ public class MarioControls {
 	public static Pair<Integer, Integer> getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final float jumpHeight = targetJumpHeight;
-			final float fallTo = targetYPos - marioYPos;
+			final float fallTo = Math.round(marioYPos) - targetYPos;
 			
 			//numbers are taken from mario class in the game
 			final float yJumpSpeed = 1.9f;
@@ -89,6 +107,7 @@ public class MarioControls {
 			
 			//calculate ticks for jumping up to desired height
 			for (int i = 0; i < MAX_JUMP_TIME; i++) {
+				//math derived from mario code
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				jumpTime--;
@@ -102,6 +121,7 @@ public class MarioControls {
 			if (currentJumpHeight > fallTo) {
 				
 				while (currentJumpHeight > fallTo) {
+					//math derived from mario code
 					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
 					currentJumpHeight += prevYDelta;
 					if (currentJumpHeight <= fallTo) {
@@ -110,10 +130,30 @@ public class MarioControls {
 					totalTicksJumped++;
 				}	
 			}
-			
+			totalTicksJumped++;
 			return new Pair<Integer, Integer>(ticksHoldingJump, totalTicksJumped);
 		}
 		return new Pair<Integer, Integer>(0, 0);
+	}
+	
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed) {
+		if (edge instanceof Running) {
+			return true;
+		}
+		final float distanceToMove = edge.target.x - edge.source.x;
+		if (!((distanceToMove < 0 && speed < 0) ||
+			  (distanceToMove > 0 && speed > 0))) {
+			return false;
+		}
+		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
+		float distanceMoved = 0;
+		speed = Math.abs(speed);
+		for (int i = 0; i < ticksJumping; i++) {
+			speed = getNextTickSpeed(speed);
+			distanceMoved += speed;
+		}
+		//+ 0.5f to make it the center of the block instead of the edge
+		return (distanceMoved >= Math.abs(distanceToMove));
 	}
 	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
@@ -124,11 +164,11 @@ public class MarioControls {
 		final Pair<Integer, Integer> jumpInfo = getJumpTime(edge, startY);
 		final int ticksHoldingUp = jumpInfo.key;
 		final int totalTicksJumped = jumpInfo.value;
-		return getMovementInformationFromEdge(startX, startY, endNode, edge, speed, ticksHoldingUp, totalTicksJumped);
+		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, ticksHoldingUp, totalTicksJumped);
 	}
 	
-	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed, int ticksHoldingUp, int totalTicksJumped) {
-		final XMovementInformation xMovementInfo = getXMovementTime((float)endNode.x - startX, speed, totalTicksJumped);
+	public static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, int ticksHoldingUp, int totalTicksJumped) {
+		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, totalTicksJumped);
 		return new MovementInformation(xMovementInfo, ticksHoldingUp, totalTicksJumped);
 	}
 	

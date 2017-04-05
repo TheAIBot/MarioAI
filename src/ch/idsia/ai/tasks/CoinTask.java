@@ -32,4 +32,9 @@ public class CoinTask implements Task {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public MarioComponent setRandomLevel(Agent controller) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -23,8 +23,8 @@ public class Play {
         if (loadLevel) {
             Agent controller = new FastAndFurious();
         	//Agent controller = new HumanKeyboardAgent();
-            //Environment observation = TestTools.loadLevel("jumpLevels/4Width.lvl", controller, true);
-            Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+            Environment observation = TestTools.loadLevel("jumpLevels/2Width.lvl", controller, true);
+            //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
             TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
@@ -42,7 +42,7 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);
