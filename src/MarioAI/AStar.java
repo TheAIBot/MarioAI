@@ -12,6 +12,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+//public boolean hasEnemy(int x, int y, int time);
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
@@ -50,7 +51,6 @@ public final class AStar {
 				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
-
 		return path;
 	}
 
@@ -74,7 +74,6 @@ public final class AStar {
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
-
 		while (!openSet.isEmpty()) {
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
@@ -85,7 +84,7 @@ public final class AStar {
 			}
 
 			maxStateSpaceSize = Math.max(maxStateSpaceSize, openSet.size());
-			System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
+			//System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
 			
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
@@ -93,12 +92,14 @@ public final class AStar {
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+
 				//make sure the edge is possible to use
 				//all Running edges are possible
 				//not all jumps are possible
 				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
 					continue;
 				}
+				
 				
 				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, neighborEdge.target, neighborEdge, current.vx);
 				

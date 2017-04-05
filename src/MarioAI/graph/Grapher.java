@@ -77,8 +77,9 @@ public  class Grapher {
 
 		for (int i = 0; i < observationGraph.length; i++) {
 			for (int j = 0; j < observationGraph[i].length; j++) {
-				if   (isOnLevelMatrix(i, j) &&
-				      canMarioStandThere(i,j)) {
+				if (isOnLevelMatrix(i, j) &&
+				    canMarioStandThere(i,j) && 
+				    observationGraph[i][j] != null) {
 				   connectNode(observationGraph[i][j], i); 
 				}
 			}
@@ -101,26 +102,7 @@ public  class Grapher {
 				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); 
 			}
-		}
-		
-//		// Recursion over the reachable nodes:
-//		for (DirectedEdge neighborEdge : node.edges)  { 
-//			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
-//			 * It must be possible to only calculate what is necessary.
-//			 */
-//			if (neighborEdge.target.ancestorEdge == null) {
-//				neighborEdge.target.ancestorEdge = neighborEdge;
-//			}
-//			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
-//				int neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
-//				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
-//					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
-//					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
-//					//Because of the structure, it is a depth first search.
-//				}				
-//			}
-//		}
-		
+		}		
 	}
 	
 	private static boolean isOnLevelMatrix(Node position, Node marioNode) {

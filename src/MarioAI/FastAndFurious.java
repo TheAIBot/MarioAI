@@ -36,7 +36,9 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
 				//graph.printMatrix(observation);
+				long startTime = System.currentTimeMillis();
 				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				//System.out.println(System.currentTimeMillis() - startTime);
 			}
 			
 			if (DEBUG) {
@@ -68,17 +70,11 @@ public class FastAndFurious implements Agent {
 	}
 	
 	private List<DirectedEdge> getPath(Environment observation) {
-		for (int i = 0; i < 11; i++) {
-			List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
-			if (path != null) {
-				return  path;
-			}					
-		}
-		return newestPath;
-<<<<<<< HEAD
-=======
-		//throw new Error("Failed to find a path");
->>>>>>> refs/remotes/origin/GraphingOfJustice
+		long startTime = System.currentTimeMillis();
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
+		
+		//System.out.println(System.currentTimeMillis() - startTime);
+		return (path == null)? newestPath : path;
 	}
 
 	public AGENT_TYPE getType() {

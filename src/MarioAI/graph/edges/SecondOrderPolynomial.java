@@ -36,7 +36,6 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		this.a = 0;
 		this.b = 0;
 		this.c = 0;
-		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 	
 	public SecondOrderPolynomial(Node source, Node target, int ceiledTopPointY) {
