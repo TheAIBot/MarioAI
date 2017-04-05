@@ -265,6 +265,43 @@ public class TestGrapher {
 		
 	}
 		
+	@Test 
+	public void testAlwaysSameResultOnSetEdges() {
+		//Should get the same result doing multiple set edges on a given level matrix.
+		Graph graph1 = totalFlatland();
+		Node[][] world1 = graph1.getLevelMatrix();
+		
+		Graph graph2 = totalFlatland();
+		Node[][] world2 = graph2.getLevelMatrix();
+		Grapher.setMovementEdges(world1, marioNode);
+		//And multiple times:
+		Grapher.setMovementEdges(world2, marioNode);
+		Grapher.setMovementEdges(world2, marioNode);
+		
+		//Asserting that the result is the same for the two matrixes:
+		for (int i = 0; i < world2.length; i++) {
+			for (int j = 0; j < world2[i].length; j++) {
+				if (world1[i][j] == null && world2[i][j] == null) {
+					continue;
+				} else if (world1[i][j] == null && world2[i][j] == null) fail();
+				//The number of edges going out from a given Node should be the same:
+				assertEquals(world1[i][j].edges.size(), world2[i][j].edges.size());
+				//All edges in one list should also be in the other list:
+				for (DirectedEdge edge : world2[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world1[i][j].edges.contains(edge));
+				}
+				//And the outher way around:
+				for (DirectedEdge edge : world1[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world2[i][j].edges.contains(edge));
+				}
+			}
+		}
+		
+		
+	}
+	
 	@Test
 	public void testNoOverlapJumpHashingAndRunningHashing() {
 		List<Integer> allJumpingEdgesList = getAllPossibleJumpingEdgeHashcodes();
@@ -294,7 +331,7 @@ public class TestGrapher {
 	
 	private List<Integer> getAllPossibleJumpingEdgeHashcodes() {
 		int limitY = 15;
-		int limitX = 300;
+		int limitX = 32;
 		int limitJumpHeight = 4;
 		ArrayList<Integer> allRunningEdgesHashes = new ArrayList<Integer>();
 		
@@ -339,7 +376,7 @@ public class TestGrapher {
 
 	private ArrayList<Integer> getAllPossibleRunningEdgeHashcodes() {
 		int limitY = 15;
-		int limitX = 300;
+		int limitX = 32;
 		ArrayList<Integer> allRunningEdgesHashcodes = new ArrayList<Integer>();
 		//The source:
 		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
@@ -350,11 +387,8 @@ public class TestGrapher {
 						//Type does not matter
 						allRunningEdgesHashcodes.add(new Running(new Node(sourceX, sourceY, (byte)10), 
 								                        new Node(targetX, targetY, (byte)10)).hashCode());
-						
 					}
-				}
-				
-				
+				}				
 			}
 		}
 		assertEquals((limitY+1)*(limitY+1)*(limitX+1)*(limitX+1), allRunningEdgesHashcodes.size() );

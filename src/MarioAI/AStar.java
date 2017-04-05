@@ -17,7 +17,7 @@ import MarioAI.graph.nodes.SpeedNode;
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
-
+	private static int maxStateSpaceSize = 0;
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
@@ -84,6 +84,9 @@ public final class AStar {
 				return reconstructPath(current);
 			}
 
+			maxStateSpaceSize = Math.max(maxStateSpaceSize, openSet.size());
+			System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
+			
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
 			//System.out.println(openSet.size());
