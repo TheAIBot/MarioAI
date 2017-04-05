@@ -33,4 +33,9 @@ public class Running extends DirectedEdge{
 		return (float) ((0.1910831330f + 0.2894875880f * v0 + 1.275251311f * Math.pow(v0 - 0.125f,2) - 0.1668494221f * Math.pow(v0 - 0.125f,3)));
 	}
 
+	@Override
+	public int getExtraEdgeHashcode() {
+		return 0; //0 represents it being a running edge. Nothing else needed.
+	}
+
 }
