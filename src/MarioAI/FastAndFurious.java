@@ -16,13 +16,15 @@ public class FastAndFurious implements Agent {
 
 	private static final String name = "The painkiller";
 	private final Graph graph = new Graph();
+	private final Grapher grapher = new Grapher();
+	private final MarioControls marioController = new MarioControls();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
 	
 	public boolean DEBUG = true;
 
 	public void reset() {
-		MarioControls.reset();
+		marioController.reset();
 	}
 
 	public boolean[] getAction(Environment observation) {
@@ -30,14 +32,14 @@ public class FastAndFurious implements Agent {
 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
-			Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			newestPath = getPath(observation);
 			
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
 				//graph.printMatrix(observation);
 				long startTime = System.currentTimeMillis();
-				Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				//System.out.println(System.currentTimeMillis() - startTime);
 			}
 			
@@ -57,7 +59,7 @@ public class FastAndFurious implements Agent {
 				newestPath = getPath(observation);
 				graph.setGoalNodesChanged(false);
 			}
-			MarioControls.getNextAction(observation, newestPath, action);
+			marioController.getNextAction(observation, newestPath, action);
 
 			if (DEBUG) {
 				DebugDraw.drawPath(observation, newestPath);
@@ -72,7 +74,7 @@ public class FastAndFurious implements Agent {
 	
 	private List<DirectedEdge> getPath(Environment observation) {
 		long startTime = System.currentTimeMillis();
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity());
 		
 		//System.out.println(System.currentTimeMillis() - startTime);
 		return (path == null)? newestPath : path;

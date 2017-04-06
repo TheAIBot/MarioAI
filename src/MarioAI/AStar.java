@@ -18,7 +18,6 @@ import MarioAI.graph.nodes.SpeedNode;
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
-	private static int maxStateSpaceSize = 0;
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
@@ -26,7 +25,7 @@ public final class AStar {
 	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes) {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
@@ -47,7 +46,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null, start.x), 
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, null, null, start.x), 
 										   new SpeedNode(goal, 0, null, null, goal.x));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
@@ -91,9 +90,6 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-
-			maxStateSpaceSize = Math.max(maxStateSpaceSize, openSet.size());
-			//System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
 			
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
@@ -159,10 +155,7 @@ public final class AStar {
 	 * @return
 	 */
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		//if (current.vx == 0) return 1000000f;
 		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
-		//return timeToReachNode(goal, current);
 	}
 
 	/**

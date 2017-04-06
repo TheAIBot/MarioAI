@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,20 +26,21 @@ public class testMassLevels {
 	public static final String MASS_LEVELS_LOSSED_FILE_PATH = "src/tests/massTests/MassLossedSeeds.txt";
 	public static final String MASS_CRASHED_SEEDS_FILE_PATH = "src/tests/massTests/MassCrashedSeeds.txt";
 	
+	int wins = 0;
+	int losses = 0;
+	int crashes = 0;
+	
 	@Test
 	public void test1000RandomLevels() {
-		
-		int wins = 0;
-		int losses = 0;
-		int crashes = 0;
+	
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
 		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
-		
 		for (int i = 0; i < 1000; i++) {
 			FastAndFurious agent = new FastAndFurious();
 			agent.DEBUG = false;
 			int seed = (int) (Math.random () * Integer.MAX_VALUE);
 			Environment observation = TestTools.loadLevelWithSeed(agent, seed);
+			
 			
 			try {
 				for (int x = 0; x < 4000; x++) {
@@ -50,14 +54,14 @@ public class testMassLevels {
 			} catch (Exception e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				continue;
+				return;
+				
 			} catch (Error e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				continue;
+				return;
 			}
 
-			
 			final int status = ((MarioComponent) observation).getMarioStatus();
 			if (status == Mario.STATUS_WIN) {
 				wins++;

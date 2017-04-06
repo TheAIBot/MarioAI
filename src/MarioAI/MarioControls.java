@@ -1,6 +1,5 @@
 package MarioAI;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.graph.GraphMath;
@@ -19,12 +18,12 @@ public class MarioControls {
 	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 2f;
 		
-	private static float oldX = MARIO_START_X_POS;
-	private static int jumpTime = 0;
-	private static int holdJumpTime = 0;
-	private static float currentXSpeed = 0;
+	private float oldX = MARIO_START_X_POS;
+	private int jumpTime = 0;
+	private int holdJumpTime = 0;
+	private float currentXSpeed = 0;
 	
-	public static void reset() {
+	public void reset() {
 		oldX = MARIO_START_X_POS;
 		jumpTime = 0;
 		holdJumpTime = 0;
@@ -69,7 +68,7 @@ public class MarioControls {
 	}
 	
 	
-	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
+	public void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge next = path.get(0);
@@ -261,12 +260,8 @@ public class MarioControls {
 		}
 		return new Pair<Float, Float>((float)driftDistance, (float)lastSpeed);
 	}
-	
-	public static float getMaxV() {
-		return MAX_X_VELOCITY;
-	}
 
-	public static float getXVelocity() {
+	public float getXVelocity() {
 		return currentXSpeed;
 	}	
 }
