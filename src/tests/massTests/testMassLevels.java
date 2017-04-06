@@ -20,6 +20,7 @@ import tests.TestTools;
 public class testMassLevels {
 	
 	public static final String MASS_LEVEL_RESULTS_FILE_PATH = "src/tests/massTests/MassLevelsResults.txt";
+	public static final String MASS_LEVELS_LOSSED_FILE_PATH = "src/tests/massTests/MassLossedSeeds.txt";
 	public static final String MASS_CRASHED_SEEDS_FILE_PATH = "src/tests/massTests/MassCrashedSeeds.txt";
 	
 	@Test
@@ -29,6 +30,7 @@ public class testMassLevels {
 		int losses = 0;
 		int crashes = 0;
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
+		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
 		
 		for (int i = 0; i < 1000; i++) {
 			FastAndFurious agent = new FastAndFurious();
@@ -62,14 +64,20 @@ public class testMassLevels {
 			}
 			else {
 				losses++;
+				lossedSeeds.add(seed);
 			}
 			System.out.println(i);
 		}
 		
 		appendStringToFile(MASS_LEVEL_RESULTS_FILE_PATH, wins + ", " + losses + ", " + crashes + "\n");
-		StringBuilder sBuilder = new StringBuilder();
-		crashedSeeds.forEach(x -> sBuilder.append(x.intValue() + "\n"));
-		appendStringToFile(MASS_CRASHED_SEEDS_FILE_PATH, sBuilder.toString());
+		
+		StringBuilder lossedSBuilder = new StringBuilder();
+		lossedSeeds.forEach(x -> lossedSBuilder.append(x.intValue() + "\n"));
+		appendStringToFile(MASS_LEVELS_LOSSED_FILE_PATH, lossedSBuilder.toString());
+		
+		StringBuilder crashesSBuilder = new StringBuilder();
+		crashedSeeds.forEach(x -> crashesSBuilder.append(x.intValue() + "\n"));
+		appendStringToFile(MASS_CRASHED_SEEDS_FILE_PATH, crashesSBuilder.toString());
 		
 		if (losses != 0 || crashes != 0) {
 			Assert.fail("\nWins: " + wins + 

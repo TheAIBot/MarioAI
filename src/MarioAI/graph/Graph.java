@@ -24,6 +24,7 @@ public class Graph {
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
+	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 	private boolean goalNodesChanged = false;
@@ -55,44 +56,57 @@ public class Graph {
 	}
 	
 	public void createStartGraph(final Environment observation) {
+		updateWholeMatrix(observation);
+		setMarioNode(observation);
+		oldMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		maxMarioXPos = SIGHT_WIDTH / 2;
+		goalNodesChanged = true;
+	}
+	
+	private void updateWholeMatrix(final Environment observation) {
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 
 		for (int i = 0; i < levelMatrix.length; i++) {
 			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
-			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, (i - (SIGHT_WIDTH / 2)) + marioXPos);
-			levelMatrix[i] = columnToInsert;
-			//saveColumn((i - (SIGHT_WIDTH / 2)) + marioXPos - 1, columnToInsert);
 			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
+			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, columnIndex);
+			levelMatrix[i] = columnToInsert;
+			
 			saveColumn(columnIndex, columnToInsert);
 		}
-		setMarioNode(observation);
-		maxMarioXPos = SIGHT_WIDTH / 2;
-		goalNodesChanged = true;
 	}
 
 	public boolean updateMatrix(final Environment observation) {
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-		final int change = marioXPos - oldMarioXPos;
+		
+		final int changeX = marioXPos - oldMarioXPos;
+		final int changeY = marioYPos - oldMarioYPos;
 		oldMarioXPos = marioXPos;
+		oldMarioYPos = marioYPos;
 		int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
 		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
 		maxMarioXPos = newMaxMarioXPos;
-		if (change < 0) {
+		if (changeX < 0) {
 			moveMatrixOneLeft(marioXPos);
 			setMarioNode(observation);
 			return true;
-		} else if (change > 0) {
+		} else if (changeX > 0) {
 			moveMatrixOneRight(observation, marioXPos, marioYPos);
 			setMarioNode(observation);
 			return true;
 		}
+		if (changeY != 0) {
+			updateWholeMatrix(observation);
+		}
+		
 		if ((short)(marioYPos + 1) != marioNode.y && 
 			Grapher.canMarioStandThere((short)11, (short)(marioYPos + 1))) {
 			marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
 			return true;
 		}
+		
 		return false;
 	}
 	
@@ -123,7 +137,6 @@ public class Graph {
 						validColumnsToIgnore--;
 						break;
 					}
-					
 				}
 			}
 		}
@@ -161,8 +174,6 @@ public class Graph {
 		}
 
 		levelMatrix[levelMatrix.length - 1] = columnToInsert;
-		
-		//levelOffSet++;
 	}
 
 	private byte[] getByteColumnFromLevel(final byte[][] level, final int marioYPos) {
@@ -182,9 +193,13 @@ public class Graph {
 	}
 
 	private Node[] convertByteColumnToNodeColumn(final byte[] byteColumn, final int x) {
-		final Node[] nodeColumn = new Node[byteColumn.length];
+		Node[] nodeColumn = getColumn(x);
+		if (nodeColumn == null) {
+			nodeColumn = new Node[byteColumn.length];
+		}
 		for (int y = 0; y < byteColumn.length; y++) {
-			if (byteColumn[y] != 0) {
+			if (nodeColumn[y] == null &&
+				byteColumn[y] != 0) {
 				nodeColumn[y] = new Node((short) x, (short) y, byteColumn[y]);
 			}
 		}

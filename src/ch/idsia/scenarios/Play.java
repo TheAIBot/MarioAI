@@ -17,8 +17,8 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			//Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("ultrashortdeadend.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
 			TestTools.runWholeLevel(observation);
@@ -39,15 +39,14 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        options.setLevelRandSeed(917473191);
+	        options.setLevelRandSeed(1772112418);
 	        /*
 	         * 
-917473191
-919333124
-690211267
-977609164
-211537039
-1869378810
+1549733898
+793284811
+640346535
+1772112418
+232887628
 	         */
 	        
 	        
