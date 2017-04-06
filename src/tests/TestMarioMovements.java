@@ -52,10 +52,11 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).ticks != speed) {
+		MovementInformation moveInfo = MarioControls.getMovementInformationFromEdge(startMarioXPos, 0, endMarioXPos, 0, 0, 0);
+		if (moveInfo.getMoveTime() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
-					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
+					"\nReceived: " + moveInfo.getMoveTime());
 		}
 	}
 	
@@ -111,10 +112,11 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).ticks != speed) {
+		MovementInformation moveInfo = MarioControls.getMovementInformationFromEdge(startMarioXPos, 0, endMarioXPos, 0, 0, 0);
+		if (moveInfo.getMoveTime() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
-					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
+					"\nReceived: " + moveInfo.getMoveTime());
 		}
 	}
 	

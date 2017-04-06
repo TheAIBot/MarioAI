@@ -224,11 +224,11 @@ public class MarioControls {
 	}
 	
 	public static float getDeaccelerationDistanceMoved(final float speed) {
-		final double a = 0.2606629227512888;
-		final double b = 4.161597216697656;
-		final double c = -0.342432087168023;
+		final float a = 0.2606629227512888f;
+		final float b = 4.161597216697656f;
+		final float c = -0.342432087168023f;
 		//has an average error of 0.0072 in the speed range 5-50
-		return (float)(a * Math.exp(b * speed) + c);
+		return (float) (a * Math.exp(b * speed) + c);
 	}
 	
 	private static int getDeaccelerationNeededSteps(float speed) {
@@ -244,9 +244,9 @@ public class MarioControls {
 	}
 	
 	public static Pair<Float, Float> getDriftingDistance(final float speed, final int driftTime) {
-		final double a = speed;
-		final double b = -0.11653355831586142;
-		final double c = -0.00000056420864292;
+		final float a = speed;
+		final float b = -0.11653355831586142f;
+		final float c = -0.00000056420864292f;
 		double driftDistance = 0;
 		double lastSpeed = a;
 		for (int i = 0; i < driftTime; i++) {
