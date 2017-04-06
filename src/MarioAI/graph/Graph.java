@@ -11,7 +11,6 @@ public class Graph {
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
-	public static final int changeX = 22;
 	private static final int MARIO_START_X_POS = 2;
 
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph

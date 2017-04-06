@@ -30,7 +30,16 @@ public final class AStar {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
-		Node goal = new Node((short) (start.x + 50), (short) 2, (byte) 3);
+		int goalX = 0;
+		for (int i = 0; i < rightmostNodes.length; i++) {
+			if (rightmostNodes[i] != null) {
+				goalX = rightmostNodes[i].x;
+				break;
+			}
+		}
+		
+		
+		Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
@@ -169,27 +178,4 @@ public final class AStar {
 		Collections.reverse(path);
 		return path;
 	}
-
-	/**
-	 * Using derived formula for time(v0,dist) from Maple (v2.5)
-	 * @param n1
-	 * @param n2
-	 * @return time to reach n2 from n1
-	 */
-	public static float timeToReachNode(SpeedNode n1, SpeedNode n2) {
-		float v0 = n1.vx;
-		if (v0 < 0) v0 = 0;
-		
-		float dist = Math.abs(n2.node.x - n1.node.x); //guard - should only be able to be positive in the first place
-		float d0 = Math.min(dist,5); //float d0 = dist <= 5 ? dist : 5f;
-		
-		float timeToReachDistanceUnder5Blocks = (float) (0.4734168362e1 - 0.2033398373e2 * v0 + 0.3650816449e1 * d0 - 0.1899556093e0 * Math.pow(d0 - 0.2e1, 0.2e1)
-				- 0.2561502720e1 * (d0 - 0.2e1) * (v0 - 0.15e0) + 0.2015956084e2 * Math.pow(v0 - 0.15e0, 0.2e1)
-				+ 0.4670562450e-1 * Math.pow(d0 - 0.2e1, 0.3e1) + 0.9447200685e0 * Math.pow(d0 - 0.2e1, 0.2e1) * (v0 - 0.15e0)
-				- 0.8877386747e1 * (d0 - 0.2e1) * Math.pow(v0 - 0.15e0, 0.2e1) + 0.1206780712e2 * Math.pow(v0 - 0.15e0, 0.3e1));
-		
-		if (dist <= 5) return timeToReachDistanceUnder5Blocks;
-		return timeToReachDistanceUnder5Blocks + (dist - 5f) / MarioControls.getMaxV(); 
-	}
-
 }
