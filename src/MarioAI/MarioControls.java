@@ -49,7 +49,8 @@ public class MarioControls {
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
 		if (!((distanceToMove < 0 && speed < 0) ||
-			  (distanceToMove > 0 && speed > 0))) {
+			  (distanceToMove > 0 && speed > 0) ||
+			   speed == 0)) {
 			return false;
 		}
 		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
@@ -212,7 +213,7 @@ public class MarioControls {
 		
 		//put sign back on values as it was lost before
 		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;
-		speed         = (distanceIsNegative)? -1 * speed : speed;
+		speed         = (distanceIsNegative)? -1 * speed         : speed;
 		return new XMovementInformation(distanceMoved, speed, steps);
 	}
 	

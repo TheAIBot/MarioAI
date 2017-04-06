@@ -17,7 +17,8 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
 			TestTools.runWholeLevel(observation);
@@ -31,14 +32,24 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
+	        options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed(997358590);
-	        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        options.setLevelRandSeed(917473191);
+	        /*
+	         * 
+917473191
+919333124
+690211267
+977609164
+211537039
+1869378810
+	         */
+	        
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);

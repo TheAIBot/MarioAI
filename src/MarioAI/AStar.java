@@ -163,14 +163,7 @@ public final class AStar {
 	private static List<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (currentSpeedNode.parent != null) {
-			DirectedEdge fisk = null;
-			for (int i = 0; i < currentSpeedNode.parent.node.edges.size(); i++) {
-				if (currentSpeedNode.parent.node.edges.get(i).target.equals(currentSpeedNode.node)) {
-					fisk = currentSpeedNode.parent.node.edges.get(i);
-					break;
-				}
-			}
-			path.add(fisk);
+			path.add(currentSpeedNode.ancestorEdge);
 			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);

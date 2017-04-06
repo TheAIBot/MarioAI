@@ -32,11 +32,11 @@ public abstract class SuperNode implements Comparable<SuperNode> {
 		return (int) (o.fScore * SCORE_MULTIPLIER - this.fScore * SCORE_MULTIPLIER);
 	}
 	
-	public boolean getAllEdgesMade() {
+	public boolean isAllEdgesMade() {
 		return allEdgesMade;
 	}
 	
-	public void setAllEdgesMade(boolean value) {
+	public void setIsAllEdgesMade(boolean value) {
 		allEdgesMade = value;
 	}
 }

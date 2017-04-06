@@ -48,5 +48,9 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public int compareTo(SpeedNode o) {
 		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
 	}
-
+	
+	@Override
+	public String toString() {
+		return node.toString();
+	}
 }

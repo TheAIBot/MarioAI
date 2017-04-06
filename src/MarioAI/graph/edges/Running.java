@@ -19,7 +19,7 @@ public class Running extends DirectedEdge{
 	}
 
 	@Override
-	public int getMaxY() {
+	public float getMaxY() {
 		return 0;
 	}
 

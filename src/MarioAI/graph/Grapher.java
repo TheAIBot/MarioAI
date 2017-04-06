@@ -80,7 +80,7 @@ public  class Grapher {
 				if (isOnLevelMatrix(i, j) &&
 				    canMarioStandThere(i,j) && 
 				    observationGraph[i][j] != null &&
-				    !observationGraph[i][j].getAllEdgesMade()) {
+				    !observationGraph[i][j].isAllEdgesMade()) {
 				   connectNode(observationGraph[i][j], i); 
 				}
 			}
@@ -124,12 +124,12 @@ public  class Grapher {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		boolean foundAllEdges = true;
 		//Three different ways to find the reachable nodes from a given position:
-		foundAllEdges = foundAllEdges && getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
-		foundAllEdges = foundAllEdges && getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;
 		
 		if (foundAllEdges) {
-			startingNode.setAllEdgesMade(true);
+			startingNode.setIsAllEdgesMade(true);
 		}
 		return listOfEdges;
 	}
@@ -163,10 +163,10 @@ public  class Grapher {
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				foundAllEdges = foundAllEdges && jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges); //TODO ERROR if removed on shortdeadend
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				foundAllEdges = foundAllEdges && jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges);					
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
 			}
 		}
 		return foundAllEdges;
