@@ -10,22 +10,18 @@ import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: May 5, 2009
- * Time: 12:46:43 PM
- */
 public class Play {
 
-    public static void main(String[] args) {
-        boolean loadLevel = false;
-        if (loadLevel) {
-            Agent controller = new FastAndFurious();
-        	//Agent controller = new HumanKeyboardAgent();
-            Environment observation = TestTools.loadLevel("jumpLevels/2Width.lvl", controller, true);
-            //Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
-            TestTools.runWholeLevel(observation);
+	public static void main(String[] args) {
+		boolean loadLevel = false;
+		if (loadLevel) {
+			Agent controller = new FastAndFurious();
+			// Agent controller = new HumanKeyboardAgent();
+			//Environment observation = TestTools.loadLevel("deadend2.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
+			// controller, true);
+			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
 	        
@@ -36,20 +32,30 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
+	        options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        options.setLevelRandSeed((int) (Math.random () * Integer.MAX_VALUE));
+	        options.setLevelRandSeed(917473191);
+	        /*
+	         * 
+917473191
+919333124
+690211267
+977609164
+211537039
+1869378810
+	         */
+	        
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
-
+	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);
-			
 		}
-    }
+	}
 }

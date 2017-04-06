@@ -16,7 +16,7 @@ public class MarioControls {
 	
 	private static final double MIN_MARIO_SPEED = 0.03;
 	private static final int MAX_JUMP_TIME = 8;
-	private static final float MAX_X_VELOCITY = 0.35f;
+	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 2f;
 		
 	private static float oldX = MARIO_START_X_POS;
@@ -43,6 +43,31 @@ public class MarioControls {
 		return false;
 	}
 	
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed) {
+		if (edge instanceof Running) {
+			return true;
+		}
+		final float distanceToMove = edge.target.x - currentXPos;
+		if (!((distanceToMove < 0 && speed < 0) ||
+			  (distanceToMove > 0 && speed > 0) ||
+			   speed == 0)) {
+			return false;
+		}
+		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
+		float distanceMoved = 0;
+		speed = Math.abs(speed);
+		for (int i = 0; i < ticksJumping; i++) {
+			speed = getNextTickSpeed(speed);
+			distanceMoved += speed;
+		}
+		//+ 0.5f to make it the center of the block instead of the edge
+		return (distanceMoved >= Math.abs(distanceToMove));
+	}
+	
+	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
+		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY;
+	}
+	
 	
 	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
@@ -51,7 +76,7 @@ public class MarioControls {
 		
 		currentXSpeed = marioXPos - oldX;
 		MovementInformation moveInfo;
-		if (jumpTime <= 0) {
+		if (jumpTime <= 0 && next.getMaxY() > 0) {
 			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
 		}
 		else {
@@ -78,7 +103,7 @@ public class MarioControls {
 	}
 	
 	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge nextEdge = path.get(0);
 		
@@ -136,26 +161,6 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed) {
-		if (edge instanceof Running) {
-			return true;
-		}
-		final float distanceToMove = edge.target.x - edge.source.x;
-		if (!((distanceToMove < 0 && speed < 0) ||
-			(distanceToMove > 0 && speed > 0))) {
-			return false;
-		}
-		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
-		float distanceMoved = 0;
-		speed = Math.abs(speed);
-		for (int i = 0; i < ticksJumping; i++) {
-			speed = getNextTickSpeed(speed);
-			distanceMoved += speed;
-		}
-		//+ 0.5f to make it the center of the block instead of the edge
-		return (distanceMoved >= Math.abs(distanceToMove));
-	}
-	
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
 		return getMovementInformationFromEdge(edge.source.x, edge.source.y, edge.target, edge, speed);
 	}
@@ -175,7 +180,7 @@ public class MarioControls {
 	public static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int time) {
 		float distanceMoved = 0;
 		int steps = 0;
-		boolean speedIsNegative = neededXDistance < 0;
+		boolean distanceIsNegative = neededXDistance < 0;
 		if ((neededXDistance < 0 && speed > 0) ||
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
@@ -186,8 +191,6 @@ public class MarioControls {
 				
 				//speed is now 0
 				speed = 0;
-				//speed in future should now be reversed
-				speedIsNegative = !speedIsNegative;
 			}
 		}
 		else if (neededXDistance == 0) {
@@ -196,14 +199,22 @@ public class MarioControls {
 		speed = Math.abs(speed);
 		neededXDistance = Math.abs(neededXDistance);
 		
-		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, time - steps).key.floatValue()) > ACCEPTED_DEVIATION) {
+		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, time - steps).key) > ACCEPTED_DEVIATION) {
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
 			steps++;
 		}
 		//get end speed
-		speed = getDriftingDistance(speed, time - steps).value.floatValue();
-		return new XMovementInformation((speedIsNegative)? -1 * distanceMoved : distanceMoved, (speedIsNegative)? -1 * speed : speed, steps);
+		Pair<Float, Float> driftInfo = getDriftingDistance(speed, time - steps);
+		speed = driftInfo.value;
+		
+		//add drifting distance to distance moved
+		distanceMoved += driftInfo.key;
+		
+		//put sign back on values as it was lost before
+		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;
+		speed         = (distanceIsNegative)? -1 * speed         : speed;
+		return new XMovementInformation(distanceMoved, speed, steps);
 	}
 	
 	public static float getNextTickSpeed(final float speed) {

@@ -3,6 +3,8 @@ package tests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Assert;
@@ -21,6 +23,10 @@ import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestGrapher {
 	
 	private static final int GRID_WIDTH = 22;
@@ -101,6 +107,7 @@ public class TestGrapher {
 	public void testRunningEdgesAgainstWall() {
 		Graph graph = getStartLevelWorld("flatWithBump.lvl");
 		Node[][] world = graph.getLevelMatrix();
+		Grapher.setMovementEdges(world, marioNode);
 		//Mario shouldn't run to the right, only to the left:
 		assertEquals(1, marioNode.getNumberOfEdgesOfType(runningEdgeType));
 		//To the left:
@@ -255,9 +262,42 @@ public class TestGrapher {
 				assertTrue(edge.target.y == edge.source.y);
 			}
 		}
+	}
+		
+	@Test 
+	public void testAlwaysSameResultOnSetEdges() {
+		//Should get the same result doing multiple set edges on a given level matrix.
+		Graph graph1 = totalFlatland();
+		Node[][] world1 = graph1.getLevelMatrix();
+		
+		Graph graph2 = totalFlatland();
+		Node[][] world2 = graph2.getLevelMatrix();
+		Grapher.setMovementEdges(world1, marioNode);
+		//And multiple times:
+		Grapher.setMovementEdges(world2, marioNode);
+		Grapher.setMovementEdges(world2, marioNode);
+		
+		//Asserting that the result is the same for the two matrixes:
+		for (int i = 0; i < world2.length; i++) {
+			for (int j = 0; j < world2[i].length; j++) {
+				if (world1[i][j] == null && world2[i][j] == null) {
+					continue;
+				} else if (world1[i][j] == null && world2[i][j] == null) fail();
+				//The number of edges going out from a given Node should be the same:
+				assertEquals(world1[i][j].edges.size(), world2[i][j].edges.size());
+				//All edges in one list should also be in the other list:
+				for (DirectedEdge edge : world2[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world1[i][j].edges.contains(edge));
+				}
+				//And the outher way around:
+				for (DirectedEdge edge : world1[i][j].edges) { 
+					//A little slow, but this test doesn't take that much time.					
+					assertTrue(world2[i][j].edges.contains(edge));
+				}
+			}
+		}
+		
 		
 	}
-	
-	
-	
 }

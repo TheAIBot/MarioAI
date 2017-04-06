@@ -1,5 +1,6 @@
 package MarioAI.graph.edges;
 
+import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public class SecondOrderPolynomial extends DirectedEdge {
@@ -14,25 +15,33 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	// possible to reach,
 	// even though it is only one it should be possible to reach. Mario changing
 	// position in the air can compensate for this.
-	private int ceiledTopPointX;
-	private int ceiledTopPointY; // Ceildes coordinates of the toppunkt
+	public int ceiledTopPointX; //TODO change to private after tests.
+	public int ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	
 	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
 		super(source, target);
-		a = polynomial.a;
-		b = polynomial.b;
-		c = polynomial.c;
-		topPointX = polynomial.topPointX;
-		topPointY = polynomial.topPointY;
-		ceiledTopPointX = polynomial.ceiledTopPointX;
-		ceiledTopPointY = polynomial.ceiledTopPointY;
+		this.a = polynomial.a;
+		this.b = polynomial.b;
+		this.c = polynomial.c;
+		this.topPointX = polynomial.topPointX;
+		this.topPointY = polynomial.topPointY;
+		this.ceiledTopPointX = polynomial.ceiledTopPointX;
+		this.ceiledTopPointY = polynomial.ceiledTopPointY;
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
+		//Needs to be rehashed, as the hash should depend on the height of the jump:
 	}
 
 	public SecondOrderPolynomial(Node source, Node target) {
 		super(source, target);
-		a = 0;
-		b = 0;
-		c = 0;
+		this.a = 0;
+		this.b = 0;
+		this.c = 0;
+	}
+	
+	public SecondOrderPolynomial(Node source, Node target, int ceiledTopPointY) {
+		this(source, target);
+		this.ceiledTopPointY = ceiledTopPointY;
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	//
@@ -64,8 +73,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	private void setTopPoint() {
-		topPointX = ((-b / a) / 2);
-		topPointY = f(topPointX);
+		float x = ((-b / a) / 2);
+		float y = f(x);
+		setTopPoint(x, y);
+	}
+	
+	public void setTopPoint(float x, float y) {
+		topPointX = x;
+		topPointY = y;
 		ceiledTopPointX = (short) Math.ceil(topPointX);
 		ceiledTopPointY = (short) Math.ceil(topPointY);
 	}
@@ -76,7 +91,7 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	
 	@Override
 	public float getMaxY() {
-		return (topPointY - source.y);
+		return topPointY - (int)source.y;
 	}
 
 	public float getWeight() {
@@ -96,8 +111,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		return v0;
 	}
 
-	public void setTopPoint(float x, float y) {
-		topPointX = x;
-		topPointY = y;
+	@Override
+	protected int getExtraEdgeHashcode() {
+		final int jumpType = 1; //it is a jump edge type
+		//Its jump height. Max is 4 min is 0, giving 3 bits.
+		//3 plus 1 but for jump type 
+		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 1;		
+		return jumpHeight | jumpType;
 	}
+
+	
 }

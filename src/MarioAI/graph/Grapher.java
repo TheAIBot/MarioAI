@@ -63,21 +63,29 @@ public  class Grapher {
 	public static void setMovementEdges(Node[][] levelMatrix, Node mario) {
 		observationGraph = levelMatrix;
 		inRecursion= new boolean[GRID_WIDTH][GRID_WIDTH];
-		clearAllEdges(levelMatrix);
-		//inRecursion[GRID_SIZE/2][mario.y]  = true; Skal ikke goeres, da Mario er en seperat node fra banen.
+		//clearAllEdges(levelMatrix);
 		Node oldMarioNode = marioNode;
 		marioNode = mario;
 		mario.deleteAllEdges();
-		if (mario.x >= 160) {
-			//System.out.println();
-		}
 		//printView();
+		//For mario:
 		if(isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) &&
 		   canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
 			connectNode(mario, GRID_WIDTH / 2); 
 		}
-		//TODO Måske skal det være Math.min((GRID_WIDTH/2),mario.x)
-		//System.out.println("The edges are ready!");
+		//For the rest of the level matrix:
+
+		for (int i = 0; i < observationGraph.length; i++) {
+			for (int j = 0; j < observationGraph[i].length; j++) {
+				if (isOnLevelMatrix(i, j) &&
+				    canMarioStandThere(i,j) && 
+				    observationGraph[i][j] != null &&
+				    !observationGraph[i][j].isAllEdgesMade()) {
+				   connectNode(observationGraph[i][j], i); 
+				}
+			}
+		}
+		
 	}
 	
 	private static void connectNode(Node node, int coloumn) {
@@ -94,26 +102,8 @@ public  class Grapher {
 				isOnLevelMatrix(connectingEdge.target, marioNode) && 
 				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
 				node.addEdge(connectingEdge); 
-				//TODO Fix the fact that there are no guarantee that there aren't duplicates.
 			}
-		}
-		// Recursion over the reachable nodes:
-		for (DirectedEdge neighborEdge : node.edges)  { 
-			/*TODO Right now it recalculates the edges on the observation, every time it is run. 
-			 * It must be possible to only calculate what is necessary.
-			 */
-			if (neighborEdge.target.ancestorEdge == null) {
-				neighborEdge.target.ancestorEdge = neighborEdge;
-			}
-			if (isOnLevelMatrix(neighborEdge.target, marioNode)) {
-				int neighborColoumn = getColoumnRelativeToMario(neighborEdge.target, marioNode);
-				if (!inRecursion[neighborColoumn][neighborEdge.target.y]) {
-					inRecursion[neighborColoumn][neighborEdge.target.y] = true; //Infinite recursion not allowed!.
-					connectNode(neighborEdge.target,neighborColoumn ); // Check which nodes it can reach!
-					//Because of the structure, it is a depth first search.
-				}				
-			}
-		}
+		}		
 	}
 	
 	private static boolean isOnLevelMatrix(Node position, Node marioNode) {
@@ -132,20 +122,33 @@ public  class Grapher {
 
 	private static List<DirectedEdge> getConnectingEdges(Node startingNode, int nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
+		boolean foundAllEdges = true;
 		//Three different ways to find the reachable nodes from a given position:
-		getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges); //TODO Obs. no need to return a list of nodes
+		foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; //TODO Obs. no need to return a list of nodes
 		//getBadJumpReachableNodes(startingNode, listOfNodes, nodeColoumn);
-		getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges);
+		foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;
+		
+		if (foundAllEdges) {
+			startingNode.setIsAllEdgesMade(true);
+		}
 		return listOfEdges;
 	}
 	
-	private static void getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+	private static boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+		boolean foundAllEdges = true;
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		}
+		else {
+			foundAllEdges = false;
+		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			listOfEdges.add(new Running(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
-		}		
+		}
+		else {
+			foundAllEdges = false;
+		}
+		return foundAllEdges;
 	}
 	
 	/*** Finds the possible places that mario can jump to, from the given position, 
@@ -154,116 +157,99 @@ public  class Grapher {
 	 * 
 	 * @return
 	 */
-	public static void getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
-		//TODO Extra ting der kan tilføjes: polynomium hop til fjender!
-		//TODO Polynomial bounding conditions.
+	public static boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
-		for (int jumpHeight = 4; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		boolean foundAllEdges = true;
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT, listOfEdges); //TODO ERROR if removed on shortdeadend
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT, listOfEdges);					
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
 			}
 		}
+		return foundAllEdges;
 	}
 	
-	private static void jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial,
-											JumpDirection direction, List<DirectedEdge> listOfEdges) {
+	private static boolean jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
 		//Starts of from Mario's initial position:
-		int currentXPosition = nodeColoumn, xPositionOffsetForJump = 0;
-		float formerYPosition = startingNode.y, currentYPosition;
+		int currentXPosition = nodeColoumn;
+		int xPositionOffsetForJump = 0;
 		int formerLowerYPosition = startingNode.y;
-		boolean hasMetHardGround = false;
-		
-		int currentLowerYPosition; //Automatic flooring included!
-		int bound;
-		
 		Collision collisionDetection = Collision.HIT_NOTHING;
 		//Gives the current direction of the jump:
-		JumpDirection currentJumpDirection = (direction.isLeftType())? JumpDirection.LEFT_UPWARDS: JumpDirection.RIGHT_UPWARDS;
-		//Get upwards moving part:
-		//Primarily collision detection.
-		while ((collisionDetection != Collision.HIT_GROUND)&&
-				collisionDetection != Collision.HIT_CEILING &&
-			   !polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump) &&
-			   isWithinView(currentXPosition + xPositionOffsetForJump)) {
-			currentXPosition = currentXPosition + ((direction.isLeftType())? -1 : 1);			
-			//Has just passed the toppunkt, ie. the toppunkt was on the current "block"
-			if (polynomial.isPastTopPoint(nodeColoumn, currentXPosition + xPositionOffsetForJump)) { 
-				//Up to the max height of the polynomial!
-				currentYPosition = polynomial.getTopPointY(); 						
-			} else {//Else up to the current height of the polynomial.
-				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);				
-			}
-			//First rounded to 1/64.	
-			currentLowerYPosition = Math.round(currentYPosition * 64) / 64; //Automatic flooring included!
-			bound = getBounds(startingNode, currentLowerYPosition); 
-			collisionDetection = ascendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
-													 polynomial, currentJumpDirection, startingNode, listOfEdges);	
-			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition = currentXPosition + ((direction.isLeftType())? 1 : -1);
-				xPositionOffsetForJump = xPositionOffsetForJump + ((direction.isLeftType())? -1 : 1);
-			} else if (collisionDetection == Collision.HIT_GROUND || 
-					   collisionDetection == Collision.HIT_CEILING) {
-				hasMetHardGround = true;
-			}
-			formerYPosition = currentYPosition;
-			formerLowerYPosition = bound;
-		}
+		JumpDirection currentJumpDirection = direction;
+
 		
-		
-		//Downwards:
-		if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
-			currentXPosition--; //The toppunkt was in the current block (and not ending there).
-			//Therefore the downward going part of that block needs to be checked.
-		} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
-			currentXPosition++; //other way around
-		}
-		currentJumpDirection = (direction.isLeftType())? JumpDirection.LEFT_DOWNWARDS: JumpDirection.RIGHT_DOWNWARDS;
-		while (!hasMetHardGround &&
-				isWithinView(currentXPosition + xPositionOffsetForJump)) { //Doesen't take falling down into a hole into account.
+		boolean hasAlreadyPassedTopPoint = false;
+		boolean isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);;
+		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
+			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();
 			
-			currentXPosition = currentXPosition + ((direction.isLeftType())? -1 : 1);						
-			currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);
-			//First rounded to 1/64.	
-			currentLowerYPosition = Math.round(currentYPosition * 64) / 64; //Automatic flooring included!			
-			// TODO change to take the sign into account
-			bound = getBounds(startingNode, currentLowerYPosition); 	
+			if (isPastTopPoint && !hasAlreadyPassedTopPoint) {
+				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
+					currentXPosition--; //The toppunkt was in the current block (and not ending there).
+					//Therefore the downward going part of that block needs to be checked.
+				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
+					currentXPosition++;
+				}
+				currentJumpDirection = direction.getOppositeVerticalDirection();				
+				hasAlreadyPassedTopPoint = true;
+			}
 			
-			collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
-					 								  polynomial, currentJumpDirection, startingNode, listOfEdges);				
+			float currentYPosition;
+			if (!isPastTopPoint) {
+				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump));
+			} else {
+				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);	
+			}
+			//The bound is the bounded value for the next y position -> rounded down.
+			//This converts the next y value from (high value = higher up on the level) to (high value = lower on the level)
+			final int bound = getBounds(startingNode, (int)currentYPosition); 
+			
+			if (!isPastTopPoint) {
+				collisionDetection = ascendingPolynomial (formerLowerYPosition, bound, currentXPosition, collisionDetection, 
+														  polynomial, currentJumpDirection, startingNode, listOfEdges);	
+			} else {
+				collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
+						                                  polynomial, currentJumpDirection, startingNode, listOfEdges);		
+			}
+			
 			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition = currentXPosition + ((direction.isLeftType())? 1 : -1);
-				xPositionOffsetForJump = xPositionOffsetForJump + ((direction.isLeftType())? -1 : 1);
+				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
+				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
+			} else if (collisionDetection == Collision.HIT_CEILING) {
+				return false;
 			} else if (collisionDetection == Collision.HIT_GROUND) {
-				hasMetHardGround = true;
+				return true;
 			}
 			
-			formerYPosition = currentYPosition;
+			isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
 			formerLowerYPosition = bound;
 		}
+		return false;
 	}
 		
 	private static Collision ascendingPolynomial(int formerLowerYPosition, int bound, int currentXPosition, Collision collisionDetection,
 												 SecondOrderPolynomial polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
 		boolean isHittingWall = false;		
 		for (int y = formerLowerYPosition; y >= Math.max(bound, 0); y--) {
-			Collision lowerFacingMarioCorner    = lowerFacingCornerCollision(isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);
-			Collision upperFacingMarioCorner    = upperFacingCornerCollision(isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
-			Collision upperOppositeMarioCorner 	= upperOppositeCornerCollision (isHittingWall , y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
+			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  (y, currentXPosition, collisionDetection, direction);
+			final Collision upperFacingMarioCorner   = upperFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, direction);	
+			final Collision upperOppositeMarioCorner = upperOppositeCornerCollision(y, currentXPosition, direction);	
 			//As it is ascending to the right, only worry about the two corners to the right
-			if 		  (upperOppositeMarioCorner == Collision.HIT_CEILING  || upperFacingMarioCorner == Collision.HIT_CEILING) {
+			if (upperOppositeMarioCorner == Collision.HIT_CEILING  || 
+				upperFacingMarioCorner == Collision.HIT_CEILING){
 				collisionDetection = Collision.HIT_CEILING;
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
 					   lowerFacingMarioCorner == Collision.HIT_GROUND) {
 				collisionDetection = Collision.HIT_GROUND;
-				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y], polynomial));
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
-					   lowerFacingMarioCorner == Collision.HIT_WALL){
+					   lowerFacingMarioCorner == Collision.HIT_WALL) {
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				//No break.
@@ -274,22 +260,27 @@ public  class Grapher {
 	
 	private static Collision descendingPolynomial(int formerLowerYPosition, int bound, int currentXPosition, Collision collisionDetection,
 												 SecondOrderPolynomial polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
-	boolean isHittingWall = false;		
-		for (int y = formerLowerYPosition; y <= Math.min(bound,GRID_HEIGHT); y++) {
-			Collision lowerFacingMarioCorner 	= lowerFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);
-			Collision upperFacingMarioCorner 	= upperFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
-			Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision(isHittingWall , y, formerLowerYPosition, currentXPosition, collisionDetection, direction);	
+		boolean isHittingWall = false;		
+		for (int y = formerLowerYPosition; y <= Math.min(bound, GRID_HEIGHT - 1); y++) {
+			final Collision lowerFacingMarioCorner 	 = lowerFacingCornerCollision  (y, currentXPosition, collisionDetection, direction);
+			final Collision upperFacingMarioCorner 	 = upperFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, direction);	
+			final Collision lowerOppositeMarioCorner = lowerOppositeCornerCollision(y, currentXPosition, direction);	
 			//As it is descending to the right, only worry about the two corners to the right, and the left lower one.
 			
 			if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
-					  (lowerFacingMarioCorner == Collision.HIT_GROUND || lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
+			    (lowerFacingMarioCorner == Collision.HIT_GROUND || 
+			     lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
 				collisionDetection = Collision.HIT_GROUND;
-				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	listOfEdges.add(
-											 new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
-				else listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition + ((direction.isLeftType())? 1: -1)][y],polynomial));
+				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	{
+					listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y],polynomial));
+				}										 
+				else {
+					final int groundXPos = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
+					listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[groundXPos][y], polynomial));
+				}
 				break;
-			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
-					   lowerFacingMarioCorner == Collision.HIT_WALL){
+			} else if (upperFacingMarioCorner == Collision.HIT_WALL || 
+					   lowerFacingMarioCorner == Collision.HIT_WALL) {
 				//It is purposefully made so that the hit wall will never stop, until the ground is hit.
 				
 				collisionDetection = Collision.HIT_WALL;
@@ -300,87 +291,31 @@ public  class Grapher {
 		return collisionDetection;
 	}
 	
-	private static boolean descendingPolynomial(int formerLowerYPosition, int bound, int currentXPosition,
-            List<DirectedEdge> listOfEdges, SecondOrderPolynomial polynomial, Node startingPosition) {
-		for (int y = formerLowerYPosition; y <= bound; y++) {
-			if (canMarioStandThere(currentXPosition, y)) { 
-				//Checks if mario can stand on the current block, and if he is currently in the falling part of the polynomial.
-				//This is not done by precisely checking if it hits the ground, for a reason --> Mario's can move while jumping.
-				//TODO Later it would be more appropriate to use a isFalling boolean, f.eks. hvis mario glider langs en mur,
-				//hvormed x positionen ikke ændrer sig.		
-				//TODO one does no neccesarily need a new polynomial for ee
-				
-				listOfEdges.add(new SecondOrderPolynomial(startingPosition, observationGraph[currentXPosition][y], polynomial));
-				//Hvis den kun lige akkurat kommer dertil, stoppes der, så der ikke kommer en kant til næste knude.
-				//TODO Fix so no multi edges
-				return true; //TODO Fix this. Shouldn't just return true, as this sometimes will not include some possibilities
-			} else if (!isAir(currentXPosition, y) && !isAir(currentXPosition, y-1)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	public static int getBounds(Node startingNode, int currentLowerYPosition) {
-		return Math.round((startingNode.y - (currentLowerYPosition-startingNode.y)) * 64) / 64; //Rounded and then floored!
+		return startingNode.y - (currentLowerYPosition - startingNode.y);
 	}
 	
-	/***
-	 * @return
-	 */
 	private static boolean isHittingWallOrGroundUpwards(int xPosition, int yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
 		//Needs yPosition-1, as else one will get an immediate collision with the ground, as mario starts on it.
-		boolean result = (isOnLevelMatrix(xPosition, (yPosition -1))) && isSolid(observationGraph[xPosition][yPosition - 1]);
-		return result;
+		return isOnLevelMatrix(xPosition, yPosition - 1) && isSolid(observationGraph[xPosition][yPosition - 1]);
 	}
 	
 	private static boolean isHittingWallOrGroundDownwards(int xPosition, int yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
 		//TODO removed yPosition-1
-		boolean isOnLevel = isOnLevelMatrix(xPosition, yPosition);
-		if (isOnLevel) {
-			boolean isAtSolidNode = isSolid(observationGraph[xPosition][yPosition]);
-			boolean isAtJumpthroughNode = isJumpThroughNode(observationGraph[xPosition][yPosition]);		
-			boolean result = isOnLevel &&  (isAtSolidNode  || isAtJumpthroughNode);
+		if (isOnLevelMatrix(xPosition, yPosition)) {
+			final boolean isAtSolidNode = isSolid(observationGraph[xPosition][yPosition]);
+			final boolean isAtJumpthroughNode = isJumpThroughNode(observationGraph[xPosition][yPosition]);
 			
 			return isAtSolidNode || isAtJumpthroughNode;
 		} else {
 			return false;
 		}
 	}
-	
-	/***
-	 * 
-	 * 
-	 */
-	/*
-	private static void hitWallOrGround(List<DirectedEdge> listOfEdges, short xPosition, short yPosition) {
-		Node fallDownPosition = getFallDownPosition(xPosition, yPosition);
-		if(fallDownPosition != null) {
-			listOfEdges.add(fallDownPosition);
-		}
-	}
-	*/
 		
-	private static boolean isWithinView(int xPosition) { //TODO Rename, curtesy of +1
-		return xPosition < GRID_WIDTH && xPosition > 0;
-	}
-	
-	private static Node getFallDownPosition(int coloumn, int row) {
-		// Not including zero, as there needs to be a block below mario to fall
-		// down and stand on.
-		for (int yPosition = row; yPosition < GRID_HEIGHT; yPosition++) {
-			if (canMarioStandThere(coloumn,yPosition))
-				return observationGraph[coloumn][row];
-		}
-
-		return null;
-	}
-	
-	private static int newYPosition(int x, int topPunktX, int currentY) {
-		if(x < topPunktX) return currentY--;
-		else return currentY++;
+	private static boolean isWithinView(int xPosition) {
+		return xPosition < GRID_WIDTH && xPosition >= 0;
 	}
 	
 	private static boolean canMarioStandThere(Node node, Node marioNode) {
@@ -410,6 +345,7 @@ public  class Grapher {
 		return node != null && node.type != -11;// TODO(*) Fix
 	}
 	
+	
 	private static boolean isAir(int coloumn, int row) {
 		//return node != null;
 		return !(0 <= row 	  && row < GRID_HEIGHT     &&
@@ -421,24 +357,19 @@ public  class Grapher {
 		return (node != null && node.type == -11);
 	}
 		
-	private static Collision lowerFacingCornerCollision(boolean isHittingWall, int y, int formerLowerYPosition, 
-			int currentXPosition, Collision collisionDetection, JumpDirection direction) {
-		/*
-		if (direction.isLeftType()) {
-			//Substracts 1 as normally currentXPosition gives the right most corner.
-			currentXPosition--;
-		} //Else it is the right going type, and nothing should be changed.
-		*/
+	private static Collision lowerFacingCornerCollision(int y, int currentXPosition, Collision collisionDetection, JumpDirection direction) {
 		if (direction.isUpwardsType()) { 
 			//In the case one is going upwards, one should not check for any other type of collisions, 
 			//than those originating from wall collisions.
-			if (isHittingWallOrGroundUpwards(currentXPosition,y)) { //If it is hitting the ceiling, upperRight will notice.
+			if (isHittingWallOrGroundUpwards(currentXPosition, y)) { //If it is hitting the ceiling, upperRight will notice.
 				return Collision.HIT_WALL;
 			} else {
 				if (isAir(currentXPosition, y - MarioHeight) && 
 					collisionDetection == Collision.HIT_WALL) {
 					return Collision.HIT_GROUND;
-				} else return Collision.HIT_NOTHING;			
+				} else {
+					return Collision.HIT_NOTHING;			
+				}
 			}
 		} else {
 			//One must be going downwards, and there should be checked for collisions:
@@ -455,12 +386,7 @@ public  class Grapher {
 		}
 	}
 
-	private static Collision upperFacingCornerCollision(boolean isHittingWall, int y, int formerLowerYPosition, 
-														int currentXPosition, Collision collisionDetection, JumpDirection direction) {
-		/*if (direction.isLeftType()) {
-			//Subtracts 1 as normally currentXPosition gives the right most corner.
-			currentXPosition--;
-		}*/
+	private static Collision upperFacingCornerCollision(boolean isHittingWall, int y, int formerLowerYPosition, int currentXPosition, JumpDirection direction) {
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
@@ -471,8 +397,12 @@ public  class Grapher {
 					//TODO make.
 					//hitWallOrGround(listOfEdges, currentXPosition,y);
 					return Collision.HIT_CEILING;					
-				} else return Collision.HIT_WALL;
-			} else return Collision.HIT_NOTHING;
+				} else {
+					return Collision.HIT_WALL;
+				}
+			} else {
+				return Collision.HIT_NOTHING;
+			}
 			
 		} else {
 			//It can only hit a wall, or nothing, so:
@@ -484,47 +414,32 @@ public  class Grapher {
 		}
 	}
 	
-	private static Collision upperOppositeCornerCollision(boolean isHittingWall, int y, int formerLowerYPosition, 
-														  int currentXPosition, Collision collisionDetection, JumpDirection direction) {
-		if (direction.isLeftType()) {
-			//TODO describe why:
-			currentXPosition++;
-		} else currentXPosition--;
-		if (direction.isUpwardsType()) {
-			//If Mario is going upwards, and since this is the opposite corner of the way he is going, 
-			//one only needs to check for ceiling collisions.
-			if (isHittingWallOrGroundUpwards(currentXPosition, y - 1)) {
-				return Collision.HIT_CEILING;
-			} else {
-				return Collision.HIT_NOTHING;
-			}
+	private static Collision upperOppositeCornerCollision(int y, int currentXPosition, JumpDirection direction) {
+		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
+		
+		//If Mario is going upwards, and since this is the opposite corner of the way he is going, 
+		//one only needs to check for ceiling collisions.
+		if (isHittingWallOrGroundUpwards(currentXPosition, y - 1)) {
+			return Collision.HIT_CEILING;
 		} else {
-			//it does not matter in the case of Mario going downwards:
 			return Collision.HIT_NOTHING;
 		}
 	}
 	
-	private static Collision lowerOppositeCornerCollision(boolean isHittingWall, int y, int formerLowerYPosition, 
-														  int currentXPosition, Collision collisionDetection, JumpDirection direction) {
+	private static Collision lowerOppositeCornerCollision(int y, int currentXPosition, JumpDirection direction) {
+		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
 		
-		if (direction.isLeftType()) {
-			//TODO explain why ++ or --
-			currentXPosition++;
-		} else currentXPosition--; 
-		if (direction.isUpwardsType()) {
-			//This should never be called when Mario is going upwards, as it won't affect anything.
-			throw new Error("ERROR: lowerOppositeCornerCollision shouldnt be called when mario is going upwards");
-		} else {
-			//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
-			if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
-				if (canMarioStandThere(currentXPosition, y)) {
-					return Collision.HIT_GROUND;
-				} else {
-					return null;
-					//TODO i don't think this should be possible:
-					//throw new Error("Logic error on corner collision detection");
-				}
-			}else return Collision.HIT_NOTHING;
+		//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
+		if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
+			if (canMarioStandThere(currentXPosition, y)) {
+				return Collision.HIT_GROUND;
+			} else {  
+				return Collision.HIT_WALL;
+				//TODO i don't think this should be possible:
+				//throw new Error("Logic error on corner collision detection");
+			}
+		}else {
+			return Collision.HIT_NOTHING;
 		}
 	}
 	

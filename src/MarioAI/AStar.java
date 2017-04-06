@@ -12,12 +12,13 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+//public boolean hasEnemy(int x, int y, int time);
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
-
+	private static int maxStateSpaceSize = 0;
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
@@ -50,7 +51,6 @@ public final class AStar {
 				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
-
 		return path;
 	}
 
@@ -74,7 +74,6 @@ public final class AStar {
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
-
 		while (!openSet.isEmpty()) {
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
@@ -84,12 +83,16 @@ public final class AStar {
 				return reconstructPath(current);
 			}
 
+			maxStateSpaceSize = Math.max(maxStateSpaceSize, openSet.size());
+			//System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
+			
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
 			//System.out.println(openSet.size());
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+
 				//make sure the edge is possible to use
 				//all Running edges are possible
 				//not all jumps are possible
@@ -97,8 +100,18 @@ public final class AStar {
 					continue;
 				}
 				
-				final MovementInformation movementInformation = MarioControls.getStepsAndSpeedAfterJump(neighborEdge, current.vx);
+				
+				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, neighborEdge.target, neighborEdge, current.vx);
+				
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
+				
+				//in a jump it's possible to jump too far
+				//and there is nothing that mario can do about it
+				//this should maybe be removed in the future
+				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)) {
+					continue;
+				}
+				
 				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
 
 				//a similar enough node has already been run through
@@ -150,14 +163,7 @@ public final class AStar {
 	private static List<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (currentSpeedNode.parent != null) {
-			DirectedEdge fisk = null;
-			for (int i = 0; i < currentSpeedNode.parent.node.edges.size(); i++) {
-				if (currentSpeedNode.parent.node.edges.get(i).target.equals(currentSpeedNode.node)) {
-					fisk = currentSpeedNode.parent.node.edges.get(i);
-					break;
-				}
-			}
-			path.add(fisk);
+			path.add(currentSpeedNode.ancestorEdge);
 			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);
