@@ -13,6 +13,8 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 //public boolean hasEnemy(int x, int y, int time);
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  

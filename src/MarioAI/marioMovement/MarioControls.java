@@ -1,7 +1,9 @@
-package MarioAI;
+package MarioAI.marioMovement;
 
 import java.util.List;
 
+import MarioAI.MarioMethods;
+import MarioAI.Pair;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;

@@ -6,6 +6,7 @@ import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
