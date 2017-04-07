@@ -191,9 +191,8 @@ public  class Grapher {
 			if (collisionDetection == Collision.HIT_WALL) {
 				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
 				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
-			} else if (collisionDetection == Collision.HIT_CEILING) {
-				return false;
-			} else if (collisionDetection == Collision.HIT_GROUND) {
+			} else if (collisionDetection == Collision.HIT_CEILING ||
+					   collisionDetection == Collision.HIT_GROUND) {
 				return true;
 			}
 			
