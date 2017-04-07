@@ -1,4 +1,4 @@
-package MarioAI;
+package MarioAI.marioMovement;
 
 public class XMovementInformation {
 	public final float xMovedDistance;

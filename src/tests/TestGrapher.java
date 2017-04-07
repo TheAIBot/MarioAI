@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.FastAndFurious;
-import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
@@ -19,6 +18,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.*;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;

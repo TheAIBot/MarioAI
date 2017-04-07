@@ -3,11 +3,11 @@ package tests;
 import org.junit.Assert;
 import org.junit.Test;
 
-import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
-import MarioAI.MovementInformation;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
