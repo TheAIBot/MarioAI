@@ -103,73 +103,76 @@ public class DebugDraw {
 		}
 	}
 
-	public static void drawPathOptionNodes(final Environment observation, Graph graph) {
+	public static void drawNodeEdgeTypes(final Environment observation, Node[][] levelMatrix) {
 		ArrayList<Point> allrunningEdges = new ArrayList<Point>();
 		ArrayList<Point> allJumpingEdges = new ArrayList<Point>();
-
-		Node mario = graph.getMarioNode(observation);
-		HashSet<Node> visitedRunningNodes = new HashSet<Node>();
-		HashSet<Node> visitedJumpingNodes = new HashSet<Node>();
-		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
-		nodesToVisit.addAll(mario.getEdges());
-
-		while (nodesToVisit.size() > 0) {
-			DirectedEdge edge = nodesToVisit.poll();
-			Node toCheck = edge.target;
-			if (!visitedRunningNodes.contains(toCheck) && edge instanceof Running) {
-				nodesToVisit.addAll(toCheck.getEdges());
-				Point p = new Point(toCheck.x, toCheck.y);
-				convertLevelPointToOnScreenPoint(observation, p);
-				visitedRunningNodes.add(toCheck);
-				allrunningEdges.add(p);
-			} else if (!visitedJumpingNodes.contains(toCheck) && edge instanceof SecondOrderPolynomial) {
-				nodesToVisit.addAll(toCheck.getEdges());
-				Point p = new Point(toCheck.x, toCheck.y);
-				convertLevelPointToOnScreenPoint(observation, p);
-				visitedJumpingNodes.add(toCheck);
-				allJumpingEdges.add(p);
+		
+		for (int x = 0; x < levelMatrix.length; x++) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				if (levelMatrix[x][y] != null) {
+					final Node toCheck = levelMatrix[x][y];
+					
+					boolean containsRunningEdge = false;
+					boolean containsJumpingEdge = false;
+					for (DirectedEdge edge : toCheck.getEdges()) {
+						if (edge instanceof Running) {
+							containsRunningEdge = true;
+						}
+						else if (edge instanceof SecondOrderPolynomial) {
+							containsJumpingEdge = true;
+						}
+						if (containsRunningEdge && containsJumpingEdge) {
+							break;
+						}
+					}
+					
+					final Point p = new Point(toCheck.x, toCheck.y);
+					convertLevelPointToOnScreenPoint(observation, p);
+					
+					if (containsRunningEdge) {
+						allrunningEdges.add(p);
+					}
+					if (containsJumpingEdge) {
+						allJumpingEdges.add(p);
+					}
+				}
 			}
 		}
+		
 		addDebugDrawing(observation, new DebugPoints(Color.BLACK, allrunningEdges, 12));
 		addDebugDrawing(observation, new DebugPoints(Color.WHITE, allJumpingEdges, 6));
 	}
 
-	public static void drawNeighborPaths(final Environment observation, Graph graph) {
-		Node mario = graph.getMarioNode(observation);
-		HashSet<Node> visitedNodes = new HashSet<Node>();
-		Queue<DirectedEdge> nodesToVisit = new LinkedList<DirectedEdge>();
-		nodesToVisit.addAll(mario.getEdges());
-
-		while (nodesToVisit.size() > 0) {
-			DirectedEdge edge = nodesToVisit.poll();
-			Node toCheck = edge.target;
-			if (!visitedNodes.contains(toCheck)) {
-				nodesToVisit.addAll(toCheck.getEdges());
-				visitedNodes.add(toCheck);				
-				
-				for (DirectedEdge directedEdge : toCheck.getEdges()) {
-					Point pSource = new Point(directedEdge.source.x, directedEdge.source.y);
-					convertLevelPointToOnScreenPoint(observation, pSource);
-					
-					Point pTarget = new Point(directedEdge.target.x,directedEdge.target.y);
-					convertLevelPointToOnScreenPoint(observation, pTarget);
-					if (pSource.y >= pTarget.y) {
-						addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource,pTarget));
+	public static void drawEdges(final Environment observation, Node[][] levelMatrix) {		
+		for (int x = 0; x < levelMatrix.length; x++) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				if (levelMatrix[x][y] != null) {
+					final Node toCheck = levelMatrix[x][y];
+					for (DirectedEdge edge : toCheck.getEdges()) {
+						final Point pSource = new Point(edge.source.x, edge.source.y);
+						convertLevelPointToOnScreenPoint(observation, pSource);
+						
+						final Point pTarget = new Point(edge.target.x,edge.target.y);
+						convertLevelPointToOnScreenPoint(observation, pTarget);
+						if (pSource.y >= pTarget.y) {
+							addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource,pTarget));
+						}
+						else {
+							addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource,pTarget));
+						}
 					}
-					else {
-						addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource,pTarget));
-					}
-				}		
+				}
 			}
 		}
 	}
 
-	public static void drawEndNodes(final Environment observation, Node[] endNodes) {
+	public static void drawGoalNodes(final Environment observation, Node[] endNodes) {
 		ArrayList<Point> allEndPoints = new ArrayList<Point>();
 		int x = 0;
 		for (int i = 0; i < endNodes.length; i++) {
 			if (endNodes[i] != null) {
 				x = endNodes[i].x;
+				break;
 			}
 		}
 		for (int i = 0; i < endNodes.length; i++) {
@@ -180,7 +183,7 @@ public class DebugDraw {
 		addDebugDrawing(observation, new DebugPoints(Color.BLUE, allEndPoints, 12));
 	}
 
-	public static void drawReachableNodes(final Environment observation, Graph graph) {
+	public static void drawMarioReachableNodes(final Environment observation, Graph graph) {
 		Node mario = graph.getMarioNode(observation);
 		List<DirectedEdge> edges = mario.getEdges();
 

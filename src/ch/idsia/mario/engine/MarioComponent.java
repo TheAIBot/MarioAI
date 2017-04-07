@@ -125,7 +125,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public int runOneTick() {
 		running = true;
 		adjustFPS();
-		EvaluationInfo evaluationInfo = new EvaluationInfo();
+		//EvaluationInfo evaluationInfo = new EvaluationInfo();
 
 		VolatileImage image = null;
 		Graphics g = null;
@@ -144,7 +144,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		int marioStatus = Mario.STATUS_RUNNING;
 
 		mario = ((LevelScene) scene).mario;
-		int totalActionsPerfomed = 0;
+		//int totalActionsPerfomed = 0;
 		// TODO: Manage better place for this:
 		Mario.resetCoins();
 
@@ -165,7 +165,6 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (action != null) {
 			for (int i = 0; i < Environment.numberOfButtons; ++i)
 				if (action[i]) {
-					++totalActionsPerfomed;
 					break;
 				}
 		} else {

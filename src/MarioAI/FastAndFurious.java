@@ -38,33 +38,34 @@ public class FastAndFurious implements Agent {
 		} else if (tickCount > 30) {
 			if (graph.updateMatrix(observation)) {
 				//graph.printMatrix(observation);
-				long startTime = System.currentTimeMillis();
+				//long startTime = System.currentTimeMillis();
 				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 				//System.out.println(System.currentTimeMillis() - startTime);
 			}
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				DebugDraw.drawEndNodes(observation, graph.getGoalNodes(0));
+				DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-				DebugDraw.drawNeighborPaths(observation, graph);
-				DebugDraw.drawReachableNodes(observation, graph);
-				DebugDraw.drawPathOptionNodes(observation, graph);
+				DebugDraw.drawEdges(observation, graph.getLevelMatrix());
+				DebugDraw.drawMarioReachableNodes(observation, graph);
+				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
 			}
-		}
-		
-		if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
-			if (MarioControls.reachedNextNode(observation, newestPath) && graph.goalNodesChanged() || 
-				 MarioControls.isPathInvalid(observation, newestPath)) {
-				newestPath = getPath(observation);
-				graph.setGoalNodesChanged(false);
-			}
-			marioController.getNextAction(observation, newestPath, action);
-
-			if (DEBUG) {
-				DebugDraw.drawPath(observation, newestPath);
-				DebugDraw.drawPathEdgeTypes(observation, newestPath);
-				DebugDraw.drawAction(observation, action);
+			
+			if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
+				if (MarioControls.reachedNextNode(observation, newestPath) && graph.goalNodesChanged() || 
+					 MarioControls.isPathInvalid(observation, newestPath)) {
+					newestPath = getPath(observation);
+					graph.setGoalNodesChanged(false);
+				}
+				
+				marioController.getNextAction(observation, newestPath, action);
+				
+				if (DEBUG) {
+					DebugDraw.drawPath(observation, newestPath);
+					DebugDraw.drawPathEdgeTypes(observation, newestPath);
+					DebugDraw.drawAction(observation, action);
+				}
 			}
 		}
 		tickCount++;

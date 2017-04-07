@@ -44,9 +44,8 @@ public class testMassLevels {
 			
 			try {
 				for (int x = 0; x < 4000; x++) {
-					TestTools.runOneTick(observation);
+					final int status = TestTools.runOneTick(observation);
 
-					final int status = ((MarioComponent) observation).getMarioStatus();
 					if (status != Mario.STATUS_RUNNING) {
 						break;
 					}
@@ -54,12 +53,12 @@ public class testMassLevels {
 			} catch (Exception e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				return;
+				continue;
 				
 			} catch (Error e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				return;
+				continue;
 			}
 
 			final int status = ((MarioComponent) observation).getMarioStatus();
