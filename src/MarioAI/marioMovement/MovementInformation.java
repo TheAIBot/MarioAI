@@ -1,7 +1,7 @@
 package MarioAI.marioMovement;
 
 public class MovementInformation {
-	private final XMovementInformation xMoveInfo;
+	public final XMovementInformation xMoveInfo;
 	private final int ticksHoldingJump;
 	private final int totalTicksJumped;
 	

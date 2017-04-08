@@ -2,13 +2,14 @@ package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MovementInformation;
 
 public class SecondOrderPolynomial extends DirectedEdge {
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.
 	private float topPointX;
-	private float topPointY; // Cordinates of the toppunkt
+	private float topPointY; // Coordinates of the toppunkt
 	// TODO Maybe change ceil after discussions. Problem associated with making
 	// this into an integer
 	// , as sometimes two possible jump position in a row will be registrated as
@@ -111,6 +112,10 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		return v0;
 	}
 
+	public float getNextYAfterTick() {
+		return 0;
+	}
+	
 	@Override
 	protected int getExtraEdgeHashcode() {
 		final int jumpType = 1; //it is a jump edge type
@@ -119,6 +124,5 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 1;		
 		return jumpHeight | jumpType;
 	}
-
 	
 }

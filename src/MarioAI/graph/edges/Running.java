@@ -2,6 +2,7 @@ package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MovementInformation;
 
 public class Running extends DirectedEdge{
 	
@@ -43,5 +44,4 @@ public class Running extends DirectedEdge{
 	protected int getExtraEdgeHashcode() {
 		return 0; //0 represents it being a running edge. Nothing else needed.
 	}
-
 }

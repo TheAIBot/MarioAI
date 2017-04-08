@@ -34,7 +34,7 @@ public class Art
     final static String curDir = System.getProperty("user.dir");
     final static String img = curDir + "/../img/";
     
-    public static int SIZE_MULTIPLIER = 2;
+    public static int SIZE_MULTIPLIER = 1;
 
     public static void init(GraphicsConfiguration gc)
     {

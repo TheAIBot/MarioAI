@@ -32,7 +32,9 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
+	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
+	        options.setLevelRandSeed(seed);
+	        System.out.println("Seed = " + seed);
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);

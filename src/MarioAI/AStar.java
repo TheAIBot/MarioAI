@@ -17,7 +17,7 @@ import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
 
-//Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
+//TODO Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
 	/**
@@ -84,23 +84,23 @@ public final class AStar {
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
+		
 		while (!openSet.isEmpty()) {
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hashCode());
 						
-			// If goal is reached return solution path
+			// If goal is reached return solution path.
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
 			
-			// Current node has been explored
+			// Current node has been explored.
 			closedSetMap.put(current.hashCode(), current);
-			//System.out.println(openSet.size());
+			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
-
-				//make sure the edge is possible to use
+				//Make sure the edge is possible to use
 				//all Running edges are possible
 				//not all jumps are possible
 				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
@@ -108,20 +108,22 @@ public final class AStar {
 				}
 				
 				
-				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, neighborEdge.target, neighborEdge, current.vx);
-				
+				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, 
+																											 neighborEdge.target, neighborEdge, current.vx);
 				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
 				
-				//in a jump it's possible to jump too far
+				//In a jump it's possible to jump too far
 				//and there is nothing that mario can do about it
-				//this should maybe be removed in the future
-				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)) {
+				//TODO this should maybe be removed in the future
+				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos) &&
+					 MarioControls.doesMovementCollideWithEnemy(0, neighborEdge, current.correctXPos, current.vx, movementInformation)) {
 					continue;
 				}
 				
-				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current, neighborEdge, correctXPos);
+				final SpeedNode sn = new SpeedNode(neighborEdge.target, movementInformation.getEndSpeed(), current,
+											       neighborEdge, correctXPos);
 
-				//a similar enough node has already been run through
+				//If a similar enough node has already been run through
 				//no need to add this one at that point
 				if (closedSetMap.containsKey(sn.hashCode())) {
 					continue;
@@ -130,7 +132,7 @@ public final class AStar {
 				// Distance from start to neighbor of current node
 				final float tentativeGScore = current.gScore + movementInformation.getMoveTime();
 				
-				//is a similar enough node exists and that has a better g score
+				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
 				if (openSetMap.containsKey(sn.hashCode()) &&
@@ -138,7 +140,7 @@ public final class AStar {
 					continue;
 				}
 				
-				//update the edges position in the priority queue
+				//Update the edges position in the priority queue
 				//by updating the scores and taking it in and out of the queue.
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
