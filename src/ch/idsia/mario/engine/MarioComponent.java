@@ -577,4 +577,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public int getMarioMode() {
 		return mario.getMode();
 	}
+	
+	public LevelScene getLevelScene() {
+		return (LevelScene)scene;
+	}
 }
