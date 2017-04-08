@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.awt.Stroke;
 import java.util.ArrayList;
 
+import ch.idsia.mario.engine.Art;
+
 public class DebugLines extends DebugDrawing {
 	private final Color color;
 	private final ArrayList<Point> lines; 
@@ -43,7 +45,7 @@ public class DebugLines extends DebugDrawing {
 			g.setColor(color);
 
 			final Stroke stroke = ((Graphics2D) g).getStroke();
-			((Graphics2D) g).setStroke(new BasicStroke(size));
+			((Graphics2D) g).setStroke(new BasicStroke(size * Art.SIZE_MULTIPLIER));
 			
 			drawLines(g);
 

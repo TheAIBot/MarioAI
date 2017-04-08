@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.FastAndFurious;
-import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
@@ -19,6 +18,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.*;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -55,25 +55,28 @@ public class TestGrapher {
 	
 	@Test
 	public void testCorrectMarioStartPosition() {
+		Grapher grapher = new Grapher();
 		Graph graph = getStartLevelWorld("flat.lvl");
-		Grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
+		grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
 		fail("Test not added yet");
 		
 	}
 	
 	public Graph flatlandWorld() {
+		Grapher grapher = new Grapher();
 		Graph graph = getStartLevelWorld("flat.lvl");
-		Grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
+		grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
 		return graph;
 	}
 	
 	public Graph totalFlatland() {
+		Grapher grapher = new Grapher();
 		Graph graph = getStartLevelWorld("flat.lvl");
 		Node[][] level = graph.getLevelMatrix();
 		for (short i = 0; i < GRID_WIDTH; i++) {
 			level[i][marioNode.y] = new Node(getXPositionFromColoumn(i), marioNode.y, (byte) 11); //TODO(*) Error: try to set it to -11
 		}	
-		Grapher.setMovementEdges(level, marioNode);
+		grapher.setMovementEdges(level, marioNode);
 		return graph;
 	}
 	
@@ -105,9 +108,10 @@ public class TestGrapher {
 	
 	@Test
 	public void testRunningEdgesAgainstWall() {
+		Grapher grapher = new Grapher();
 		Graph graph = getStartLevelWorld("flatWithBump.lvl");
 		Node[][] world = graph.getLevelMatrix();
-		Grapher.setMovementEdges(world, marioNode);
+		grapher.setMovementEdges(world, marioNode);
 		//Mario shouldn't run to the right, only to the left:
 		assertEquals(1, marioNode.getNumberOfEdgesOfType(runningEdgeType));
 		//To the left:
@@ -154,6 +158,7 @@ public class TestGrapher {
 	
 	@Test
 	public void testJumpRightOverWall() { 
+		Grapher grapher = new Grapher();
 		//This includes correct jump heights		
 		Graph graph = totalFlatland();
 		Node[][] world = graph.getLevelMatrix();
@@ -164,7 +169,7 @@ public class TestGrapher {
 			for (short i = 2; i <= 4; i++) {
 				addWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
 				List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
-				Grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);	
+				grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);	
 				System.out.println("meh");
 				for (DirectedEdge directedEdge : newEdges) {
 										
@@ -197,6 +202,7 @@ public class TestGrapher {
 	
 	@Test
 	public void testJumpUpAgainsWall() {
+		Grapher grapher = new Grapher();
 		Graph graph = totalFlatland();
 		Node[][] world = graph.getLevelMatrix();
 		//adding the walls:
@@ -208,7 +214,7 @@ public class TestGrapher {
 			//Grapher.clearAllEdges(world);
 			//Grapher.setMovementEdges(world, marioNode);
 			List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
-			Grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);
+			grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);
 			for (DirectedEdge edge : newEdges) {
 				if (edge instanceof SecondOrderPolynomial) {
 					SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
@@ -234,12 +240,13 @@ public class TestGrapher {
 	
 	@Test
 	public void testAbleToJumpUpThroughCertainMaterials() {
+		Grapher grapher = new Grapher();
 		Graph graph = totalFlatland();
 		Node[][] world = graph.getLevelMatrix();
 		for (int i = 0; i < world.length; i++) {
 			world[i][(short)(marioNode.y - 3)] = new Node(getXPositionFromColoumn(i),(short) (marioNode.y - 3), (byte) -11);
 		}
-		Grapher.setMovementEdges(world, marioNode); //TODO remove -1 after adding possibility for left jump.
+		grapher.setMovementEdges(world, marioNode); //TODO remove -1 after adding possibility for left jump.
 		for (int i = 0; i < world.length - 1; i++) {
 			boolean hasEdgeToUpperLevel = false;
 			for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
@@ -251,12 +258,13 @@ public class TestGrapher {
 	
 	@Test
 	public void testNoFallingThroughPlatform() {
+		Grapher grapher = new Grapher();
 		Graph graph = totalFlatland();
 		Node[][] world = graph.getLevelMatrix();
 		for (short i = 0; i < world.length; i++) {
 			world[i][marioNode.y] = new Node(i, (short) (marioNode.y + 3), (byte) -11);
 		}		
-		Grapher.setMovementEdges(world, marioNode);
+		grapher.setMovementEdges(world, marioNode);
 		for (int i = 0; i < world.length ; i++) {
 			for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
 				assertTrue(edge.target.y == edge.source.y);
@@ -266,16 +274,17 @@ public class TestGrapher {
 		
 	@Test 
 	public void testAlwaysSameResultOnSetEdges() {
+		Grapher grapher = new Grapher();
 		//Should get the same result doing multiple set edges on a given level matrix.
 		Graph graph1 = totalFlatland();
 		Node[][] world1 = graph1.getLevelMatrix();
 		
 		Graph graph2 = totalFlatland();
 		Node[][] world2 = graph2.getLevelMatrix();
-		Grapher.setMovementEdges(world1, marioNode);
+		grapher.setMovementEdges(world1, marioNode);
 		//And multiple times:
-		Grapher.setMovementEdges(world2, marioNode);
-		Grapher.setMovementEdges(world2, marioNode);
+		grapher.setMovementEdges(world2, marioNode);
+		grapher.setMovementEdges(world2, marioNode);
 		
 		//Asserting that the result is the same for the two matrixes:
 		for (int i = 0; i < world2.length; i++) {

@@ -73,8 +73,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	private void setTopPoint() {
-		topPointX = ((-b / a) / 2);
-		topPointY = f(topPointX);
+		float x = ((-b / a) / 2);
+		float y = f(x);
+		setTopPoint(x, y);
+	}
+	
+	public void setTopPoint(float x, float y) {
+		topPointX = x;
+		topPointY = y;
 		ceiledTopPointX = (short) Math.ceil(topPointX);
 		ceiledTopPointY = (short) Math.ceil(topPointY);
 	}
@@ -84,8 +90,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 	
 	@Override
-	public int getMaxY() {
-		return ceiledTopPointY - (int)source.y;
+	public float getMaxY() {
+		return topPointY - (int)source.y;
 	}
 
 	public float getWeight() {
@@ -105,17 +111,12 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		return v0;
 	}
 
-	public void setTopPoint(float x, float y) {
-		topPointX = x;
-		topPointY = y;
-	}
-
 	@Override
 	protected int getExtraEdgeHashcode() {
 		final int jumpType = 1; //it is a jump edge type
 		//Its jump height. Max is 4 min is 0, giving 3 bits.
 		//3 plus 1 but for jump type 
-		final int jumpHeight = (getMaxY() & 0xf) << 1;		
+		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 1;		
 		return jumpHeight | jumpType;
 	}
 

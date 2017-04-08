@@ -31,13 +31,13 @@ public abstract class DirectedEdge {
 		}
 	}
 	
-	public abstract int getMaxY();
+	public abstract float getMaxY();
 	
 	public abstract float getWeight();
 	
 	@Override
 	public String toString() {
-		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + "\n";
+		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + getMaxY();
 	}
 	
 	/**

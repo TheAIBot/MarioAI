@@ -31,7 +31,7 @@ public class TestAStar {
 		TestTools.runOneTick(observation);
 		graph = new Graph();
 		graph.createStartGraph(observation);
-		Grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		new Grapher().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class TestAStar {
 	public void testAStarRunning() {
 		setup("flat");
 		
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0);
 		assertTrue(path != null);
 		
 //		float c = 1.0f;
@@ -67,7 +67,7 @@ public class TestAStar {
 	public void testAStarJumping() {
 		setup("TestAStarJump");
 		
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0));
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0);
 		assertTrue(path != null);
 		
 		DirectedEdge e1 = path.get(1);

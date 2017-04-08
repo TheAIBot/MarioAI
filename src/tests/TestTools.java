@@ -22,8 +22,8 @@ public class TestTools {
 
 	public static final int LEVEL_INIT_TICKS = 30;
 
-	public static void runOneTick(Environment observation) {
-		((MarioComponent) observation).runOneTick();
+	public static int runOneTick(Environment observation) {
+		return ((MarioComponent) observation).runOneTick();
 	}
 	
 	public static void runWholeLevel(Environment observation) {

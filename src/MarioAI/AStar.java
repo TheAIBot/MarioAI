@@ -13,12 +13,13 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 //public boolean hasEnemy(int x, int y, int time);
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 
 
 //Fix bug moving left by maintaining Mario velocity. Problem starting a star velocity 0 meaning polynomial get 9000 score (!).  
 
 public final class AStar {
-	private static int maxStateSpaceSize = 0;
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
@@ -26,11 +27,20 @@ public final class AStar {
 	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes) {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
-		Node goal = new Node((short) (start.x + 50), (short) 2, (byte) 3);
+		int goalX = 0;
+		for (int i = 0; i < rightmostNodes.length; i++) {
+			if (rightmostNodes[i] != null) {
+				goalX = rightmostNodes[i].x;
+				break;
+			}
+		}
+		
+		
+		Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
@@ -38,7 +48,7 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(new SpeedNode(start, MarioControls.getXVelocity(), null, null, start.x), 
+		List<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, null, null, start.x), 
 										   new SpeedNode(goal, 0, null, null, goal.x));
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
@@ -82,9 +92,6 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-
-			maxStateSpaceSize = Math.max(maxStateSpaceSize, openSet.size());
-			//System.out.println(openSet.size() + ", max=" + maxStateSpaceSize);
 			
 			// Current node has been explored
 			closedSetMap.put(current.hashCode(), current);
@@ -150,10 +157,7 @@ public final class AStar {
 	 * @return
 	 */
 	public static float heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-		//return MarioControls.getXMovementTime(goal.node.x - start.node.x); //pending correct funtinoality
-		//if (current.vx == 0) return 1000000f;
 		return MarioControls.getXMovementTime(goal.node.x - current.correctXPos, current.vx, 0).ticks;
-		//return timeToReachNode(goal, current);
 	}
 
 	/**
@@ -163,40 +167,10 @@ public final class AStar {
 	private static List<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
 		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		while (currentSpeedNode.parent != null) {
-			DirectedEdge fisk = null;
-			for (int i = 0; i < currentSpeedNode.parent.node.edges.size(); i++) {
-				if (currentSpeedNode.parent.node.edges.get(i).target.equals(currentSpeedNode.node)) {
-					fisk = currentSpeedNode.parent.node.edges.get(i);
-					break;
-				}
-			}
-			path.add(fisk);
+			path.add(currentSpeedNode.ancestorEdge);
 			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);
 		return path;
 	}
-
-	/**
-	 * Using derived formula for time(v0,dist) from Maple (v2.5)
-	 * @param n1
-	 * @param n2
-	 * @return time to reach n2 from n1
-	 */
-	public static float timeToReachNode(SpeedNode n1, SpeedNode n2) {
-		float v0 = n1.vx;
-		if (v0 < 0) v0 = 0;
-		
-		float dist = Math.abs(n2.node.x - n1.node.x); //guard - should only be able to be positive in the first place
-		float d0 = Math.min(dist,5); //float d0 = dist <= 5 ? dist : 5f;
-		
-		float timeToReachDistanceUnder5Blocks = (float) (0.4734168362e1 - 0.2033398373e2 * v0 + 0.3650816449e1 * d0 - 0.1899556093e0 * Math.pow(d0 - 0.2e1, 0.2e1)
-				- 0.2561502720e1 * (d0 - 0.2e1) * (v0 - 0.15e0) + 0.2015956084e2 * Math.pow(v0 - 0.15e0, 0.2e1)
-				+ 0.4670562450e-1 * Math.pow(d0 - 0.2e1, 0.3e1) + 0.9447200685e0 * Math.pow(d0 - 0.2e1, 0.2e1) * (v0 - 0.15e0)
-				- 0.8877386747e1 * (d0 - 0.2e1) * Math.pow(v0 - 0.15e0, 0.2e1) + 0.1206780712e2 * Math.pow(v0 - 0.15e0, 0.3e1));
-		
-		if (dist <= 5) return timeToReachDistanceUnder5Blocks;
-		return timeToReachDistanceUnder5Blocks + (dist - 5f) / MarioControls.getMaxV(); 
-	}
-
 }

@@ -1,8 +1,9 @@
-package MarioAI;
+package MarioAI.marioMovement;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.MarioMethods;
+import MarioAI.Pair;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
@@ -19,12 +20,12 @@ public class MarioControls {
 	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 2f;
 		
-	private static float oldX = MARIO_START_X_POS;
-	private static int jumpTime = 0;
-	private static int holdJumpTime = 0;
-	private static float currentXSpeed = 0;
+	private float oldX = MARIO_START_X_POS;
+	private int jumpTime = 0;
+	private int holdJumpTime = 0;
+	private float currentXSpeed = 0;
 	
-	public static void reset() {
+	public void reset() {
 		oldX = MARIO_START_X_POS;
 		jumpTime = 0;
 		holdJumpTime = 0;
@@ -49,7 +50,8 @@ public class MarioControls {
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
 		if (!((distanceToMove < 0 && speed < 0) ||
-			  (distanceToMove > 0 && speed > 0))) {
+			  (distanceToMove > 0 && speed > 0) ||
+			   speed == 0)) {
 			return false;
 		}
 		final int ticksJumping = getJumpTime(edge, edge.source.y).value;
@@ -68,7 +70,7 @@ public class MarioControls {
 	}
 	
 	
-	public static void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
+	public void getNextAction(Environment observation, final List<DirectedEdge> path, boolean[] action) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge next = path.get(0);
@@ -102,7 +104,7 @@ public class MarioControls {
 	}
 	
 	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final DirectedEdge nextEdge = path.get(0);
 		
@@ -212,7 +214,7 @@ public class MarioControls {
 		
 		//put sign back on values as it was lost before
 		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;
-		speed         = (distanceIsNegative)? -1 * speed : speed;
+		speed         = (distanceIsNegative)? -1 * speed         : speed;
 		return new XMovementInformation(distanceMoved, speed, steps);
 	}
 	
@@ -223,11 +225,11 @@ public class MarioControls {
 	}
 	
 	public static float getDeaccelerationDistanceMoved(final float speed) {
-		final double a = 0.2606629227512888;
-		final double b = 4.161597216697656;
-		final double c = -0.342432087168023;
+		final float a = 0.2606629227512888f;
+		final float b = 4.161597216697656f;
+		final float c = -0.342432087168023f;
 		//has an average error of 0.0072 in the speed range 5-50
-		return (float)(a * Math.exp(b * speed) + c);
+		return (float) (a * Math.exp(b * speed) + c);
 	}
 	
 	private static int getDeaccelerationNeededSteps(float speed) {
@@ -243,9 +245,9 @@ public class MarioControls {
 	}
 	
 	public static Pair<Float, Float> getDriftingDistance(final float speed, final int driftTime) {
-		final double a = speed;
-		final double b = -0.11653355831586142;
-		final double c = -0.00000056420864292;
+		final float a = speed;
+		final float b = -0.11653355831586142f;
+		final float c = -0.00000056420864292f;
 		double driftDistance = 0;
 		double lastSpeed = a;
 		for (int i = 0; i < driftTime; i++) {
@@ -260,12 +262,8 @@ public class MarioControls {
 		}
 		return new Pair<Float, Float>((float)driftDistance, (float)lastSpeed);
 	}
-	
-	public static float getMaxV() {
-		return MAX_X_VELOCITY;
-	}
 
-	public static float getXVelocity() {
+	public float getXVelocity() {
 		return currentXSpeed;
 	}	
 }

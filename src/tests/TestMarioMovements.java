@@ -3,11 +3,11 @@ package tests;
 import org.junit.Assert;
 import org.junit.Test;
 
-import MarioAI.MarioControls;
 import MarioAI.MarioMethods;
-import MarioAI.MovementInformation;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -52,10 +52,11 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).ticks != speed) {
+		MovementInformation moveInfo = MarioControls.getMovementInformationFromEdge(startMarioXPos, 0, endMarioXPos, 0, 0, 0);
+		if (moveInfo.getMoveTime() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
-					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
+					"\nReceived: " + moveInfo.getMoveTime());
 		}
 	}
 	
@@ -111,10 +112,11 @@ public class TestMarioMovements {
 					"\nx: " + Math.abs(endMarioXPos - expectedXPos) + 
 					"\ny: " + Math.abs(endMarioYPos - expectedYPos));
 		}
-		if (MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0).ticks != speed) {
+		MovementInformation moveInfo = MarioControls.getMovementInformationFromEdge(startMarioXPos, 0, endMarioXPos, 0, 0, 0);
+		if (moveInfo.getMoveTime() != speed) {
 			Assert.fail("Expected steps didn't match correct steps." + 
 					"\nExpected: " + speed + 
-					"\nReceived: " + MarioControls.getXMovementTime(endMarioXPos - startMarioXPos, 0, 0));
+					"\nReceived: " + moveInfo.getMoveTime());
 		}
 	}
 	
@@ -217,10 +219,12 @@ public class TestMarioMovements {
 				upTime = false;
 			}
 			TestTools.runOneTick(observation);
+			
+			expectedJumpTime++;
 			if (observation.isMarioOnGround()) {
 				break;
 			}
-			expectedJumpTime++;
+			
 		}
 		//can't hold jump for more than 8 ticks
 		expectedTicksHeldUp = Math.min(expectedTicksHeldUp, 8);
