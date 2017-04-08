@@ -3,11 +3,13 @@ package MarioAI;
 import java.util.List;
 
 import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 /**
@@ -19,6 +21,7 @@ public class FastAndFurious implements Agent {
 	private final Graph graph = new Graph();
 	private final Grapher grapher = new Grapher();
 	private final MarioControls marioController = new MarioControls();
+	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
 	private List<DirectedEdge> newestPath = null;
 	
@@ -35,8 +38,11 @@ public class FastAndFurious implements Agent {
 			graph.createStartGraph(observation);
 			grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 			newestPath = getPath(observation);
+			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
 		} else if (tickCount > 30) {
+			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			
 			if (graph.updateMatrix(observation)) {
 				//graph.printMatrix(observation);
 				//long startTime = System.currentTimeMillis();
@@ -76,7 +82,7 @@ public class FastAndFurious implements Agent {
 	
 	private List<DirectedEdge> getPath(Environment observation) {
 		long startTime = System.currentTimeMillis();
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity());
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor);
 		
 		//System.out.println(System.currentTimeMillis() - startTime);
 		return (path == null)? newestPath : path;

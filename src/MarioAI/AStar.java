@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
@@ -27,7 +28,7 @@ public final class AStar {
 	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed) {
+	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
@@ -49,7 +50,7 @@ public final class AStar {
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 		List<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, null, null, start.x), 
-										   new SpeedNode(goal, 0, null, null, goal.x));
+										   new SpeedNode(goal, 0, null, null, goal.x), enemyPredictor);
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
@@ -71,7 +72,7 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal) {
+	public static List<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor) {
 		// Set of nodes already explored
 		final Map<Integer, SpeedNode> closedSetMap = new HashMap<Integer, SpeedNode>();
 		// Set of nodes yet to be explored

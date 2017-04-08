@@ -10,6 +10,7 @@ import MarioAI.graph.GraphMath;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
+import sun.awt.EmbeddedFrame;
 import sun.font.FileFontStrike;
 
 public class EnemyPredictor {
@@ -19,28 +20,27 @@ public class EnemyPredictor {
 	private static final int X_OFFSET = 1;
 	private static final int Y_OFFSET = 2;
 	private static final int BLOCK_PIXEL_SIZE = 16;
+	private static final int ACCEPTED_POSITION_DEVIATION = 1;
 	
-	private final LevelScene levelScene;
+	private LevelScene levelScene;
 	private HashMap<Integer, ArrayList<Point>> oldEnemyInfo;
-	private ArrayList<EnemySimulation> potentialCorrectSimulations;
-	private ArrayList<EnemySimulation> verifiedEnemySimulations;
+	private ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
+	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 	
-	public EnemyPredictor(LevelScene levelScene) {
+	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
 	}
 	
-	public void addEnemies(float[] enemyInfo) {
+	public void updateEnemies(float[] enemyInfo) {
 		final HashMap<Integer, ArrayList<Point>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
 		removeDeadEnemies(sortedEnemyInfo);
 		
+		updateSimulations();
+		
 		addCorrectSimulations(sortedEnemyInfo);
 		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
-		
-		
-		
-		
 		
 		oldEnemyInfo = sortedEnemyInfo;
 	}
@@ -52,7 +52,7 @@ public class EnemyPredictor {
 			final float x = enemyInfo[i + X_OFFSET];
 			final float y = enemyInfo[i + Y_OFFSET];
 			
-			final Point enemyPos = new Point((int)(x / BLOCK_PIXEL_SIZE), (int)(y / BLOCK_PIXEL_SIZE));
+			final Point enemyPos = new Point((int)(x * BLOCK_PIXEL_SIZE), (int)(y * BLOCK_PIXEL_SIZE));
 			
 			if (byType.get(kind) == null) {
 				byType.put(kind, new ArrayList<Point>());
@@ -63,25 +63,57 @@ public class EnemyPredictor {
 		return byType;
 	}
 	
+	private void updateSimulations() {
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+			enemySimulation.moveTime();
+		}
+	}
+	
 	private void removeDeadEnemies(HashMap<Integer, ArrayList<Point>> enemyInfo) {
+		ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
+		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {
+			final int kind = enemySimulation.getKind();
+			final int simulationX = enemySimulation.getX();
+			final int simulationY = enemySimulation.getY();
+			
+			final ArrayList<Point> enemyPositions = enemyInfo.get(kind);
+			
+			Point simulatedPosition = null;
+			
+			for (Point enemyPosition : enemyPositions) {
+				final int deltaX = Math.abs(enemyPosition.x - simulationX);
+				final int deltaY = Math.abs(enemyPosition.y - simulationY);
+				
+				if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
+					deltaY <= ACCEPTED_POSITION_DEVIATION) {
+					simulatedPosition = enemyPosition;
+					break;
+				}
+			}
+			
+			if (simulatedPosition != null) {
+				enemyPositions.remove(simulatedPosition);
+				
+				notDeletedSimulations.add(enemySimulation);
+			}
+		}
 		
+		verifiedEnemySimulations = notDeletedSimulations;
 	}
 	
 	private void addCorrectSimulations(HashMap<Integer, ArrayList<Point>> enemyInfo) {
-		for (EnemySimulation enemySimulation : potentialCorrectSimulations) {
+		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {
 			enemySimulation.move();
 			
-			final int type = enemySimulation.getType();
+			final int kind = enemySimulation.getKind();
 			final int x = enemySimulation.getX();
 			final int y = enemySimulation.getY();
-			final ArrayList<Point> enemyPositions = enemyInfo.get(type); 
+			final ArrayList<Point> enemyPositions = enemyInfo.get(kind); 
 			
 			if (enemyPositions != null) {
 				Point foundPoint = null;
 				
-				for (Point point : enemyPositions) {
-					final int ACCEPTED_POSITION_DEVIATION = 1;
-					
+				for (Point point : enemyPositions) {					
 					final int deltaX = Math.abs(x - point.x);
 					final int deltaY = Math.abs(y - point.y);
 					
@@ -131,7 +163,7 @@ public class EnemyPredictor {
 							deltaY <= BLOCK_PIXEL_SIZE) {
 							final int type = getTypeFromKind(kind);
 							final boolean winged = canKindFly(kind);
-							final EnemySimulation enemySimulation = new EnemySimulation(levelScene, x1, y1, x1 - x2, y1 - y2, type, winged);
+							final WalkingEnemySimulator enemySimulation = new WalkingEnemySimulator(levelScene, x1, y1, x1 - x2, y1 - y2, type, kind, winged);
 							
 							potentialCorrectSimulations.add(enemySimulation);
 						}
@@ -144,7 +176,17 @@ public class EnemyPredictor {
 	}
 	
 	public boolean hasEnemy(int x, int y, int time) {
-		return true;
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+			final Point enemyPosition = enemySimulation.getPositionAtTime(time);
+			final int enemyX = enemyPosition.x / BLOCK_PIXEL_SIZE;
+			final int enemyY = enemyPosition.y / BLOCK_PIXEL_SIZE;
+			
+			if (enemyX == x && 
+				enemyY == y) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	

@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import MarioAI.AStar;
 import MarioAI.FastAndFurious;
+import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.Graph;
 import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
@@ -41,7 +42,8 @@ public class TestAStar {
 	public void testAStarRunning() {
 		setup("flat");
 		
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0);
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor);
 		assertTrue(path != null);
 		
 //		float c = 1.0f;
@@ -66,8 +68,8 @@ public class TestAStar {
 	@Test
 	public void testAStarJumping() {
 		setup("TestAStarJump");
-		
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0);
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor);
 		assertTrue(path != null);
 		
 		DirectedEdge e1 = path.get(1);

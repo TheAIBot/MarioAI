@@ -1,14 +1,12 @@
 package MarioAI.enemy;
 
-import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
-import ch.idsia.mario.engine.sprites.Sprite;
 
 import java.awt.*;
 
 
-public class EnemySimulation
+public class WalkingEnemySimulator extends EnemySimulator
 {
     public static final int ENEMY_RED_KOOPA = 0;
     public static final int ENEMY_GREEN_KOOPA = 1;
@@ -22,18 +20,13 @@ public class EnemySimulation
 
     private final int width = 4;
     private final int height;
-    private final LevelScene world;
+    protected final LevelScene world;
     private final boolean avoidCliffs;
     private final boolean winged;
     
     private int facing;
-    private float x;
-    private float y;
-    private float xa;
-    private float ya;
-    private int type;
 
-    public EnemySimulation(LevelScene world, float x, float y, float xa, float ya, int type, boolean winged)
+    public WalkingEnemySimulator(LevelScene world, float x, float y, float xa, float ya, int type, int kind, boolean winged)
     {
         this.winged = winged;
 
@@ -42,6 +35,7 @@ public class EnemySimulation
         
         this.world = world;
         this.type = type;
+        this.kind = kind;
 
         avoidCliffs = (type == Enemy.ENEMY_RED_KOOPA);
 
@@ -56,6 +50,7 @@ public class EnemySimulation
         this.facing = (xa >= 0) ? 1 : -1;
     }
     
+    @Override
     public void move()
     {
         float sideWaysSpeed = 1.75f;
@@ -93,6 +88,8 @@ public class EnemySimulation
         {
             ya = -10;
         }
+        
+        positionAtTime.add(new Point((int)x, (int)y));
     }
 
     private boolean move(float xa, float ya)
@@ -190,17 +187,5 @@ public class EnemySimulation
         }
 
         return world.level.isBlocking(x, y, xa, ya);
-    }
-    
-    public int getType() {
-    	return type;
-    }
-    
-    public int getX() {
-    	return (int)x;
-    }
-    
-    public int getY() {
-    	return (int)y;
     }
 }
