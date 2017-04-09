@@ -1,17 +1,14 @@
 package MarioAI.enemy;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import MarioAI.graph.GraphMath;
+import MarioAI.enemy.simulators.EnemySimulator;
+import MarioAI.enemy.simulators.WalkingEnemySimulator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
-import ch.idsia.mario.engine.sprites.Sprite;
-import sun.awt.EmbeddedFrame;
-import sun.font.FileFontStrike;
 
 public class EnemyPredictor {
 	
@@ -29,6 +26,20 @@ public class EnemyPredictor {
 	
 	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
+	}
+	
+	public boolean hasEnemy(int x, int y, int time) {
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+			final Point enemyPosition = enemySimulation.getPositionAtTime(time);
+			final int enemyX = enemyPosition.x / BLOCK_PIXEL_SIZE;
+			final int enemyY = enemyPosition.y / BLOCK_PIXEL_SIZE;
+			
+			if (enemyX == x && 
+				enemyY == y) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void updateEnemies(float[] enemyInfo) {
@@ -153,17 +164,20 @@ public class EnemyPredictor {
 						final int y1 = p1.y;
 						
 						final Point p2 = oldEnemyPositions.get(z);
-						final int x2 = p1.x;
-						final int y2 = p1.y;
+						final int x2 = p2.x;
+						final int y2 = p2.y;
 						
-						final int deltaX = Math.abs(x1 - x2);
-						final int deltaY = Math.abs(y1 - y2);
+						final int xa = x1 - x2;
+						final int ya = y1 - y2;
+						
+						final int deltaX = Math.abs(xa);
+						final int deltaY = Math.abs(ya);
 						
 						if (deltaX <= HALF_BLOCK && 
 							deltaY <= BLOCK_PIXEL_SIZE) {
 							final int type = getTypeFromKind(kind);
 							final boolean winged = canKindFly(kind);
-							final WalkingEnemySimulator enemySimulation = new WalkingEnemySimulator(levelScene, x1, y1, x1 - x2, y1 - y2, type, kind, winged);
+							final WalkingEnemySimulator enemySimulation = new WalkingEnemySimulator(levelScene, x1, y1, xa, ya, type, kind, winged);
 							
 							potentialCorrectSimulations.add(enemySimulation);
 						}
@@ -174,22 +188,7 @@ public class EnemyPredictor {
 			}
 		}
 	}
-	
-	public boolean hasEnemy(int x, int y, int time) {
-		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			final Point enemyPosition = enemySimulation.getPositionAtTime(time);
-			final int enemyX = enemyPosition.x / BLOCK_PIXEL_SIZE;
-			final int enemyY = enemyPosition.y / BLOCK_PIXEL_SIZE;
-			
-			if (enemyX == x && 
-				enemyY == y) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
+		
 	private boolean canKindFly(int kind) {
         switch (kind) {
         case 5:

@@ -24,6 +24,7 @@ public class Play {
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
+	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
 	        
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
@@ -41,14 +42,12 @@ public class Play {
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1905810938);
 	        /*
-	         * 
 1549733898
 793284811
 640346535
 1772112418
 232887628
 	         */
-	        
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        options.setLevelDifficulty(10);

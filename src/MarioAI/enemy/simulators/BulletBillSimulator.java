@@ -1,4 +1,4 @@
-package MarioAI.enemy;
+package MarioAI.enemy.simulators;
 
 import java.awt.Point;
 
@@ -7,8 +7,9 @@ public class BulletBillSimulator extends EnemySimulator
 {
     public int facing;
 
-    public BulletBillSimulator(float x, float y, int dir)
+    public BulletBillSimulator(float x, float y, int dir, int type, int kind)
     {
+    	super(type, kind);
         this.x = x;
         this.y = y;
 

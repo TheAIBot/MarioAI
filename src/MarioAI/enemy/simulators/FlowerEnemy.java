@@ -1,17 +1,18 @@
-package MarioAI.enemy;
+package MarioAI.enemy.simulators;
 
 import ch.idsia.mario.engine.LevelScene;
 
-public class FlowerEnemy extends WalkingEnemySimulator
+public class FlowerEnemy extends EnemySimulator
 {
+	private LevelScene world;
     private int yStart;
     private int jumpTime = 0;
     
-    public FlowerEnemy(LevelScene world, int x, int y, int mapX, int mapY)
+    public FlowerEnemy(LevelScene world, int x, int y, int mapX, int mapY, int kind)
     {
-        //super(world, x, y, 1, ENEMY_SPIKY, false, mapX, mapY);
-    	super(world, x, y, 0, 0, WalkingEnemySimulator.ENEMY_SPIKY, 7, false);
+    	super(WalkingEnemySimulator.ENEMY_SPIKY, kind);
         
+    	this.world = world;
         yStart = y;
         ya = -8;
         

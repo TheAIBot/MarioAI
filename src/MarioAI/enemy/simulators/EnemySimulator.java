@@ -1,4 +1,4 @@
-package MarioAI.enemy;
+package MarioAI.enemy.simulators;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -8,10 +8,15 @@ public abstract class EnemySimulator {
     protected float y;
     protected float xa;
     protected float ya;
-    protected int type;
-    protected int kind;
-    protected ArrayList<Point> positionAtTime = new ArrayList<Point>(); 
+    protected final int type;
+    protected final int kind;
+    protected final ArrayList<Point> positionAtTime = new ArrayList<Point>(); 
 	
+    public EnemySimulator(int type, int kind) {
+    	this.type = type;
+    	this.kind = kind;
+    }
+    
 	public abstract void move();
 	
     public int getKind() {
