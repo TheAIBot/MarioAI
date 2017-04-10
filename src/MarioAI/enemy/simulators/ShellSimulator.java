@@ -22,9 +22,9 @@ public class ShellSimulator extends EnemySimulator
     {
     	super(Sprite.KIND_SHELL);
 
+    	this.world = world;
         this.x = x;
         this.y = y;
-        this.world = world;
         this.xa = xa;
         this.ya = ya;
     }

@@ -20,14 +20,6 @@ public abstract class EnemySimulator {
     public int getKind() {
     	return kind;
     }
-    
-    public float getX() {
-    	return x;
-    }
-    
-    public float getY() {
-    	return y;
-    }
 
     public void moveTime() {
     	if (positionAtTime.size() > 0) {
@@ -38,6 +30,18 @@ public abstract class EnemySimulator {
     public void moveEnemy() {
     	move();
     	positionAtTime.add(new Point2D.Float(x, y));
+    }
+    
+    public void setX(float x) {
+    	this.x = x;
+    }
+    
+    public void setY(float y) {
+    	this.y = y;
+    }
+
+    public Point2D.Float getCurrentPosition() {
+    	return getPositionAtTime(0);
     }
     
     public Point2D.Float getPositionAtTime(int time) {

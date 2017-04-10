@@ -31,6 +31,7 @@ public class EnemyPredictor {
 	
 	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
+		FlowerEnemy.createStateTable(levelScene);
 	}
 	
 	public boolean hasEnemy(int x, int y, int time) {
@@ -50,10 +51,11 @@ public class EnemyPredictor {
 	public void updateEnemies(float[] enemyInfo) {
 		final HashMap<Integer, ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
-		removeDeadEnemies(sortedEnemyInfo);
-		
 		updateSimulations();
 		
+		removeDeadEnemies(sortedEnemyInfo);
+		
+		System.out.println(verifiedEnemySimulations.size());
 		addCorrectSimulations(sortedEnemyInfo);
 		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
@@ -87,29 +89,37 @@ public class EnemyPredictor {
 	
 	private void removeDeadEnemies(HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
 		ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
-		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final int kind = enemySimulation.getKind();
-			final float simulationX = enemySimulation.getX();
-			final float simulationY = enemySimulation.getY();
+			final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
+			final float simulationX = simulationPosition.x;
+			final float simulationY = simulationPosition.y;
 			
 			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
 			
 			if (enemyPositions != null) {
 				Point2D.Float simulatedPosition = null;
+				float leastDifference = Integer.MAX_VALUE;
 				
 				for (Point2D.Float enemyPosition : enemyPositions) {
 					final float deltaX = Math.abs(enemyPosition.x - simulationX);
 					final float deltaY = Math.abs(enemyPosition.y - simulationY);
 					
+					final float difference = deltaX + deltaY;
+					
 					if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
-						deltaY <= ACCEPTED_POSITION_DEVIATION) {
+						deltaY <= ACCEPTED_POSITION_DEVIATION && 
+						difference < leastDifference) {
 						simulatedPosition = enemyPosition;
+						leastDifference = difference;
 						break;
 					}
 				}
 				
 				if (simulatedPosition != null) {
 					enemyPositions.remove(simulatedPosition);
+					enemySimulation.setX(simulatedPosition.x);
+					enemySimulation.setY(simulatedPosition.y);
 					
 					notDeletedSimulations.add(enemySimulation);
 				}	
@@ -120,12 +130,11 @@ public class EnemyPredictor {
 	}
 	
 	private void addCorrectSimulations(HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {
-			enemySimulation.moveEnemy();
-			
+		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
-			final float x = enemySimulation.getX();
-			final float y = enemySimulation.getY();
+			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
+			final float x = enemyPosition.x;
+			final float y = enemyPosition.y;
 			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind); 
 			
 			if (enemyPositions != null) {

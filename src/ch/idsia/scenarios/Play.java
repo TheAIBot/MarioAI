@@ -40,7 +40,7 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed(1905810938);
+	        options.setLevelRandSeed(690683631);
 	        /*
 1549733898
 793284811

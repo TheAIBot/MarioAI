@@ -1,24 +1,65 @@
 package MarioAI.enemy.simulators;
 
+import java.util.ArrayList;
+
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
 
 public class FlowerEnemy extends EnemySimulator
 {
-	private LevelScene world;
-    private int yStart;
+	private static final ArrayList<FlowerState> flowerStates = new ArrayList<FlowerState>();
+	
+	private final LevelScene world;
+    private final int yStart;
     private int jumpTime = 0;
     
-    public FlowerEnemy(LevelScene world, float x, float y, float ya)
+    public FlowerEnemy(LevelScene world, float x, float y, float ya) {
+    	this(world, x, y, ya, true);
+    }
+    
+    private FlowerEnemy(LevelScene world, float x, float y, float ya, boolean fromFlowerState)
     {
     	super(Sprite.KIND_ENEMY_FLOWER);
         
     	this.world = world;
-    	//the magic number is how much
-    	//the flower has moved up since it was spawned
-    	//and added as a simulator
-        yStart = (int)Math.round(y + 52.1752f);
-        this.ya = ya;
+    	this.x = x;
+    	this.y = y;
+    	this.ya = ya;
+    	if (fromFlowerState) {
+    		final FlowerState state = getFlowerState(ya);
+        	this.yStart = (int) Math.round(y - state.y);
+		}
+    	else {
+    		this.yStart = (int) y;
+    	}
+    }
+    
+    private FlowerState getFlowerState(float ya) {
+    	FlowerState bestMatch = flowerStates.get(0);
+    	float yaDiff = Math.abs(ya - bestMatch.ya);
+    	float bestDiff = yaDiff;
+    	
+    	for (int i = 1; i < flowerStates.size(); i++) {
+    		FlowerState state = flowerStates.get(i);
+    		yaDiff = Math.abs(ya - state.ya);
+    		if (yaDiff < bestDiff) {
+				bestMatch = state;
+				bestDiff = yaDiff;
+			}
+		}
+    	
+    	return bestMatch;
+    }
+    
+    public static void createStateTable(LevelScene levelScene) {
+    	final FlowerEnemy enemy = new FlowerEnemy(levelScene, 0, 0, -8, false);
+        
+        enemy.setY(-1);
+        
+        do {
+        	enemy.move();
+        	flowerStates.add(new FlowerState(enemy.jumpTime, enemy.y, enemy.ya));
+		} while (enemy.y != 0);
     }
 
     @Override
