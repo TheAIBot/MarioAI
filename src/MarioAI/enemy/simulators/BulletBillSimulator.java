@@ -1,15 +1,13 @@
 package MarioAI.enemy.simulators;
 
-import java.awt.Point;
-
 
 public class BulletBillSimulator extends EnemySimulator
 {
     public int facing;
 
-    public BulletBillSimulator(float x, float y, int dir, int type, int kind)
+    public BulletBillSimulator(float x, float y, int dir, int kind)
     {
-    	super(type, kind);
+    	super(kind);
         this.x = x;
         this.y = y;
 
@@ -19,13 +17,11 @@ public class BulletBillSimulator extends EnemySimulator
     }
 
     @Override
-    public void move()
+    protected void move()
     {
         final float sideWaysSpeed = 4f;
 
         xa = facing * sideWaysSpeed;
         x += xa;
-        
-        positionAtTime.add(new Point((int)x, (int)y));
-    }         
+    }
 }

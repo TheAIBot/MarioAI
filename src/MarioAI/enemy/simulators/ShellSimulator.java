@@ -1,52 +1,38 @@
 package MarioAI.enemy.simulators;
 
 import ch.idsia.mario.engine.LevelScene;
-import ch.idsia.mario.engine.sprites.Enemy;
+import ch.idsia.mario.engine.sprites.Sprite;
 
 
-public class WalkingEnemySimulator extends EnemySimulator
+public class ShellSimulator extends EnemySimulator
 {
-    public static final int ENEMY_RED_KOOPA = 0;
-    public static final int ENEMY_GREEN_KOOPA = 1;
-    public static final int ENEMY_GOOMBA = 2;
-    public static final int ENEMY_SPIKY = 3;
-    public static final int ENEMY_FLOWER = 4;
-
     private static float GROUND_INERTIA = 0.89f;
 
     private boolean onGround = false;
 
-    protected final LevelScene world;
     private final int width = 4;
-    private final int height;
-    private final boolean avoidCliffs;
-    private final boolean winged;
-    
-    private int facing;
+    private final int height = 12;
 
-    public WalkingEnemySimulator(LevelScene world, float x, float y, float xa, float ya, int type, int kind, boolean winged)
+    private final LevelScene world;
+    private int facing = 0;
+
+    private boolean avoidCliffs = false;
+
+    public ShellSimulator(LevelScene world, float x, float y, float xa, float ya)
     {
-    	super(kind);
-        
-        this.world = world;
+    	super(Sprite.KIND_SHELL);
+
         this.x = x;
         this.y = y;
+        this.world = world;
         this.xa = xa;
         this.ya = ya;
-        this.winged = winged;
-
-        avoidCliffs = (type == Enemy.ENEMY_RED_KOOPA);
-
-        final int yPic = type;
-        
-        this.height = (yPic > 1) ? 12 : 24;
-        this.facing = (xa >= 0) ? 1 : -1;
     }
-    
+
     @Override
     protected void move()
     {
-        float sideWaysSpeed = 1.75f;
+        float sideWaysSpeed = 11f;
 
         if (xa > 2)
         {
@@ -59,27 +45,19 @@ public class WalkingEnemySimulator extends EnemySimulator
 
         xa = facing * sideWaysSpeed;
 
-        if (!move(xa, 0)) facing = -facing;
+        if (!move(xa, 0))
+        {
+            facing = -facing;
+        }
         onGround = false;
         move(0, ya);
 
-        ya *= winged ? 0.95f : 0.85f;
+        ya *= 0.85f;
         xa *= GROUND_INERTIA;
 
         if (!onGround)
         {
-            if (winged)
-            {
-                ya += 0.6f;
-            }
-            else
-            {
-                ya += 2;
-            }
-        }
-        else if (winged)
-        {
-            ya = -10;
+            ya += 2;
         }
     }
 
@@ -173,10 +151,15 @@ public class WalkingEnemySimulator extends EnemySimulator
     {
         int x = (int) (_x / 16);
         int y = (int) (_y / 16);
-        if (x == (int) (this.x / 16) && y == (int) (this.y / 16)) {
-        	return false;
+        if (x == (int) (this.x / 16) && y == (int) (this.y / 16)) return false;
+
+        boolean blocking = world.level.isBlocking(x, y, xa, ya);
+        
+        if (blocking && ya == 0 && xa!=0)
+        {
+            world.bump(x, y, true);
         }
 
-        return world.level.isBlocking(x, y, xa, ya);
+        return blocking;
     }
 }

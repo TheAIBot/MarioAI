@@ -1,6 +1,7 @@
 package MarioAI.enemy.simulators;
 
 import ch.idsia.mario.engine.LevelScene;
+import ch.idsia.mario.engine.sprites.Sprite;
 
 public class FlowerEnemy extends EnemySimulator
 {
@@ -8,24 +9,20 @@ public class FlowerEnemy extends EnemySimulator
     private int yStart;
     private int jumpTime = 0;
     
-    public FlowerEnemy(LevelScene world, int x, int y, int mapX, int mapY, int kind)
+    public FlowerEnemy(LevelScene world, float x, float y, float ya)
     {
-    	super(WalkingEnemySimulator.ENEMY_SPIKY, kind);
+    	super(Sprite.KIND_ENEMY_FLOWER);
         
     	this.world = world;
-        yStart = y;
-        ya = -8;
-        
-        this.y-=1;
-        
-        for (int i=0; i<4; i++)
-        {
-            move();
-        }
+    	//the magic number is how much
+    	//the flower has moved up since it was spawned
+    	//and added as a simulator
+        yStart = (int)Math.round(y + 52.1752f);
+        this.ya = ya;
     }
 
     @Override
-    public void move()
+    protected void move()
     {
     	if (y>=yStart)
         {

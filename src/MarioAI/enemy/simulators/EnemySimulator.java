@@ -1,6 +1,6 @@
 package MarioAI.enemy.simulators;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public abstract class EnemySimulator {
@@ -8,36 +8,41 @@ public abstract class EnemySimulator {
     protected float y;
     protected float xa;
     protected float ya;
-    protected final int type;
     protected final int kind;
-    protected final ArrayList<Point> positionAtTime = new ArrayList<Point>(); 
+    protected final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
 	
-    public EnemySimulator(int type, int kind) {
-    	this.type = type;
+    public EnemySimulator(int kind) {
     	this.kind = kind;
     }
     
-	public abstract void move();
+    protected abstract void move();
 	
     public int getKind() {
     	return kind;
     }
     
-    public int getX() {
-    	return (int)x;
+    public float getX() {
+    	return x;
     }
     
-    public int getY() {
-    	return (int)y;
+    public float getY() {
+    	return y;
     }
 
     public void moveTime() {
-    	positionAtTime.remove(0);
+    	if (positionAtTime.size() > 0) {
+    		positionAtTime.remove(0);
+		}
     }
     
-    public Point getPositionAtTime(int time) {
+    public void moveEnemy() {
+    	move();
+    	positionAtTime.add(new Point2D.Float(x, y));
+    }
+    
+    public Point2D.Float getPositionAtTime(int time) {
     	while (positionAtTime.size() <= time) {
-			move();
+    		moveEnemy();
 		}
     	return positionAtTime.get(time);
     }
