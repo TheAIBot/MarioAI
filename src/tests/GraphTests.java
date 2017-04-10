@@ -6,10 +6,6 @@ import org.junit.Test;
 import MarioAI.MarioMethods;
 import MarioAI.graph.Graph;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.ai.BasicAIAgent;
-import ch.idsia.ai.agents.ai.ForwardAgent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphTests {

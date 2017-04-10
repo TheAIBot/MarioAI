@@ -99,19 +99,6 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	@Override
-	public float getTraversedTime(float v0) {
-		// TODO Auto-generated method stub 
-		if (v0 == 0) return 20f;
-		return (target.x - source.x) / v0;
-	}
-
-	@Override
-	public float getSpeedAfterTraversal(float v0) {
-		// TODO Auto-generated method stub
-		return v0;
-	}
-
-	@Override
 	protected int getExtraEdgeHashcode() {
 		final int jumpType = 1; //it is a jump edge type
 		//Its jump height. Max is 4 min is 0, giving 3 bits.

@@ -1,6 +1,5 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public abstract class DirectedEdge {
@@ -24,7 +23,7 @@ public abstract class DirectedEdge {
 			return false;
 		}
 		if (b instanceof DirectedEdge) {
-			DirectedEdge bb = (DirectedEdge) b;
+			final DirectedEdge bb = (DirectedEdge) b;
 			return bb.hashCode() == hashCode();
 		} else {
 			return false;
@@ -39,15 +38,6 @@ public abstract class DirectedEdge {
 	public String toString() {
 		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + getMaxY();
 	}
-	
-	/**
-	 * TODO Change assumption of not accelerating during traversal
-	 * @param initial velocity v0
-	 * @return the time it takes to traverse the edge given an intial velocity
-	 */
-	public abstract float getTraversedTime(float v0);
-	
-	public abstract float getSpeedAfterTraversal(float v0);
 
 	protected abstract int getExtraEdgeHashcode();
 	

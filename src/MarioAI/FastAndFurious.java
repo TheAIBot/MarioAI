@@ -32,7 +32,7 @@ public class FastAndFurious implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		boolean[] action = new boolean[Environment.numberOfButtons];
+		final boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
@@ -81,8 +81,8 @@ public class FastAndFurious implements Agent {
 	}
 	
 	private List<DirectedEdge> getPath(Environment observation) {
-		long startTime = System.currentTimeMillis();
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor);
+		//long startTime = System.currentTimeMillis();
+		final List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor);
 		
 		//System.out.println(System.currentTimeMillis() - startTime);
 		return (path == null)? newestPath : path;
