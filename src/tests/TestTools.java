@@ -12,8 +12,14 @@ import org.junit.Assert;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
+import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.level.Level;
+import ch.idsia.mario.engine.sprites.BulletBill;
+import ch.idsia.mario.engine.sprites.Enemy;
+import ch.idsia.mario.engine.sprites.FlowerEnemy;
+import ch.idsia.mario.engine.sprites.Shell;
+import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
@@ -103,5 +109,28 @@ public class TestTools {
 		for (int i = 0; i < LEVEL_INIT_TICKS; i++) {
 			runOneTick(observation);
 		}
+	}
+
+	public static void SpawnEnemy(Environment observation, int mapX, int mapY, int direction, int type, boolean winged) {
+		final LevelScene world = ((MarioComponent)observation).getLevelScene();
+		final float x = mapX * 16;
+		final float y = mapY * 16;
+		
+		Sprite enemy = null;
+		switch (type) {
+		case Sprite.KIND_BULLET_BILL:
+			enemy = new BulletBill(world, x, y, direction);
+			break;
+		case Sprite.KIND_ENEMY_FLOWER:
+			enemy = new FlowerEnemy(world, (int)x, type, mapX, mapY);
+			break;
+		case Sprite.KIND_SHELL:
+			enemy = new Shell(world, x, y, type);
+			break;
+		default:
+			enemy = new Enemy(world, (int)x, (int)y, direction, type, winged, mapX, mapY);
+			break;
+		}
+		world.addSprite(enemy);
 	}
 }
