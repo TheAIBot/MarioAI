@@ -20,14 +20,9 @@ public class Graph {
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 	private boolean goalNodesChanged = false;
-
-	public Node[][] getLevelMatrix(){
-		return levelMatrix;
-	}
 	
-	public void printMatrix(Environment observation)
+	public void printMatrix(final Environment observation)
 	{
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
 			for (int y = 0; y < LEVEL_WIDTH; y++) {
@@ -158,15 +153,15 @@ public class Graph {
 		return savedColumns.get(x);
 	}
 	
-	public int getMaxMarioXPos() {
-		return maxMarioXPos;
-	}
-	
 	public boolean goalNodesChanged() {
 		return goalNodesChanged;
 	}
 	
 	public void setGoalNodesChanged(boolean value) {
 		goalNodesChanged = value;
+	}
+	
+	public Node[][] getLevelMatrix(){
+		return levelMatrix;
 	}
 }

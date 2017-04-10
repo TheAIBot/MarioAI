@@ -17,7 +17,7 @@ public class GraphTests {
 	@Test
 	public void testLevelMatrixCreation()
 	{
-		BasicAIAgent agent = new BasicAIAgent("");
+		UnitTestAgent agent = new UnitTestAgent();
 		Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
 		Graph graph = new Graph();
