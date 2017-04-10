@@ -26,7 +26,7 @@ public class EnemyPredictor {
 	
 	private LevelScene levelScene;
 	private HashMap<Integer, ArrayList<Point2D.Float>> oldEnemyInfo;
-	private ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
+	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 	
 	public void intialize(LevelScene levelScene) {
@@ -34,7 +34,7 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(int x, int y, int time) {
+	public boolean hasEnemy(final int x, final int y, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			final int enemyX = (int) (enemyPosition.x / BLOCK_PIXEL_SIZE);
@@ -48,14 +48,14 @@ public class EnemyPredictor {
 		return false;
 	}
 	
-	public void updateEnemies(float[] enemyInfo) {
+	public void updateEnemies(final float[] enemyInfo) {
 		final HashMap<Integer, ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
 		updateSimulations();
 		
 		removeDeadEnemies(sortedEnemyInfo);
 		
-		System.out.println(verifiedEnemySimulations.size());
+		//System.out.println(verifiedEnemySimulations.size());
 		addCorrectSimulations(sortedEnemyInfo);
 		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
@@ -63,8 +63,8 @@ public class EnemyPredictor {
 		oldEnemyInfo = sortedEnemyInfo;
 	}
 	
-	private HashMap<Integer, ArrayList<Point2D.Float>> sortEnemiesByType(float[] enemyInfo) {
-		HashMap<Integer, ArrayList<Point2D.Float>> byType = new HashMap<Integer, ArrayList<Point2D.Float>>();
+	private HashMap<Integer, ArrayList<Point2D.Float>> sortEnemiesByType(final float[] enemyInfo) {
+		final HashMap<Integer, ArrayList<Point2D.Float>> byType = new HashMap<Integer, ArrayList<Point2D.Float>>();
 		for (int i = 0; i < enemyInfo.length; i += FLOATS_PER_ENEMY) {
 			final int kind = (int) enemyInfo[i + TYPE_OFFSET];
 			final float x = enemyInfo[i + X_OFFSET];
@@ -87,8 +87,8 @@ public class EnemyPredictor {
 		}
 	}
 	
-	private void removeDeadEnemies(HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
+	private void removeDeadEnemies(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+		final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
@@ -129,7 +129,7 @@ public class EnemyPredictor {
 		verifiedEnemySimulations = notDeletedSimulations;
 	}
 	
-	private void addCorrectSimulations(HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
@@ -159,7 +159,7 @@ public class EnemyPredictor {
 		}
 	}
 	
-	private void addPotentialCorrectSimulations(HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+	private void addPotentialCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
 		potentialCorrectSimulations.clear();
 		if (oldEnemyInfo != null) {
 			for (Entry<Integer, ArrayList<Point2D.Float>> keyValueSet : enemyInfo.entrySet()) {
@@ -199,7 +199,7 @@ public class EnemyPredictor {
 		}
 	}
 	
-	private EnemySimulator getSimulator(float x, float y, float xa , float ya, int kind) {
+	private EnemySimulator getSimulator(final float x, final float y, final float xa , final float ya, final int kind) {
 		switch (kind) {
 		case Sprite.KIND_BULLET_BILL:
 			final int direction = (xa > 0) ? 1 : -1;
@@ -215,7 +215,7 @@ public class EnemyPredictor {
 		}
 	}
 		
-	private boolean canKindFly(int kind) {
+	private boolean canKindFly(final int kind) {
         switch (kind) {
         case 5:
         case 7:
@@ -227,7 +227,7 @@ public class EnemyPredictor {
 		}
 	} 
 	
-	private int getTypeFromKind(int kind) {
+	private int getTypeFromKind(final int kind) {
         switch (kind) {
 		case Sprite.KIND_GOOMBA:
 		case Sprite.KIND_GOOMBA_WINGED:
