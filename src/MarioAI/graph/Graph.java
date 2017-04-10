@@ -59,7 +59,7 @@ public class Graph {
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 
 		for (int i = 0; i < levelMatrix.length; i++) {
-			final byte[] byteColumn = getByteColumnFromLevel(observation.getCompleteObservation(), marioYPos, i);
+			final byte[] byteColumn = getByteColumnFromLevel(observation.getLevelSceneObservation(), marioYPos, i);
 			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, columnIndex);
 			levelMatrix[i] = columnToInsert;
