@@ -23,9 +23,6 @@ import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
 import MarioAI.debugGraphics.DebugDrawing;
-import MarioAI.debugGraphics.DebugLines;
-import MarioAI.debugGraphics.DebugPoints;
-import MarioAI.graph.Grapher;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;
