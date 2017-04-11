@@ -6,7 +6,12 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.xerces.internal.util.EntityResolver2Wrapper;
+import com.sun.org.apache.xml.internal.security.encryption.EncryptionMethod;
+
 import MarioAI.MarioMethods;
+import MarioAI.enemy.EnemyPredictor;
+import MarioAI.enemy.simulators.EnemySimulator;
 import MarioAI.graph.Graph;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
@@ -201,11 +206,6 @@ public class DebugDraw {
 	}
 	
 	public static void drawAction(final Environment observation, final boolean[] actions) {
-		final ArrayList<Point> startsGreen = new ArrayList<Point>();
-		final ArrayList<Point> sizesGreen = new ArrayList<Point>();
-		
-		final ArrayList<Point> startsRed = new ArrayList<Point>();
-		final ArrayList<Point> sizesRed = new ArrayList<Point>();
 		final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
 		
 		final Point2D.Float[] keyPositions = new Point2D.Float[] {
@@ -221,22 +221,37 @@ public class DebugDraw {
 				Mario.KEY_JUMP
 		};
 		
-		final Point size = new Point((int)(BLOCK_PIXEL_SIZE * 0.8), (int)(BLOCK_PIXEL_SIZE * 0.8));
+		final Point size = new Point((int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER), (int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER));
 		
 		for (int i = 0; i < keys.length; i++) {
 			convertLevelPointToOnScreenPoint(observation, keyPositions[i]);
 			final Point keyPosition = new Point((int)keyPositions[i].x, (int)keyPositions[i].y);
 			
 			if (actions[keys[i]]) {
-				startsGreen.add(keyPosition);
-				sizesGreen.add(size);
+				addDebugDrawing(observation, new DebugSquare(Color.GREEN, keyPosition, size));
 			}
 			else {
-				startsRed.add(keyPosition);
-				sizesRed.add(size);
+				addDebugDrawing(observation, new DebugSquare(Color.RED, keyPosition, size));
 			}
-			addDebugDrawing(observation, new DebugSquare(Color.GREEN, startsGreen, sizesGreen));
-			addDebugDrawing(observation, new DebugSquare(Color.RED, startsRed, sizesRed));
+		}
+	}
+	
+	public static void drawEnemies(final Environment observation, EnemyPredictor enemyPredictor) {
+		for (EnemySimulator enemy : enemyPredictor.getEnemies()) {
+			final Point2D.Float enemyPos = enemy.getPositionAtTime(1);
+			final Point2D.Float startPos = new Point2D.Float(((enemyPos.x - enemy.getWidthInPixels()) / BLOCK_PIXEL_SIZE), 
+															 ((enemyPos.y - enemy.getHeightInPixels()) / BLOCK_PIXEL_SIZE) + 0.5f);
+			final Point2D.Float size = new Point2D.Float((float)enemy.getWidthInPixels() * Art.SIZE_MULTIPLIER, 
+														 (float)enemy.getHeightInPixels() * Art.SIZE_MULTIPLIER);
+			
+			
+			convertLevelPointToOnScreenPoint(observation, startPos);
+			//convertLevelPointToOnScreenPoint(observation, size);
+			
+			final Point startPosAsInt = new Point((int)startPos.x, (int)startPos.y);
+			final Point sizeAsInt = new Point((int)size.x, (int)size.y);
+			
+			addDebugDrawing(observation, new DebugSquare(new Color(255, 255, 255, 100), startPosAsInt, sizeAsInt));
 		}
 	}
 
