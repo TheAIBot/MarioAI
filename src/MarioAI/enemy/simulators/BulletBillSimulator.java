@@ -7,7 +7,7 @@ public class BulletBillSimulator extends EnemySimulator
 
     public BulletBillSimulator(float x, float y, int dir, int kind)
     {
-    	super(kind);
+    	super(kind, 16, 14);
         this.x = x;
         this.y = y;
 

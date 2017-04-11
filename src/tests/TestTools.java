@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Assert;
 
+import MarioAI.enemy.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
@@ -110,6 +111,30 @@ public class TestTools {
 			runOneTick(observation);
 		}
 	}
+	
+	public static void SpawnBulletBill(Environment observation, int mapX, int mapY, int direction) {
+		final LevelScene world = ((MarioComponent)observation).getLevelScene();
+		final float x = mapX * 16;
+		final float y = mapY * 16;
+		
+		world.addSprite(new BulletBill(world, x, y, direction));
+	}
+	
+	public static void SpawnEnemyFlower(Environment observation, int mapX, int mapY, int direction) {
+		final LevelScene world = ((MarioComponent)observation).getLevelScene();
+		final float x = mapX * 16;
+		final float y = mapY * 16;
+		
+		world.addSprite(new FlowerEnemy(world, (int)x, (int)y, mapX, mapY));
+	}
+	
+	public static void SpawnShell(Environment observation, int mapX, int mapY, int direction) {
+		final LevelScene world = ((MarioComponent)observation).getLevelScene();
+		final float x = mapX * 16;
+		final float y = mapY * 16;
+		
+		//world.addSprite(new ShellSimulator(world, x, y, xa, ya));
+	}
 
 	public static void SpawnEnemy(Environment observation, int mapX, int mapY, int direction, int type, boolean winged) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
@@ -119,12 +144,11 @@ public class TestTools {
 		Sprite enemy = null;
 		switch (type) {
 		case Sprite.KIND_BULLET_BILL:
-			enemy = new BulletBill(world, x, y, direction);
 			break;
 		case Sprite.KIND_ENEMY_FLOWER:
-			enemy = new FlowerEnemy(world, (int)x, type, mapX, mapY);
 			break;
 		case Sprite.KIND_SHELL:
+			
 			enemy = new Shell(world, x, y, type);
 			break;
 		default:

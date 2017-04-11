@@ -57,6 +57,12 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawEdges(observation, graph.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, graph);
 				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
+				DebugDraw.drawEnemies(observation, enemyPredictor);
+			}
+			
+			if (newestPath == null || newestPath.size() == 0) {
+				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				newestPath = getPath(observation);
 			}
 			
 			if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
@@ -66,13 +72,18 @@ public class FastAndFurious implements Agent {
 					graph.setGoalNodesChanged(false);
 				}
 				
-				marioController.getNextAction(observation, newestPath, action);
+				if (newestPath != null && newestPath.size() > 0) {
+					marioController.getNextAction(observation, newestPath, action);
+				}
 				
 				if (DEBUG) {
 					DebugDraw.drawPath(observation, newestPath);
 					DebugDraw.drawPathEdgeTypes(observation, newestPath);
-					DebugDraw.drawAction(observation, action);
 				}
+			}
+			
+			if (DEBUG) {
+				DebugDraw.drawAction(observation, action);
 			}
 		}
 		tickCount++;
@@ -81,10 +92,11 @@ public class FastAndFurious implements Agent {
 	}
 	
 	private List<DirectedEdge> getPath(Environment observation) {
+		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		final List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor);
-		
+		final List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 		//System.out.println(System.currentTimeMillis() - startTime);
+		
 		return (path == null)? newestPath : path;
 	}
 

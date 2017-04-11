@@ -20,7 +20,7 @@ public class ShellSimulator extends EnemySimulator
 
     public ShellSimulator(LevelScene world, float x, float y, float xa, float ya)
     {
-    	super(Sprite.KIND_SHELL);
+    	super(Sprite.KIND_SHELL, 16, 16);
 
     	this.world = world;
         this.x = x;

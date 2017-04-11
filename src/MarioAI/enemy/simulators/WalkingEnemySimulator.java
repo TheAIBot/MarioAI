@@ -26,7 +26,7 @@ public class WalkingEnemySimulator extends EnemySimulator
 
     public WalkingEnemySimulator(LevelScene world, float x, float y, float xa, float ya, int type, int kind, boolean winged)
     {
-    	super(kind);
+    	super(kind, 16, (type > 1) ? 16 : 27);
         
         this.world = world;
         this.x = x;
@@ -36,10 +36,8 @@ public class WalkingEnemySimulator extends EnemySimulator
         this.winged = winged;
 
         avoidCliffs = (type == Enemy.ENEMY_RED_KOOPA);
-
-        final int yPic = type;
         
-        this.height = (yPic > 1) ? 12 : 24;
+        this.height = (type > 1) ? 12 : 24;
         this.facing = (xa >= 0) ? 1 : -1;
     }
     

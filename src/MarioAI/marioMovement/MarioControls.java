@@ -167,7 +167,7 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 
-	public static boolean doesMovementCollideWithEnemy(DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor) {
+	public static boolean doesMovementCollideWithEnemy(DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor, int marioHeight) {
 		//Calculates the different position that Mario will be in, at the different ticsk, 
 		
 		float x = startXPosition;
@@ -188,14 +188,19 @@ public class MarioControls {
 			//System.out.println("tick " + currentTick + 
 			//				   ", position (" + x + ", " + y + 
 			//				   "), speeds: (" + xSpeed + ", " + ySpeed + ")");
+			if (enemyPredictor.hasEnemy((int)x, (int)y, 1, marioHeight, currentTick)) {
+				return true;
+			}
 			
+			/*
 			//Checking then for all the corners of Mario:
 			if (enemyPredictor.hasEnemy((int)x    , (int)y    , currentTick) || //Lower right corner
 				enemyPredictor.hasEnemy((int)x - 1, (int)y    , currentTick) || //Lower left  corner
 				enemyPredictor.hasEnemy((int)x    , (int)y - 1, currentTick) || //Upper right corner
 				enemyPredictor.hasEnemy((int)x - 1, (int)y - 1, currentTick)) { //Upper left  corner
 				return true;
-			}	
+			}
+			*/	
 		}
 		//If there are no collisions:
 		return false;		

@@ -19,7 +19,7 @@ public class FlowerEnemy extends EnemySimulator
     
     private FlowerEnemy(LevelScene world, float x, float y, float ya, boolean fromFlowerState)
     {
-    	super(Sprite.KIND_ENEMY_FLOWER);
+    	super(Sprite.KIND_ENEMY_FLOWER, 16, 21);
         
     	this.world = world;
     	this.x = x;

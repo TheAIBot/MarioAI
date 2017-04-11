@@ -1,6 +1,5 @@
 package MarioAI.enemy;
 
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,14 +33,25 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(final int x, final int y, final int time) {
+	public boolean hasEnemy(final int marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
-			final int enemyX = (int) (enemyPosition.x / BLOCK_PIXEL_SIZE);
-			final int enemyY = (int) (enemyPosition.y / BLOCK_PIXEL_SIZE);
+			//a
+			final float enemyX2 = (int) (enemyPosition.x / BLOCK_PIXEL_SIZE);
+			final float enemyY2 = (int) (enemyPosition.y / BLOCK_PIXEL_SIZE);
+			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
+			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
-			if (enemyX == x && 
-				enemyY == y) {
+			//b
+			final float marioX1 = marioX2 - marioWidth;
+			final float marioY1 = marioY2 - marioHeight;
+			
+			
+			//check if the rectangle if mario intersects with the enemy rectangle
+			if (enemyX1 <= marioX2 && 
+				enemyX2 >= marioX1 &&
+				enemyY1 <= marioY2 &&
+				enemyY2 >= marioY1) {
 				return true;
 			}
 		}
@@ -217,10 +227,10 @@ public class EnemyPredictor {
 		
 	private boolean canKindFly(final int kind) {
         switch (kind) {
-        case 5:
-        case 7:
-        case 3:
-        case 10:
+        case Sprite.KIND_GOOMBA_WINGED:
+        case Sprite.KIND_RED_KOOPA_WINGED:
+        case Sprite.KIND_GREEN_KOOPA_WINGED:
+        case Sprite.KIND_SPIKY_WINGED:
         	return true;
 		default:
 			return false;
@@ -243,5 +253,9 @@ public class EnemyPredictor {
 			return Enemy.ENEMY_SPIKY;
 		}
 		throw new Error("Unkown kind: " + kind);
+	}
+	
+	public ArrayList<EnemySimulator> getEnemies() {
+		return verifiedEnemySimulations;
 	}
 }
