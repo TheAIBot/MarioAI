@@ -213,8 +213,7 @@ public class TestMarioMovements {
 			if (startMarioYPos - jumpHeight < currentMarioYPos && upTime) {
 				agent.action[Mario.KEY_JUMP] = true;
 				expectedTicksHeldUp++;
-			}
-			else {
+			} else {
 				agent.action[Mario.KEY_JUMP] = false;
 				upTime = false;
 			}
@@ -242,8 +241,8 @@ public class TestMarioMovements {
 		final int receivedJumpTime = moveInfo.getTotalTicksJumped();
 		final int receivedHoldJump = moveInfo.getTicksHoldingJump();
 		if (receivedJumpTime != expectedJumpTime ||
-			receivedHoldJump != expectedTicksHeldUp) {
-			Assert.fail("Expected jump time wasn't the same as the received one." + 
+			 receivedHoldJump != expectedTicksHeldUp) {
+			 Assert.fail("Expected jump time wasn't the same as the received one." + 
 						"\nExpected jump time: " + expectedJumpTime + 
 						"\nReceived jump time: " + receivedJumpTime + 
 						"\nExpected hold jump: " + expectedTicksHeldUp + 

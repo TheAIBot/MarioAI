@@ -17,15 +17,19 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("ultrashortdeadend.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
+<<<<<<< HEAD
 	        Agent controller = new FastAndFurious();
 	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
 	        
+=======
+	        Agent controller = new FastAndFurious();	        
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
 	        Task task = new ProgressTask(options);
@@ -33,14 +37,20 @@ public class Play {
 	        options.setVisualization(true);
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
-	        options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
+	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
+	        options.setLevelRandSeed(seed);
+	        System.out.println("Seed = " + seed);
 	        //options.setLevelRandSeed(2);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
+<<<<<<< HEAD
 	        options.setLevelRandSeed(690683631);
+=======
+	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 	        /*
 1549733898
 793284811

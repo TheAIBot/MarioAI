@@ -34,7 +34,11 @@ public class Art
     final static String curDir = System.getProperty("user.dir");
     final static String img = curDir + "/../img/";
     
+<<<<<<< HEAD
     public static int SIZE_MULTIPLIER = 4;
+=======
+    public static int SIZE_MULTIPLIER = 1;
+>>>>>>> refs/remotes/origin/GraphingOfJustice
 
     public static void init(GraphicsConfiguration gc)
     {
