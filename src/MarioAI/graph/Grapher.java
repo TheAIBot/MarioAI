@@ -122,7 +122,7 @@ public  class Grapher {
 		}
 		return foundAllEdges;
 	}
-	
+
 	/*** Finds the possible places that mario can jump to, from the given position, 
 	 *   and adds the to the given list of nodes. This is done by simulating the jump as a polynomial,
 	 *   and finding the place it collides with something.
@@ -133,7 +133,7 @@ public  class Grapher {
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); //The jump polynomial.
 		boolean foundAllEdges = true;
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
-			for (int jumpRange = 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
@@ -144,7 +144,7 @@ public  class Grapher {
 		return foundAllEdges;
 	}
 	
-	private boolean jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
+	public boolean jumpAlongPolynomial(Node startingNode, int nodeColoumn, SecondOrderPolynomial polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
 		//Starts of from Mario's initial position:
 		int currentXPosition = nodeColoumn;
 		int xPositionOffsetForJump = 0;
@@ -153,13 +153,14 @@ public  class Grapher {
 		//Gives the current direction of the jump:
 		JumpDirection currentJumpDirection = direction;
 
-		
+		//column
 		boolean hasAlreadyPassedTopPoint = false;
-		boolean isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);;
+		boolean isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);;
 		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
 			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();
+			float currentYPosition;
 			
-			if (isPastTopPoint && !hasAlreadyPassedTopPoint) {
+			if (isPastTopPointColumn && !hasAlreadyPassedTopPoint) {
 				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
 					currentXPosition--; //The toppunkt was in the current block (and not ending there).
 					//Therefore the downward going part of that block needs to be checked.
@@ -170,9 +171,9 @@ public  class Grapher {
 				hasAlreadyPassedTopPoint = true;
 			}
 			
-			float currentYPosition;
-			if (!isPastTopPoint) {
-				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump));
+			if (!isPastTopPointColumn && 
+				  polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump)) { //TODO fix here, probably a bug.
+				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump)); //TODO no max needed?
 			} else {
 				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);	
 			}
@@ -180,9 +181,9 @@ public  class Grapher {
 			//This converts the next y value from (high value = higher up on the level) to (high value = lower on the level)
 			final int bound = getBounds(startingNode, (int)currentYPosition); 
 			
-			if (!isPastTopPoint) {
+			if (!isPastTopPointColumn) {
 				collisionDetection = ascendingPolynomial (formerLowerYPosition, bound, currentXPosition, collisionDetection, 
-														  polynomial, currentJumpDirection, startingNode, listOfEdges);	
+														            polynomial, currentJumpDirection, startingNode, listOfEdges);	
 			} else {
 				collisionDetection = descendingPolynomial(formerLowerYPosition, bound, currentXPosition, collisionDetection, 
 						                                  polynomial, currentJumpDirection, startingNode, listOfEdges);		
@@ -196,7 +197,7 @@ public  class Grapher {
 				return true;
 			}
 			
-			isPastTopPoint = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
+			isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
 			formerLowerYPosition = bound;
 		}
 		return false;
@@ -410,6 +411,16 @@ public  class Grapher {
 			}
 		}else {
 			return Collision.HIT_NOTHING;
+		}
+	}
+
+	public void clearAllEdges(Node[][] world) {
+		for (int i = 0; i < world.length; i++) {
+			for (int j = 0; j < world[i].length; j++) {
+				if (world[i][j] != null) {
+					world[i][j].deleteAllEdges();					
+				}
+			}
 		}
 	}
 	

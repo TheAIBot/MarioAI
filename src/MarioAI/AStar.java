@@ -104,7 +104,7 @@ public final class AStar {
 				//all Running edges are possible
 				//not all jumps are possible
 				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
-					continue;
+					//continue;
 				}
 				
 				
@@ -115,8 +115,12 @@ public final class AStar {
 				//In a jump it's possible to jump too far
 				//and there is nothing that mario can do about it
 				//TODO this should maybe be removed in the future
-				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos) &&
-					 MarioControls.doesMovementCollideWithEnemy(0, neighborEdge, current.correctXPos, current.vx, movementInformation)) {
+				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)){
+					//continue;
+				}
+				
+				if (MarioControls.doesMovementCollideWithEnemy(1, neighborEdge, current.correctXPos, current.vx, movementInformation)){
+					//TODO combine after tests with the check above.
 					continue;
 				}
 				

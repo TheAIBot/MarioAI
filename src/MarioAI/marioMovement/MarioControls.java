@@ -88,9 +88,7 @@ public class MarioControls {
 		}
 		else {
 			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target.x, currentXSpeed, holdJumpTime, jumpTime);
-		}
-		
-		
+		}		
 		
 		if (jumpTime < 0 && observation.isMarioOnGround()) {
 			jumpTime = moveInfo.getTotalTicksJumped();
@@ -168,26 +166,29 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 
-	public static boolean doesMovementCollideWithEnemy(int startingTick, DirectedEdge traversingEdge, float startXPosition, float vx, MovementInformation movementInformation) {
-		//Calculates the different position that mario will be in, at the different tics, 
+	public static boolean doesMovementCollideWithEnemy(int startingTick, DirectedEdge traversingEdge, float startXPosition, 
+																		float vx, MovementInformation movementInformation) {
+		//Calculates the different position that Mario will be in, at the different tics, 
 		//starting from a given tick.
+		
 		int currentTick = 0;
 		//TODO change traversingEdge.source.x to current.x, and the likes.
 		Pair<Float, Float> currentTickXPositionAndSpeed = new Pair<Float, Float>((float) startXPosition, (float) vx);
 		Pair<Float, Float> currentTickYPositionAndDeltaDistance = new Pair<Float, Float>((float) traversingEdge.source.y, (float) 0);
-		
+		//System.out.println("Movement tics: " + movementInformation.getMoveTime());
 		//As long as mario hasn't reached the target of the edge:
-		while (currentTick >= movementInformation.getMoveTime()) { 
+		while (currentTick <= movementInformation.getMoveTime()) { 
 			currentTick++;
 			//This is the position of the lower right corner of mario:			
 			currentTickXPositionAndSpeed         = traversingEdge.getNextXPostionAndSpeedAfterTick        (currentTick, currentTickXPositionAndSpeed,         movementInformation);
 			currentTickYPositionAndDeltaDistance = traversingEdge.getNextYPostionAndDeltaDistanceAfterTick(currentTick, currentTickYPositionAndDeltaDistance, movementInformation);
-			
-			//Checking then for all the corners of mario:
-			if (hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.value    , currentTick) || //Lower right corner
-				hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.value	 , currentTick) || //Lower left  corner
-				hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.value - 1, currentTick) || //Upper right corner
-				hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.value - 1, currentTick)) { //Upper left  corner
+			//System.out.println("tick " + currentTick + ", position (" + currentTickXPositionAndSpeed.key   + "," + currentTickYPositionAndDeltaDistance.key   + "), speeds: (" + 
+			//																				currentTickXPositionAndSpeed.value + "," + currentTickYPositionAndDeltaDistance.value + ")");
+			//Checking then for all the corners of Mario:
+			if (hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.key    , currentTick) || //Lower right corner
+				 hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.key	  , currentTick) || //Lower left  corner
+				 hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.key - 1, currentTick) || //Upper right corner
+				 hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.key - 1, currentTick)) { //Upper left  corner
 				return true;
 			}			
 		}
@@ -219,7 +220,7 @@ public class MarioControls {
 	public static XMovementInformation getNextXPosition(float neededXDistance, float speed, final int airTime) {
 		float distanceMoved = 0;
 		int steps = 0;
-		//If mario currently moves the opposite way of the way he should go,
+		//If Mario currently moves the opposite way of the way he should go,
 		//he first needs to deaccelerate:
 		boolean distanceIsNegative = neededXDistance < 0;
 		if ((neededXDistance < 0 && speed > 0) ||
@@ -324,7 +325,11 @@ public class MarioControls {
 		final float a = 0.6714839288108793f;
 		final float b = -0.11653327286299346f;
 		final float c = -0.3409108568136135f;
-		return (float) (a * Math.exp(b * tick)  + c);			
+		//Stepwise implementation of the getDeaccelerationNeededSteps method.
+		float newSpeed = (float) (a * Math.exp(b * tick)  + c);
+		if (newSpeed >= MIN_MARIO_SPEED) {
+			return 0;
+		} else return newSpeed;			
 	}
 	
 	public static float getDeaccelerationDistanceMoved(final float speed) {
@@ -340,7 +345,8 @@ public class MarioControls {
 		final float b = -0.11653327286299346f;
 		final float c = -0.3409108568136135f;
 		int steps = 0;
-		while(speed >= MIN_MARIO_SPEED) {
+		//TODO Can be made into exponential search, reducing it to a log n time complexity, instead of linear.
+		while(speed >= MIN_MARIO_SPEED) { 
 			speed = (float) (a * Math.exp(b * steps)  + c);
 			steps++;
 		}

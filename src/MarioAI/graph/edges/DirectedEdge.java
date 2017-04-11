@@ -51,31 +51,28 @@ public abstract class DirectedEdge {
 	public abstract float getTraversedTime(float v0);
 	
 	public abstract float getSpeedAfterTraversal(float v0);
-
 	
 	public Pair<Float, Float> getNextXPostionAndSpeedAfterTick(int tick, Pair<Float, Float> currentTickXPositionAndSpeed,
-			                                           MovementInformation movementInformation) {
+																				  MovementInformation movementInformation) {
 		float newSpeed;//New speed next tick.
 		float newXPositon;//New x position next tick.
 		 //If Mario is in the deaccelerating period of the movement:
 		if (tick  <= movementInformation.xMoveInfo.ticksDeaccelerating) {
 			newSpeed = MarioControls.getNextTickDeacceleratingSpeed(tick, currentTickXPositionAndSpeed.value);
-		} //If he should accelerate:
+		} //If he is in the accelerating period:
 		else if( tick <= (movementInformation.xMoveInfo.ticksAccelerating + 
-				          movementInformation.xMoveInfo.ticksDeaccelerating)) { 
+				            movementInformation.xMoveInfo.ticksDeaccelerating)) { 
 			newSpeed = MarioControls.getNextTickSpeed(currentTickXPositionAndSpeed.value);
 		} //else it is simply a mater of "drifting"
-		else { 
-			newSpeed = MarioControls.getNextTickDriftSpeed(currentTickXPositionAndSpeed.value);
-		}
+		else newSpeed = MarioControls.getNextTickDriftSpeed(currentTickXPositionAndSpeed.value);
 		newXPositon = currentTickXPositionAndSpeed.key + newSpeed;
-		return new Pair<Float,Float>(newSpeed,newXPositon);
+		return new Pair<Float,Float>(newXPositon,newSpeed);
 	}
 	
-	public Pair<Float, Float> getNextYPostionAndDeltaDistanceAfterTick(int tick, Pair<Float, Float> currentTickYPositionAndSpeed,
+	public Pair<Float, Float> getNextYPostionAndDeltaDistanceAfterTick(int tick, Pair<Float, Float> currentTickYPositionAndDeltaDistance,
 			                                                   MovementInformation movementInformation) {
 		if (this instanceof Running) { //Running gives no change in y position, nor speed, the later being 0.
-			return new Pair<Float, Float>(currentTickYPositionAndSpeed.key, (float) 0);
+			return new Pair<Float, Float>(currentTickYPositionAndDeltaDistance.key, (float) 0);
 		} else {
 			final float jumpHeight = this.getMaxY();
 			final float fallTo = Math.round(source.y) - target.y;
@@ -85,7 +82,7 @@ public abstract class DirectedEdge {
 			final float yJumpSpeed = 1.9f;
 			float jumpTime = 8 - tick + 1; //The decrementation is moved to this part.
 			float currentJumpHeight = 0;
-			float prevYDelta = 0;
+			float prevYDelta = currentTickYPositionAndDeltaDistance.value;
 			
 			if (tick <= movementInformation.getTicksHoldingJump()) { //The "jumping" part.
 				//Math derived from mario code

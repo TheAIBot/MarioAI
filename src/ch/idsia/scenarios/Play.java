@@ -17,14 +17,13 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("ultrashortdeadend.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
-	        Agent controller = new FastAndFurious();
-	        
+	        Agent controller = new FastAndFurious();	        
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
 	        Task task = new ProgressTask(options);
@@ -41,7 +40,7 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed(1905810938);
+	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
 	        /*
 	         * 
 1549733898

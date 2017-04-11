@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,7 @@ import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestGrapher {
-	
+	Grapher grapher = new Grapher();
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
 	public DirectedEdge runningEdgeType = new Running(null, null);
@@ -76,7 +77,6 @@ public class TestGrapher {
 		for (short i = 0; i < GRID_WIDTH; i++) {
 			level[i][marioNode.y] = new Node(getXPositionFromColoumn(i), marioNode.y, (byte) 11); //TODO(*) Error: try to set it to -11
 		}	
-		grapher.setMovementEdges(level, marioNode);
 		return graph;
 	}
 	
@@ -122,6 +122,7 @@ public class TestGrapher {
 	public void testCanJumpRight() {
 		Graph graph = totalFlatland();
 		Node[][] level = graph.getLevelMatrix();
+		grapher.setMovementEdges(level, marioNode);
 		boolean[] possibleJumpLenghts = new boolean[5];//5 for the five different jump lengths
 		for (DirectedEdge edge : marioNode.edges) {
 			if (edge instanceof SecondOrderPolynomial) {
@@ -133,7 +134,7 @@ public class TestGrapher {
 			}		
 		}
 		for (int i = 0; i < possibleJumpLenghts.length; i++) {
-			assertTrue(possibleJumpLenghts[i]);
+			assertTrue("Failure at lenght " + (i+1) + ", have array:" + Arrays.toString(possibleJumpLenghts),possibleJumpLenghts[i]);
 		}
 	}
 	
@@ -141,18 +142,20 @@ public class TestGrapher {
 	public void testCanJumpLeft() {
 		Graph graph = totalFlatland();
 		Node[][] level = graph.getLevelMatrix();
+		Grapher grapher = new Grapher();
+		grapher.setMovementEdges(level, marioNode);
 		boolean[] possibleJumpLenghts = new boolean[5];//5 for the five different jump lengths
 		for (DirectedEdge edge : marioNode.edges) {
 			if (edge instanceof SecondOrderPolynomial) {
 				SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
-				if (marioNode.x > polynomialEdge.target.x) { //Goes rightwards
+				if (marioNode.x > polynomialEdge.target.x) { //Goes leftwards
 					int index = (marioNode.x - polynomialEdge.target.x ) - 1;
 					possibleJumpLenghts[index] = true;
 				}
 			}		
 		}
 		for (int i = 0; i < possibleJumpLenghts.length; i++) {
-			assertTrue(possibleJumpLenghts[i]);
+			assertTrue("Failure at lenght " + (i+1), possibleJumpLenghts[i]);
 		}
 	}
 	
@@ -201,18 +204,18 @@ public class TestGrapher {
 	}
 	
 	@Test
-	public void testJumpUpAgainsWall() {
+	public void testJumpUpAgainstWall() {
 		Grapher grapher = new Grapher();
 		Graph graph = totalFlatland();
 		Node[][] world = graph.getLevelMatrix();
 		//adding the walls:
 		final int WALL_HEIGHT = 4;
-		for (short i = -3; i <= 3; i++) {
+		for (short i = 1; i <= 3; i++) {
 			if (i == 0) continue;
 			boolean hasJumpedAgainstWall = false;
 			addWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
-			//Grapher.clearAllEdges(world);
-			//Grapher.setMovementEdges(world, marioNode);
+			grapher.clearAllEdges(world);
+			grapher.setMovementEdges(world, marioNode);
 			List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
 			grapher.getPolynomialReachingEdges(marioNode,(short) 11, newEdges);
 			for (DirectedEdge edge : newEdges) {
@@ -221,8 +224,7 @@ public class TestGrapher {
 					//It has only jumped along the wall, if the height of the jump without collision at the wall,
 					//is less than the walls height.
 					if (edge.target == null) {
-						System.out.println("Error");
-						
+						System.out.println("Error");						
 					}
 					if (polynomialEdge.f(11 + i) < (marioNode.y + WALL_HEIGHT) && 
 						edge.target.x == getXPositionFromColoumn(11+i) && 
@@ -232,7 +234,7 @@ public class TestGrapher {
 					}
 				}
 			}
-			assertTrue("Failure at wall distance: " + i,hasJumpedAgainstWall);
+			assertTrue("Failure at wall distance: " + i, hasJumpedAgainstWall);
 			//removing the wall:
 			removeWall(WALL_HEIGHT, 11 + i, marioNode.y, world);
 		}
@@ -252,7 +254,7 @@ public class TestGrapher {
 			for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
 				if(edge.target.y == marioNode.y - 3) hasEdgeToUpperLevel = true;
 			}
-			assertTrue("Error at coloumn: "+i ,hasEdgeToUpperLevel);
+			assertTrue("Error at coloumn: " + i ,hasEdgeToUpperLevel);
 		}		
 	}
 	

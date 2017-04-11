@@ -54,7 +54,8 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	}
 
 	public boolean isPastTopPoint(int startPosition, int currentPosition) {
-		return (startPosition <= topPointX && topPointX <= currentPosition || startPosition >= topPointX && topPointX >= currentPosition);
+		return (startPosition <= topPointX && topPointX <= currentPosition || //Going right
+				  startPosition >= topPointX && topPointX >= currentPosition);  //Going left.
 	}
 
 	public float getTopPointX() {
