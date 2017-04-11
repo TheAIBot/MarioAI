@@ -23,13 +23,8 @@ public class Play {
 			// controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
-<<<<<<< HEAD
 	        Agent controller = new FastAndFurious();
 	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
-	        
-=======
-	        Agent controller = new FastAndFurious();	        
->>>>>>> refs/remotes/origin/GraphingOfJustice
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
 	        Task task = new ProgressTask(options);
@@ -46,11 +41,8 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-<<<<<<< HEAD
-	        options.setLevelRandSeed(690683631);
-=======
+	        //options.setLevelRandSeed(690683631);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
->>>>>>> refs/remotes/origin/GraphingOfJustice
 	        /*
 1549733898
 793284811
@@ -60,7 +52,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(10);
+	        options.setLevelDifficulty(5);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

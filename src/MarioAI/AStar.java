@@ -104,7 +104,7 @@ public final class AStar {
 				//all Running edges are possible
 				//not all jumps are possible
 				if (!MarioControls.canMarioUseEdge(neighborEdge, current.correctXPos, current.vx)) {
-					//continue;
+					continue;
 				}
 				
 				
@@ -116,11 +116,10 @@ public final class AStar {
 				//and there is nothing that mario can do about it
 				//TODO this should maybe be removed in the future
 				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)){
-					//continue;
+					continue;
 				}
 				
-				if (MarioControls.doesMovementCollideWithEnemy(1, neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation)){
-					//TODO combine after tests with the check above.
+				if (MarioControls.doesMovementCollideWithEnemy(neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor)){
 					continue;
 				}
 				

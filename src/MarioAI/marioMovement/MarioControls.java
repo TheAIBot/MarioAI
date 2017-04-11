@@ -4,6 +4,7 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.Pair;
+import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
@@ -166,39 +167,38 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 
-	public static boolean doesMovementCollideWithEnemy(int startingTick, DirectedEdge traversingEdge, float startXPosition, float startYPosition,
-																		float vx, MovementInformation movementInformation) {
-		//Calculates the different position that Mario will be in, at the different tics, 
-		//starting from a given tick.
+	public static boolean doesMovementCollideWithEnemy(DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor) {
+		//Calculates the different position that Mario will be in, at the different ticsk, 
 		
-		int currentTick = 0;
-		//TODO change traversingEdge.source.x to current.x, and the likes.
-		Pair<Float, Float> currentTickXPositionAndSpeed = new Pair<Float, Float>((float) startXPosition, (float) vx);
-		Pair<Float, Float> currentTickYPositionAndDeltaDistance = new Pair<Float, Float>((float) startYPosition, (float) 0);
-		System.out.println("Movement tics: " + movementInformation.getMoveTime());
+		float x = startXPosition;
+		float y = startYPosition;
+		
+		float xSpeed = vx;
+		float ySpeed = 0;
+		
+		//System.out.println("Movement tics: " + movementInformation.getMoveTime());
 		//As long as mario hasn't reached the target of the edge:
-		while (currentTick <= movementInformation.getMoveTime()) { 
-			currentTick++;
-			//This is the position of the lower right corner of mario:			
-			currentTickXPositionAndSpeed         = traversingEdge.getNextXPostionAndSpeedAfterTick        (currentTick, currentTickXPositionAndSpeed,         movementInformation);
-			currentTickYPositionAndDeltaDistance = traversingEdge.getNextYPostionAndDeltaDistanceAfterTick(currentTick, currentTickYPositionAndDeltaDistance, movementInformation);
-			System.out.println("tick " + currentTick + ", position (" + currentTickXPositionAndSpeed.key   + "," + currentTickYPositionAndDeltaDistance.key   + "), speeds: (" + 
-																							currentTickXPositionAndSpeed.value + "," + currentTickYPositionAndDeltaDistance.value + ")");
+		for (int currentTick = 1; currentTick <= movementInformation.getMoveTime(); currentTick++) {
+			xSpeed = traversingEdge.getNextXSpeedAfterTick(currentTick, xSpeed, movementInformation);
+			x += xSpeed;
+			
+			ySpeed = traversingEdge.getNextYSpeedAfterTick(currentTick, ySpeed, y, movementInformation);
+			y -= ySpeed;
+			
+			//System.out.println("tick " + currentTick + 
+			//				   ", position (" + x + ", " + y + 
+			//				   "), speeds: (" + xSpeed + ", " + ySpeed + ")");
+			
 			//Checking then for all the corners of Mario:
-			if (hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.key    , currentTick) || //Lower right corner
-				 hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.key	  , currentTick) || //Lower left  corner
-				 hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.key - 1, currentTick) || //Upper right corner
-				 hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.key - 1, currentTick)) { //Upper left  corner
+			if (enemyPredictor.hasEnemy((int)x    , (int)y    , currentTick) || //Lower right corner
+				enemyPredictor.hasEnemy((int)x - 1, (int)y    , currentTick) || //Lower left  corner
+				enemyPredictor.hasEnemy((int)x    , (int)y - 1, currentTick) || //Upper right corner
+				enemyPredictor.hasEnemy((int)x - 1, (int)y - 1, currentTick)) { //Upper left  corner
 				return true;
-			}			
+			}	
 		}
 		//If there are no collisions:
 		return false;		
-	}
-	
-	private static boolean hasEnemy(float currentTickXPosition, float currentTickYPosition, int tick) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	public static MovementInformation getStepsAndSpeedAfterJump(DirectedEdge edge, float speed) {
