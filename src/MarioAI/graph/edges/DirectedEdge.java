@@ -75,24 +75,24 @@ public abstract class DirectedEdge {
 			return new Pair<Float, Float>(currentTickYPositionAndDeltaDistance.key, (float) 0);
 		} else {
 			final float jumpHeight = this.getMaxY();
-			final float fallTo = Math.round(source.y) - target.y;
+			final float fallTo = target.y;
 			
 			//Numbers are taken from mario class in the game
 			//Used for simulating mario's movement.
 			final float yJumpSpeed = 1.9f;
 			float jumpTime = 8 - tick + 1; //The decrementation is moved to this part.
-			float currentJumpHeight = 0;
+			float currentJumpHeight = currentTickYPositionAndDeltaDistance.key;
 			float prevYDelta = currentTickYPositionAndDeltaDistance.value;
 			
-			if (tick <= movementInformation.getTicksHoldingJump()) { //The "jumping" part.
+			if (tick <= movementInformation.getTicksHoldingJump() + 1) { //The "jumping" part.
 				//Math derived from mario code
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
-				currentJumpHeight += prevYDelta;
-			} else { //and afterwards
+				currentJumpHeight -= prevYDelta;
+			} else if (currentJumpHeight < fallTo){ //and afterwards
 				//The if part is removed.				
 				//Math derived from mario code.
 				prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
-				currentJumpHeight += prevYDelta;			
+				currentJumpHeight -= prevYDelta;			
 			}
 			return new Pair<Float, Float>(currentJumpHeight, prevYDelta);
 		}

@@ -119,7 +119,7 @@ public final class AStar {
 					//continue;
 				}
 				
-				if (MarioControls.doesMovementCollideWithEnemy(1, neighborEdge, current.correctXPos, current.vx, movementInformation)){
+				if (MarioControls.doesMovementCollideWithEnemy(1, neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation)){
 					//TODO combine after tests with the check above.
 					continue;
 				}

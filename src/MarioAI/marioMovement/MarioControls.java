@@ -166,7 +166,7 @@ public class MarioControls {
 		return new Pair<Integer, Integer>(0, 0);
 	}
 
-	public static boolean doesMovementCollideWithEnemy(int startingTick, DirectedEdge traversingEdge, float startXPosition, 
+	public static boolean doesMovementCollideWithEnemy(int startingTick, DirectedEdge traversingEdge, float startXPosition, float startYPosition,
 																		float vx, MovementInformation movementInformation) {
 		//Calculates the different position that Mario will be in, at the different tics, 
 		//starting from a given tick.
@@ -174,16 +174,16 @@ public class MarioControls {
 		int currentTick = 0;
 		//TODO change traversingEdge.source.x to current.x, and the likes.
 		Pair<Float, Float> currentTickXPositionAndSpeed = new Pair<Float, Float>((float) startXPosition, (float) vx);
-		Pair<Float, Float> currentTickYPositionAndDeltaDistance = new Pair<Float, Float>((float) traversingEdge.source.y, (float) 0);
-		//System.out.println("Movement tics: " + movementInformation.getMoveTime());
+		Pair<Float, Float> currentTickYPositionAndDeltaDistance = new Pair<Float, Float>((float) startYPosition, (float) 0);
+		System.out.println("Movement tics: " + movementInformation.getMoveTime());
 		//As long as mario hasn't reached the target of the edge:
 		while (currentTick <= movementInformation.getMoveTime()) { 
 			currentTick++;
 			//This is the position of the lower right corner of mario:			
 			currentTickXPositionAndSpeed         = traversingEdge.getNextXPostionAndSpeedAfterTick        (currentTick, currentTickXPositionAndSpeed,         movementInformation);
 			currentTickYPositionAndDeltaDistance = traversingEdge.getNextYPostionAndDeltaDistanceAfterTick(currentTick, currentTickYPositionAndDeltaDistance, movementInformation);
-			//System.out.println("tick " + currentTick + ", position (" + currentTickXPositionAndSpeed.key   + "," + currentTickYPositionAndDeltaDistance.key   + "), speeds: (" + 
-			//																				currentTickXPositionAndSpeed.value + "," + currentTickYPositionAndDeltaDistance.value + ")");
+			System.out.println("tick " + currentTick + ", position (" + currentTickXPositionAndSpeed.key   + "," + currentTickYPositionAndDeltaDistance.key   + "), speeds: (" + 
+																							currentTickXPositionAndSpeed.value + "," + currentTickYPositionAndDeltaDistance.value + ")");
 			//Checking then for all the corners of Mario:
 			if (hasEnemy(currentTickXPositionAndSpeed.key    , currentTickYPositionAndDeltaDistance.key    , currentTick) || //Lower right corner
 				 hasEnemy(currentTickXPositionAndSpeed.key - 1, currentTickYPositionAndDeltaDistance.key	  , currentTick) || //Lower left  corner

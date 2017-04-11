@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
 import MarioAI.graph.Graph;
@@ -20,6 +21,7 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.*;
 import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -42,13 +44,13 @@ public class TestEnemyCollisionDetection{
 	
 	
 	public void startup(){
-		boolean[] action = new boolean[Environment.numberOfButtons];	
+		action = new boolean[Environment.numberOfButtons];	
 		agent = new UnitTestAgent();		
-		Environment observation = TestTools.loadLevel("flat.lvl", agent, false);	
+		observation = TestTools.loadLevel("flat.lvl", agent, false);	
 		graph.createStartGraph(observation);
 		level = graph.getLevelMatrix();
 		marioNode = graph.getMarioNode(observation);
-		MarioControls marioController = new MarioControls();
+		marioController = new MarioControls();
 	}
 	
 	
@@ -59,25 +61,46 @@ public class TestEnemyCollisionDetection{
 		SecondOrderPolynomial polynomial =  new SecondOrderPolynomial(marioNode, null);
 		List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		polynomial.setToJumpPolynomial(marioNode, 11, 4, 4);
+		grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
 		grapher.jumpAlongPolynomial(marioNode, 11, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges);
 		
 		assertEquals(1, listOfEdges.size());//One edge should exist.
 		Path.add(listOfEdges.get(0));
 		
+		final float marioStartXPos =  MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioStartYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+
+		marioController.getNextAction(observation, Path, action);
+		agent.action = action;
+		TestTools.runOneTick(observation);
+		
+		//System.out.println("Tick " + 0 + " -> (" + marioXPos + "," + marioYPos + ")");
+		
 		//Checking the path that mario would make with this:	
-		for (int i = 0; i < 20; i++) {
+		for (int i = 1; i <= 100; i++) {
 			marioController.getNextAction(observation, Path, action);
+			agent.action = action;
 			TestTools.runOneTick(observation);
 			
-			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-			final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			
 			System.out.println("Tick " + i + " -> (" + marioXPos + "," + marioYPos + ")");
-			
 			if (observation.isMarioOnGround()) {
 				break;
 			}
 		}
+		
+		System.out.println("\nCompare with:\n");
+		
+		final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(marioStartXPos, marioStartYPos, 
+				 																													Path.get(0).target, Path.get(0), 0);
+		
+		assertFalse(marioController.doesMovementCollideWithEnemy(1, Path.get(0), marioStartXPos, marioStartYPos, 0, movementInformation));
 		
 	}
 	
