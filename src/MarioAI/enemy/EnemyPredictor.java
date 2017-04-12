@@ -204,7 +204,15 @@ public class EnemyPredictor {
 						
 						if (deltaX <= HALF_BLOCK && 
 							deltaY <= BLOCK_PIXEL_SIZE) {
-							potentialCorrectSimulations.add(getSimulator(x1, y1, xa, ya, kind));
+							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
+							//the xa and ya are 1 tick too old so they are updated here
+							potentialSimulation.moveEnemy();
+							potentialSimulation.moveTime();
+							//but the position isn't too old so it's set here again
+							potentialSimulation.setX(x1);
+							potentialSimulation.setY(y1);
+							
+							potentialCorrectSimulations.add(potentialSimulation);
 						}
 					}
 				}
