@@ -198,9 +198,7 @@ public final class AStar {
 			ySpeed = traversingEdge.getNextYSpeedAfterTick(currentTick, ySpeed, y, movementInformation);
 			y -= ySpeed;
 			
-			//System.out.println("tick " + currentTick + 
-			//				   ", position (" + x + ", " + y + 
-			//				   "), speeds: (" + xSpeed + ", " + ySpeed + ")");
+			//System.out.println("tick " + currentTick + ", position (" + x + ", " + y + "), speeds: (" + xSpeed + ", " + ySpeed + ")");
 			if (enemyPredictor.hasEnemy((int)x, (int)y, 1, marioHeight, currentTick)) {
 				return true;
 			}

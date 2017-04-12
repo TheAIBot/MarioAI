@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Assert;
 
+import MarioAI.enemy.EnemyType;
 import MarioAI.enemy.simulators.BulletBillSimulator;
 import MarioAI.enemy.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
@@ -124,42 +125,37 @@ public class TestTools {
 		return enemy;
 	}
 	
-	public static void SpawnEnemyFlower(Environment observation, int mapX, int mapY, int direction) {
+	public static Sprite SpawnEnemyFlower(Environment observation, int mapX, int mapY, int direction) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
 		
-		world.addSprite(new FlowerEnemy(world, (int)x, (int)y, mapX, mapY));
+		final FlowerEnemy flowerEnemy = new FlowerEnemy(world, (int)x, (int)y, mapX, mapY);
+		world.addSprite(flowerEnemy);
+		
+		return flowerEnemy;
 	}
 	
-	public static void SpawnShell(Environment observation, int mapX, int mapY, int direction) {
+	public static Sprite SpawnShell(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
 		
-		//world.addSprite(new ShellSimulator(world, x, y, xa, ya));
+		final Shell shell = new Shell(world, x, y, enemyType.getType());
+		shell.facing = direction;
+		world.addSprite(shell);
+		
+		return shell;
 	}
 
-	public static Sprite SpawnEnemy(Environment observation, int mapX, int mapY, int direction, int type, boolean winged) {
+	public static Sprite SpawnWalkingEnemy(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
 		
-		Sprite enemy = null;
-		switch (type) {
-		case Sprite.KIND_BULLET_BILL:
-			break;
-		case Sprite.KIND_ENEMY_FLOWER:
-			break;
-		case Sprite.KIND_SHELL:
-			
-			enemy = new Shell(world, x, y, type);
-			break;
-		default:
-			enemy = new Enemy(world, (int)x, (int)y, direction, type, winged, mapX, mapY);
-			break;
-		}
+		final Enemy enemy = new Enemy(world, (int)x, (int)y, direction, enemyType.getType(), enemyType.hasWings(), mapX, mapY);
 		world.addSprite(enemy);
+		
 		return enemy;
 	}
 	

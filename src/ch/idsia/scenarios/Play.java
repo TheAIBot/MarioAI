@@ -42,7 +42,7 @@ public class Play {
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(690683631);
-	        options.setLevelRandSeed(1905810938); //Bug here without running edges
+	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
 	        /*
 1549733898
 793284811
