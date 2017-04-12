@@ -61,7 +61,7 @@ public class FastAndFurious implements Agent {
 			}
 			
 			if (newestPath == null || newestPath.size() == 0) {
-				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation)); // TODO probably not nessesary
 				newestPath = getPath(observation);
 			}
 			

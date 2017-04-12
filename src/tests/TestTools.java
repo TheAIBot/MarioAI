@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Assert;
 
+import MarioAI.enemy.simulators.BulletBillSimulator;
 import MarioAI.enemy.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
@@ -112,12 +113,15 @@ public class TestTools {
 		}
 	}
 	
-	public static void SpawnBulletBill(Environment observation, int mapX, int mapY, int direction) {
+	public static Sprite SpawnBulletBill(Environment observation, int mapX, int mapY, int direction) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
 		
-		world.addSprite(new BulletBill(world, x, y, direction));
+		final BulletBill enemy = new BulletBill(world, x, y, direction);
+		world.addSprite(enemy);
+		
+		return enemy;
 	}
 	
 	public static void SpawnEnemyFlower(Environment observation, int mapX, int mapY, int direction) {
@@ -136,7 +140,7 @@ public class TestTools {
 		//world.addSprite(new ShellSimulator(world, x, y, xa, ya));
 	}
 
-	public static void SpawnEnemy(Environment observation, int mapX, int mapY, int direction, int type, boolean winged) {
+	public static Sprite SpawnEnemy(Environment observation, int mapX, int mapY, int direction, int type, boolean winged) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
@@ -156,5 +160,15 @@ public class TestTools {
 			break;
 		}
 		world.addSprite(enemy);
+		return enemy;
+	}
+	
+	public static void removeEnemy(Environment observation, Sprite enemy) {
+		final LevelScene world = ((MarioComponent)observation).getLevelScene();
+		world.removeSprite(enemy);
+	}
+	
+	public static void setMarioInvulnerability(Environment observation, boolean value) {
+		((MarioComponent)observation).setMarioInvulnerable(value);
 	}
 }

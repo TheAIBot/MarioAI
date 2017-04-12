@@ -3,16 +3,15 @@ package MarioAI.enemy.simulators;
 
 public class BulletBillSimulator extends EnemySimulator
 {
-    public int facing;
+    private int facing;
 
     public BulletBillSimulator(float x, float y, int dir, int kind)
     {
     	super(kind, 16, 14);
         this.x = x;
         this.y = y;
-
-        facing = 0;
-        ya = -5;
+        
+        this.ya = -5;
         this.facing = dir;
     }
 

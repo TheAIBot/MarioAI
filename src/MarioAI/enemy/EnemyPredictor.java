@@ -47,7 +47,7 @@ public class EnemyPredictor {
 			final float marioY1 = marioY2 - marioHeight;
 			
 			
-			//check if the rectangle if mario intersects with the enemy rectangle
+			//check if the rectangle of mario intersects with the enemy rectangle
 			if (enemyX1 <= marioX2 && 
 				enemyX2 >= marioX1 &&
 				enemyY1 <= marioY2 &&
@@ -133,6 +133,9 @@ public class EnemyPredictor {
 					
 					notDeletedSimulations.add(enemySimulation);
 				}	
+				else {
+					System.out.println("removed");
+				}
 			}
 		}
 		
