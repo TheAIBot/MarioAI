@@ -122,7 +122,7 @@ public final class AStar {
 				}
 				
 				//can't use edge if mario collides with a enemy in it
-				if (MarioControls.doesMovementCollideWithEnemy(neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
+				if (doesMovementCollideWithEnemy(neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
 					continue;
 				}
 				
@@ -180,5 +180,32 @@ public final class AStar {
 		}
 		Collections.reverse(path);
 		return path;
+	}
+	
+	private static boolean doesMovementCollideWithEnemy(DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor, int marioHeight) {
+		float x = startXPosition;
+		float y = startYPosition;
+		
+		float xSpeed = vx;
+		float ySpeed = 0;
+		
+		//System.out.println("Movement tics: " + movementInformation.getMoveTime());
+		//As long as mario hasn't reached the target of the edge:
+		for (int currentTick = 1; currentTick <= movementInformation.getMoveTime(); currentTick++) {
+			xSpeed = traversingEdge.getNextXSpeedAfterTick(currentTick, xSpeed, movementInformation);
+			x += xSpeed;
+			
+			ySpeed = traversingEdge.getNextYSpeedAfterTick(currentTick, ySpeed, y, movementInformation);
+			y -= ySpeed;
+			
+			//System.out.println("tick " + currentTick + 
+			//				   ", position (" + x + ", " + y + 
+			//				   "), speeds: (" + xSpeed + ", " + ySpeed + ")");
+			if (enemyPredictor.hasEnemy((int)x, (int)y, 1, marioHeight, currentTick)) {
+				return true;
+			}
+		}
+		//If there are no collisions:
+		return false;		
 	}
 }
