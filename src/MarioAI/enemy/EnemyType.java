@@ -190,10 +190,10 @@ public enum EnemyType {
 			return false;
 		}
 	},
-	GREEN_SHELL {
+	RED_SHELL {
 		@Override
 		public int getType() {
-			return TYPE_GREEN_SHEEL;
+			return TYPE_RED_SHELL;
 		}
 
 		@Override
@@ -211,10 +211,10 @@ public enum EnemyType {
 			return false;
 		}
 	},
-	RED_SHELL {
+	GREEN_SHELL {
 		@Override
 		public int getType() {
-			return TYPE_RED_SHELL;
+			return TYPE_GREEN_SHEEL;
 		}
 
 		@Override
