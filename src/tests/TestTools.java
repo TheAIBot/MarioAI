@@ -114,46 +114,38 @@ public class TestTools {
 		}
 	}
 	
-	public static Sprite SpawnBulletBill(Environment observation, int mapX, int mapY, int direction) {
+	public static Sprite spawnEnemy(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
 		final float y = mapY * 16;
 		
-		final BulletBill enemy = new BulletBill(world, x, y, direction);
-		world.addSprite(enemy);
+		Sprite enemy = null;
 		
-		return enemy;
-	}
-	
-	public static Sprite SpawnEnemyFlower(Environment observation, int mapX, int mapY, int direction) {
-		final LevelScene world = ((MarioComponent)observation).getLevelScene();
-		final float x = mapX * 16;
-		final float y = mapY * 16;
+		switch (enemyType) {
+		case RED_KOOPA:
+		case RED_KOOPA_WINGED:
+		case GREEN_KOOPA:
+		case GREEN_KOOPA_WINGED:
+		case GOOMBA:
+		case GOOMBA_WINGED:
+		case SPIKY:
+		case SPIKY_WINGED:
+			enemy = new Enemy(world, (int)x, (int)y, direction, enemyType.getType(), enemyType.hasWings(), mapX, mapY);
+			break;
+		case FLOWER:
+			enemy = new FlowerEnemy(world, (int)x, (int)y, mapX, mapY);
+			break;
+		case GREEN_SHELL:
+		case RED_SHELL:
+			Shell shell = new Shell(world, x, y, enemyType.getType());
+			shell.facing = direction;
+			enemy = shell;
+			break;
+		case BULLET_BILL:
+			enemy = new BulletBill(world, x, y, direction);
+			break;
+		}
 		
-		final FlowerEnemy flowerEnemy = new FlowerEnemy(world, (int)x, (int)y, mapX, mapY);
-		world.addSprite(flowerEnemy);
-		
-		return flowerEnemy;
-	}
-	
-	public static Sprite SpawnShell(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
-		final LevelScene world = ((MarioComponent)observation).getLevelScene();
-		final float x = mapX * 16;
-		final float y = mapY * 16;
-		
-		final Shell shell = new Shell(world, x, y, enemyType.getType());
-		shell.facing = direction;
-		world.addSprite(shell);
-		
-		return shell;
-	}
-
-	public static Sprite SpawnWalkingEnemy(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
-		final LevelScene world = ((MarioComponent)observation).getLevelScene();
-		final float x = mapX * 16;
-		final float y = mapY * 16;
-		
-		final Enemy enemy = new Enemy(world, (int)x, (int)y, direction, enemyType.getType(), enemyType.hasWings(), mapX, mapY);
 		world.addSprite(enemy);
 		
 		return enemy;

@@ -14,7 +14,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public final DirectedEdge ancestorEdge;
 	public final float correctXPos;
 	
-	public float gScore = 0;
+	public int gScore = 0;
 	public float fScore = 0;
 	
 	public SpeedNode(Node node, float vx, SpeedNode parent, DirectedEdge ancestorEdge, float correctXPos) {
