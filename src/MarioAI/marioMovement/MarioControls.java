@@ -4,11 +4,9 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.Pair;
-import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -184,50 +182,6 @@ public class MarioControls {
 		return new MovementInformation(xMovementInfo, ticksHoldingUp, totalTicksJumped);
 	}
 	
-	public static XMovementInformation getNextXPosition(float neededXDistance, float speed, final int airTime) {
-		float distanceMoved = 0;
-		int steps = 0;
-		//If Mario currently moves the opposite way of the way he should go,
-		//he first needs to deaccelerate:
-		boolean distanceIsNegative = neededXDistance < 0;
-		if ((neededXDistance < 0 && speed > 0) ||
-			(neededXDistance > 0 && speed < 0)) {
-			speed = Math.abs(speed);
-			
-			if (speed > 0) {
-				steps = getDeaccelerationNeededSteps(speed);
-				distanceMoved = -getDeaccelerationDistanceMoved(speed);				
-				//speed is now 0
-				speed = 0;
-			}
-		} else if (neededXDistance == 0) {
-			return new XMovementInformation(0, speed, 0, 0, 0);
-		}
-		final int ticksDeaccelerating = steps;
-		//The calculations are independent of the direction:
-		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance);
-		
-		//The movement:
-		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - steps).key) > ACCEPTED_DEVIATION) {
-			speed = getNextTickSpeed(speed);
-			distanceMoved += speed;
-			steps++;
-		}
-		
-		//Get end speed
-		Pair<Float, Float> driftInfo = getDriftingDistance(speed, airTime - steps);
-		speed = driftInfo.value;
-		
-		//Add drifting (in the air!) distance to distance moved
-		distanceMoved += driftInfo.key;
-		
-		//Put sign back on values as it was lost before
-		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;
-		speed         = (distanceIsNegative)? -1 * speed         : speed;
-		return new XMovementInformation(distanceMoved, speed, steps, ticksDeaccelerating, steps - ticksDeaccelerating);
-	}
-			
 	public static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime) {
 		float distanceMoved = 0;
 		int steps = 0;
