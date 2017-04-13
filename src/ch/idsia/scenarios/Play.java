@@ -52,7 +52,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(5);
+	        options.setLevelDifficulty(10);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

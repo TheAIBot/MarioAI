@@ -122,7 +122,7 @@ public final class AStar {
 				}
 				
 				//can't use edge if mario collides with a enemy in it
-				if (doesMovementCollideWithEnemy(neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
+				if (doesMovementCollideWithEnemy((int)current.gScore, neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
 					continue;
 				}
 				
@@ -136,7 +136,7 @@ public final class AStar {
 				}
 				
 				// Distance from start to neighbor of current node
-				final float tentativeGScore = current.gScore + movementInformation.getMoveTime();
+				final int tentativeGScore = current.gScore + movementInformation.getMoveTime();
 				
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
@@ -182,7 +182,7 @@ public final class AStar {
 		return path;
 	}
 	
-	private static boolean doesMovementCollideWithEnemy(DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor, int marioHeight) {
+	private static boolean doesMovementCollideWithEnemy(Integer startTime, DirectedEdge traversingEdge, float startXPosition, float startYPosition, float vx, MovementInformation movementInformation, EnemyPredictor enemyPredictor, int marioHeight) {
 		float x = startXPosition;
 		float y = startYPosition;
 		
@@ -199,7 +199,7 @@ public final class AStar {
 			y -= ySpeed;
 			
 			//System.out.println("tick " + currentTick + ", position (" + x + ", " + y + "), speeds: (" + xSpeed + ", " + ySpeed + ")");
-			if (enemyPredictor.hasEnemy((int)x, (int)y, 1, marioHeight, currentTick)) {
+			if (enemyPredictor.hasEnemy((int)x, (int)y, 1, marioHeight, startTime + currentTick)) {
 				return true;
 			}
 		}
