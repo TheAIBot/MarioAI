@@ -27,6 +27,7 @@ public class EnemyPredictor {
 	private HashMap<Integer, ArrayList<Point2D.Float>> oldEnemyInfo;
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
+	private boolean newEnemySpawned = false;
 	
 	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
@@ -37,8 +38,8 @@ public class EnemyPredictor {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a
-			final float enemyX2 = (int) (enemyPosition.x / BLOCK_PIXEL_SIZE);
-			final float enemyY2 = (int) (enemyPosition.y / BLOCK_PIXEL_SIZE);
+			final float enemyX2 = enemyPosition.x / BLOCK_PIXEL_SIZE;
+			final float enemyY2 = enemyPosition.y / BLOCK_PIXEL_SIZE;
 			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
 			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
@@ -128,8 +129,8 @@ public class EnemyPredictor {
 				
 				if (simulatedPosition != null) {
 					enemyPositions.remove(simulatedPosition);
-					enemySimulation.setX(simulatedPosition.x);
-					enemySimulation.setY(simulatedPosition.y);
+					//enemySimulation.setX(simulatedPosition.x);
+					//enemySimulation.setY(simulatedPosition.y);
 					
 					notDeletedSimulations.add(enemySimulation);
 				}	
@@ -143,6 +144,7 @@ public class EnemyPredictor {
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+		newEnemySpawned = false;
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
@@ -167,6 +169,7 @@ public class EnemyPredictor {
 				if (foundPoint != null) {
 					enemyPositions.remove(foundPoint);
 					verifiedEnemySimulations.add(enemySimulation);
+					newEnemySpawned = true;
 				}
 			}
 		}
@@ -186,8 +189,6 @@ public class EnemyPredictor {
 				
 				for (int i = 0; i < enemyPositions.size(); i++) {
 					for (int z = 0; z < oldEnemyPositions.size(); z++) {
-						final int HALF_BLOCK = BLOCK_PIXEL_SIZE / 2;
-						
 						final Point2D.Float p1 = enemyPositions.get(i);
 						final float x1 = p1.x;
 						final float y1 = p1.y;
@@ -202,7 +203,7 @@ public class EnemyPredictor {
 						final float deltaX = Math.abs(xa);
 						final float deltaY = Math.abs(ya);
 						
-						if (deltaX <= HALF_BLOCK && 
+						if (deltaX <= BLOCK_PIXEL_SIZE && 
 							deltaY <= BLOCK_PIXEL_SIZE) {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
 							//the xa and ya are 1 tick too old so they are updated here
@@ -268,5 +269,9 @@ public class EnemyPredictor {
 	
 	public ArrayList<EnemySimulator> getEnemies() {
 		return verifiedEnemySimulations;
+	}
+	
+	public boolean hasNewEnemySpawned() {
+		return newEnemySpawned;
 	}
 }

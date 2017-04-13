@@ -84,6 +84,7 @@ public class MarioControls {
 		
 		currentXSpeed = marioXPos - oldX;
 		MovementInformation moveInfo;
+		
 		if (jumpTime <= 0 && next.getMaxY() > 0) {
 			moveInfo = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
 		}
