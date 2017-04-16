@@ -52,6 +52,9 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
+	        
+	        //Seed = 942181699 running stuck bug
+	        
 	        options.setLevelDifficulty(10);
 	        task.setOptions(options);
 	        

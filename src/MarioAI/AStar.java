@@ -123,6 +123,7 @@ public final class AStar {
 				
 				//can't use edge if mario collides with a enemy in it
 				if (doesMovementCollideWithEnemy((int)current.gScore, neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
+					// TODO: Penalize edge with very high fScore instead of breaking current cycle to give the option of worst case having to go through enemy if no other path is applicable
 					continue;
 				}
 				
