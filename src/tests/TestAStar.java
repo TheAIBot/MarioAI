@@ -74,6 +74,7 @@ public class TestAStar {
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		
 		assertTrue(path != null);
+		assertTrue(path.size() >= 6);
 		
 		DirectedEdge e1 = path.get(1);
 		DirectedEdge e2 = path.get(2);
@@ -82,7 +83,7 @@ public class TestAStar {
 		//assertEquals(e1.target.gScore, e2.target.y - e2.source.y, delta);
 		assertTrue(e1 instanceof SecondOrderPolynomial);
 		assertTrue(e2 instanceof SecondOrderPolynomial);
-		assertTrue(eN instanceof Running);		
+		assertTrue(eN instanceof Running);
 		
 		// TODO Bug: Mario thinks he can jump through one layer wall
 		// TODO Bug: Mario not finding path at first A* call (in the next call, however, he finds the solution path)
@@ -104,9 +105,11 @@ public class TestAStar {
 			assertFalse(edge.target.x == 6);
 		}
 		
+		int c = 0;
 		for (Node node : graph.getGoalNodes(0)) {
-			assertEquals(node, path.get(path.size()-1));
+			if (node.equals(path.get(path.size()-1))) c++;
 		}
+		assertEquals(1, c);
 		
 	}
 }
