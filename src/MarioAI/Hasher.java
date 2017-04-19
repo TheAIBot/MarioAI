@@ -5,12 +5,12 @@ import MarioAI.graph.edges.DirectedEdge;
 public class Hasher {
 
 	public static int hashShortPoint(short x, short y) {
-		return x + Short.MAX_VALUE * y;
+		return x + 1000 * y;
 	}
 
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {
 		//the hash of the speed needs to be fixed
-		final long a = (((int)vx) * 10) << 32;		
+		final long a = ((long)(vx * 10)) << 32; 
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
