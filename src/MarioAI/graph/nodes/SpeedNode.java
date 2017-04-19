@@ -49,7 +49,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash) {
 		this.node = node;
-		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx);
+		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
 		this.parent = parent;
 		this.parentXPos = parentXPos;
@@ -85,8 +85,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		int currentTick = startTime;
 		
 		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = xPos + position.x;
-			final float y = yPos + position.y;
+			final float x = parentXPos + position.x;
+			final float y = parent.yPos + position.y;
 			
 			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
 				return true;

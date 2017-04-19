@@ -19,6 +19,7 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
@@ -32,7 +33,7 @@ public class TestAStar {
 	}
 	
 	public void setup(String levelName, boolean showLevel) {
-		agent = new FastAndFurious();
+		agent = new UnitTestAgent();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		
 		TestTools.runOneTick(observation);
@@ -109,6 +110,13 @@ public class TestAStar {
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
