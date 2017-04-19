@@ -1,6 +1,7 @@
 package ch.idsia.scenarios;
 
 import MarioAI.FastAndFurious;
+import MarioAI.enemy.EnemyType;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
@@ -13,14 +14,15 @@ import tests.TestTools;
 public class Play {
 
 	public static void main(String[] args) {
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("testAStarEnemyJumpOver.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
 			// controller, true);
+			TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
