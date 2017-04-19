@@ -1,6 +1,9 @@
 package MarioAI;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.sun.xml.internal.ws.api.server.AbstractServerAsyncTransport;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
@@ -11,6 +14,7 @@ import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import sun.security.krb5.Asn1Exception;
 
 /**
  * Main program agent.
@@ -20,10 +24,11 @@ public class FastAndFurious implements Agent {
 	private static final String name = "The painkiller";
 	private final Graph graph = new Graph();
 	private final Grapher grapher = new Grapher();
+	private final AStar aStar = new AStar();
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	private List<DirectedEdge> newestPath = null;
+	private ArrayList<DirectedEdge> newestPath = null;
 	
 	public boolean DEBUG = true;
 
@@ -32,7 +37,7 @@ public class FastAndFurious implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		final boolean[] action = new boolean[Environment.numberOfButtons];
+		boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
@@ -57,7 +62,7 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawEdges(observation, graph.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, graph);
 				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
-				//DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawEnemies(observation, enemyPredictor);
 			}
 			
 			if (newestPath == null || newestPath.size() == 0) {
@@ -74,7 +79,7 @@ public class FastAndFurious implements Agent {
 				}
 				
 				if (newestPath != null && newestPath.size() > 0) {
-					marioController.getNextAction(observation, newestPath, action);
+					action = marioController.getNextAction(observation, newestPath);
 				}
 				
 				if (DEBUG) {
@@ -92,10 +97,10 @@ public class FastAndFurious implements Agent {
 		return action;
 	}
 	
-	private List<DirectedEdge> getPath(Environment observation) {
+	private ArrayList<DirectedEdge> getPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		final List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
+		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 		//System.out.println(System.currentTimeMillis() - startTime);
 		
 		return (path == null)? newestPath : path;

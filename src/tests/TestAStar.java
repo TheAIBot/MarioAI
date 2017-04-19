@@ -43,7 +43,8 @@ public class TestAStar {
 		setup("flat");
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		AStar aStar = new AStar();
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		
 //		float c = 1.0f;
@@ -69,7 +70,8 @@ public class TestAStar {
 	public void testAStarJumping() {
 		setup("TestAStarJump");
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		List<DirectedEdge> path = AStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		AStar aStar = new AStar();
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		
 		DirectedEdge e1 = path.get(1);

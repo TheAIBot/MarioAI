@@ -34,7 +34,7 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(final int marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
+	public boolean hasEnemy(final float marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a

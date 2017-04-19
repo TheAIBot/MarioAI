@@ -27,7 +27,6 @@ import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-import tests.*;
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
@@ -76,7 +75,7 @@ public class TestEnemyCollisionDetection{
 		float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 
-		marioController.getNextAction(observation, Path, action);
+		action = marioController.getNextAction(observation, Path);
 		agent.action = action;
 		TestTools.runOneTick(observation);
 		
@@ -84,7 +83,7 @@ public class TestEnemyCollisionDetection{
 		
 		//Checking the path that mario would make with this:	
 		for (int i = 1; i <= 100; i++) {
-			marioController.getNextAction(observation, Path, action);
+			action = marioController.getNextAction(observation, Path);
 			agent.action = action;
 			TestTools.runOneTick(observation);
 			
@@ -99,7 +98,7 @@ public class TestEnemyCollisionDetection{
 		
 		System.out.println("\nCompare with:\n");
 		
-		final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(marioStartXPos, marioStartYPos, Path.get(0).target, Path.get(0), 0);
+		//final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(marioStartXPos, marioStartYPos, Path.get(0).target, Path.get(0), 0);
 		
 		//assertFalse(marioController.doesMovementCollideWithEnemy(1, Path.get(0), marioStartXPos, marioStartYPos, 0, movementInformation));
 		

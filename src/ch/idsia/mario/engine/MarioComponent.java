@@ -158,16 +158,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 		}
 
-		boolean[] action = agent.getAction(this/* DummyEnvironment */);
-		if (action != null) {
-			for (int i = 0; i < Environment.numberOfButtons; ++i)
-				if (action[i]) {
-					break;
-				}
-		} else {
-			System.err.println("Null Action received. Skipping simulation...");
-			stop();
-		}
+		
+		final boolean[] action = agent.getAction(this);
 
 		// Apply action;
 		// scene.keys = action;

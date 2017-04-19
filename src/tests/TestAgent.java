@@ -16,8 +16,10 @@ public class TestAgent implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		boolean[] actions = new boolean[Environment.numberOfButtons];
-		
+		final boolean[] actions = new boolean[Environment.numberOfButtons];
+		final float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float currentYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		/*
 		if (tick == TestTools.LEVEL_INIT_TICKS) {
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -27,8 +29,6 @@ public class TestAgent implements Agent {
 		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +  50;
 		int a3 =                             a1 +  20;
 		
-		float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		float currentYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		float xChange = currentXPos - prevX;
 		
 		if (tick > TestTools.LEVEL_INIT_TICKS && tick < a1) {
@@ -58,8 +58,8 @@ public class TestAgent implements Agent {
 		prevX = currentXPos;
 		prevY = currentYPos;
 		
+		*/
 		
-		/*
 		switch (tick) {
 		case TestTools.LEVEL_INIT_TICKS:
 			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -77,15 +77,19 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 10:
 		case TestTools.LEVEL_INIT_TICKS + 11:
 		case TestTools.LEVEL_INIT_TICKS + 12:
-			System.out.println(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) - startY);
-			actions[Mario.KEY_RIGHT] = true;
-			break;
 		case TestTools.LEVEL_INIT_TICKS + 13:
 		case TestTools.LEVEL_INIT_TICKS + 14:
 		case TestTools.LEVEL_INIT_TICKS + 15:
 		case TestTools.LEVEL_INIT_TICKS + 16:
 		case TestTools.LEVEL_INIT_TICKS + 17:
 		case TestTools.LEVEL_INIT_TICKS + 18:
+			System.out.println(currentXPos - prevX);
+			//System.out.println(currentYPos - startY);
+			prevX = currentXPos;
+			startY = currentYPos;
+			actions[Mario.KEY_RIGHT] = true;
+			break;
+
 		case TestTools.LEVEL_INIT_TICKS + 19:
 		case TestTools.LEVEL_INIT_TICKS + 20:
 		case TestTools.LEVEL_INIT_TICKS + 21:
@@ -97,12 +101,25 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 27:
 		case TestTools.LEVEL_INIT_TICKS + 28:
 		case TestTools.LEVEL_INIT_TICKS + 29:
-			actions[Mario.KEY_RIGHT] = true;
-			actions[Mario.KEY_JUMP] = true;
-			System.out.println(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()) - startY);
+		case TestTools.LEVEL_INIT_TICKS + 30:
+		case TestTools.LEVEL_INIT_TICKS + 31:
+		case TestTools.LEVEL_INIT_TICKS + 32:
+		case TestTools.LEVEL_INIT_TICKS + 33:
+		case TestTools.LEVEL_INIT_TICKS + 34:
+		case TestTools.LEVEL_INIT_TICKS + 35:
+		case TestTools.LEVEL_INIT_TICKS + 36:
+		case TestTools.LEVEL_INIT_TICKS + 37:
+		case TestTools.LEVEL_INIT_TICKS + 38:
+		case TestTools.LEVEL_INIT_TICKS + 39:
+			System.out.println(currentXPos - prevX);
+			//System.out.println(currentYPos - startY);
+			prevX = currentXPos;
+			startY = currentYPos;
+			actions[Mario.KEY_RIGHT] = false;
+			actions[Mario.KEY_LEFT] = true;
 		}
 		
-		*/
+		
 		
 		tick++;
 		return actions;

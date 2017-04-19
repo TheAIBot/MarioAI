@@ -8,16 +8,12 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	public static int hashSpeedNode(short x, short y, float vx, boolean isRunningEdge) {
-		final short factor = (short) 10; // arbitrarily chosen value
-		// h = (a*P1 + b)*P2 + c
-		// return (int) ((x*31 + y)*59 + vx * factor);
-		int ff = (isRunningEdge) ? 1 << 31 : 0;
-		int a = (byte) (vx * factor) & 0x800f;
-		int b = ((x & 511) << 4);
-		int c = ((y & 15) << 13);
-		int hashCode = a | b | c | ff;
-		return hashCode;
+	public static long hashSpeedNode(float vx, DirectedEdge edge) {
+		//the hash of the speed needs to be fixed
+		final long a = (((int)vx) * 10) << 32;		
+		final long edgeHash = edge.hashCode();
+		
+		return a | edgeHash;
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {
@@ -27,7 +23,7 @@ public class Hasher {
 		//General hash for all kings of edges:
 		if (edge.target == null) { //setMovementEdges will delete it later:
 			//This will mean a running edge from x,y=0,0 to 0,0, will not be unique: 
-			//no worries, as it is not possible to have such an edge.
+			//no worries, as they will be discarded.
 			return 0; 
 		}
 		
@@ -50,6 +46,5 @@ public class Hasher {
 		//Includes things like if it is an jump edge or running edge, and things like that.
 		final int b5 = extraHash << position5; 
 		return b1 | b2 | b3 | b4 | b5;
-		//return ll++;
 	}
 }
