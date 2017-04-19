@@ -39,7 +39,7 @@ public final class AStar {
 				break;
 			}
 		}
-		
+		goalX += 50;
 		
 		Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 		for (Node node : rightmostNodes) {
