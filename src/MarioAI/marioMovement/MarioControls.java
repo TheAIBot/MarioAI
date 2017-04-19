@@ -308,15 +308,14 @@ public class MarioControls {
 	private static ArrayList<Float> getDeaccelerationPositions(float speed) {
 		final ArrayList<Float> xPositions = new ArrayList<Float>(); 
 		float xMovement = 0;
-		
-		while(speed >= MIN_MARIO_SPEED) { 
+		do {
 			speed = speed * 0.89f - 0.0375f;
-			if (speed < 0.0375f) {
+			if (speed < MIN_MARIO_SPEED) {
 				speed = 0;
 			}
 			xMovement += speed;
 			xPositions.add(xMovement);
-		}
+		} while (speed >= MIN_MARIO_SPEED);
 		return xPositions;
 	}
 	
