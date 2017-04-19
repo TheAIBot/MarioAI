@@ -84,7 +84,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			final float x = xPos + position.x;
 			final float y = yPos + position.y;
 			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, startTime + currentTick)) {
+			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
 				return true;
 			}
 			
