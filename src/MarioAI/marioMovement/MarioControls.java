@@ -99,16 +99,16 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		if (jumpTime <= 0 && next.getMaxY() > 0) {
+		if (jumpTime <= 0 || xHoldTime <= 0 && observation.isMarioOnGround()) {
 			moveInfo1 = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
 			xHoldTime = moveInfo1.getXMovementTime();
+			jumpTime = moveInfo1.getTotalTicksJumped();
+			holdJumpTime = moveInfo1.getTicksHoldingJump();
+		}
+		if (jumpTime <= 0 && next.getMaxY() > 0) {
 		}
 		
 		if (moveInfo1 != null) {
-			if (jumpTime < 0 && observation.isMarioOnGround()) {
-				jumpTime = moveInfo1.getTotalTicksJumped();
-				holdJumpTime = moveInfo1.getTicksHoldingJump();
-			}
 			if (holdJumpTime > 0) {
 				actions[Mario.KEY_JUMP] = true;
 				holdJumpTime--;
@@ -217,10 +217,11 @@ public class MarioControls {
 					//Math derived from mario code
 					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
 					currentJumpHeight += prevYDelta;
-					yPositions.add(currentJumpHeight);
 					if (currentJumpHeight <= fallTo) {
+						yPositions.add(fallTo);
 						break;
 					}
+					yPositions.add(currentJumpHeight);
 					totalTicksJumped++;
 				}	
 			}
