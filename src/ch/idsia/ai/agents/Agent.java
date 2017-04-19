@@ -25,7 +25,4 @@ public interface Agent {
 
     public void setName(String name);
     
-    public void disableMovement();
-    
-    public void enableMovement();
 }

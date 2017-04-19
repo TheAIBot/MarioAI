@@ -38,12 +38,10 @@ public class TestAStar {
 	}
 	
 	public void setup(String levelName, boolean showLevel) {
-		agent = new FastAndFurious();
+		agent = new UnitTestAgent();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
-		agent.disableMovement();
 		TestTools.runOneTick(observation);
-		agent.enableMovement();
 		graph = new Graph();
 		graph.createStartGraph(observation);
 		grapher = new Grapher();
@@ -57,28 +55,28 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarRunning() {
-		fail();
 		setup("flat");
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
-		
-//		float c = 1.0f;
+		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
-			//assertEquals(directedEdge.target.gScore, c, delta);
-			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
 			assertTrue(directedEdge instanceof Running);
-//			try {
-//				Running test = (Running) directedEdge;
-//			} catch (ClassCastException e) {
-//				Assert.fail();
-//			}
-//			c++;
 		}
-		// goal node has been removed from path returned
-		//assertNotEquals(path.get(path.size()-1).target.x, 1000, delta);
+		assertEquals(12, path.get(path.size() - 1).target.x); //Correct x end destination
+		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
+	}
+	
+	public void testTakeFastestJump(){
+		setup("flatWithWall", true);
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		AStar aStar = new AStar();
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		assertTrue(path != null);
+		TestTools.runWholeLevel(observation);
+		
 	}
 	
 	/**
@@ -86,7 +84,6 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		fail();
 		setup("TestAStarJump", false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
@@ -123,7 +120,6 @@ public class TestAStar {
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
-		agent.disableMovement();
 		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.runOneTick(observation);
@@ -135,7 +131,6 @@ public class TestAStar {
 		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.renderLevel(observation);
-		agent.enableMovement();
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
@@ -153,13 +148,12 @@ public class TestAStar {
 	}
 
 	@Test
-	public void testNotCollideWithEnemy(){
-		setup("testAStarEnemyJumpOver",true);
-		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
+	public void testCollideWithEnemy(){
+		setup("testAStarEnemyJumpOver",false);
 		
+		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
-		agent.disableMovement();
 		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.runOneTick(observation);
@@ -172,14 +166,17 @@ public class TestAStar {
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.renderLevel(observation);
 
-		Node source = graph.getLevelMatrix()[13][marioNode.y];
-		Node target = graph.getLevelMatrix()[15][marioNode.y];
+		final int columnStart = 13;
+		final int columnEnd = 15;
+
+		Node source = graph.getLevelMatrix()[columnStart][marioNode.y];
+		Node target = graph.getLevelMatrix()[columnEnd][marioNode.y];
 		
 		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 		marioNode = graph.getMarioNode(observation);
 		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); 
-		polynomial.setToJumpPolynomial(source, 13, 2, 4);
-		grapher.jumpAlongPolynomial(source, 13, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
+		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
+		grapher.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
 		
 		assertEquals(1, edges.size());
 		SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edges.get(0);		
@@ -187,17 +184,64 @@ public class TestAStar {
 		assertEquals(target.y, polynomialEdge.target.y);
 		
 		SpeedNode start = new SpeedNode(source, Long.MAX_VALUE);
-		AStar aStar = new AStar();
-		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
-		
 		start.gScore = 0;
 		start.fScore = 0;
+		AStar aStar = new AStar();
+		
+		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
+		
 		
 		assertTrue(end.isSpeedNodeUseable());
-		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));
-		
-		
+		assertTrue(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
+	
+	@Test
+	public void testNotCollideWithEnemy(){
+		setup("testAStarEnemyJumpOver",false);
+		
+		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.renderLevel(observation);
+		
+		final int columnStart = 11;
+		final int columnEnd = 13;
+
+		Node source = graph.getLevelMatrix()[columnStart][marioNode.y];
+		Node target = graph.getLevelMatrix()[columnEnd][marioNode.y];
+		
+		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
+		marioNode = graph.getMarioNode(observation);
+		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); 
+		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
+		grapher.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
+		
+		assertEquals(1, edges.size());
+		SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edges.get(0);		
+		assertEquals(target.x, polynomialEdge.target.x);
+		assertEquals(target.y, polynomialEdge.target.y);
+		
+		SpeedNode start = new SpeedNode(source, Long.MAX_VALUE);
+		start.gScore = 0;
+		start.fScore = 0;
+		AStar aStar = new AStar();
+		
+		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
+				
+		assertTrue(end.isSpeedNodeUseable());
+		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
+	}
+
 
 }
 

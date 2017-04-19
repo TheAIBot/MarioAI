@@ -2,12 +2,8 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
-import org.hamcrest.core.IsInstanceOf;
-
-import MarioAI.Hasher;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
 import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
@@ -49,7 +45,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash) {
 		this.node = node;
-		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx);
+		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
 		this.parent = parent;
 		this.parentXPos = parentXPos;
@@ -85,8 +81,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		int currentTick = startTime;
 		
 		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = xPos + position.x;
-			final float y = yPos + position.y;
+			final float x = parentXPos  + position.x;
+			final float y = parent.yPos - position.y;
 			
 			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
 				return true;

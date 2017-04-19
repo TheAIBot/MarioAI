@@ -28,7 +28,6 @@ public class FastAndFurious implements Agent {
 	private ArrayList<DirectedEdge> newestPath = null;
 	
 	public boolean DEBUG = true;
-	private boolean enableMovement;
 
 	public void reset() {
 		marioController.reset();
@@ -36,9 +35,6 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
-		if (!enableMovement) {
-			return action;
-		}
 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
@@ -120,14 +116,4 @@ public class FastAndFurious implements Agent {
 	public void setName(String name) {
 	}
 
-	@Override
-	public void disableMovement() {
-		enableMovement = false;
-	}
-
-	@Override
-	public void enableMovement() {
-		enableMovement = true;
-		
-	}
 }

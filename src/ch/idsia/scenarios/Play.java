@@ -19,11 +19,10 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("testAStarEnemyJumpOver.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("flatWithJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
-			// controller, true);
-			TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
+			//TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

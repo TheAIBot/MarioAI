@@ -94,11 +94,10 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-
-			System.out.println("Current node:");
-			System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-			System.out.println("Current node edges:");
-			System.out.println(current.node.edges + "\n");
+			//System.out.println("Current node:");
+			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
+			//System.out.println("Current node edges:");
+			//System.out.println(current.node.edges + "\n");
 			
 			
 			// Current node has been explored.
@@ -106,12 +105,7 @@ public final class AStar {
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
-			for (DirectedEdge neighborEdge : current.node.getEdges()) {
-				
-				
-				System.out.println("Current edge: ");
-				System.out.println(neighborEdge + "\n");
-				
+			for (DirectedEdge neighborEdge : current.node.getEdges()) {			
 				final SpeedNode sn = getSpeedNode(neighborEdge, current);
 				
 				if (!sn.isSpeedNodeUseable()) {
