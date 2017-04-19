@@ -81,6 +81,7 @@ public class TestAStar {
 
 		//TestTools.runOneTick(observation);
 		assertTrue(path != null);
+		
 		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
 		DebugDraw.drawPath(observation, path);
 		TestTools.renderLevel(observation);
@@ -116,9 +117,11 @@ public class TestAStar {
 			assertFalse(edge.target.x == 6);
 		}
 		
+		int c = 0;
 		for (Node node : graph.getGoalNodes(0)) {
-			assertEquals(node, path.get(path.size()-1));
+			if (node.equals(path.get(path.size()-1))) c++;
 		}
+		assertEquals(1, c);
 		
 	}
 }
