@@ -1,10 +1,6 @@
 package MarioAI;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
-import com.sun.xml.internal.ws.api.server.AbstractServerAsyncTransport;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
@@ -32,6 +28,7 @@ public class FastAndFurious implements Agent {
 	private ArrayList<DirectedEdge> newestPath = null;
 	
 	public boolean DEBUG = true;
+	private boolean enableMovement;
 
 	public void reset() {
 		marioController.reset();
@@ -39,6 +36,9 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
+		if (!enableMovement) {
+			return action;
+		}
 
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
@@ -118,5 +118,16 @@ public class FastAndFurious implements Agent {
 	}
 
 	public void setName(String name) {
+	}
+
+	@Override
+	public void disableMovement() {
+		enableMovement = false;
+	}
+
+	@Override
+	public void enableMovement() {
+		enableMovement = true;
+		
 	}
 }

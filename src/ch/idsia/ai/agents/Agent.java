@@ -9,8 +9,8 @@ import ch.idsia.mario.environments.Environment;
  * Time: 8:46:42 PM
  package ch.idsia.ai.agents;
  */
-public interface Agent
-{
+public interface Agent {
+	
     public enum AGENT_TYPE {AI, HUMAN, TCP_SERVER }
 
     // clears all dynamic data, such as hidden layers in recurrent networks
@@ -24,4 +24,8 @@ public interface Agent
     public String getName();
 
     public void setName(String name);
+    
+    public void disableMovement();
+    
+    public void enableMovement();
 }

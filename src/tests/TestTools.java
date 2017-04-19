@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Assert;
 
+import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyType;
 import MarioAI.enemy.simulators.BulletBillSimulator;
 import MarioAI.enemy.simulators.ShellSimulator;
@@ -162,5 +163,6 @@ public class TestTools {
 	
 	public static void renderLevel(Environment observation) {
 		((MarioComponent)observation).render();
+		DebugDraw.resetGraphics(observation);
 	}
 }

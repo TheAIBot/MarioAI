@@ -3,7 +3,6 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -13,7 +12,6 @@ import MarioAI.graph.edges.Running;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import MarioAI.marioMovement.MovementInformation;
 
 
 public final class AStar {
@@ -98,7 +96,7 @@ public final class AStar {
 			}
 
 			System.out.println("Current node:");
-			System.out.println(current.node + "\nFrom: " + current.ancestorEdge);
+			System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
 			System.out.println("Current node edges:");
 			System.out.println(current.node.edges + "\n");
 			
@@ -155,7 +153,7 @@ public final class AStar {
 		return null;
 	}
 	
-	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
+	public SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
