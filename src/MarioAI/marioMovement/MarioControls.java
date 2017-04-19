@@ -35,6 +35,7 @@ public class MarioControls {
 	
 	private int jumpTime = 0;
 	private int holdJumpTime = 0;
+	private int xTime = 0;
 	private int xHoldTime = 0;
 	private MovementInformation moveInfo1;
 	
@@ -47,6 +48,7 @@ public class MarioControls {
 		
 		jumpTime = 0;
 		holdJumpTime = 0;
+		xTime = 0;
 		xHoldTime = 0;
 	}
 	
@@ -99,13 +101,12 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		if (jumpTime <= 0 || xHoldTime <= 0 && observation.isMarioOnGround()) {
+		if (moveInfo1 == null || jumpTime < 0 && xTime <= 0 && observation.isMarioOnGround()) {
 			moveInfo1 = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
-			xHoldTime = moveInfo1.getXMovementTime();
 			jumpTime = moveInfo1.getTotalTicksJumped();
+			xHoldTime = moveInfo1.getXMovementTime();
+			xTime = moveInfo1.getXMovementTime();
 			holdJumpTime = moveInfo1.getTicksHoldingJump();
-		}
-		if (jumpTime <= 0 && next.getMaxY() > 0) {
 		}
 		
 		if (moveInfo1 != null) {
@@ -121,6 +122,7 @@ public class MarioControls {
 				actions[movementDirection] = true;
 				xHoldTime--;
 			}
+			xTime--;
 			oldX = marioXPos;	
 		}
 		
