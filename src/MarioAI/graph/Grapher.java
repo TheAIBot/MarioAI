@@ -71,7 +71,7 @@ public  class Grapher {
 		// Find the reachable nodes:
 		for (DirectedEdge connectingEdge : getConnectingEdges(node, coloumn)) {
 			if (connectingEdge.target != null && 
-				isOnLevelMatrix(connectingEdge.target, marioNode) && //why are the last two checks here?
+				isOnLevelMatrix(connectingEdge.target, marioNode) && //why are the last 3 checks here?
 				canMarioStandThere(connectingEdge.target, marioNode) && 
 				connectingEdge.source.x != connectingEdge.target.x) { // FIX
 				node.addEdge(connectingEdge); 
@@ -139,8 +139,8 @@ public  class Grapher {
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
 				//TODO temp no left jump (*)
-				//polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				//foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
 			}
 		}
 		return foundAllEdges;

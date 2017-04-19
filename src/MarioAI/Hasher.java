@@ -1,6 +1,9 @@
 package MarioAI;
 
+import com.sun.nio.sctp.SctpStandardSocketOptions.InitMaxStreams;
+
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.nodes.SpeedNode;
 
 public class Hasher {
 
@@ -10,10 +13,27 @@ public class Hasher {
 
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {
 		//the hash of the speed needs to be fixed
-		final long a = ((long)(vx * 10)) << 32; 
+		final long a = ((long)hashSpeed(vx)) << 32; 
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
+	}
+	
+	public static int hashEndSpeedNode(SpeedNode sn) {
+		final int x = sn.node.x;
+		final int y = sn.node.y;
+		final float vx = sn.vx;
+		
+		final int a = x & 0xffff;
+		final int b = (y & 0xff) << 16;
+		final int c = hashSpeed(vx) << 24;
+		final int d = (((int)hashSpeed(vx)) & 0x80000000);
+		
+		return d | c | b | a;
+	}
+	
+	public static int hashSpeed(float vx) {
+		return (int)(vx * 20);
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

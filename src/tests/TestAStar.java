@@ -124,13 +124,6 @@ public class TestAStar {
 		for (DirectedEdge edge : path) {
 			assertFalse(edge.target.x == 6);
 		}
-		
-		int c = 0;
-		for (Node node : graph.getGoalNodes(0)) {
-			if (node.equals(path.get(path.size()-1))) c++;
-		}
-		assertEquals(1, c);
-		
 	}
 }
 
