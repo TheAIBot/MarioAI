@@ -3,6 +3,7 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
 import com.sun.xml.internal.ws.api.server.AbstractServerAsyncTransport;
 
 import MarioAI.debugGraphics.DebugDraw;
@@ -63,6 +64,7 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawMarioReachableNodes(observation, graph);
 				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
 				DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawMarioNode(observation, graph.getMarioNode(observation));
 			}
 			
 			if (newestPath == null || newestPath.size() == 0) {
@@ -83,8 +85,9 @@ public class FastAndFurious implements Agent {
 				}
 				
 				if (DEBUG) {
-					DebugDraw.drawPath(observation, newestPath);
+					//DebugDraw.drawPath(observation, newestPath);
 					DebugDraw.drawPathEdgeTypes(observation, newestPath);
+					DebugDraw.drawPathMovement(observation, newestPath);
 				}
 			}
 			
