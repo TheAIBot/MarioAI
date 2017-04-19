@@ -72,7 +72,8 @@ public  class Grapher {
 		for (DirectedEdge connectingEdge : getConnectingEdges(node, coloumn)) {
 			if (connectingEdge.target != null && 
 				isOnLevelMatrix(connectingEdge.target, marioNode) && //why are the last two checks here?
-				canMarioStandThere(connectingEdge.target, marioNode)) { // FIX
+				canMarioStandThere(connectingEdge.target, marioNode) && 
+				connectingEdge.source.x != connectingEdge.target.x) { // FIX
 				node.addEdge(connectingEdge); 
 			}
 		}		

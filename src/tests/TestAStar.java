@@ -38,7 +38,7 @@ public class TestAStar {
 	}
 	
 	public void setup(String levelName, boolean showLevel) {
-		agent = new FastAndFurious();
+		agent = new UnitTestAgent();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
 		agent.disableMovement();

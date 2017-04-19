@@ -100,18 +100,12 @@ public final class AStar {
 			System.out.println("Current node edges:");
 			System.out.println(current.node.edges + "\n");
 			
-			
 			// Current node has been explored.
 			closedSetMap.put(current.hash, current);
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
-			for (DirectedEdge neighborEdge : current.node.getEdges()) {
-				
-				
-				System.out.println("Current edge: ");
-				System.out.println(neighborEdge + "\n");
-				
+			for (DirectedEdge neighborEdge : current.node.getEdges()) {			
 				final SpeedNode sn = getSpeedNode(neighborEdge, current);
 				
 				if (!sn.isSpeedNodeUseable()) {

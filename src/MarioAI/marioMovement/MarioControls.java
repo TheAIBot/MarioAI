@@ -1,5 +1,6 @@
 package MarioAI.marioMovement;
 
+import java.awt.datatransfer.FlavorTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,8 +168,8 @@ public class MarioControls {
 				 nextEdge.target.y < marioYPos));
 	}
 	
-	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed) {
-		return getMovementInformationFromEdge(edge.source.x, edge.source.y, edge.target, edge, speed);
+	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
+		return getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
 	}
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -266,12 +267,21 @@ public class MarioControls {
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
-		while (neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks)) > ACCEPTED_DEVIATION) {
+		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
+		float oldDistanceToTarget = distanceToTarget;
+		while (distanceToTarget > ACCEPTED_DEVIATION) {
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
 			xPositions.add(distanceMoved);
 			totalTicks++;
 			ticksAccelerating++;
+			
+			oldDistanceToTarget = distanceToTarget;
+			distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
+			
+			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget)) {
+				break;
+			}
 		}
 		
 		final int ticksDrifting = Math.max(0, airTime - totalTicks);
