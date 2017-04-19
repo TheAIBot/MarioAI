@@ -110,10 +110,11 @@ public final class AStar {
 					continue;
 				}
 				
-				if (!sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+				
+				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
 				}
-
+				
 				//If a similar enough node has already been run through
 				//no need to add this one at that point
 				if (closedSetMap.containsKey(sn.hash)) {
