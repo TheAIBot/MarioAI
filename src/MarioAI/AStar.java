@@ -106,24 +106,11 @@ public final class AStar {
 				
 				final SpeedNode sn = getSpeedNode(neighborEdge, current);
 				
-<<<<<<< HEAD
 				if (!sn.isSpeedNodeUseable()) {
-=======
-				final MovementInformation movementInformation = MarioControls.getMovementInformationFromEdge(current.correctXPos, current.node.y, 
-																											 neighborEdge.target, neighborEdge, current.vx);
-				final float correctXPos = current.correctXPos + movementInformation.getXMovementDistance();
-				
-				//In a jump it's possible to jump too far
-				//and there is nothing that mario can do about it
-				//TODO this should maybe be removed in the future
-				if (!MarioControls.canMarioUseJumpEdge(neighborEdge, correctXPos)){
 					continue;
 				}
 				
-				//can't use edge if mario collides with a enemy in it
-				if (doesMovementCollideWithEnemy((int)current.gScore, neighborEdge, current.correctXPos, current.node.y, current.vx, movementInformation, enemyPredictor, marioHeight)){
-					// TODO: Penalize edge with very high fScore instead of breaking current cycle to give the option of worst case having to go through enemy if no other path is applicable
->>>>>>> origin/EnemyController
+				if (!sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
 				}
 

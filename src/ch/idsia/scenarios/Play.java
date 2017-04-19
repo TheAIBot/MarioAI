@@ -52,14 +52,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-<<<<<<< HEAD
 	        options.setLevelDifficulty(5);
-=======
-	        
-	        //Seed = 942181699 running stuck bug
-	        
-	        options.setLevelDifficulty(10);
->>>>>>> origin/EnemyController
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);
