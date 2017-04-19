@@ -98,8 +98,6 @@ public final class AStar {
 			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
 			//System.out.println("Current node edges:");
 			//System.out.println(current.node.edges + "\n");
-			
-			
 			// Current node has been explored.
 			closedSetMap.put(current.hash, current);
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
