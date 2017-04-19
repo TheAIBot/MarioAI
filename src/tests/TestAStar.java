@@ -1,13 +1,15 @@
 package tests;
 
+import org.junit.Assert.*;
+
 import static org.junit.Assert.*;
 
 import java.util.List;
-
 import org.junit.Test;
-
+import org.junit.*;
 import MarioAI.AStar;
 import MarioAI.FastAndFurious;
+import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.EnemyType;
 import MarioAI.graph.Graph;
@@ -24,10 +26,14 @@ public class TestAStar {
 	Environment observation;
 	Graph graph;
 	final float delta = 0.05f;
-	
+
 	public void setup(String levelName) {
+		setup(levelName, false);
+	}
+	
+	public void setup(String levelName, boolean showLevel) {
 		agent = new FastAndFurious();
-		observation = TestTools.loadLevel("" + levelName + ".lvl", agent);
+		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		
 		TestTools.runOneTick(observation);
 		graph = new Graph();
@@ -68,22 +74,28 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setup("TestAStarJump");
+		setup("TestAStarJump", true);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
-		
+
+		//TestTools.runOneTick(observation);
 		assertTrue(path != null);
-		assertTrue(path.size() >= 6);
 		
-		DirectedEdge e1 = path.get(1);
-		DirectedEdge e2 = path.get(2);
-		DirectedEdge eN = path.get(5);
-		//assertEquals(e1.target.gScore, e1.target.y - e1.source.y, delta);
-		//assertEquals(e1.target.gScore, e2.target.y - e2.source.y, delta);
-		assertTrue(e1 instanceof SecondOrderPolynomial);
-		assertTrue(e2 instanceof SecondOrderPolynomial);
-		assertTrue(eN instanceof Running);
+		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+		DebugDraw.drawPath(observation, path);
+		TestTools.renderLevel(observation);
+		assertEquals(10, path.size());
+		
+		
+		for (int i = 0; i < 3; i++) { //Jumping edges
+			assertTrue(path.get(i) instanceof SecondOrderPolynomial);
+		}
+		
+		for (int i = 4; i < path.size(); i++) { //Running
+			assertTrue(path.get(i) instanceof Running);
+			
+		}		
 		
 		// TODO Bug: Mario thinks he can jump through one layer wall
 		// TODO Bug: Mario not finding path at first A* call (in the next call, however, he finds the solution path)

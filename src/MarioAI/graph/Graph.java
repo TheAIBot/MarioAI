@@ -45,7 +45,7 @@ public class Graph {
 		updateWholeMatrix(observation);
 		setMarioNode(observation);
 		oldMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-		maxMarioXPos = SIGHT_WIDTH / 2;
+		maxMarioXPos = (SIGHT_WIDTH / 2) + MARIO_START_X_POS - 1;
 		goalNodesChanged = true;
 	}
 	
@@ -72,7 +72,7 @@ public class Graph {
 		oldMarioXPos = marioXPos;
 		oldMarioYPos = marioYPos;
 		
-		final int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + 10);
+		final int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + (SIGHT_WIDTH / 2) - 1);
 		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
 		maxMarioXPos = newMaxMarioXPos;		
 		

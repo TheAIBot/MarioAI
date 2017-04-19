@@ -40,6 +40,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 	private int ZLevelEnemies = 1;
 	private int ZLevelScene = 1;
+	private Graphics debugRenderGraphics = null;
+	private VolatileImage debugRenderImage = null;
 
 	public void setGameViewer(GameViewer gameViewer) {
 		this.gameViewer = gameViewer;
@@ -130,7 +132,9 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		if (GlobalOptions.VisualizationOn) {
 			image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 			g = getGraphics();
-			og = image.getGraphics();	
+			og = image.getGraphics();
+			debugRenderGraphics = og;
+			debugRenderImage = image;
 		}
 
 		addFocusListener(this);
@@ -213,6 +217,15 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		// Advance the frame
 		frame++;
 		return mario.getStatus();
+	}
+	
+	public void render() {
+		if (debugRenderGraphics != null) {
+			debugRenderGraphics.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			scene.render(debugRenderGraphics, 0);
+			((LevelScene)scene).renderDebugDrawings(debugRenderGraphics, debugDrawingsToDraw);	
+			getGraphics().drawImage(debugRenderImage, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+		}
 	}
 
 	public EvaluationInfo run1(int currentTrial, int totalNumberOfTrials) {

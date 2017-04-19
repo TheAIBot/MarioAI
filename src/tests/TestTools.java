@@ -159,4 +159,8 @@ public class TestTools {
 	public static void setMarioInvulnerability(Environment observation, boolean value) {
 		((MarioComponent)observation).setMarioInvulnerable(value);
 	}
+	
+	public static void renderLevel(Environment observation) {
+		((MarioComponent)observation).render();
+	}
 }

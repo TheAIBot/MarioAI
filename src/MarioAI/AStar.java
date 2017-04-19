@@ -96,6 +96,12 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
+
+			System.out.println("Current node:");
+			System.out.println(current.node + "\nFrom: " + current.ancestorEdge);
+			System.out.println("Current node edges:");
+			System.out.println(current.node.edges + "\n");
+			
 			
 			// Current node has been explored.
 			closedSetMap.put(current.hash, current);
@@ -103,6 +109,10 @@ public final class AStar {
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+				
+				
+				System.out.println("Current edge: ");
+				System.out.println(neighborEdge + "\n");
 				
 				final SpeedNode sn = getSpeedNode(neighborEdge, current);
 				
@@ -130,15 +140,15 @@ public final class AStar {
 				if (openSetMap.containsKey(sn.hash) &&
 					tentativeGScore >= openSetMap.get(sn.hash).gScore) {
 					continue;
-				}
-				
-				//Update the edges position in the priority queue
-				//by updating the scores and taking it in and out of the queue.
-				openSet.remove(sn);
-				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
-				openSet.add(sn);
-				openSetMap.put(sn.hash, sn);
+				} else {
+					//Update the edges position in the priority queue
+					//by updating the scores and taking it in and out of the queue.
+					openSet.remove(sn);
+					sn.gScore = tentativeGScore;
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+					openSet.add(sn);
+					openSetMap.put(sn.hash, sn);
+				}				
 			}
 		}
 		// No solution was found

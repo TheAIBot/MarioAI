@@ -2,10 +2,13 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
+import org.hamcrest.core.IsInstanceOf;
+
 import MarioAI.Hasher;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.SecondOrderPolynomial;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
@@ -69,7 +72,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		//In a jump it's possible to jump too far
 		//and there is nothing that mario can do about it
 		//TODO this should maybe be removed in the future
-		if (!MarioControls.canMarioUseJumpEdge(ancestorEdge, xPos)) {
+		if (this.ancestorEdge instanceof SecondOrderPolynomial && 
+			!MarioControls.canMarioUseJumpEdge(ancestorEdge, xPos)) {
 			return false;
 		}
 		
