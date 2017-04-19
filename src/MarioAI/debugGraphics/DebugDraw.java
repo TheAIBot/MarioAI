@@ -256,6 +256,26 @@ public class DebugDraw {
 			}
 		}
 	}
+	
+	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
+		ArrayList<Point> positions = new ArrayList<Point>(); 
+		for (DirectedEdge edge : path) {
+			for (Point2D.Float pos : edge.getMoveInfo().getPositions()) {
+				Point2D.Float correctPos = new Point2D.Float(edge.source.x + pos.x, edge.source.y - pos.y);
+				convertLevelPointToOnScreenPoint(observation, correctPos);
+				
+				positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+			}
+		}
+		addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+	}
+	
+	public static void drawMarioNode(final Environment observation, final Node marioNode) {
+		Point nodePos = new Point(marioNode.x - 1, marioNode.y - 1);
+		convertLevelPointToOnScreenPoint(observation, nodePos);
+		Point size = new Point(BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER, BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER);
+		addDebugDrawing(observation, new DebugSquare(Color.GREEN, nodePos, size));
+	}
 
 	private static void convertLevelPointToOnScreenPoint(final Environment observation, final Point point) {
 		final Point2D.Float p = new Point2D.Float(point.x, point.y);

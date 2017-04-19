@@ -35,6 +35,7 @@ public class MarioControls {
 	
 	private int jumpTime = 0;
 	private int holdJumpTime = 0;
+	private int xTime = 0;
 	private int xHoldTime = 0;
 	private MovementInformation moveInfo1;
 	
@@ -47,6 +48,7 @@ public class MarioControls {
 		
 		jumpTime = 0;
 		holdJumpTime = 0;
+		xTime = 0;
 		xHoldTime = 0;
 	}
 	
@@ -99,16 +101,15 @@ public class MarioControls {
 		final DirectedEdge next = path.get(0);
 		
 		currentXSpeed = marioXPos - oldX;
-		if (jumpTime <= 0 && next.getMaxY() > 0) {
+		if (moveInfo1 == null || jumpTime < 0 && xTime <= 0 && observation.isMarioOnGround()) {
 			moveInfo1 = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
+			jumpTime = moveInfo1.getTotalTicksJumped();
 			xHoldTime = moveInfo1.getXMovementTime();
+			xTime = moveInfo1.getXMovementTime();
+			holdJumpTime = moveInfo1.getTicksHoldingJump();
 		}
 		
 		if (moveInfo1 != null) {
-			if (jumpTime < 0 && observation.isMarioOnGround()) {
-				jumpTime = moveInfo1.getTotalTicksJumped();
-				holdJumpTime = moveInfo1.getTicksHoldingJump();
-			}
 			if (holdJumpTime > 0) {
 				actions[Mario.KEY_JUMP] = true;
 				holdJumpTime--;
@@ -121,6 +122,7 @@ public class MarioControls {
 				actions[movementDirection] = true;
 				xHoldTime--;
 			}
+			xTime--;
 			oldX = marioXPos;	
 		}
 		
@@ -217,10 +219,11 @@ public class MarioControls {
 					//Math derived from mario code
 					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
 					currentJumpHeight += prevYDelta;
-					yPositions.add(currentJumpHeight);
 					if (currentJumpHeight <= fallTo) {
+						yPositions.add(fallTo);
 						break;
 					}
+					yPositions.add(currentJumpHeight);
 					totalTicksJumped++;
 				}	
 			}
@@ -307,15 +310,14 @@ public class MarioControls {
 	private static ArrayList<Float> getDeaccelerationPositions(float speed) {
 		final ArrayList<Float> xPositions = new ArrayList<Float>(); 
 		float xMovement = 0;
-		
-		while(speed >= MIN_MARIO_SPEED) { 
+		do {
 			speed = speed * 0.89f - 0.0375f;
-			if (speed < 0.0375f) {
+			if (speed < MIN_MARIO_SPEED) {
 				speed = 0;
 			}
 			xMovement += speed;
 			xPositions.add(xMovement);
-		}
+		} while (speed >= MIN_MARIO_SPEED);
 		return xPositions;
 	}
 	
