@@ -1,36 +1,50 @@
 package MarioAI;
 
-import MarioAI.graph.DirectedEdge;
+import MarioAI.graph.edges.DirectedEdge;
 
 public class Hasher {
-	public static int hashShortPoint(short x, short y)
-	{
-		return x + Short.MAX_VALUE * y;
+
+	public static int hashShortPoint(short x, short y) {
+		return x + 1000 * y;
 	}
-	
-	private static int ll = 0;
-	public static int hashEdge(DirectedEdge edge)
-	{
-		//64 should be greater than the largest y value possible.
-		//(*)Check it is unique
-		/*if (edge.target == null) {
-			return 0;
-		} else if (edge.motion == null) {
-			
-		}
-		else return edge.target.x + Short.MAX_VALUE * edge.target.y + Short.MAX_VALUE*64*edge.motion.motionTypeID();
-		*/
-		byte isJumpEdge = (byte) ((edge instanceof SecondOrderPolynomial) ? 0x80 : 0x0);
-		if (edge.target == null) {
-			return 0;
+
+	public static long hashSpeedNode(float vx, DirectedEdge edge) {
+		//the hash of the speed needs to be fixed
+		final long a = ((long)(vx * 10)) << 32; 
+		final long edgeHash = edge.hashCode();
+		
+		return a | edgeHash;
+	}
+
+	public static int hashEdge(DirectedEdge edge, int extraHash) {
+		//TODO It does not handle wall jumps properly. Look at later.
+
+		//TODO remember using isJumpEdge
+		//General hash for all kings of edges:
+		if (edge.target == null) { //setMovementEdges will delete it later:
+			//This will mean a running edge from x,y=0,0 to 0,0, will not be unique: 
+			//no worries, as they will be discarded.
+			return 0; 
 		}
 		
-		int b1 = (((int)edge.target.y & 0x000000ff) | isJumpEdge) << 0;
-		int b2 = ((int)edge.target.x  & 0x000000ff) << 8;
-		int b3 = ((int)edge.source.y  & 0x000000ff) << 16;
-		int b4 = ((int)edge.source.x  & 0x000000ff) << 24;
+		//The y positions:
+		final int position1 = 0;		
+		final int b1 =  ((int) edge.target.y &  0xf) << position1; //Max height = 15, including 0, giving 4 bits.
+		final int position2 = position1+4;
 		
-		//return b1 | b2 | b3 | b4;
-		return ll++;
+		final int b2 = 	((int) edge.source.y &  0xf) << position2;//Same as above.
+		final int position3 = position2+4;
+		
+		//The x positions:
+		final int b3 = 	((int) edge.target.x & 0x1ff) << position3; //X position is max 300 ish and min 0, requiring 9 bits.
+		final int position4 = position3+9;
+		
+		final int b4 = 	((int) edge.source.x & 0x1ff) << position4; //Same as above.
+		final int position5 = position4+9;
+		
+		//Unique edge information to add to the hash.
+		//Includes things like if it is an jump edge or running edge, and things like that.
+		final int b5 = extraHash << position5; 
+		return b1 | b2 | b3 | b4 | b5;
 	}
 }

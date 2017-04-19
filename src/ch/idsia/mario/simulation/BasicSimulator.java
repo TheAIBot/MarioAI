@@ -53,6 +53,22 @@ public class BasicSimulator implements Simulation
         marioComponent.setMarioInvulnerable(simulationOptions.isMarioInvulnerable());
         return marioComponent;
     }
+    
+    public MarioComponent setRandomLevel()
+    {
+        Mario.resetStatic(simulationOptions.getMarioMode());        
+        prepareMarioComponent();
+        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
+        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
+        marioComponent.startLevel(simulationOptions.getLevelRandSeed(), simulationOptions.getLevelDifficulty()
+                , simulationOptions.getLevelType(), simulationOptions.getLevelLength(),
+                 simulationOptions.getTimeLimit());
+        marioComponent.setPaused(simulationOptions.isPauseWorld());
+        marioComponent.setZLevelEnemies(simulationOptions.getZLevelEnemies());
+        marioComponent.setZLevelScene(simulationOptions.getZLevelMap());
+        marioComponent.setMarioInvulnerable(simulationOptions.isMarioInvulnerable());
+        return marioComponent;
+    }
 
     public EvaluationInfo simulateOneLevel()
     {

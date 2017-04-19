@@ -22,10 +22,7 @@ import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
-
-import MarioAI.debugGraphics.debugLines;
-import MarioAI.debugGraphics.debugPoints;
-import MarioAI.graph.Grapher;
+import MarioAI.debugGraphics.DebugDrawing;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;
@@ -43,6 +40,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 	private int ZLevelEnemies = 1;
 	private int ZLevelScene = 1;
+	private Graphics debugRenderGraphics = null;
+	private VolatileImage debugRenderImage = null;
 
 	public void setGameViewer(GameViewer gameViewer) {
 		this.gameViewer = gameViewer;
@@ -57,8 +56,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private Mario mario = null;
 	private LevelScene levelScene = null;
 	
-	private ArrayList<debugLines> debugLinesToDraw = new ArrayList<debugLines>(); 
-	private ArrayList<debugPoints> debugPointsToDraw = new ArrayList<debugPoints>();
+	private ArrayList<DebugDrawing> debugDrawingsToDraw = new ArrayList<DebugDrawing>();
 
 	public MarioComponent(int width, int height) {
 		adjustFPS();
@@ -126,20 +124,17 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public int runOneTick() {
 		running = true;
 		adjustFPS();
-		EvaluationInfo evaluationInfo = new EvaluationInfo();
+		//EvaluationInfo evaluationInfo = new EvaluationInfo();
 
 		VolatileImage image = null;
 		Graphics g = null;
 		Graphics og = null;
-
-		image = createVolatileImage(320, 240);
-		g = getGraphics();
-		og = image.getGraphics();
-
-		if (!GlobalOptions.VisualizationOn) {
-			String msgClick = "Vizualization is not available";
-			drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 1);
-			drawString(og, msgClick, 160 - msgClick.length() * 4, 110, 7);
+		if (GlobalOptions.VisualizationOn) {
+			image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			g = getGraphics();
+			og = image.getGraphics();
+			debugRenderGraphics = og;
+			debugRenderImage = image;
 		}
 
 		addFocusListener(this);
@@ -150,12 +145,10 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		int marioStatus = Mario.STATUS_RUNNING;
 
 		mario = ((LevelScene) scene).mario;
-		int totalActionsPerfomed = 0;
+		//int totalActionsPerfomed = 0;
 		// TODO: Manage better place for this:
 		Mario.resetCoins();
 
-		// Display the next frame of animation.
-		// repaint();
 		scene.tick();
 		if (gameViewer != null && gameViewer.getContinuousUpdatesState())
 			gameViewer.tick();
@@ -164,23 +157,13 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 		// og.setColor(Color.RED);
 		if (GlobalOptions.VisualizationOn) {
-			og.fillRect(0, 0, 320, 240);
+			og.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 			scene.render(og, alpha);
-			((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
-			((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
+			((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 		}
 
-		boolean[] action = agent.getAction(this/* DummyEnvironment */);
-		if (action != null) {
-			for (int i = 0; i < Environment.numberOfButtons; ++i)
-				if (action[i]) {
-					++totalActionsPerfomed;
-					break;
-				}
-		} else {
-			System.err.println("Null Action received. Skipping simulation...");
-			stop();
-		}
+		
+		final boolean[] action = agent.getAction(this);
 
 		// Apply action;
 		// scene.keys = action;
@@ -217,19 +200,32 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			LevelScene.drawStringDropShadow(og, "Trial:", 33, 4, 7);
 			LevelScene.drawStringDropShadow(og, msg, 33, 5, 7);
 
+			g.drawImage(image, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+			/*
 			if (width != 320 || height != 240) {
 				g.drawImage(image, 0, 0, 640 * 2, 480 * 2, null);
 			} else {
 				g.drawImage(image, 0, 0, null);
 			}
+			*/
 		} else {
 			// Win or Die without renderer!! independently.
 			marioStatus = ((LevelScene) scene).mario.getStatus();
 			if (marioStatus != Mario.STATUS_RUNNING)
 				stop();
 		}
+		// Advance the frame
 		frame++;
 		return mario.getStatus();
+	}
+	
+	public void render() {
+		if (debugRenderGraphics != null) {
+			debugRenderGraphics.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			scene.render(debugRenderGraphics, 0);
+			((LevelScene)scene).renderDebugDrawings(debugRenderGraphics, debugDrawingsToDraw);	
+			getGraphics().drawImage(debugRenderImage, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+		}
 	}
 
 	public EvaluationInfo run1(int currentTrial, int totalNumberOfTrials) {
@@ -241,7 +237,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		Graphics g = null;
 		Graphics og = null;
 
-		image = createVolatileImage(320, 240);
+		image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 		g = getGraphics();
 		og = image.getGraphics();
 
@@ -274,10 +270,9 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 			// og.setColor(Color.RED);
 			if (GlobalOptions.VisualizationOn) {
-				og.fillRect(0, 0, 320, 240);
+				og.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
 				scene.render(og, alpha);
-				((LevelScene)scene).renderDebugLines(og, debugLinesToDraw);
-				((LevelScene)scene).renderDebugPoints(og, debugPointsToDraw);
+				((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 			}
 
 			if (agent instanceof ServerAgent && !((ServerAgent) agent).isAvailable()) {
@@ -335,11 +330,14 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 				LevelScene.drawStringDropShadow(og, "Trial:", 33, 4, 7);
 				LevelScene.drawStringDropShadow(og, msg, 33, 5, 7);
 
+				g.drawImage(image, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+				/*
 				if (width != 320 || height != 240) {
 					g.drawImage(image, 0, 0, 640 * 2, 480 * 2, null);
 				} else {
 					g.drawImage(image, 0, 0, null);
 				}
+				*/
 			} else {
 				// Win or Die without renderer!! independently.
 				marioStatus = ((LevelScene) scene).mario.getStatus();
@@ -393,7 +391,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	private void drawString(Graphics g, String text, int x, int y, int c) {
 		char[] ch = text.toCharArray();
 		for (int i = 0; i < ch.length; i++) {
-			g.drawImage(Art.font[ch[i] - 32][c], x + i * 8, y, null);
+			g.drawImage(Art.font[ch[i] - 32][c], (x + i * 8), y, null);
 		}
 	}
 
@@ -558,8 +556,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		return null;
 	}
 
-	public int getMarioMode() {
-		return mario.getMode();
+	public int getMarioStatus() {
+		return mario.getStatus();
 	}
 
 	public boolean isMarioCarrying() {
@@ -571,15 +569,18 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	}
 	
 	public void resetDebugGraphics() {
-		debugLinesToDraw.clear();
-		debugPointsToDraw.clear();
+		debugDrawingsToDraw.clear();
 	}
 	
-	public void addDebugLines(debugLines lines) {
-		debugLinesToDraw.add(lines);
+	public void addDebugDrawing(DebugDrawing drawing) {
+		debugDrawingsToDraw.add(drawing);
+	}
+
+	public int getMarioMode() {
+		return mario.getMode();
 	}
 	
-	public void addDebugPoints(debugPoints points) {
-		debugPointsToDraw.add(points);
+	public LevelScene getLevelScene() {
+		return (LevelScene)scene;
 	}
 }

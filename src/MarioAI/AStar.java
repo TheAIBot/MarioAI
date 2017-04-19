@@ -1,51 +1,69 @@
 package MarioAI;
 
-import java.util.List;
-import java.util.PriorityQueue;
-
-import MarioAI.graph.DirectedEdge;
-import MarioAI.graph.GraphMath;
-import MarioAI.graph.Node;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.environments.Environment;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+import MarioAI.enemy.EnemyPredictor;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.Running;
+import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
+
 
 public final class AStar {
-
+	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
+	
+	
 	/**
-	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most
-	 * column of the screen
+	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
 	 * @param start
-	 * @param nodes
+	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public static List<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] nodes)  {
+	public ArrayList<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+		
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
-		// pretty good goal positions to end up in after A* search
-		Node goal = new Node((short) 1000, (short) 11, (byte) 3);
-		for (Node node : nodes) {
+		// pretty good goal positions to end up in after A* search 
+		int goalX = 0;
+		for (int i = 0; i < rightmostNodes.length; i++) {
+			if (rightmostNodes[i] != null) {
+				goalX = rightmostNodes[i].x;
+				break;
+			}
+		}
+		
+		
+		Node goal = new Node((short) goalX, (short) 2, (byte) 3);
+		for (Node node : rightmostNodes) {
 			if (node != null) {
 				node.addEdge(new Running(node, goal));
 			}
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		List<DirectedEdge> path = runAStar(start, goal);
-		if (path != null) {
+		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, Long.MAX_VALUE), 
+										   			  new SpeedNode(goal, Long.MIN_VALUE),
+										   			  enemyPredictor, 
+										   			  marioHeight);
+		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
-		for (Node node : nodes) {
+
+		for (Node node : rightmostNodes) {
 			if (node != null) {
-				//remove the last edge as that's the egde to the goal
-				//because it was the soonest added edge
+				//remove the last edge as that's the edge to the goal
+				//because it was the first added edge
 				node.removeEdge(node.edges.get(node.edges.size() - 1));
 			}
 		}
-
 		return path;
 	}
 
@@ -56,83 +74,119 @@ public final class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public static List<DirectedEdge> runAStar(final Node start, final Node goal) {
+	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight) {
 		// Set of nodes already explored
-		final List<Node> closedSet = new ArrayList<Node>();
+		final Map<Long, SpeedNode> closedSetMap = new HashMap<Long, SpeedNode>();
 		// Set of nodes yet to be explored
-		final PriorityQueue<Node> openSet = new PriorityQueue<Node>();
+		final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
+		final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
 
 		// Initialization
 		openSet.add(start);
+		openSetMap.put(start.hash, start);
 		start.gScore = 0;
+		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
-
+		
 		while (!openSet.isEmpty()) {
-			Node current = openSet.remove();
-
-			// If goal is reached return solution path
-			if (current.equals(goal)) {
+			final SpeedNode current = openSet.remove();
+			openSetMap.remove(current.hash);
+						
+			// If goal is reached return solution path.
+			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
 
-			// Current node has been explored
-			// openSet.remove(current);
-			closedSet.add(current);
-
+			System.out.println("Current node:");
+			System.out.println(current.node + "\nFrom: " + current.ancestorEdge);
+			System.out.println("Current node edges:");
+			System.out.println(current.node.edges + "\n");
+			
+			
+			// Current node has been explored.
+			closedSetMap.put(current.hash, current);
+			//System.out.println(openSet.size()); //Used to check how AStar performs.
+			
 			// Explore each neighbor of current node
-			final List<DirectedEdge> neighborEdges = current.getEdges();
-			for (DirectedEdge neighborEdge : neighborEdges) {
-				if (closedSet.contains(neighborEdge.target))
-					continue;
-				// Distance from start to neighbor of current node
-				float tentativeGScore = current.gScore + neighborEdge.getWeight();
-				if (!openSet.contains(neighborEdge.target)) {
-					openSet.add(neighborEdge.target);
-				} else if (tentativeGScore >= neighborEdge.target.gScore) {
+			for (DirectedEdge neighborEdge : current.node.getEdges()) {
+				
+				
+				System.out.println("Current edge: ");
+				System.out.println(neighborEdge + "\n");
+				
+				final SpeedNode sn = getSpeedNode(neighborEdge, current);
+				
+				if (!sn.isSpeedNodeUseable()) {
 					continue;
 				}
-
-				// Update values
-				neighborEdge.target.parent = current;
-				neighborEdge.target.gScore = tentativeGScore;
-				neighborEdge.target.fScore = neighborEdge.target.gScore + heuristicFunction(neighborEdge.target, goal);
+				
+				
+				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+					continue;
+				}
+				
+				//If a similar enough node has already been run through
+				//no need to add this one at that point
+				if (closedSetMap.containsKey(sn.hash)) {
+					continue;
+				}
+				
+				// Distance from start to neighbor of current node
+				final int tentativeGScore = current.gScore + sn.getMoveTime();
+				
+				//If a similar enough node exists and that has a better g score
+				//then there is no need to add this edge as it's worse than the
+				//current one
+				if (openSetMap.containsKey(sn.hash) &&
+					tentativeGScore >= openSetMap.get(sn.hash).gScore) {
+					continue;
+				} else {
+					//Update the edges position in the priority queue
+					//by updating the scores and taking it in and out of the queue.
+					openSet.remove(sn);
+					sn.gScore = tentativeGScore;
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+					openSet.add(sn);
+					openSetMap.put(sn.hash, sn);
+				}				
 			}
-		}
-		for (Node node : closedSet) {
-			node.gScore = 0;
-			node.fScore = 0;
-			node.parent = null;
 		}
 		// No solution was found
 		return null;
 	}
+	
+	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
+		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge);
+		
+		final SpeedNode speedNode = speedNodes.get(hash);
+		if (speedNode != null) {
+			return speedNode;
+		}
+		
+		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash);
+		speedNodes.put(hash, newSpeedNode);
+		return newSpeedNode;
+	}
 
 	/**
-	 * @param start
+	 * @param current
 	 * @param goal
-	 * @return the estimated cost of the cheapest path from current node to goal node
+	 * @return
 	 */
-	public static float heuristicFunction(final Node node, final Node goal) {
-		// temp use distance (later should use time)
-		return GraphMath.distanceBetween(node, goal);
+	public int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
+		return MarioControls.getTicksToTarget(goal.node.x - current.xPos, current.vx);
 	}
 
 	/**
 	 * @param current
 	 * @return path
 	 */
-	private static List<DirectedEdge> reconstructPath(Node current) {
-		final List<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		while (current.parent != null) {
-			DirectedEdge fisk = null;
-			for (int i = 0; i < current.parent.edges.size(); i++) {
-				if (current.parent.edges.get(i).target.equals(current)) {
-					fisk = current.parent.edges.get(i);
-					break;
-				}
-			}
-			path.add(fisk);
-			current = current.parent;
+	private ArrayList<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		while (currentSpeedNode.parent != null) {
+			currentSpeedNode.use();
+			path.add(currentSpeedNode.ancestorEdge);
+			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);
 		return path;

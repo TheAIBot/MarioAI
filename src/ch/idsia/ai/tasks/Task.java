@@ -16,10 +16,12 @@ public interface Task {
 	
 	public MarioComponent loadLevel(Level level, Agent controller);
 	
-    public double[] evaluate (Agent controller);
+	public MarioComponent setRandomLevel(Agent controller);
+	
+    public double[] evaluate(Agent controller);
 
-    public void setOptions (EvaluationOptions options);
+    public void setOptions(EvaluationOptions options);
 
-    public EvaluationOptions getOptions ();
+    public EvaluationOptions getOptions();
 
 }

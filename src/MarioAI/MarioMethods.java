@@ -1,5 +1,8 @@
 package MarioAI;
 
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.engine.sprites.Mario.MODE;
+
 /**
  * Class containing auxiliary getters and setters for info about Mario
  */
@@ -30,5 +33,17 @@ public class MarioMethods {
 
 	public static float getPreciseCenteredMarioYPos(final float[] marioPos) {
 		return getPreciseMarioYPos(marioPos) - BLOCK_CENTERING_OFFSET;
+	}
+	
+	public static int getMarioHeightFromMarioMode(int mode) {
+		switch (mode) {
+		case 0:
+			return 1;
+		case 1:
+			return 2;
+		case 2:
+			return 2;
+		}
+		throw new Error("Invalid mario mode given: " + mode);
 	}
 }

@@ -103,6 +103,12 @@ public class Evaluator implements Runnable
         Simulation simulator = new BasicSimulator(evaluationOptions.getSimulationOptionsCopy());
         return simulator.setLevel(level);
     }
+    
+    public MarioComponent setRandomLevel(Agent agent)
+    {
+        Simulation simulator = new BasicSimulator(evaluationOptions.getSimulationOptionsCopy());
+        return simulator.setRandomLevel();
+    }
 
     public List<EvaluationInfo> evaluate()
     {

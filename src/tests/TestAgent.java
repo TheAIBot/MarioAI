@@ -1,31 +1,70 @@
 package tests;
 
-import java.util.ArrayList;
-
 import MarioAI.MarioMethods;
 import ch.idsia.ai.agents.*;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAgent implements Agent {
-	private int tick = 0;
-	private float maxX = 0;
-	private float startX = 1000;
-	
-	//Fitted estimate of v(t) for Mario
-	//v(t) := .340909068708614-.340909068708614*exp(-.116533823678965*t)
-	
+	private int tick = 0;	
 	private float prevX = 0;
+	private float prevY = 0;
+	private float startX = 0;
+	private float startY = 0;
 
 	public void reset() {
 	}
 
 	public boolean[] getAction(Environment observation) {
-		boolean[] actions = new boolean[Environment.numberOfButtons];
-		startX = Math.min(startX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
-		maxX = Math.max(maxX, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
-
+		final boolean[] actions = new boolean[Environment.numberOfButtons];
+		final float currentXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float currentYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		/*
+		if (tick == TestTools.LEVEL_INIT_TICKS) {
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			actions[Mario.KEY_RIGHT] = true;
+		}		
+		
+		int a1 = 1 + TestTools.LEVEL_INIT_TICKS +  50;
+		int a3 =                             a1 +  20;
+		
+		float xChange = currentXPos - prevX;
+		
+		if (tick > TestTools.LEVEL_INIT_TICKS && tick < a1) {
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
+			//actions[Mario.KEY_RIGHT] = true;
+			//actions[Mario.KEY_JUMP] = true;
+			actions[Mario.KEY_RIGHT] = true;
+		}
+		else if (tick == a1) {
+			//System.out.println("stop jumping");
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
+			//actions[Mario.KEY_JUMP] = false;
+			actions[Mario.KEY_RIGHT] = true;
+			//actions[Mario.KEY_RIGHT] = false;
+			//actions[Mario.KEY_LEFT] = true;
+			//actions[Mario.KEY_JUMP] = false;
+		}
+		else if (tick > a1 && tick < a3) {
+			//System.out.println(prevY - currentYPos);
+			System.out.println(currentXPos - startX);
+			//actions[Mario.KEY_JUMP] = false;
+			actions[Mario.KEY_RIGHT] = true;
+			//actions[Mario.KEY_LEFT] = true;
+		}
+		prevX = currentXPos;
+		prevY = currentYPos;
+		
+		*/
+		
 		switch (tick) {
+		case TestTools.LEVEL_INIT_TICKS:
+			startX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			startY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			break;
 		case TestTools.LEVEL_INIT_TICKS + 1:
 		case TestTools.LEVEL_INIT_TICKS + 2:
 		case TestTools.LEVEL_INIT_TICKS + 3:
@@ -44,6 +83,13 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 16:
 		case TestTools.LEVEL_INIT_TICKS + 17:
 		case TestTools.LEVEL_INIT_TICKS + 18:
+			System.out.println(currentXPos - prevX);
+			//System.out.println(currentYPos - startY);
+			prevX = currentXPos;
+			startY = currentYPos;
+			actions[Mario.KEY_RIGHT] = true;
+			break;
+
 		case TestTools.LEVEL_INIT_TICKS + 19:
 		case TestTools.LEVEL_INIT_TICKS + 20:
 		case TestTools.LEVEL_INIT_TICKS + 21:
@@ -65,27 +111,26 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 37:
 		case TestTools.LEVEL_INIT_TICKS + 38:
 		case TestTools.LEVEL_INIT_TICKS + 39:
-		case TestTools.LEVEL_INIT_TICKS + 40:
-		case TestTools.LEVEL_INIT_TICKS + 41:
-		case TestTools.LEVEL_INIT_TICKS + 42:
-			System.out.print("<" + (tick - (TestTools.LEVEL_INIT_TICKS + 1)) + ", " + ((maxX - startX) - prevX) + ">|");
-			prevX = (maxX - startX);
-			actions[Mario.KEY_RIGHT] = true;
-			break;
-			//0   0.0
-			//1   0.037499905
-			//2   0.108374834
-			//3   0.20895362
-			//4   0.33596873
-			//5   0.48651218
-			//6   0.6579957
-			//7   0.84811616
-			//8   1.0548234
+			System.out.println(currentXPos - prevX);
+			//System.out.println(currentYPos - startY);
+			prevX = currentXPos;
+			startY = currentYPos;
+			actions[Mario.KEY_RIGHT] = false;
+			actions[Mario.KEY_LEFT] = true;
 		}
-
+		
+		
+		
 		tick++;
 		return actions;
 	}
+	
+    public static void main(String[] args) {
+        Agent controller = new TestAgent();
+        Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+        //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", controller, true);
+        TestTools.runWholeLevel(observation);
+    }
 
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;
