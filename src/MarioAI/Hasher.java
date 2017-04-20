@@ -1,7 +1,5 @@
 package MarioAI;
 
-import com.sun.nio.sctp.SctpStandardSocketOptions.InitMaxStreams;
-
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 
