@@ -124,7 +124,7 @@ public class TestGrapher {
 		Node[][] level = graph.getLevelMatrix();
 		grapher.setMovementEdges(level, marioNode);
 		boolean[] possibleJumpLenghts = new boolean[5];//5 for the five different jump lengths
-		for (DirectedEdge edge : marioNode.edges) {
+		for (DirectedEdge edge : marioNode.getEdges()) {
 			if (edge instanceof SecondOrderPolynomial) {
 				SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
 				if (marioNode.x < polynomialEdge.target.x) { //Goes rightwards
@@ -145,7 +145,7 @@ public class TestGrapher {
 		Grapher grapher = new Grapher();
 		grapher.setMovementEdges(level, marioNode);
 		boolean[] possibleJumpLenghts = new boolean[5];//5 for the five different jump lengths
-		for (DirectedEdge edge : marioNode.edges) {
+		for (DirectedEdge edge : marioNode.getEdges()) {
 			if (edge instanceof SecondOrderPolynomial) {
 				SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edge;
 				if (marioNode.x > polynomialEdge.target.x) { //Goes leftwards
@@ -295,16 +295,16 @@ public class TestGrapher {
 					continue;
 				} else if (world1[i][j] == null && world2[i][j] == null) fail();
 				//The number of edges going out from a given Node should be the same:
-				assertEquals(world1[i][j].edges.size(), world2[i][j].edges.size());
+				assertEquals(world1[i][j].getEdges().size(), world2[i][j].getEdges().size());
 				//All edges in one list should also be in the other list:
-				for (DirectedEdge edge : world2[i][j].edges) { 
+				for (DirectedEdge edge : world2[i][j].getEdges()) { 
 					//A little slow, but this test doesn't take that much time.					
-					assertTrue(world1[i][j].edges.contains(edge));
+					assertTrue(world1[i][j].getEdges().contains(edge));
 				}
 				//And the outher way around:
-				for (DirectedEdge edge : world1[i][j].edges) { 
+				for (DirectedEdge edge : world1[i][j].getEdges()) { 
 					//A little slow, but this test doesn't take that much time.					
-					assertTrue(world2[i][j].edges.contains(edge));
+					assertTrue(world2[i][j].getEdges().contains(edge));
 				}
 			}
 		}

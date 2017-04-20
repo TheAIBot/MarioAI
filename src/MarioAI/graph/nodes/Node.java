@@ -10,19 +10,21 @@ import MarioAI.graph.edges.DirectedEdge;
  * Standard type of node
  */
 public class Node {
-	public final HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer,DirectedEdge>();
-	public final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
+	private final HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer,DirectedEdge>();
+	private final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 	private boolean allEdgesMade = false;
-	public final short x;
-	public final short y;
-	public final byte type;
 	private final int hash;
 	
-	public Node(short x, short y, byte type) {
+	public final int x;
+	public final int y;
+	public final byte type;
+	
+	
+	public Node(int x, int y, byte type) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
-		this.hash = Hasher.hashShortPoint(x, y);
+		this.hash = Hasher.hashIntPoint(x, y);
 	}
 	
 	public void addEdge(DirectedEdge edge) {
