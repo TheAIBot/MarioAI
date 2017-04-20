@@ -1,22 +1,14 @@
 package MarioAI.marioMovement;
 
-import java.awt.datatransfer.FlavorTable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.IDREFDatatypeValidator;
-
 import MarioAI.MarioMethods;
-import MarioAI.Pair;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.sprites.Fireball;
 import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Sparkle;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
