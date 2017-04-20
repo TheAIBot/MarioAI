@@ -1,10 +1,6 @@
 package MarioAI;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
-import com.sun.xml.internal.ws.api.server.AbstractServerAsyncTransport;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
@@ -15,21 +11,16 @@ import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
-import sun.security.krb5.Asn1Exception;
 
-/**
- * Main program agent.
- */
+
 public class FastAndFurious implements Agent {
-
-	private static final String name = "The painkiller";
 	private final NodeCreator graph = new NodeCreator();
 	private final EdgeCreator grapher = new EdgeCreator();
 	private final AStar aStar = new AStar();
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
-	private int tickCount = 0;
 	private ArrayList<DirectedEdge> newestPath = null;
+	private int tickCount = 0;
 	
 	public boolean DEBUG = true;
 
@@ -114,7 +105,7 @@ public class FastAndFurious implements Agent {
 	}
 
 	public String getName() {
-		return name;
+		return "\';DROP TABLE Grades;";
 	}
 
 	public void setName(String name) {

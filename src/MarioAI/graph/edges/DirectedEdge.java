@@ -1,8 +1,6 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
-import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
 public abstract class DirectedEdge {

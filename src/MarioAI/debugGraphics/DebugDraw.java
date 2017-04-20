@@ -6,9 +6,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.org.apache.xerces.internal.util.EntityResolver2Wrapper;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptionMethod;
-
 import MarioAI.MarioMethods;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.simulators.EnemySimulator;

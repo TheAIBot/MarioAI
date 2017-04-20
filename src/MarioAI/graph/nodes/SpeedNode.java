@@ -2,12 +2,8 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
-import org.hamcrest.core.IsInstanceOf;
-
-import MarioAI.Hasher;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
