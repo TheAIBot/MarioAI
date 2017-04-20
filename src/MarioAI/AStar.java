@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
@@ -47,7 +47,7 @@ public final class AStar {
 		for (int i = 0; i < rightmostNodes.length; i++) {
 			final Node node = rightmostNodes[i];
 			if (node != null) {
-				Running edge = new Running(node, goal);
+				RunningEdge edge = new RunningEdge(node, goal);
 				node.addEdge(edge);
 				addedEdges[i] = edge;
 			}

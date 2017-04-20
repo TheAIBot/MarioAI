@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.Graph;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.NodeCreator;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphTests {
@@ -16,7 +16,7 @@ public class GraphTests {
 		UnitTestAgent agent = new UnitTestAgent();
 		Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		Graph graph = new Graph();
+		NodeCreator graph = new NodeCreator();
 		graph.createStartGraph(observation);
 		
 		final byte[][] levelMap = TestTools.getLevelMap(observation);

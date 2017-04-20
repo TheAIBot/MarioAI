@@ -12,12 +12,12 @@ import MarioAI.FastAndFurious;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.EnemyType;
-import MarioAI.graph.Graph;
-import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.NodeCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
@@ -25,7 +25,7 @@ import ch.idsia.mario.environments.Environment;
 public class TestAStar {
 	Agent agent;
 	Environment observation;
-	Graph graph;
+	NodeCreator graph;
 	final float delta = 0.05f;
 
 	public void setup(String levelName) {
@@ -37,9 +37,9 @@ public class TestAStar {
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		
 		TestTools.runOneTick(observation);
-		graph = new Graph();
+		graph = new NodeCreator();
 		graph.createStartGraph(observation);
-		new Grapher().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class TestAStar {
 		for (DirectedEdge directedEdge : path) {
 			//assertEquals(directedEdge.target.gScore, c, delta);
 			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
-			assertTrue(directedEdge instanceof Running);
+			assertTrue(directedEdge instanceof RunningEdge);
 //			try {
 //				Running test = (Running) directedEdge;
 //			} catch (ClassCastException e) {
@@ -90,11 +90,11 @@ public class TestAStar {
 		
 		
 		for (int i = 0; i < 3; i++) { //Jumping edges
-			assertTrue(path.get(i) instanceof SecondOrderPolynomial);
+			assertTrue(path.get(i) instanceof JumpingEdge);
 		}
 		
 		for (int i = 4; i < path.size(); i++) { //Running
-			assertTrue(path.get(i) instanceof Running);
+			assertTrue(path.get(i) instanceof RunningEdge);
 			
 		}		
 		

@@ -8,9 +8,9 @@ import com.sun.xml.internal.ws.api.server.AbstractServerAsyncTransport;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
-import MarioAI.graph.Graph;
-import MarioAI.graph.Grapher;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.nodes.NodeCreator;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -23,8 +23,8 @@ import sun.security.krb5.Asn1Exception;
 public class FastAndFurious implements Agent {
 
 	private static final String name = "The painkiller";
-	private final Graph graph = new Graph();
-	private final Grapher grapher = new Grapher();
+	private final NodeCreator graph = new NodeCreator();
+	private final EdgeCreator grapher = new EdgeCreator();
 	private final AStar aStar = new AStar();
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();

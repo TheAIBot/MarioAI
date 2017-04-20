@@ -12,11 +12,11 @@ import com.sun.org.apache.xml.internal.security.encryption.EncryptionMethod;
 import MarioAI.MarioMethods;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.simulators.EnemySimulator;
-import MarioAI.graph.Graph;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.NodeCreator;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -66,14 +66,14 @@ public class DebugDraw {
 			convertLevelPointToOnScreenPoint(observation, stringPos);
 			final Point correctedPos = new Point((int)stringPos.x, (int)stringPos.y);
 			
-			final String typeName = (directedEdge instanceof Running) ? "Running" : "Jumping";
+			final String typeName = (directedEdge instanceof RunningEdge) ? "Running" : "Jumping";
 			addDebugDrawing(observation, new DebugString(typeName, correctedPos));
 			
 			topStringPosition.y += distanceBetweenStrings;
 		}
 	}
 
-	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final Graph graph) {
+	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final NodeCreator graph) {
  		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix = graph.getLevelMatrix();
@@ -112,10 +112,10 @@ public class DebugDraw {
 					boolean containsRunningEdge = false;
 					boolean containsJumpingEdge = false;
 					for (DirectedEdge edge : toCheck.getEdges()) {
-						if (edge instanceof Running) {
+						if (edge instanceof RunningEdge) {
 							containsRunningEdge = true;
 						}
-						else if (edge instanceof SecondOrderPolynomial) {
+						else if (edge instanceof JumpingEdge) {
 							containsJumpingEdge = true;
 						}
 						if (containsRunningEdge && containsJumpingEdge) {
@@ -184,7 +184,7 @@ public class DebugDraw {
 		addDebugDrawing(observation, new DebugPoints(Color.BLUE, allEndPoints, 4));
 	}
 
-	public static void drawMarioReachableNodes(final Environment observation, final Graph graph) {
+	public static void drawMarioReachableNodes(final Environment observation, final NodeCreator graph) {
 		final Node mario = graph.getMarioNode(observation);
 		final List<DirectedEdge> edges = mario.getEdges();
 

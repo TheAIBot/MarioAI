@@ -4,9 +4,9 @@ import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MovementInformation;
 
-public class Running extends DirectedEdge{
+public class RunningEdge extends DirectedEdge{
 
-	public Running(Node source, Node target) {
+	public RunningEdge(Node source, Node target) {
 		super(source, target);
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}

@@ -11,7 +11,7 @@ import MarioAI.MarioMethods;
 import MarioAI.Pair;
 import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.sprites.Fireball;
@@ -66,7 +66,7 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
-		if (edge instanceof Running) {
+		if (edge instanceof RunningEdge) {
 			return true;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
