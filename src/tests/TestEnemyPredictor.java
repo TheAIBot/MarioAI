@@ -155,8 +155,8 @@ public class TestEnemyPredictor {
 			for (int i = 0; i < enemyCount; i++) {
 				final Point2D.Float[] enemyPredictedPositions = new Point2D.Float[testTime];
 				
-				for (int j = 1; j <= testTime; j++) {
-					enemyPredictedPositions[j - 1] = enemy.getPositionAtTime(j);
+				for (int j = 0; j < testTime; j++) {
+					enemyPredictedPositions[j] = enemy.getPositionAtTime(j + 1);
 				}
 				
 				predictedPositions.add(enemyPredictedPositions);
@@ -165,29 +165,22 @@ public class TestEnemyPredictor {
 		
 		for (int i = 0; i < 80; i++) {
 			TestTools.runOneTick(observation);
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
-			
 			final float[] enemyArray = observation.getEnemiesFloatPos();
-			final int currentEnemyCount = enemyArray.length / 3;
-			final Point2D.Float[] enemyPositions = new Point2D.Float[currentEnemyCount];
+			enemyPredictor.updateEnemies(enemyArray);
 			
-			int index = 0;
-			for (int j = 0; j < enemyArray.length; j += 3) {
-				enemyPositions[index] = new Point2D.Float(enemyArray[j + 1], enemyArray[j + 2]);
-				index++;
-			}
+			final int currentEnemyCount = enemyArray.length / EnemyPredictor.FLOATS_PER_ENEMY;
 			
 			assertEquals("Lost " + enemyName + " after " + i + " ticks", currentEnemyCount, enemyPredictor.getEnemies().size());
 			
 			int removedEnemies = currentEnemyCount -  enemyPredictor.getEnemies().size();
 			for (Point2D.Float[] simulatedEnemyPositions : predictedPositions) {
 				boolean foundEnemyPosition = false;
-				for (int j = 0; j < enemyPositions.length; j++) {
-					final float deltaX = Math.abs(simulatedEnemyPositions[i].x - enemyPositions[j].x);
-					final float deltaY = Math.abs(simulatedEnemyPositions[i].y - enemyPositions[j].y);
+				for (int j = 0; j < enemyArray.length; j += EnemyPredictor.FLOATS_PER_ENEMY) {
+					final float deltaX = Math.abs(simulatedEnemyPositions[i].x - enemyArray[j + EnemyPredictor.X_OFFSET]);
+					final float deltaY = Math.abs(simulatedEnemyPositions[i].y - enemyArray[j + EnemyPredictor.Y_OFFSET]);
 					
-					if (deltaX < 1 && 
-						deltaY < 1) {
+					if (deltaX < EnemyPredictor.ACCEPTED_POSITION_DEVIATION && 
+						deltaY < EnemyPredictor.ACCEPTED_POSITION_DEVIATION) {
 						foundEnemyPosition = true;
 						break;
 					}
