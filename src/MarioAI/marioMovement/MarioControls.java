@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
@@ -50,11 +49,15 @@ public class MarioControls {
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		final DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
+		if (distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
 			path.remove(0);
 			return true;
 		}
 		return false;
+	}
+	
+	private static float distanceBetween(float x1, float y1, int x2, int y2) {
+		return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
