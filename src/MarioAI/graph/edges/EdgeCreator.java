@@ -3,7 +3,6 @@ package MarioAI.graph.edges;
 import java.util.*;
 
 import MarioAI.graph.Collision;
-import MarioAI.graph.Function;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.nodes.Node;
 
@@ -204,7 +203,7 @@ public  class EdgeCreator {
 		return false;
 	}
 				
-	public static Collision ascendingNoncollidingFunction( int formerLowerYPosition, int bound, int currentXPosition, 
+	public  Collision ascendingNoncollidingFunction( int formerLowerYPosition, int bound, int currentXPosition, 
 																	Collision collisionDetection, JumpDirection direction){
 		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, null, direction, null, null, true, false);
 	}
@@ -214,7 +213,7 @@ public  class EdgeCreator {
 		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, direction, startingPosition, listOfEdges, false, true);
 	}
 	
-	public static Collision ascendingFunction(int formerLowerYPosition, int bound, int currentXPosition, 
+	public Collision ascendingFunction(int formerLowerYPosition, int bound, int currentXPosition, 
 													Collision collisionDetection, JumpingEdge polynomial, JumpDirection direction, 
 													Node startingPosition, List<DirectedEdge> listOfEdges,
 													boolean stopAtAnyCollision, boolean addEdges) {

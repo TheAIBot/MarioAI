@@ -16,8 +16,7 @@ import MarioAI.marioMovement.MarioControls;
 
 
 public final class AStar {
-	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
-	
+	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();	
 	
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
@@ -122,9 +121,6 @@ public final class AStar {
 					continue;
 				}	
 				
-				if (sn.doesSpeedNodeCollide()) {
-					continue;
-				}
 				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;

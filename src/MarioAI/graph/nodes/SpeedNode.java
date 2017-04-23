@@ -25,7 +25,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public float fScore = 0;
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
-	private final boolean doesSpeednodeCollide;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -57,7 +56,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable();
 		this.hash = hash;
-		this.doesSpeednodeCollide = collissionDetector();
 	}
 	
 	private boolean determineIfThisNodeIsUseable() {
@@ -140,11 +138,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	
 	private boolean collissionDetector(){
 		boolean hasCollided = false;
-		new 
 		return hasCollided;
-	}
-
-	public boolean doesSpeedNodeCollide() {
-		return doesSpeednodeCollide;
 	}
 }
