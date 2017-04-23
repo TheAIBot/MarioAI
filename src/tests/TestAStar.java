@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -125,6 +126,7 @@ public class TestAStar {
 		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
 		final int MAX_NUMBER_OF_SPEED_NODES = Hasher.FACTOR_NUMBER_OF_SPEED_NODES * 2 + 1;
 		final int NUMBER_OF_TEST_TICKS = 100;
+		final HashSet<Long>searchedNodes = new HashSet<Long>(); 
 		
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 			TestTools.runOneTick(observation);
@@ -132,18 +134,23 @@ public class TestAStar {
 			aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 			
 			for (SpeedNode speedNode : speedNodes.values()) {
-				int hashCode = speedNode.node.hashCode();
-				if (numberOfNodesMap.containsKey(hashCode)) {
-					int number = numberOfNodesMap.get(hashCode);
-					numberOfNodesMap.put(hashCode, number+1);
-					//assertTrue(number <= MAX_NUMBER_OF_SPEED_NODES);
+				if (!searchedNodes.contains(speedNode.hash)) {
+					int hashCode = speedNode.node.hashCode();
+					if (numberOfNodesMap.containsKey(hashCode)) {
+						int number = numberOfNodesMap.get(hashCode);
+						numberOfNodesMap.put(hashCode, number+1);
+						//assertTrue(number <= MAX_NUMBER_OF_SPEED_NODES);
+					}
+					else {
+						numberOfNodesMap.put(hashCode, 1);
+					}
+					searchedNodes.add(speedNode.hash);
 				}
-				else numberOfNodesMap.put(hashCode, 1);
 			}
 		}
-		assertTrue("Maximum number " + numberOfNodesMap.values().stream().max(Integer::compare).get()
-					+ "instead of" + MAX_NUMBER_OF_SPEED_NODES,
-					numberOfNodesMap.values().stream().allMatch(x -> x <= MAX_NUMBER_OF_SPEED_NODES));
+		assertTrue("Maximum number " + numberOfNodesMap.values().stream().max(Integer::compare).get() + 
+				   "instead of " + MAX_NUMBER_OF_SPEED_NODES,
+				   numberOfNodesMap.values().stream().allMatch(x -> x <= MAX_NUMBER_OF_SPEED_NODES));
 	}
 	
 	// === Tests with enemies ===
