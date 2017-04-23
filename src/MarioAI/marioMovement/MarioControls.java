@@ -120,7 +120,7 @@ public class MarioControls {
 				xHoldTime--;
 			}
 			xTime--;
-			oldX = marioXPos;	
+			oldX = marioXPos;
 		}
 		
 		return actions;
@@ -130,7 +130,7 @@ public class MarioControls {
 		currentXSpeed = marioXPos - oldX;
 		oldX = marioXPos;
 		
-		final DirectedEdge next = path.get(0);
+		DirectedEdge next = path.get(0);
 		if (!next.equals(prevEdge)) {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
@@ -142,7 +142,10 @@ public class MarioControls {
 				firstTick = false;
 			}
 		}
-		
+		if (next.getMoveInfo().getMoveTime() < ticksOnThisEdge) {
+			path.remove(0);
+			next = path.get(0);
+		}
 		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
 		
 	}

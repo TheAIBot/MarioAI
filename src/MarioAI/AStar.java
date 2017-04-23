@@ -52,8 +52,8 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, Long.MAX_VALUE), 
-										   			  new SpeedNode(goal, Long.MIN_VALUE),
+		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), 
+										   			  new SpeedNode(goal, 0, Long.MIN_VALUE),
 										   			  enemyPredictor, 
 										   			  marioHeight);
 		//speedNodes.remove(Long.MAX_VALUE);

@@ -218,7 +218,7 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, Long.MAX_VALUE);
+		SpeedNode start = new SpeedNode(source, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
 		AStar aStar = new AStar();
@@ -266,7 +266,7 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, Long.MAX_VALUE);
+		SpeedNode start = new SpeedNode(source, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
 		AStar aStar = new AStar();
