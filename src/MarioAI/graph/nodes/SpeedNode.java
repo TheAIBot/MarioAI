@@ -127,6 +127,6 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	@Override
 	public String toString() {
-		return node.toString();
+		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
 	}
 }

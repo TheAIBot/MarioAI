@@ -90,11 +90,18 @@ public class TestAStar {
 		List<DirectedEdge> path = fastAgent.getPath(observation);
 		int numberOfActions = 1;
 		int numberOfTicks = 0;
+		DebugDraw.resetGraphics(observation);
+		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+		DebugDraw.drawPathMovement(observation, path);
+		TestTools.renderLevel(observation);
+		assertTrue(path != null);
+		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
 		while(numberOfActions <= 5){
 			if (MarioControls.reachedNextNode(observation, path) && graph.goalNodesChanged() || 
 				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
 				 numberOfActions++;
 				 path = fastAgent.getPath(observation);
+				 DebugDraw.resetGraphics(observation);
 				 DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
 				 DebugDraw.drawPath(observation, path);
 				 TestTools.renderLevel(observation);

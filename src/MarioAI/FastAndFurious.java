@@ -34,6 +34,7 @@ public class FastAndFurious implements Agent {
 		if (tickCount == 30) {
 			graph.createStartGraph(observation);
 			grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			
 			newestPath = getPath(observation);
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
@@ -94,6 +95,7 @@ public class FastAndFurious implements Agent {
 	public ArrayList<DirectedEdge> getPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
+		System.out.println("Starting x velocity: " + marioController.getXVelocity());
 		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 		return (path == null)? newestPath : path;
 	}

@@ -42,7 +42,7 @@ public class Play {
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
-	        //options.setLevelRandSeed(42243);
+	        options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1581696905);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
 	        /*
@@ -54,7 +54,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(-1);
+	        options.setLevelDifficulty(2);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

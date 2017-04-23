@@ -108,14 +108,14 @@ public  class EdgeCreator {
 	private boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
-			//Run to the left:
+			//Run to the right:
 			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
 		} else {
 			foundAllEdges = false;
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			//Run to the right:
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			//Run to the left:
+			//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}	else {
 			foundAllEdges = false;
 		}
@@ -132,7 +132,7 @@ public  class EdgeCreator {
 		JumpingEdge polynomial = new JumpingEdge(null, null); //The jump polynomial.
 		boolean foundAllEdges = true;
 		for (int jumpHeight = (int) MAX_JUMP_HEIGHT; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
-			for (int jumpRange = (int) 2; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
+			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
