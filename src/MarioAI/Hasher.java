@@ -31,7 +31,7 @@ public class Hasher {
 	}
 	
 	public static int hashSpeed(float vx) {
-		return (int)(vx * 20);
+		return (int)(vx * 100);
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {
