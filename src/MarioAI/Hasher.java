@@ -30,8 +30,9 @@ public class Hasher {
 		return d | c | b | a;
 	}
 	
+	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 20;
 	public static int hashSpeed(float vx) {
-		return (int)(vx * 100);
+		return (int)(vx * FACTOR_NUMBER_OF_SPEED_NODES);
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

@@ -81,7 +81,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		int currentTick = startTime;
 		
 		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = parentXPos + position.x;
+			final float x = parentXPos  + position.x;
 			final float y = parent.yPos - position.y;
 			
 			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {

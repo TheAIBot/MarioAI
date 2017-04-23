@@ -99,7 +99,10 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-			
+			//System.out.println("Current node:");
+			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
+			//System.out.println("Current node edges:");
+			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
 			final int endHash = Hasher.hashEndSpeedNode(current);
 			closedSet.add(endHash);
@@ -149,7 +152,7 @@ public final class AStar {
 		return null;
 	}
 	
-	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
+	public SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
@@ -160,6 +163,10 @@ public final class AStar {
 		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash);
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
+	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return speedNodes;
 	}
 
 	/**
