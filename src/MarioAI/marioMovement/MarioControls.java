@@ -91,6 +91,7 @@ public class MarioControls {
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
+		/*
 		final boolean[] actions = new boolean[Environment.numberOfButtons];
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -119,27 +120,37 @@ public class MarioControls {
 				xHoldTime--;
 			}
 			xTime--;
-			oldX = marioXPos;	
+			oldX = marioXPos;
 		}
 		
 		return actions;
-		/*
+		*/
+		
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		currentXSpeed = marioXPos - oldX;
 		oldX = marioXPos;
 		
-		final DirectedEdge next = path.get(0);
+		DirectedEdge next = path.get(0);
 		if (!next.equals(prevEdge)) {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
 		}
 		else {
 			ticksOnThisEdge++;
+			if (firstTick) {
+				ticksOnThisEdge = 0;
+				firstTick = false;
+			}
 		}
-		
+		if (next.getMoveInfo().getMoveTime() < ticksOnThisEdge) {
+			path.remove(0);
+			next = path.get(0);
+		}
 		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
-		*/
+		
 	}
+	
+	private boolean firstTick = true;
 	
 	public static int getTicksToTarget(float neededXDistance, float speed) {
 		float distanceMoved = 0;
@@ -278,16 +289,19 @@ public class MarioControls {
 			}
 		}
 		
-		speed = getNextTickSpeed(speed);
-		distanceMoved += speed;
-		xPositions.add(distanceMoved);
-		totalTicks++;
-		ticksAccelerating++;
-		
 		final int ticksDrifting = Math.max(0, airTime - totalTicks);
 		
 		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions);
 		distanceMoved = xPositions.get(xPositions.size() - 1);
+		
+		//move the last tick
+		//which should be on ground
+		//this allows two jumping edges
+		//after each other.
+		speed = getNextTickSpeed(speed);
+		distanceMoved += speed;
+		xPositions.add(distanceMoved);
+		totalTicks++;
 		
 		//Put sign back on values as it was lost before
 		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;

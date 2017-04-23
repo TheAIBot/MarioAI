@@ -25,10 +25,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
 	
-	public SpeedNode(Node node, long hash) {
+	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
-		this.vx = 0;
+		this.vx = vx;
 		this.parent = null;
 		this.parentXPos = node.x;
 		this.parentVx = 0;

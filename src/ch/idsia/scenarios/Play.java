@@ -15,14 +15,13 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
 			Environment observation = TestTools.loadLevel("flatWithJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
-			//TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
@@ -42,7 +41,7 @@ public class Play {
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
-	        //options.setLevelRandSeed(42243);
+	        options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1581696905);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
 	        /*

@@ -52,8 +52,8 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, Long.MAX_VALUE), 
-										   			  new SpeedNode(goal, Long.MIN_VALUE),
+		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), 
+										   			  new SpeedNode(goal, 0, Long.MIN_VALUE),
 										   			  enemyPredictor, 
 										   			  marioHeight);
 		//speedNodes.remove(Long.MAX_VALUE);
@@ -83,11 +83,10 @@ public final class AStar {
 		final HashSet<Integer> closedSet = new HashSet<Integer>();
 		// Set of nodes yet to be explored
 		final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
-		final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
-
+		final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 		// Initialization
 		openSet.add(start);
-		openSetMap.put(start.hash, start);
+		openSetMap.put(Integer.MAX_VALUE, start);
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
@@ -107,7 +106,7 @@ public final class AStar {
 			// Current node has been explored.
 			final int endHash = Hasher.hashEndSpeedNode(current);
 			closedSet.add(endHash);
-			//System.out.println(openSet.size()); //Used to check how AStar performs.
+			System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {			
@@ -134,19 +133,19 @@ public final class AStar {
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
-				if (openSetMap.containsKey(sn.hash) &&
-					tentativeGScore >= openSetMap.get(sn.hash).gScore) {
+				if (openSetMap.containsKey(snEndHash) &&
+					tentativeGScore >= openSetMap.get(snEndHash).gScore) {
 					continue;
-				} else {
-					//Update the edges position in the priority queue
-					//by updating the scores and taking it in and out of the queue.
-					openSet.remove(sn);
-					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
-					sn.parent = current;
-					openSet.add(sn);
-					openSetMap.put(sn.hash, sn);
-				}				
+				} 
+				
+				//Update the edges position in the priority queue
+				//by updating the scores and taking it in and out of the queue.
+				openSet.remove(sn);
+				sn.gScore = tentativeGScore;
+				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+				sn.parent = current;
+				openSet.add(sn);
+				openSetMap.put(snEndHash, sn);			
 			}
 		}
 		// No solution was found
