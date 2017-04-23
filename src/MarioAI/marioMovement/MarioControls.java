@@ -17,7 +17,7 @@ public class MarioControls {
 	private static final double MIN_MARIO_SPEED = 0.0375f;
 	private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.351f;
-	private static final float MARIO_START_X_POS = 2f;
+	private static final float MARIO_START_X_POS = 1.5f;
 		
 	
 	private int ticksOnThisEdge = 0;
@@ -135,6 +135,7 @@ public class MarioControls {
 		if (!next.equals(prevEdge)) {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
+ 			next.getMoveInfo().reset();
 		}
 		else {
 			ticksOnThisEdge++;
@@ -146,6 +147,7 @@ public class MarioControls {
 		if (next.getMoveInfo().getMoveTime() < ticksOnThisEdge) {
 			path.remove(0);
 			next = path.get(0);
+			next.getMoveInfo().reset();
 			prevEdge = next;
 			ticksOnThisEdge = 0;
 		}
@@ -198,7 +200,9 @@ public class MarioControls {
 	private static YMovementInformation getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final ArrayList<Float> yPositions = new ArrayList<Float>(); 
-			final float jumpHeight = targetJumpHeight;
+			//0.0625 is because marios y value isn't an integer but that number less
+			//than expected so to jump high enough it has to be added
+			final float jumpHeight = targetJumpHeight + 0.0625f;
 			final float fallTo = Math.round(marioYPos) - targetYPos;
 			
 			//Numbers are taken from mario class in the game

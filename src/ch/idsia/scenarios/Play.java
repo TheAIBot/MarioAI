@@ -22,7 +22,7 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("flatWithJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
-			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();

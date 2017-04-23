@@ -69,18 +69,28 @@ public class MovementInformation {
 		return combinedPositions;
 	}
 	
+	private int heldUp = 0;
+	private int heldDirection = 0;
+	
+	public void reset() {
+		heldUp = ticksHoldingJump;
+		heldDirection = ticksDeaccelerating + ticksAccelerating;
+	}
+	
 	public boolean[] getActionsFromTick(int tick) {
 		final boolean[] actions = new boolean[Environment.numberOfButtons];
 		
 		if (totalTicksXMoved > 0) {
 			final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-			if (tick < ticksDeaccelerating + ticksAccelerating) {
+			if (heldDirection > 0) {
 				actions[buttonXMovement] = true;
+				heldDirection--;
 			}	
 		}
 		if (totalTicksJumped > 0) {
-			if (tick < ticksHoldingJump) {
+			if (heldUp > 0) {
 				actions[Mario.KEY_JUMP] = true;
+				heldUp--;
 			}	
 		}
 		
