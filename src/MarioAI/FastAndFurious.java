@@ -58,13 +58,13 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawMarioNode(observation, graph.getMarioNode(observation));
 			}
 			
-			if (newestPath == null || newestPath.size() == 0) {
+			if (newestPath == null || newestPath.size() < 2) {
 				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation)); // TODO probably not nessesary
 				newestPath = getPath(observation);
 			}
 			
-			if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
-				if (MarioControls.reachedNextNode(observation, newestPath) && graph.goalNodesChanged() || 
+			if (newestPath != null && newestPath.size() > 1) { //TODO Must also allowed to be 1, but adding this gives an error
+				if (/*MarioControls.reachedNextNode(observation, newestPath) && */graph.goalNodesChanged() || 
 					newestPath.size() > 0 && MarioControls.isPathInvalid(observation, newestPath) ||
 					enemyPredictor.hasNewEnemySpawned()) {
 					newestPath = getPath(observation);

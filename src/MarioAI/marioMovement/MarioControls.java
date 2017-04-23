@@ -43,7 +43,7 @@ public class MarioControls {
 		xTime = 0;
 		xHoldTime = 0;
 	}
-	
+	/*
 	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -59,6 +59,7 @@ public class MarioControls {
 	private static float distanceBetween(float x1, float y1, int x2, int y2) {
 		return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 	}
+	*/
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
 		if (edge instanceof RunningEdge) {
@@ -145,6 +146,8 @@ public class MarioControls {
 		if (next.getMoveInfo().getMoveTime() < ticksOnThisEdge) {
 			path.remove(0);
 			next = path.get(0);
+			prevEdge = next;
+			ticksOnThisEdge = 0;
 		}
 		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
 		
@@ -269,7 +272,7 @@ public class MarioControls {
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 2);
+		neededXDistance = Math.abs(neededXDistance);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
