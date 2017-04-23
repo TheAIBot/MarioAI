@@ -3,6 +3,8 @@ package MarioAI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -39,10 +41,14 @@ public final class AStar {
 		}
 		goalX += 50;
 		
-		Node goal = new Node((short) goalX, (short) 2, (byte) 3);
-		for (Node node : rightmostNodes) {
+		final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
+		final DirectedEdge[] addedEdges = new DirectedEdge[rightmostNodes.length];
+		for (int i = 0; i < rightmostNodes.length; i++) {
+			final Node node = rightmostNodes[i];
 			if (node != null) {
-				node.addEdge(new Running(node, goal));
+				Running edge = new Running(node, goal);
+				node.addEdge(edge);
+				addedEdges[i] = edge;
 			}
 		}
 
@@ -51,15 +57,16 @@ public final class AStar {
 										   			  new SpeedNode(goal, Long.MIN_VALUE),
 										   			  enemyPredictor, 
 										   			  marioHeight);
+		//speedNodes.remove(Long.MAX_VALUE);
+		//speedNodes.remove(Long.MIN_VALUE);
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
-
-		for (Node node : rightmostNodes) {
+		
+		for (int i = 0; i < rightmostNodes.length; i++) {
+			final Node node = rightmostNodes[i];
 			if (node != null) {
-				//remove the last edge as that's the edge to the goal
-				//because it was the first added edge
-				node.removeEdge(node.edges.get(node.edges.size() - 1));
+				node.removeEdge(addedEdges[i]);
 			}
 		}
 		return path;
@@ -74,7 +81,7 @@ public final class AStar {
 	 */
 	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight) {
 		// Set of nodes already explored
-		final Map<Long, SpeedNode> closedSetMap = new HashMap<Long, SpeedNode>();
+		final HashSet<Integer> closedSet = new HashSet<Integer>();
 		// Set of nodes yet to be explored
 		final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 		final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
@@ -99,7 +106,8 @@ public final class AStar {
 			//System.out.println("Current node edges:");
 			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
-			closedSetMap.put(current.hash, current);
+			final int endHash = Hasher.hashEndSpeedNode(current);
+			closedSet.add(endHash);
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
@@ -108,8 +116,7 @@ public final class AStar {
 				
 				if (!sn.isSpeedNodeUseable()) {
 					continue;
-				}
-				
+				}				
 				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
@@ -117,7 +124,8 @@ public final class AStar {
 				
 				//If a similar enough node has already been run through
 				//no need to add this one at that point
-				if (closedSetMap.containsKey(sn.hash)) {
+				final int snEndHash = Hasher.hashEndSpeedNode(sn);
+				if (closedSet.contains(snEndHash)) {
 					continue;
 				}
 				
@@ -136,6 +144,7 @@ public final class AStar {
 					openSet.remove(sn);
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(sn.hash, sn);
 				}				

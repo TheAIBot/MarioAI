@@ -59,7 +59,7 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawEdges(observation, graph.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, graph);
 				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
-				DebugDraw.drawEnemies(observation, enemyPredictor);
+				//DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, graph.getMarioNode(observation));
 			}
 			

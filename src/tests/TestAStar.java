@@ -69,12 +69,14 @@ public class TestAStar {
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
 	}
 	
+	@Test
 	public void testTakeFastestJump(){
-		setup("flatWithWall", true);
+		setup("flatWithJump", false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
+		assertEquals(1, path.stream().filter(edge -> edge instanceof SecondOrderPolynomial).count());
 		TestTools.runWholeLevel(observation);
 		
 	}
@@ -135,16 +137,9 @@ public class TestAStar {
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		
-		//for (DirectedEdge edge : path) {
-			//assertFalse(edge.target.x == 6);
-		//}
-		
-		int c = 0;
-		for (Node node : graph.getGoalNodes(0)) {
-			//if (node.equals(path.get(path.size()-1))) c++;
+		for (DirectedEdge edge : path) {
+			assertFalse(edge.target.x == 6);
 		}
-		//assertEquals(1, c);
-		
 	}
 
 	@Test
