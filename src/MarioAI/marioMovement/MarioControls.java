@@ -258,12 +258,11 @@ public class MarioControls {
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance);
+		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 2);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
 		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
-		float oldDistanceToTarget = distanceToTarget;
 		while (distanceToTarget > ACCEPTED_DEVIATION) {
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
@@ -271,13 +270,19 @@ public class MarioControls {
 			totalTicks++;
 			ticksAccelerating++;
 			
-			oldDistanceToTarget = distanceToTarget;
+			final float oldDistanceToTarget = distanceToTarget;
 			distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
 			
 			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget)) {
 				break;
 			}
 		}
+		
+		speed = getNextTickSpeed(speed);
+		distanceMoved += speed;
+		xPositions.add(distanceMoved);
+		totalTicks++;
+		ticksAccelerating++;
 		
 		final int ticksDrifting = Math.max(0, airTime - totalTicks);
 		
