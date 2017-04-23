@@ -1,25 +1,25 @@
 package tests;
 
-import org.junit.Assert.*;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
-import org.junit.*;
+
 import MarioAI.AStar;
-import MarioAI.FastAndFurious;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.EnemyType;
-import MarioAI.graph.Graph;
-import MarioAI.graph.Grapher;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.JumpingEdge;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.NodeCreator;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -28,8 +28,8 @@ import ch.idsia.mario.environments.Environment;
 public class TestAStar {
 	Agent agent;
 	Environment observation;
-	Graph graph;
-	Grapher grapher;
+	NodeCreator graph;
+	EdgeCreator edgeCreator;
 	final float delta = 0.05f;
 	Node marioNode;
 
@@ -42,12 +42,11 @@ public class TestAStar {
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
-		graph = new Graph();
+		graph = new NodeCreator();
+		edgeCreator = new EdgeCreator();
 		graph.createStartGraph(observation);
-		grapher = new Grapher();
-		grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		edgeCreator.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 		marioNode = graph.getMarioNode(observation);
-		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	}
 	
 	/**
@@ -63,7 +62,7 @@ public class TestAStar {
 		assertTrue(path != null);
 		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
-			assertTrue(directedEdge instanceof Running);
+			assertTrue(directedEdge instanceof RunningEdge);
 		}
 		assertEquals(12, path.get(path.size() - 1).target.x); //Correct x end destination
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
@@ -76,7 +75,7 @@ public class TestAStar {
 		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
-		assertEquals(1, path.stream().filter(edge -> edge instanceof SecondOrderPolynomial).count());
+		assertEquals(1, path.stream().filter(edge -> edge instanceof JumpingEdge).count());
 		TestTools.runWholeLevel(observation);
 		
 	}
@@ -101,11 +100,11 @@ public class TestAStar {
 		
 		
 		for (int i = 0; i < 3; i++) { //Jumping edges
-			assertTrue(path.get(i) instanceof SecondOrderPolynomial);
+			assertTrue(path.get(i) instanceof JumpingEdge);
 		}
 		
 		for (int i = 4; i < path.size(); i++) { //Running
-			assertTrue(path.get(i) instanceof Running);
+			assertTrue(path.get(i) instanceof RunningEdge);
 			
 		}		
 		
@@ -169,12 +168,12 @@ public class TestAStar {
 		
 		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 		marioNode = graph.getMarioNode(observation);
-		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); 
+		JumpingEdge polynomial = new JumpingEdge(null, null); 
 		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
-		grapher.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
+		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
 		
 		assertEquals(1, edges.size());
-		SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edges.get(0);		
+		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);		
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
@@ -217,12 +216,12 @@ public class TestAStar {
 		
 		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 		marioNode = graph.getMarioNode(observation);
-		SecondOrderPolynomial polynomial = new SecondOrderPolynomial(null, null); 
+		JumpingEdge polynomial = new JumpingEdge(null, null); 
 		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
-		grapher.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
+		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
 		
 		assertEquals(1, edges.size());
-		SecondOrderPolynomial polynomialEdge = (SecondOrderPolynomial) edges.get(0);		
+		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);		
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		

@@ -11,7 +11,6 @@ public class BulletBillSimulator extends EnemySimulator
         this.x = x;
         this.y = y;
         
-        this.ya = -5;
         this.facing = dir;
     }
 

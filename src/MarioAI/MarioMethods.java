@@ -1,8 +1,5 @@
 package MarioAI;
 
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Mario.MODE;
-
 /**
  * Class containing auxiliary getters and setters for info about Mario
  */

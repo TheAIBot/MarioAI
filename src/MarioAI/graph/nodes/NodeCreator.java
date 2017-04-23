@@ -1,12 +1,11 @@
-package MarioAI.graph;
+package MarioAI.graph.nodes;
 
 import java.util.HashMap;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
-public class Graph {
+public class NodeCreator {
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;

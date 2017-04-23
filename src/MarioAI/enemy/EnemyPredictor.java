@@ -16,12 +16,12 @@ import ch.idsia.mario.engine.sprites.Sprite;
 
 public class EnemyPredictor {
 	
-	private static final int FLOATS_PER_ENEMY = 3;
-	private static final int TYPE_OFFSET = 0;
-	private static final int X_OFFSET = 1;
-	private static final int Y_OFFSET = 2;
+	public static final int FLOATS_PER_ENEMY = 3;
+	public static final int TYPE_OFFSET = 0;
+	public static final int X_OFFSET = 1;
+	public static final int Y_OFFSET = 2;
 	private static final int BLOCK_PIXEL_SIZE = 16;
-	private static final int ACCEPTED_POSITION_DEVIATION = 1;
+	public static final int ACCEPTED_POSITION_DEVIATION = 1;
 	
 	private LevelScene levelScene;
 	private HashMap<Integer, ArrayList<Point2D.Float>> oldEnemyInfo;
@@ -35,6 +35,10 @@ public class EnemyPredictor {
 	}
 	
 	public boolean hasEnemy(final float marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
+		//b
+		final float marioX1 = marioX2 - marioWidth;
+		final float marioY1 = marioY2 - marioHeight;
+		
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a
@@ -43,12 +47,8 @@ public class EnemyPredictor {
 			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
 			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
-			//b
-			final float marioX1 = marioX2 - marioWidth;
-			final float marioY1 = marioY2 - marioHeight;
 			
-			
-			//check if the rectangle of mario intersects with the enemy rectangle
+			//check if the rectangle of mario intersects with the enemys rectangle
 			if (enemyX1 <= marioX2 && 
 				enemyX2 >= marioX1 &&
 				enemyY1 <= marioY2 &&

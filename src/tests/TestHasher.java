@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 
 public class TestHasher {
@@ -52,7 +52,7 @@ public class TestHasher {
 							//Type does not matter
 							final Node source = new Node(sourceX, sourceY, (byte)10);
 							final Node target = new Node(targetX, targetY, (byte)10);
-							final SecondOrderPolynomial newPolynomial = new SecondOrderPolynomial(source,target, sourceY + JumpHeight);
+							final JumpingEdge newPolynomial = new JumpingEdge(source,target, sourceY + JumpHeight);
 							allRunningEdgesHashes.add(newPolynomial.hashCode());
 						}						
 					}
@@ -86,7 +86,7 @@ public class TestHasher {
 			for (short sourceX = 0; sourceX <= limitX; sourceX++) {						
 				for (short targetY = 0; targetY <= limitY; targetY++) {
 					for (short targetX = 0; targetX <= limitX; targetX++) {
-						final Running run = new Running(new Node(sourceX, sourceY, (byte)10), 
+						final RunningEdge run = new RunningEdge(new Node(sourceX, sourceY, (byte)10), 
 		                        				  		new Node(targetX, targetY, (byte)10));
 						allRunningEdgesHashcodes.add(run.hashCode());
 						
