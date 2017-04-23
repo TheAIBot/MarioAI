@@ -165,6 +165,10 @@ public final class AStar {
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return speedNodes;
+	}
 
 	/**
 	 * @param current

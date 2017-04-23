@@ -5,11 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
 import MarioAI.AStar;
+import MarioAI.Hasher;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.EnemyType;
@@ -23,10 +26,11 @@ import MarioAI.graph.nodes.NodeCreator;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
-	Agent agent;
+	UnitTestAgent agent = new UnitTestAgent();
 	Environment observation;
 	NodeCreator graph;
 	EdgeCreator edgeCreator;
@@ -38,7 +42,6 @@ public class TestAStar {
 	}
 	
 	public void setup(String levelName, boolean showLevel) {
-		agent = new UnitTestAgent();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
@@ -110,6 +113,37 @@ public class TestAStar {
 		
 		// TODO Bug: Mario thinks he can jump through one layer wall
 		// TODO Bug: Mario not finding path at first A* call (in the next call, however, he finds the solution path)
+	}
+	
+	@Test
+	public void testNumberOfSpeedNodes() {
+		setup("TestAStarJump", false);
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		AStar aStar = new AStar();
+		
+		Map<Long, SpeedNode> speedNodes = aStar.getSpeedNodes();
+		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
+		final int MAX_NUMBER_OF_SPEED_NODES = Hasher.FACTOR_NUMBER_OF_SPEED_NODES * 2 + 1;
+		final int NUMBER_OF_TEST_TICKS = 100;
+		
+		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
+			TestTools.runOneTick(observation);
+			agent.action[Mario.KEY_RIGHT] = true;
+			aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+			
+			for (SpeedNode speedNode : speedNodes.values()) {
+				int hashCode = speedNode.node.hashCode();
+				if (numberOfNodesMap.containsKey(hashCode)) {
+					int number = numberOfNodesMap.get(hashCode);
+					numberOfNodesMap.put(hashCode, number+1);
+					//assertTrue(number <= MAX_NUMBER_OF_SPEED_NODES);
+				}
+				else numberOfNodesMap.put(hashCode, 1);
+			}
+		}
+		assertTrue("Maximum number " + numberOfNodesMap.values().stream().max(Integer::compare).get()
+					+ "instead of" + MAX_NUMBER_OF_SPEED_NODES,
+					numberOfNodesMap.values().stream().allMatch(x -> x <= MAX_NUMBER_OF_SPEED_NODES));
 	}
 	
 	// === Tests with enemies ===
