@@ -86,7 +86,7 @@ public final class AStar {
 		final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 		// Initialization
 		openSet.add(start);
-		openSetMap.put(0, start);
+		openSetMap.put(Integer.MAX_VALUE, start);
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);

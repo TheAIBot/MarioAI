@@ -100,7 +100,7 @@ public class TestMarioMovements {
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
+		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0);
@@ -138,6 +138,7 @@ public class TestMarioMovements {
 		testJumpTime(5.6f, -4);
 	}
 	private void testJumpTime(float jumpHeight, int heightDifference) {
+		/*
 		final UnitTestAgent agent = new UnitTestAgent();		
 		String levelPath = "jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl";
 		Environment observation = TestTools.loadLevel(levelPath, agent, false);
@@ -175,7 +176,7 @@ public class TestMarioMovements {
 		final Node endNode   = new Node((short)endMarioXPos  , (short)Math.round(endMarioYPos)  , (byte)0);
 		JumpingEdge edge = new JumpingEdge(startNode, endNode);
 		
-		/*
+		
 		edge.setTopPoint(0, Math.round(startMarioYPos) + jumpHeight);
 		MovementInformation moveInfo = MarioControls.getStepsAndSpeedAfterJump(edge, 0);
 		
