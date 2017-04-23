@@ -3,6 +3,7 @@ package MarioAI.graph.edges;
 import java.util.*;
 
 import MarioAI.graph.Collision;
+import MarioAI.graph.Function;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.nodes.Node;
 
@@ -115,7 +116,7 @@ public  class EdgeCreator {
 		}
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			//Run to the left:
-			//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
 		}	else {
 			foundAllEdges = false;
 		}
@@ -131,14 +132,14 @@ public  class EdgeCreator {
 	public boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		JumpingEdge polynomial = new JumpingEdge(null, null); //The jump polynomial.
 		boolean foundAllEdges = true;
-		for (int jumpHeight = (int) MAX_JUMP_HEIGHT; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { //TODO test only jumprange = 6, no running.
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
 				//TODO temp no left jump (*)
-				//polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				//foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
 			}
 		}
 		return foundAllEdges;
@@ -202,9 +203,21 @@ public  class EdgeCreator {
 		}
 		return false;
 	}
-		
+				
+	public static Collision ascendingNoncollidingFunction( int formerLowerYPosition, int bound, int currentXPosition, 
+																	Collision collisionDetection, JumpDirection direction){
+		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, null, direction, null, null, true, false);
+	}
+	
 	private Collision ascendingPolynomial(int formerLowerYPosition, int bound, int currentXPosition, Collision collisionDetection,
 												 JumpingEdge polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
+		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, direction, startingPosition, listOfEdges, false, true);
+	}
+	
+	public static Collision ascendingFunction(int formerLowerYPosition, int bound, int currentXPosition, 
+													Collision collisionDetection, JumpingEdge polynomial, JumpDirection direction, 
+													Node startingPosition, List<DirectedEdge> listOfEdges,
+													boolean stopAtAnyCollision, boolean addEdges) {
 		boolean isHittingWall = false;		
 		for (int y = formerLowerYPosition; y >= Math.max(bound, 0); y--) {
 			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  (y, currentXPosition, collisionDetection, direction);
@@ -216,14 +229,19 @@ public  class EdgeCreator {
 				collisionDetection = Collision.HIT_CEILING;
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
-					   lowerFacingMarioCorner == Collision.HIT_GROUND) {
+						  lowerFacingMarioCorner == Collision.HIT_GROUND) {
 				collisionDetection = Collision.HIT_GROUND;
-				listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][y], polynomial));
+				if (addEdges) {
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][y], polynomial));
+				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
-					   lowerFacingMarioCorner == Collision.HIT_WALL) {
+				lowerFacingMarioCorner == Collision.HIT_WALL) {
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
+				if (stopAtAnyCollision) {
+					break;
+				}
 				//No break.
 			}
 		}

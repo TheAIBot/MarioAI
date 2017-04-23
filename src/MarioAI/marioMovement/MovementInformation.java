@@ -3,10 +3,11 @@ package MarioAI.marioMovement;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import MarioAI.graph.Function;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
-public class MovementInformation {
+public class MovementInformation implements Function{
 	//vertical information
 	private final int ticksHoldingJump;
 	private final int totalTicksJumped;
@@ -113,5 +114,10 @@ public class MovementInformation {
 	
 	public Point2D.Float[] getPositions() {
 		return positions;
+	}
+
+	@Override
+	public float f(float x) {
+		return 0;
 	}
 }

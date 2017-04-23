@@ -52,8 +52,8 @@ public final class AStar {
 		}
 
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, Long.MAX_VALUE), 
-										   			  new SpeedNode(goal, Long.MIN_VALUE),
+		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), 
+										   			  new SpeedNode(goal, 0, Long.MIN_VALUE),
 										   			  enemyPredictor, 
 										   			  marioHeight);
 		//speedNodes.remove(Long.MAX_VALUE);
@@ -86,14 +86,14 @@ public final class AStar {
 		final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 		// Initialization
 		openSet.add(start);
-		openSetMap.put(0, start);
+		openSetMap.put(Integer.MAX_VALUE, start);
 		start.gScore = 0;
 		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
 		
 		while (!openSet.isEmpty()) {
-			System.out.println("Current open set:");
-			System.out.println(openSet);
+			//System.out.println("Current open set:");
+			//System.out.println(openSet);
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
@@ -102,25 +102,29 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-			System.out.println("Current node:");
-			System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-			System.out.println("Current node edges:");
-			System.out.println(current.node.edges + "\n");
+			//System.out.println("Current node:");
+			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
+			//System.out.println("Current node edges:");
+			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
 			final int endHash = Hasher.hashEndSpeedNode(current);
 			closedSet.add(endHash);
-			System.out.println(openSet.size()); //Used to check how AStar performs.
+			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {			
 				final SpeedNode sn = getSpeedNode(neighborEdge, current);
 				
-				System.out.println("Current edge: ");
-				System.out.println(neighborEdge + "\n");
+				//System.out.println("Current edge: ");
+				//System.out.println(neighborEdge + "\n");
 				
 				if (!sn.isSpeedNodeUseable()) {
 					continue;
-				}				
+				}	
+				
+				if (sn.doesSpeedNodeCollide()) {
+					continue;
+				}
 				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
@@ -172,6 +176,10 @@ public final class AStar {
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return speedNodes;
+	}
 
 	/**
 	 * @param current
@@ -191,9 +199,9 @@ public final class AStar {
 		while (currentSpeedNode.parent != null) {
 			currentSpeedNode.use();
 			path.add(currentSpeedNode.ancestorEdge);
-			if (currentSpeedNode.parent.parent == null) {
-				System.out.println("First transition speed: " + currentSpeedNode.vx);				
-			}
+			//if (currentSpeedNode.parent.parent == null) {
+			//	System.out.println("First transition speed: " + currentSpeedNode.vx);				
+			//}
 			currentSpeedNode = currentSpeedNode.parent;
 		}
 		Collections.reverse(path);

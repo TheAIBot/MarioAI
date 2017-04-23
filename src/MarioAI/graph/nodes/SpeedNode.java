@@ -3,11 +3,13 @@ package MarioAI.graph.nodes;
 import java.awt.geom.Point2D;
 
 import MarioAI.enemy.EnemyPredictor;
+import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.JumpingEdge;import MarioAI.marioMovement.MarioControls;
+import MarioAI.graph.edges.JumpingEdge;
+import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
-public class SpeedNode implements Comparable<SpeedNode> {
+public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
@@ -23,11 +25,12 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public float fScore = 0;
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
+	private final boolean doesSpeednodeCollide;
 	
-	public SpeedNode(Node node, long hash) {
+	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
-		this.vx = 0;
+		this.vx = vx;
 		this.parent = null;
 		this.parentXPos = node.x;
 		this.parentVx = 0;
@@ -54,6 +57,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable();
 		this.hash = hash;
+		this.doesSpeednodeCollide = collissionDetector();
 	}
 	
 	private boolean determineIfThisNodeIsUseable() {
@@ -128,5 +132,19 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	@Override
 	public String toString() {
 		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
+	}
+
+	public float f(float x) {
+		return moveInfo.f(x);
+	}
+	
+	private boolean collissionDetector(){
+		boolean hasCollided = false;
+		new 
+		return hasCollided;
+	}
+
+	public boolean doesSpeedNodeCollide() {
+		return doesSpeednodeCollide;
 	}
 }
