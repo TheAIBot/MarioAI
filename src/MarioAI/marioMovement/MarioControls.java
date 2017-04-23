@@ -1,22 +1,13 @@
 package MarioAI.marioMovement;
 
-import java.awt.datatransfer.FlavorTable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.IDREFDatatypeValidator;
-
 import MarioAI.MarioMethods;
-import MarioAI.Pair;
-import MarioAI.graph.GraphMath;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.sprites.Fireball;
 import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Sparkle;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
@@ -58,15 +49,19 @@ public class MarioControls {
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		final DirectedEdge next = path.get(0);
-		if (GraphMath.distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
+		if (distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
 			path.remove(0);
 			return true;
 		}
 		return false;
 	}
 	
+	private static float distanceBetween(float x1, float y1, int x2, int y2) {
+		return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+	}
+	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
-		if (edge instanceof Running) {
+		if (edge instanceof RunningEdge) {
 			return true;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;

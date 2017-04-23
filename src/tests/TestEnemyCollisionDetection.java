@@ -14,12 +14,11 @@ import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
 import MarioAI.enemy.EnemyPredictor;
-import MarioAI.graph.Graph;
-import MarioAI.graph.Grapher;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.*;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
@@ -39,8 +38,8 @@ public class TestEnemyCollisionDetection{
 	MarioControls marioController;
 	Node[][] level;
 	Node marioNode;
-	Graph graph = new Graph();
-	Grapher grapher = new Grapher();
+	NodeCreator graph = new NodeCreator();
+	EdgeCreator grapher = new EdgeCreator();
 	
 	
 	public void startup(){
@@ -59,7 +58,7 @@ public class TestEnemyCollisionDetection{
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		startup();
 		List<DirectedEdge> Path = new ArrayList<DirectedEdge>(); //Lenght 1 path. Testing one edge.
-		SecondOrderPolynomial polynomial =  new SecondOrderPolynomial(marioNode, null);
+		JumpingEdge polynomial =  new JumpingEdge(marioNode, null);
 		List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		polynomial.setToJumpPolynomial(marioNode, 11, 4, 4);
 		grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);

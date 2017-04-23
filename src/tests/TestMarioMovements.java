@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
-import MarioAI.graph.edges.SecondOrderPolynomial;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
@@ -40,7 +40,7 @@ public class TestMarioMovements {
 		
 		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge = new Running(startNode, endNode);
+		final DirectedEdge edge = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		
 		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls, distanceToMove, true);
@@ -77,7 +77,7 @@ public class TestMarioMovements {
 		
 		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos - distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge = new Running(startNode, endNode);
+		final DirectedEdge edge = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		
 		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls, distanceToMove, true);
@@ -102,11 +102,11 @@ public class TestMarioMovements {
 		
 		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge1 = new Running(startNode, endNode);
+		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0);
 		final MovementInformation moveInfo = speedNode1.getMoveInfo();
 		
-		final DirectedEdge edge2 = new Running(endNode, startNode);
+		final DirectedEdge edge2 = new RunningEdge(endNode, startNode);
 		final SpeedNode speedNode2 = new SpeedNode(startNode, null, startMarioXPos + moveInfo.getXMovementDistance(), moveInfo.getEndSpeed(), edge2, 0);
 		
 		testEdgeMovement(observation, edge1, speedNode1.getMoveInfo(), agent, marioControls, distanceToMove, true);
@@ -173,7 +173,7 @@ public class TestMarioMovements {
 		
 		final Node startNode = new Node((short)startMarioXPos, (short)Math.round(startMarioYPos), (byte)0);
 		final Node endNode   = new Node((short)endMarioXPos  , (short)Math.round(endMarioYPos)  , (byte)0);
-		SecondOrderPolynomial edge = new SecondOrderPolynomial(startNode, endNode);
+		JumpingEdge edge = new JumpingEdge(startNode, endNode);
 		
 		/*
 		edge.setTopPoint(0, Math.round(startMarioYPos) + jumpHeight);

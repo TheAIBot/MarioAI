@@ -1,14 +1,12 @@
 package MarioAI;
 
-import com.sun.nio.sctp.SctpStandardSocketOptions.InitMaxStreams;
-
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 
 public class Hasher {
 
-	public static int hashShortPoint(short x, short y) {
-		return x + 1000 * y;
+	public static int hashIntPoint(int x, int y) {
+		return x + Short.MAX_VALUE * y;
 	}
 
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {

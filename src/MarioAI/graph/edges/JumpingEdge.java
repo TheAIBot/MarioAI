@@ -2,9 +2,8 @@ package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
-import MarioAI.marioMovement.MovementInformation;
 
-public class SecondOrderPolynomial extends DirectedEdge {
+public class JumpingEdge extends DirectedEdge {
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.
@@ -19,7 +18,7 @@ public class SecondOrderPolynomial extends DirectedEdge {
 	public int ceiledTopPointX; //TODO change to private after tests.
 	public int ceiledTopPointY; // Ceildes coordinates of the toppunkt
 	
-	public SecondOrderPolynomial(Node source, Node target, SecondOrderPolynomial polynomial) {
+	public JumpingEdge(Node source, Node target, JumpingEdge polynomial) {
 		super(source, target);
 		this.a = polynomial.a;
 		this.b = polynomial.b;
@@ -32,14 +31,14 @@ public class SecondOrderPolynomial extends DirectedEdge {
 		//Needs to be rehashed, as the hash should depend on the height of the jump:
 	}
 
-	public SecondOrderPolynomial(Node source, Node target) {
+	public JumpingEdge(Node source, Node target) {
 		super(source, target);
 		this.a = 0;
 		this.b = 0;
 		this.c = 0;
 	}
 	
-	public SecondOrderPolynomial(Node source, Node target, int ceiledTopPointY) {
+	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
 		this(source, target);
 		this.ceiledTopPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());

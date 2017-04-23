@@ -1,6 +1,7 @@
 package MarioAI.graph.nodes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import MarioAI.Hasher;
 import MarioAI.graph.edges.DirectedEdge;
@@ -8,17 +9,22 @@ import MarioAI.graph.edges.DirectedEdge;
 /**
  * Standard type of node
  */
-public class Node extends SuperNode {
-	public final short x;
-	public final short y;
-	public final byte type;
+public class Node {
+	private final HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer, DirectedEdge>();
+	public final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
+	private boolean allEdgesMade = false;
 	private final int hash;
 	
-	public Node(short x, short y, byte type) {
+	public final byte type;
+	public final int x;
+	public final int y;
+	
+	
+	public Node(int x, int y, byte type) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
-		this.hash = Hasher.hashShortPoint(x, y);
+		this.hash = Hasher.hashIntPoint(x, y);
 	}
 	
 	public void addEdge(DirectedEdge edge) {
@@ -42,11 +48,6 @@ public class Node extends SuperNode {
 	
 	public boolean isConnectingEdge(DirectedEdge edge) {
 		return (edge != null && edgesMap.containsKey(edge.hashCode()));		
-	}
-
-	@Override
-	public ArrayList<DirectedEdge> getEdges() {
-		return edges;
 	}	
 
 	@Override
@@ -81,6 +82,18 @@ public class Node extends SuperNode {
 			}
 		}
 		return count;
+	}
+	
+	public ArrayList<DirectedEdge> getEdges() {
+		return edges;
+	}
+	
+	public boolean isAllEdgesMade() {
+		return allEdgesMade;
+	}
+	
+	public void setIsAllEdgesMade(boolean value) {
+		allEdgesMade = value;
 	}
 
 	@Override

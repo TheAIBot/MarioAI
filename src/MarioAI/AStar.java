@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.Running;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
@@ -46,7 +45,7 @@ public final class AStar {
 		for (int i = 0; i < rightmostNodes.length; i++) {
 			final Node node = rightmostNodes[i];
 			if (node != null) {
-				Running edge = new Running(node, goal);
+				RunningEdge edge = new RunningEdge(node, goal);
 				node.addEdge(edge);
 				addedEdges[i] = edge;
 			}
@@ -101,10 +100,10 @@ public final class AStar {
 			if (current.node.equals(goal.node)) {
 				return reconstructPath(current);
 			}
-			//System.out.println("Current node:");
-			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-			//System.out.println("Current node edges:");
-			//System.out.println(current.node.edges + "\n");
+			System.out.println("Current node:");
+			System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
+			System.out.println("Current node edges:");
+			System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
 			final int endHash = Hasher.hashEndSpeedNode(current);
 			closedSet.add(endHash);

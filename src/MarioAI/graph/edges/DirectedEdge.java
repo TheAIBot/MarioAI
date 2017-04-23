@@ -1,9 +1,6 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
-import MarioAI.Pair;
 import MarioAI.graph.nodes.Node;
-import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
 public abstract class DirectedEdge {
@@ -17,11 +14,12 @@ public abstract class DirectedEdge {
 		this.target = target;
 	}
 	
-	@Override
-	public int hashCode() {
-		return hash;
-	}
+	public abstract float getMaxY();
 	
+	public abstract float getWeight();
+	
+	protected abstract int getExtraEdgeHashcode();
+		
 	@Override
 	public boolean equals(Object b) {
 		if (b == null) {
@@ -34,11 +32,7 @@ public abstract class DirectedEdge {
 			return false;
 		}
 	}
-	
-	public abstract float getMaxY();
-	
-	public abstract float getWeight();
-	
+		
 	public void setMoveInfo(MovementInformation moveInfo) {
 		this.moveInfo = moveInfo;
 	}
@@ -48,14 +42,12 @@ public abstract class DirectedEdge {
 	}
 	
 	@Override
+	public int hashCode() {
+		return hash;
+	}
+	
+	@Override
 	public String toString() {
-		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + Math.round(getMaxY());
+		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + Math.round(getMaxY()) + "\n";
 	}
-		
-	public boolean hasReachedTarget() {
-		return true; //TODO make.
-	}
-	
-	protected abstract int getExtraEdgeHashcode();
-	
 }
