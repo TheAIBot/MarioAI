@@ -64,11 +64,14 @@ public class FastAndFurious implements Agent {
 			}
 			
 			if (newestPath != null && newestPath.size() > 1) { //TODO Must also allowed to be 1, but adding this gives an error
-				if (/*MarioControls.reachedNextNode(observation, newestPath) && */graph.goalNodesChanged() || 
-					newestPath.size() > 0 && MarioControls.isPathInvalid(observation, newestPath) ||
-					enemyPredictor.hasNewEnemySpawned()) {
+				if ((graph.goalNodesChanged() || 
+					 MarioControls.isPathInvalid(observation, newestPath) ||
+					 enemyPredictor.hasNewEnemySpawned()) && 
+					marioController.canUpdatePath) 
+				{
 					newestPath = getPath(observation);
-					graph.setGoalNodesChanged(false);
+					graph.resetGoalNodesChanged();
+					enemyPredictor.resetNewEnemySpawned();
 				}
 				
 				if (newestPath != null && newestPath.size() > 0) {

@@ -39,7 +39,7 @@ public class MovementInformation {
 	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, ArrayList<Float> y, int moveTime) {
 		final Point2D.Float[] combinedPositions = new Point2D.Float[moveTime];
 		
-		for (int i = 0; i < combinedPositions.length; i++) {
+		for (int i = 0; i < Math.max(x.size(), y.size()); i++) {
 			float xPos;
 			float yPos;
 			
@@ -47,7 +47,8 @@ public class MovementInformation {
 				xPos = 0;
 			}
 			else if (x.size() <= i) {
-				xPos = x.get(x.size() - 1);
+				throw new Error("not enough x positions for the movement");
+				//xPos = x.get(x.size() - 1);
 			}
 			else {
 				xPos = x.get(i);
@@ -80,19 +81,19 @@ public class MovementInformation {
 	public boolean[] getActionsFromTick(int tick) {
 		final boolean[] actions = new boolean[Environment.numberOfButtons];
 		
-		if (totalTicksXMoved > 0) {
-			final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-			if (heldDirection > 0) {
-				actions[buttonXMovement] = true;
-				heldDirection--;
-			}	
+		final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+		
+		if (heldDirection > 0) {
+			actions[buttonXMovement] = true;
+			heldDirection--;
+		}	
+		if (tick == getMoveTime() - 1) {
+			actions[buttonXMovement] = true;
 		}
-		if (totalTicksJumped > 0) {
-			if (heldUp > 0) {
-				actions[Mario.KEY_JUMP] = true;
-				heldUp--;
-			}	
-		}
+		if (heldUp > 0) {
+			actions[Mario.KEY_JUMP] = true;
+			heldUp--;
+		}	
 		
 		return actions;
 	}

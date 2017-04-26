@@ -98,7 +98,7 @@ public class TestAStar {
 		assertTrue(path != null);
 		
 		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-		DebugDraw.drawPath(observation, path);
+		DebugDraw.drawPathMovement(observation, path);
 		TestTools.renderLevel(observation);
 		assertEquals(10, path.size());
 		

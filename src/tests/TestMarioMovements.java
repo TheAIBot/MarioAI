@@ -42,6 +42,7 @@ public class TestMarioMovements {
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
+		speedNode.use();
 		
 		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls, distanceToMove, true);
 	}
@@ -79,6 +80,7 @@ public class TestMarioMovements {
 		final Node endNode = new Node((short)(startMarioXPos - distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
+		speedNode.use();
 		
 		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls, distanceToMove, true);
 	}
@@ -104,13 +106,18 @@ public class TestMarioMovements {
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0);
+		speedNode1.use();
 		final MovementInformation moveInfo = speedNode1.getMoveInfo();
 		
 		final DirectedEdge edge2 = new RunningEdge(endNode, startNode);
 		final SpeedNode speedNode2 = new SpeedNode(startNode, null, startMarioXPos + moveInfo.getXMovementDistance(), moveInfo.getEndSpeed(), edge2, 0);
+		speedNode2.use();
+		
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		path.add(edge1);
+		path.add(edge2);
 		
 		testEdgeMovement(observation, edge1, speedNode1.getMoveInfo(), agent, marioControls, distanceToMove, true);
-		testEdgeMovement(observation, edge2, speedNode2.getMoveInfo(), agent, marioControls, distanceToMove, false);
 	}
 	
 	@Test
@@ -149,7 +156,7 @@ public class TestMarioMovements {
 	private void testJumpTime(float jumpHeight, int heightDifference, int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl", agent, true);
+		final Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl", agent, false);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -159,17 +166,20 @@ public class TestMarioMovements {
 		final JumpingEdge edge = new JumpingEdge(startNode, endNode, (int)(jumpHeight));
 		edge.setTopPoint(0, Math.round(startMarioYPos) + jumpHeight);
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
+		speedNode.use();
 		
 		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls, distanceToMove, true);
 	}
 	
 	private void testEdgeMovement(Environment observation, DirectedEdge edge, MovementInformation moveInfo, UnitTestAgent agent, MarioControls marioControls, int distanceToMove, boolean firstEdge) {
-		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		path.add(edge);
-		edge.setMoveInfo(moveInfo);
+		testEdgeMovement(observation, path, moveInfo, agent, marioControls, distanceToMove, firstEdge);
+	}
+	
+	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, MovementInformation moveInfo, UnitTestAgent agent, MarioControls marioControls, int distanceToMove, boolean firstEdge) {
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		if (firstEdge) {
 			agent.action = marioControls.getNextAction(observation, path);

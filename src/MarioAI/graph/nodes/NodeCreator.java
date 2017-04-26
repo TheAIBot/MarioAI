@@ -156,8 +156,8 @@ public class NodeCreator {
 		return goalNodesChanged;
 	}
 	
-	public void setGoalNodesChanged(boolean value) {
-		goalNodesChanged = value;
+	public void resetGoalNodesChanged() {
+		goalNodesChanged = false;
 	}
 	
 	public Node[][] getLevelMatrix(){

@@ -3,6 +3,8 @@ package MarioAI.marioMovement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.xml.internal.ws.api.pipe.NextAction;
+
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
@@ -19,47 +21,39 @@ public class MarioControls {
 	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 1.5f;
 		
+	private static final int NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS = 5;
+	private static final int MAX_JUMP_HEIGHT = 4;
+	private static final int LEVEL_HEIGHT = 15;
+	private static final int NUMBER_OF_DIFFERENT_JUMPS = (LEVEL_HEIGHT + NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS) * NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS;
+	private static final YMovementInformation[] yMovements = new YMovementInformation[NUMBER_OF_DIFFERENT_JUMPS];
+	private static boolean hasCreatedYMovements = false;
 	
 	private int ticksOnThisEdge = 0;
 	private float oldX = MARIO_START_X_POS;
 	private DirectedEdge prevEdge = null;
 	private float currentXSpeed = 0;
+	private boolean firstTick = true;
 	
-	private int jumpTime = 0;
-	private int holdJumpTime = 0;
-	private int xTime = 0;
-	private int xHoldTime = 0;
-	private MovementInformation moveInfo1;
+	public boolean canUpdatePath = false;
 	
-	
+	public MarioControls() {
+		if (!hasCreatedYMovements) {
+			for (int jumpHeightDifference = -LEVEL_HEIGHT; jumpHeightDifference <= MAX_JUMP_HEIGHT; jumpHeightDifference++) {
+				for (int jumpHeight = 0; jumpHeight < NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS; jumpHeight++) {
+					final int index = getIndexForYMovement(jumpHeight, jumpHeightDifference);
+					yMovements[index] = getJumpTime(jumpHeight, jumpHeightDifference, 0);
+				}
+			}
+			hasCreatedYMovements = true;
+		}
+	}
+		
 	public void reset() {
 		ticksOnThisEdge = 0;
 		oldX = MARIO_START_X_POS;
 		prevEdge = null;
 		currentXSpeed = 0;
-		
-		jumpTime = 0;
-		holdJumpTime = 0;
-		xTime = 0;
-		xHoldTime = 0;
 	}
-	/*
-	public static boolean reachedNextNode(Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		
-		final DirectedEdge next = path.get(0);
-		if (distanceBetween(marioXPos, marioYPos, next.target.x, next.target.y) <= MAX_X_VELOCITY / 2) {
-			path.remove(0);
-			return true;
-		}
-		return false;
-	}
-	
-	private static float distanceBetween(float x1, float y1, int x2, int y2) {
-		return (float) Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-	}
-	*/
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
 		if (edge instanceof RunningEdge) {
@@ -71,7 +65,6 @@ public class MarioControls {
 		//the other way around with to the left, and if he stands still,
 		//he can go both ways.
 		//Note, this works as a limitation in his movement pattern.
-		//TODO maybe do so this isn't neccesary.
 		if (!( (distanceToMove < 0 && speed < 0) ||
 			   (distanceToMove > 0 && speed > 0) ||
 			    speed == 0)) {
@@ -92,41 +85,6 @@ public class MarioControls {
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
-		/*
-		final boolean[] actions = new boolean[Environment.numberOfButtons];
-		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		final DirectedEdge next = path.get(0);
-		
-		currentXSpeed = marioXPos - oldX;
-		if (moveInfo1 == null || jumpTime < 0 && xTime <= 0 && observation.isMarioOnGround()) {
-			moveInfo1 = getMovementInformationFromEdge(marioXPos, marioYPos, next.target, next, currentXSpeed);
-			jumpTime = moveInfo1.getTotalTicksJumped();
-			xHoldTime = moveInfo1.getXMovementTime();
-			xTime = moveInfo1.getXMovementTime();
-			holdJumpTime = moveInfo1.getTicksHoldingJump();
-		}
-		
-		if (moveInfo1 != null) {
-			if (holdJumpTime > 0) {
-				actions[Mario.KEY_JUMP] = true;
-				holdJumpTime--;
-			}
-			jumpTime--;
-			
-		
-			if (moveInfo1.getXMovementTime() > 0 && xHoldTime > 0) {
-				final int movementDirection = (next.target.x - marioXPos > 0) ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-				actions[movementDirection] = true;
-				xHoldTime--;
-			}
-			xTime--;
-			oldX = marioXPos;
-		}
-		
-		return actions;
-		*/
-		
 		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 		currentXSpeed = marioXPos - oldX;
 		oldX = marioXPos;
@@ -136,26 +94,32 @@ public class MarioControls {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
  			next.getMoveInfo().reset();
+ 			thisEdgeIsFirst = 0;
 		}
 		else {
 			ticksOnThisEdge++;
 			if (firstTick) {
 				ticksOnThisEdge = 0;
 				firstTick = false;
+				thisEdgeIsFirst = 1;
 			}
 		}
-		if (next.getMoveInfo().getMoveTime() < ticksOnThisEdge) {
+		
+		final int movementTime = next.getMoveInfo().getMoveTime();
+		canUpdatePath = movementTime - thisEdgeIsFirst == ticksOnThisEdge;
+		
+		if (movementTime - thisEdgeIsFirst < ticksOnThisEdge) {
 			path.remove(0);
 			next = path.get(0);
 			next.getMoveInfo().reset();
 			prevEdge = next;
 			ticksOnThisEdge = 0;
+			thisEdgeIsFirst = 0;
 		}
 		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
-		
 	}
 	
-	private boolean firstTick = true;
+	private int thisEdgeIsFirst = 0;
 	
 	public static int getTicksToTarget(float neededXDistance, float speed) {
 		float distanceMoved = 0;
@@ -184,7 +148,13 @@ public class MarioControls {
 	}
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
-		final YMovementInformation jumpInfo = getJumpTime(edge, startY);
+		YMovementInformation jumpInfo;
+		if (edge instanceof RunningEdge) {
+			jumpInfo = getYMovement(0, 0, 0);
+		}
+		else {
+			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
+		}
 		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo);
 	}
 	
@@ -193,8 +163,13 @@ public class MarioControls {
 		return new MovementInformation(xMovementInfo, jumpInfo);
 	}
 	
-	private static YMovementInformation getJumpTime(DirectedEdge next, float marioYPos) {
-		return getJumpTime(next.getMaxY(), next.target.y, marioYPos);
+	private static int getIndexForYMovement(int jumpHeight, int jumpHeightDifference) {
+		return (jumpHeightDifference + LEVEL_HEIGHT) * NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS + jumpHeight;
+	}
+	
+	private static YMovementInformation getYMovement(int jumpHeight, int marioYPos, int targetYPos) {
+		final int index = getIndexForYMovement(jumpHeight, marioYPos - targetYPos);
+		return yMovements[index];
 	}
 	
 	private static YMovementInformation getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
@@ -203,7 +178,7 @@ public class MarioControls {
 			//0.0625 is because marios y value isn't an integer but that number less
 			//than expected so to jump high enough it has to be added
 			final float jumpHeight = targetJumpHeight + 0.0625f;
-			final float fallTo = Math.round(marioYPos) - targetYPos;
+			final float fallTo = Math.round(marioYPos) + targetYPos;
 			
 			//Numbers are taken from mario class in the game
 			//Used for simulating mario's movement.
@@ -254,8 +229,7 @@ public class MarioControls {
 		int totalTicks = 0;
 		int ticksDeaccelerating = 0;
 		//If Mario currently moves the opposite way of the way he should go,
-		//he first needs to deaccelerate:
-		
+		//he first needs to deaccelerate		
 		if ((neededXDistance < 0 && speed > 0) ||
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
@@ -276,7 +250,7 @@ public class MarioControls {
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance);
+		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 2);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
@@ -297,6 +271,7 @@ public class MarioControls {
 		}
 		
 		final int ticksDrifting = Math.max(0, airTime - totalTicks);
+		totalTicks += ticksDrifting;
 		
 		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions);
 		distanceMoved = xPositions.get(xPositions.size() - 1);

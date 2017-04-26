@@ -29,30 +29,6 @@ public class DebugDraw {
 		((MarioComponent) observation).resetDebugGraphics();
 	}
 
-	public static void drawPath(final Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-
-		final ArrayList<Point> pathLines = new ArrayList<Point>();
-		final ArrayList<Point> pathCirclesRunning = new ArrayList<Point>();
-
-		final Point2D.Float marioPoint = new Point2D.Float(marioXPos, marioYPos);
-		convertLevelPointToOnScreenPoint(observation, marioPoint);
-		pathLines.add(new Point((int)marioPoint.x, (int)marioPoint.y));
-
-		for (int i = 0; i < path.size(); i++) {
-			final Node node = path.get(i).target;
-			final Point point = new Point(node.x, node.y);
-
-			convertLevelPointToOnScreenPoint(observation, point);
-			pathLines.add(point);
-			pathCirclesRunning.add(point);
-		}
-
-		addDebugDrawing(observation, new DebugLines(Color.RED, pathLines, 1));
-		addDebugDrawing(observation, new DebugPoints(Color.RED, pathCirclesRunning, 4));
-	}
-	
 	public static void drawPathEdgeTypes(final Environment observation, final List<DirectedEdge> path) {
 		final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
 		final Point2D.Float topStringPosition = new Point2D.Float((marioXPos + 7), 1f);
