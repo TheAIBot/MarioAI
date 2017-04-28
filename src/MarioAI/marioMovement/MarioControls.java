@@ -102,6 +102,7 @@ public class MarioControls {
 				ticksOnThisEdge = 0;
 				firstTick = false;
 				thisEdgeIsFirst = 1;
+				next.getMoveInfo().reset();
 			}
 		}
 		

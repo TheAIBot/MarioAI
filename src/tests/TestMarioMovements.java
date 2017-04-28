@@ -181,11 +181,13 @@ public class TestMarioMovements {
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
+		
 		if (firstEdge) {
 			agent.action = marioControls.getNextAction(observation, path);
 			marioControls.reset();
 			TestTools.runOneTick(observation);	
 		}
+		
 		for (int i = 0; i < moveInfo.getPositions().length; i++) {
 			final Point2D.Float position = moveInfo.getPositions()[i];
 			
