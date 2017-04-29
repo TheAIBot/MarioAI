@@ -3,13 +3,10 @@ package MarioAI.marioMovement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.xml.internal.ws.api.pipe.NextAction;
-
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
@@ -94,33 +91,28 @@ public class MarioControls {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
  			next.getMoveInfo().reset();
- 			thisEdgeIsFirst = 0;
 		}
 		else {
 			ticksOnThisEdge++;
 			if (firstTick) {
 				ticksOnThisEdge = 0;
 				firstTick = false;
-				thisEdgeIsFirst = 1;
 				next.getMoveInfo().reset();
 			}
 		}
 		
 		final int movementTime = next.getMoveInfo().getMoveTime();
-		canUpdatePath = movementTime - thisEdgeIsFirst == ticksOnThisEdge;
+		canUpdatePath = movementTime - 1 == ticksOnThisEdge;
 		
-		if (movementTime - thisEdgeIsFirst < ticksOnThisEdge) {
+		if (movementTime == ticksOnThisEdge) {
 			path.remove(0);
 			next = path.get(0);
 			next.getMoveInfo().reset();
 			prevEdge = next;
 			ticksOnThisEdge = 0;
-			thisEdgeIsFirst = 0;
 		}
 		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
 	}
-	
-	private int thisEdgeIsFirst = 0;
 	
 	public static int getTicksToTarget(float neededXDistance, float speed) {
 		float distanceMoved = 0;
@@ -176,6 +168,7 @@ public class MarioControls {
 	private static YMovementInformation getJumpTime(float targetJumpHeight, float targetYPos, float marioYPos) {
 		if (targetJumpHeight > 0) {
 			final ArrayList<Float> yPositions = new ArrayList<Float>(); 
+			final ArrayList<Boolean> pressJumpButton = new ArrayList<Boolean>();
 			//0.0625 is because marios y value isn't an integer but that number less
 			//than expected so to jump high enough it has to be added
 			final float jumpHeight = targetJumpHeight + 0.0625f;
@@ -196,6 +189,7 @@ public class MarioControls {
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				yPositions.add(currentJumpHeight);
+				pressJumpButton.add(true);
 				jumpTime--;
 				totalTicksJumped++;
 				ticksHoldingJump++;
@@ -218,13 +212,14 @@ public class MarioControls {
 				}	
 			}
 			totalTicksJumped++;
-			return new YMovementInformation(ticksHoldingJump, totalTicksJumped, yPositions);
+			return new YMovementInformation(ticksHoldingJump, totalTicksJumped, yPositions, pressJumpButton);
 		}
-		return new YMovementInformation(0, 0, new ArrayList<Float>());
+		return new YMovementInformation(0, 0, new ArrayList<Float>(), new ArrayList<Boolean>());
 	}
 	
 	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime) {
 		final ArrayList<Float> xPositions = new ArrayList<Float>();
+		final ArrayList<Boolean> pressButton = new ArrayList<Boolean>(); 
 		final boolean distanceIsNegative = neededXDistance < 0;
 		float distanceMoved = 0;
 		int totalTicks = 0;
@@ -235,7 +230,7 @@ public class MarioControls {
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
 			
-			addOnDeaccelerationPositions(speed, xPositions);
+			addOnDeaccelerationPositions(speed, xPositions, pressButton);
 			
 			ticksDeaccelerating = xPositions.size();
 			totalTicks = ticksDeaccelerating;			
@@ -245,7 +240,7 @@ public class MarioControls {
 			//deaccelerated his speed is now 0
 			speed = 0;
 		} else if (neededXDistance == 0) {
-			return new XMovementInformation(0, speed, 0, 0, 0, 0, xPositions);
+			return new XMovementInformation(0, speed, 0, 0, 0, 0, xPositions, pressButton);
 		}
 		int ticksAccelerating = 0;
 		
@@ -260,6 +255,7 @@ public class MarioControls {
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
 			xPositions.add(distanceMoved);
+			pressButton.add(true);
 			totalTicks++;
 			ticksAccelerating++;
 			
@@ -274,7 +270,7 @@ public class MarioControls {
 		final int ticksDrifting = Math.max(0, airTime - totalTicks);
 		totalTicks += ticksDrifting;
 		
-		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions);
+		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
 		distanceMoved = xPositions.get(xPositions.size() - 1);
 		
 		//move the last tick
@@ -284,6 +280,7 @@ public class MarioControls {
 		speed = getNextTickSpeed(speed);
 		distanceMoved += speed;
 		xPositions.add(distanceMoved);
+		pressButton.add(true);
 		totalTicks++;
 		
 		//Put sign back on values as it was lost before
@@ -297,14 +294,15 @@ public class MarioControls {
 			}
 		}
 
-		return new XMovementInformation(distanceMoved, speed, totalTicks, ticksDeaccelerating, ticksAccelerating, ticksDrifting, xPositions);
+		return new XMovementInformation(distanceMoved, speed, totalTicks, ticksDeaccelerating, ticksAccelerating, ticksDrifting, xPositions, pressButton);
 	}
 	
-	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions) {
+	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton) {
 		final ArrayList<Float> xDeaccelerationPositions = getDeaccelerationPositions(speed);
 		
 		for (int i = 0; i < xDeaccelerationPositions.size(); i++) {
 			xPositions.add(-xDeaccelerationPositions.get(i));
+			pressButton.add(true);
 		}	
 	}
 			
@@ -336,12 +334,13 @@ public class MarioControls {
 		return driftDistance;
 	}
 	
-	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, ArrayList<Float> xPositions) {
+	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton) {
 		final ArrayList<Float> driftPositions = getDriftingPositions(speed, driftTime);
 		final float startXPosition = distanceMoved;
 		
 		for (int i = 0; i < driftPositions.size(); i++) {
 			xPositions.add(startXPosition + driftPositions.get(i));
+			pressButton.add(false);
 		}
 		return getLastSpeedDrifting(speed, distanceMoved, driftPositions);
 	}

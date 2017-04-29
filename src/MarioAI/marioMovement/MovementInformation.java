@@ -18,6 +18,8 @@ public class MovementInformation {
 	private final int ticksDeaccelerating;
 	private final int ticksAccelerating;
 	private final int ticksDrifting;
+	private final boolean[] pressXButton;
+	private final boolean[] pressYButton;
 	
 	//position information
 	private final Point2D.Float[] positions;
@@ -32,6 +34,15 @@ public class MovementInformation {
 		
 		this.ticksHoldingJump = yMoveInfo.ticksHoldingJump;
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
+		
+		this.pressXButton = new boolean[getMoveTime()];
+		for (int i = 0; i < xMoveInfo.pressXButton.size(); i++) {
+			pressXButton[i] = xMoveInfo.pressXButton.get(i);
+		}
+		this.pressYButton = new boolean[getMoveTime()];
+		for (int i = 0; i < yMoveInfo.pressYButton.size(); i++) {
+			pressYButton[i] = yMoveInfo.pressYButton.get(i);
+		}
 		
 		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
 	}
@@ -82,18 +93,9 @@ public class MovementInformation {
 		final boolean[] actions = new boolean[Environment.numberOfButtons];
 		
 		final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
+		actions[buttonXMovement] = pressXButton[tick];
 		
-		if (heldDirection > 0) {
-			actions[buttonXMovement] = true;
-			heldDirection--;
-		}	
-		if (tick == getMoveTime() - 1) {
-			actions[buttonXMovement] = true;
-		}
-		if (heldUp > 0) {
-			actions[Mario.KEY_JUMP] = true;
-			heldUp--;
-		}	
+		actions[Mario.KEY_JUMP] = pressYButton[tick];
 		
 		return actions;
 	}
