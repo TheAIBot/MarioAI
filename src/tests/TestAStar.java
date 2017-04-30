@@ -92,7 +92,7 @@ public class TestAStar {
 		setup("TestAStarJump", false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 
 		//TestTools.runOneTick(observation);
 		assertTrue(path != null);

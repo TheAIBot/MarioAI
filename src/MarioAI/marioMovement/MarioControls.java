@@ -7,14 +7,18 @@ import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
+import ch.idsia.mario.engine.GlobalOptions;
+import ch.idsia.mario.engine.sprites.Fireball;
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.engine.sprites.Sparkle;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
 	
 	public static final float ACCEPTED_DEVIATION = 0.0002f;
 	
-	private static final double MIN_MARIO_SPEED = 0.0375f;
-	private static final int MAX_JUMP_TIME = 8;
+	private static final double MIN_MARIO_SPEED = 0.03125f;//0.0375f;
+	//private static final int MAX_JUMP_TIME = 8;
 	private static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 1.5f;
 		
@@ -29,7 +33,7 @@ public class MarioControls {
 	private float oldX = MARIO_START_X_POS;
 	private DirectedEdge prevEdge = null;
 	private float currentXSpeed = 0;
-	private boolean firstTick = true;
+	private boolean[] actions = new boolean[Environment.numberOfButtons];
 	
 	public boolean canUpdatePath = false;
 	
@@ -87,31 +91,24 @@ public class MarioControls {
 		oldX = marioXPos;
 		
 		DirectedEdge next = path.get(0);
+		int movementTime = next.getMoveInfo().getMoveTime();
+		if (movementTime == ticksOnThisEdge + 1) {
+			path.remove(0);
+			next = path.get(0);
+			movementTime = next.getMoveInfo().getMoveTime();
+		}
+		
 		if (!next.equals(prevEdge)) {
 			ticksOnThisEdge = 0;
  			prevEdge = next;
- 			next.getMoveInfo().reset();
 		}
 		else {
 			ticksOnThisEdge++;
-			if (firstTick) {
-				ticksOnThisEdge = 0;
-				firstTick = false;
-				next.getMoveInfo().reset();
-			}
 		}
 		
-		final int movementTime = next.getMoveInfo().getMoveTime();
-		canUpdatePath = movementTime - 1 == ticksOnThisEdge;
-		
-		if (movementTime == ticksOnThisEdge) {
-			path.remove(0);
-			next = path.get(0);
-			next.getMoveInfo().reset();
-			prevEdge = next;
-			ticksOnThisEdge = 0;
-		}
-		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge);
+		canUpdatePath = movementTime == ticksOnThisEdge + 1;
+
+		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
 	}
 	
 	public static int getTicksToTarget(float neededXDistance, float speed) {
@@ -177,44 +174,38 @@ public class MarioControls {
 			//Numbers are taken from mario class in the game
 			//Used for simulating mario's movement.
 			final float yJumpSpeed = 1.9f;
-			float jumpTime = 8;
 			float currentJumpHeight = 0;
 			int totalTicksJumped = 0;
-			int ticksHoldingJump = 0;
 			float prevYDelta = 0;
 			
 			//Calculate ticks for jumping up to desired height
-			for (int i = 0; i < MAX_JUMP_TIME; i++) {
+			for (int jumpTime = 8; jumpTime > 0; jumpTime--) {
 				//Math derived from mario code
 				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				yPositions.add(currentJumpHeight);
 				pressJumpButton.add(true);
-				jumpTime--;
 				totalTicksJumped++;
-				ticksHoldingJump++;
 				if (currentJumpHeight >= jumpHeight) {
 					break;
 				}
 			}
-			//Calculate ticks for falling down
-			if (currentJumpHeight > fallTo) {				
-				while (currentJumpHeight > fallTo) {
-					//Math derived from mario code
-					prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
-					currentJumpHeight += prevYDelta;
-					if (currentJumpHeight <= fallTo) {
-						yPositions.add(fallTo);
-						break;
-					}
-					yPositions.add(currentJumpHeight);
-					totalTicksJumped++;
-				}	
+			//Calculate ticks for falling down			
+			while (currentJumpHeight > fallTo) {
+				//Math derived from mario code
+				prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
+				currentJumpHeight += prevYDelta;
+				if (currentJumpHeight <= fallTo) {
+					yPositions.add(fallTo);
+					break;
+				}
+				yPositions.add(currentJumpHeight);
+				totalTicksJumped++;
 			}
 			totalTicksJumped++;
-			return new YMovementInformation(ticksHoldingJump, totalTicksJumped, yPositions, pressJumpButton);
+			return new YMovementInformation(totalTicksJumped, yPositions, pressJumpButton);
 		}
-		return new YMovementInformation(0, 0, new ArrayList<Float>(), new ArrayList<Boolean>());
+		return new YMovementInformation(0, new ArrayList<Float>(), new ArrayList<Boolean>());
 	}
 	
 	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime) {
@@ -223,7 +214,6 @@ public class MarioControls {
 		final boolean distanceIsNegative = neededXDistance < 0;
 		float distanceMoved = 0;
 		int totalTicks = 0;
-		int ticksDeaccelerating = 0;
 		//If Mario currently moves the opposite way of the way he should go,
 		//he first needs to deaccelerate		
 		if ((neededXDistance < 0 && speed > 0) ||
@@ -232,17 +222,15 @@ public class MarioControls {
 			
 			addOnDeaccelerationPositions(speed, xPositions, pressButton);
 			
-			ticksDeaccelerating = xPositions.size();
-			totalTicks = ticksDeaccelerating;			
+			totalTicks = xPositions.size();
 			distanceMoved = xPositions.get(xPositions.size() - 1);		
 			
 			//because mario has now completely 
 			//deaccelerated his speed is now 0
 			speed = 0;
 		} else if (neededXDistance == 0) {
-			return new XMovementInformation(0, speed, 0, 0, 0, 0, xPositions, pressButton);
+			return new XMovementInformation(0, speed, 0, xPositions, pressButton);
 		}
-		int ticksAccelerating = 0;
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
@@ -257,7 +245,6 @@ public class MarioControls {
 			xPositions.add(distanceMoved);
 			pressButton.add(true);
 			totalTicks++;
-			ticksAccelerating++;
 			
 			final float oldDistanceToTarget = distanceToTarget;
 			distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
@@ -294,7 +281,7 @@ public class MarioControls {
 			}
 		}
 
-		return new XMovementInformation(distanceMoved, speed, totalTicks, ticksDeaccelerating, ticksAccelerating, ticksDrifting, xPositions, pressButton);
+		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton);
 	}
 	
 	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton) {
@@ -381,4 +368,52 @@ public class MarioControls {
 	public float getXVelocity() {
 		return currentXSpeed;
 	}
+	/*
+	 * ya = 7 * -1.9;
+	 * ya = 7 * -1.9;
+	 * ya = 6 * -1.9;
+	 * ya = 5 * -1.9;
+	 * ya = 4 * -1.9;
+	 * ya = 3 * -1.9;
+	 * ya = 2 * -1.9;
+	 * ya = 1 * -1.9;
+	 * 
+	 * 
+	 * 
+	 */
+	/*
+	public void move() {
+		if (keys[KEY_JUMP]) {
+			if (onGround && mayJump) {
+				xJumpSpeed = 0;
+				yJumpSpeed = -1.9f;
+				jumpTime = 7;
+				ya = jumpTime * yJumpSpeed;
+				onGround = false;
+				sliding = false;
+			}
+			} else if (jumpTime > 0) {
+				xa += xJumpSpeed;
+				ya = jumpTime * yJumpSpeed;
+				jumpTime--;
+			}
+		} else {
+			jumpTime = 0;
+		}
+		
+		//update xy pos
+
+
+		ya *= 0.85f;
+		if (onGround) {
+			xa *= GROUND_INERTIA;
+		} else {
+			xa *= AIR_INERTIA;
+		}
+
+		if (!onGround) {
+			ya += 3;
+		}
+	}
+	*/
 }

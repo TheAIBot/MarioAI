@@ -126,10 +126,22 @@ public class TestAgent implements Agent {
 	}
 	
     public static void main(String[] args) {
-        Agent controller = new TestAgent();
-        Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
-        //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", controller, true);
+    	UnitTestAgent agent = new UnitTestAgent();
+    	Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
+    	float startXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+    	float startYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+    	//agent.action[Mario.KEY_RIGHT] = true;
+    	agent.action[Mario.KEY_JUMP] = true;
+    	TestTools.runOneTick(observation);
+    	float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+    	float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+    	System.out.println((endXPos - startXPos) + ", " + (endYPos - startYPos));
+    	/*
+        Agent agent = new TestAgent();
+        Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
+        //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", agent, true);
         TestTools.runWholeLevel(observation);
+    	 */ 
     }
 
 	public AGENT_TYPE getType() {

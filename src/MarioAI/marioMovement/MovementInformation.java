@@ -8,16 +8,12 @@ import ch.idsia.mario.environments.Environment;
 
 public class MovementInformation {
 	//vertical information
-	private final int ticksHoldingJump;
 	private final int totalTicksJumped;
 	
 	//horizontal information
 	private final float xMovedDistance;
 	private final float endSpeed;
 	private final int totalTicksXMoved;
-	private final int ticksDeaccelerating;
-	private final int ticksAccelerating;
-	private final int ticksDrifting;
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
 	
@@ -28,11 +24,7 @@ public class MovementInformation {
 		this.xMovedDistance = xMoveInfo.xMovedDistance;
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
-		this.ticksDeaccelerating = xMoveInfo.ticksDeaccelerating;
-		this.ticksAccelerating = xMoveInfo.ticksAccelerating;
-		this.ticksDrifting = xMoveInfo.ticksDrifting;
 		
-		this.ticksHoldingJump = yMoveInfo.ticksHoldingJump;
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
 		this.pressXButton = new boolean[getMoveTime()];
@@ -81,16 +73,7 @@ public class MovementInformation {
 		return combinedPositions;
 	}
 	
-	private int heldUp = 0;
-	private int heldDirection = 0;
-	
-	public void reset() {
-		heldUp = ticksHoldingJump;
-		heldDirection = ticksDeaccelerating + ticksAccelerating;
-	}
-	
-	public boolean[] getActionsFromTick(int tick) {
-		final boolean[] actions = new boolean[Environment.numberOfButtons];
+	public boolean[] getActionsFromTick(int tick, boolean[] actions) {
 		
 		final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 		actions[buttonXMovement] = pressXButton[tick];
@@ -110,10 +93,6 @@ public class MovementInformation {
 	
 	public float getEndSpeed() {
 		return endSpeed;
-	}
-	
-	public int getTicksHoldingJump() {
-		return ticksHoldingJump;
 	}
 	
 	public int getTotalTicksJumped() {
