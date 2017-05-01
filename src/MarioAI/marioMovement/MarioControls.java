@@ -1,26 +1,22 @@
 package MarioAI.marioMovement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.sprites.Fireball;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Sparkle;
 import ch.idsia.mario.environments.Environment;
 
 public class MarioControls {
 	
 	public static final float ACCEPTED_DEVIATION = 0.0002f;
 	
-	private static final double MIN_MARIO_SPEED = 0.03125f;//0.0375f;
-	//private static final int MAX_JUMP_TIME = 8;
+	private static final double MIN_MARIO_SPEED = 0.03125f; // 0.5 / 16;
 	private static final float MAX_X_VELOCITY = 0.351f;
-	private static final float MARIO_START_X_POS = 1.5f;
+	private static final float MARIO_START_X_POS = 2;
 		
 	private static final int NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS = 5;
 	private static final int MAX_JUMP_HEIGHT = 4;
@@ -86,29 +82,36 @@ public class MarioControls {
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-		currentXSpeed = marioXPos - oldX;
-		oldX = marioXPos;
-		
-		DirectedEdge next = path.get(0);
-		int movementTime = next.getMoveInfo().getMoveTime();
-		if (movementTime == ticksOnThisEdge + 1) {
-			path.remove(0);
-			next = path.get(0);
-			movementTime = next.getMoveInfo().getMoveTime();
-		}
-		
-		if (!next.equals(prevEdge)) {
-			ticksOnThisEdge = 0;
- 			prevEdge = next;
+		if (path != null) {			
+			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			currentXSpeed = marioXPos - oldX;
+			oldX = marioXPos;
+			
+			DirectedEdge next = path.get(0);
+			int movementTime = next.getMoveInfo().getMoveTime();
+			if (next.equals(prevEdge) && movementTime == ticksOnThisEdge + 1) {
+				path.remove(0);
+				next = path.get(0);
+				movementTime = next.getMoveInfo().getMoveTime();
+			}
+			
+			if (!next.equals(prevEdge)) {
+				ticksOnThisEdge = 0;
+	 			prevEdge = next;
+			}
+			else {
+				ticksOnThisEdge++;
+			}
+			
+			canUpdatePath = movementTime == ticksOnThisEdge + 1;
+
+			next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
 		}
 		else {
-			ticksOnThisEdge++;
+			canUpdatePath = true;
+			Arrays.fill(actions, false);
 		}
-		
-		canUpdatePath = movementTime == ticksOnThisEdge + 1;
-
-		return next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
+		return actions;
 	}
 	
 	public static int getTicksToTarget(float neededXDistance, float speed) {
@@ -123,14 +126,19 @@ public class MarioControls {
 	}
 	
 	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
-		final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-		final DirectedEdge nextEdge = path.get(0);
-		
-		return (nextEdge.target.x == marioXPos &&
-				observation.isMarioOnGround() &&
-				(nextEdge.target.y > marioYPos ||
-				 nextEdge.target.y < marioYPos));
+		if (path != null && path.size() > 1) {
+			final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
+			final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+			final DirectedEdge nextEdge = path.get(0);
+			
+			return (nextEdge.target.x == marioXPos &&
+					observation.isMarioOnGround() &&
+					(nextEdge.target.y > marioYPos ||
+					 nextEdge.target.y < marioYPos));
+		}
+		else {
+			return true;
+		}
 	}
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
@@ -171,9 +179,6 @@ public class MarioControls {
 			final float jumpHeight = targetJumpHeight + 0.0625f;
 			final float fallTo = Math.round(marioYPos) + targetYPos;
 			
-			//Numbers are taken from mario class in the game
-			//Used for simulating mario's movement.
-			final float yJumpSpeed = 1.9f;
 			float currentJumpHeight = 0;
 			int totalTicksJumped = 0;
 			float prevYDelta = 0;
@@ -181,7 +186,7 @@ public class MarioControls {
 			//Calculate ticks for jumping up to desired height
 			for (int jumpTime = 8; jumpTime > 0; jumpTime--) {
 				//Math derived from mario code
-				prevYDelta = (yJumpSpeed * Math.min(jumpTime, 7)) / 16f;
+				prevYDelta = (1.9f * Math.min(jumpTime, 7)) / 16f;
 				currentJumpHeight += prevYDelta;
 				yPositions.add(currentJumpHeight);
 				pressJumpButton.add(true);
@@ -195,14 +200,11 @@ public class MarioControls {
 				//Math derived from mario code
 				prevYDelta = (prevYDelta * 0.85f) - (3f / 16f);
 				currentJumpHeight += prevYDelta;
-				if (currentJumpHeight <= fallTo) {
-					yPositions.add(fallTo);
-					break;
-				}
-				yPositions.add(currentJumpHeight);
 				totalTicksJumped++;
+				//end jump height can't be lower than fallTo because that would mean mario is jumping through the target block
+				currentJumpHeight = (currentJumpHeight <= fallTo) ? fallTo : currentJumpHeight;
+				yPositions.add(currentJumpHeight);
 			}
-			totalTicksJumped++;
 			return new YMovementInformation(totalTicksJumped, yPositions, pressJumpButton);
 		}
 		return new YMovementInformation(0, new ArrayList<Float>(), new ArrayList<Boolean>());

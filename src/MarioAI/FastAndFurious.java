@@ -41,11 +41,20 @@ public class FastAndFurious implements Agent {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 			
 			if (graph.updateMatrix(observation)) {
-				//graph.printMatrix(observation);
-				//long startTime = System.currentTimeMillis();
 				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-				//System.out.println(System.currentTimeMillis() - startTime);
 			}
+			
+			if ((graph.goalNodesChanged() || 
+				 MarioControls.isPathInvalid(observation, newestPath) ||
+				 enemyPredictor.hasNewEnemySpawned()) && 
+				marioController.canUpdatePath) 
+			{
+				newestPath = getPath(observation);
+				graph.resetGoalNodesChanged();
+				enemyPredictor.resetNewEnemySpawned();
+			}
+			
+			action = marioController.getNextAction(observation, newestPath);
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
@@ -56,36 +65,8 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
 				//DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, graph.getMarioNode(observation));
-			}
-			
-			if (newestPath == null || newestPath.size() < 2) {
-				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation)); // TODO probably not nessesary
-				newestPath = getPath(observation);
-			}
-			
-			if (newestPath != null && newestPath.size() > 1) { //TODO Must also allowed to be 1, but adding this gives an error
-				if ((graph.goalNodesChanged() || 
-					 MarioControls.isPathInvalid(observation, newestPath) ||
-					 enemyPredictor.hasNewEnemySpawned()) && 
-					marioController.canUpdatePath) 
-				{
-					newestPath = getPath(observation);
-					graph.resetGoalNodesChanged();
-					enemyPredictor.resetNewEnemySpawned();
-				}
-				
-				if (newestPath != null && newestPath.size() > 0) {
-					action = marioController.getNextAction(observation, newestPath);
-				}
-				
-				if (DEBUG) {
-					//DebugDraw.drawPath(observation, newestPath);
-					DebugDraw.drawPathEdgeTypes(observation, newestPath);
-					DebugDraw.drawPathMovement(observation, newestPath);
-				}
-			}
-			
-			if (DEBUG) {
+				DebugDraw.drawPathEdgeTypes(observation, newestPath);
+				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
 			}
 		}

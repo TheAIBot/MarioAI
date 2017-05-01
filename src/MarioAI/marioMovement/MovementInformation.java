@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.environments.Environment;
 
 public class MovementInformation {
 	//vertical information
@@ -74,6 +73,9 @@ public class MovementInformation {
 	}
 	
 	public boolean[] getActionsFromTick(int tick, boolean[] actions) {
+		if (tick < 0 || tick >= getMoveTime()) {
+			throw new Error("Invalid tick given: " + tick);
+		}
 		
 		final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
 		actions[buttonXMovement] = pressXButton[tick];

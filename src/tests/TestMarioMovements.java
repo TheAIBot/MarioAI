@@ -44,7 +44,7 @@ public class TestMarioMovements {
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		speedNode.use();
 		
-		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls);
+		testEdgeMovement(observation, edge, agent, marioControls);
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class TestMarioMovements {
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		speedNode.use();
 		
-		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls);
+		testEdgeMovement(observation, edge, agent, marioControls);
 	}
 	
 	@Test
@@ -117,7 +117,7 @@ public class TestMarioMovements {
 		path.add(edge1);
 		path.add(edge2);
 		
-		testEdgeMovement(observation, edge1, speedNode1.getMoveInfo(), agent, marioControls);
+		testEdgeMovement(observation, edge1, agent, marioControls);
 	}
 	
 	@Test
@@ -160,7 +160,7 @@ public class TestMarioMovements {
 	private void testJumpTime(float jumpHeight, int heightDifference, int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl", agent, true);
+		final Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl", agent, false);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -172,44 +172,47 @@ public class TestMarioMovements {
 		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		speedNode.use();
 		
-		testEdgeMovement(observation, edge, speedNode.getMoveInfo(), agent, marioControls);
+		testEdgeMovement(observation, edge, agent, marioControls);
 	}
 	
-	private void testEdgeMovement(Environment observation, DirectedEdge edge, MovementInformation moveInfo, UnitTestAgent agent, MarioControls marioControls) {
+	private void testEdgeMovement(Environment observation, DirectedEdge edge, UnitTestAgent agent, MarioControls marioControls) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		path.add(edge);
-		testEdgeMovement(observation, path, moveInfo, agent, marioControls);
+		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
-	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, MovementInformation moveInfo, UnitTestAgent agent, MarioControls marioControls) {
-		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		
-		for (int i = 0; i < moveInfo.getPositions().length; i++) {
-			final Point2D.Float position = moveInfo.getPositions()[i];
+	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
+		for (int z = 0; z < path.size(); z++) {
+			final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			final MovementInformation moveInfo = path.get(0).getMoveInfo();
 			
-			boolean[] newActions = marioControls.getNextAction(observation, path);
-			for (int j = 0; j < newActions.length; j++) {
-				agent.action[j] = newActions[j];
-			}
-			TestTools.runOneTick(observation);
-			
-			final float expectedMarioXPos = startMarioXPos + position.x;
-			final float expectedMarioYPos = startMarioYPos - position.y;
-			
-			final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-			final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-			
-			if (!withinAcceptableError(expectedMarioXPos, expectedMarioYPos, actualMarioXPos, actualMarioYPos)) {
-				final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
-				final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
-				Assert.fail("Mario Wasn't close enough to the expected position" + 
-							"\nxdistance: " + distanceXMoved + 
-							"\nydistance: " + distanceYMoved + 
-							"\njump height: " + path.get(0).getMaxY() + 
-							"\nx: " + (expectedMarioXPos - actualMarioXPos) + 
-							"\ny: " + (expectedMarioYPos - actualMarioYPos) +
-							"\ntick: " + i);
+			for (int i = 0; i < moveInfo.getPositions().length; i++) {
+				final Point2D.Float position = moveInfo.getPositions()[i];
+				
+				boolean[] newActions = marioControls.getNextAction(observation, path);
+				for (int j = 0; j < newActions.length; j++) {
+					agent.action[j] = newActions[j];
+				}
+				TestTools.runOneTick(observation);
+				
+				final float expectedMarioXPos = startMarioXPos + position.x;
+				final float expectedMarioYPos = startMarioYPos - position.y;
+				
+				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+				
+				if (!withinAcceptableError(expectedMarioXPos, expectedMarioYPos, actualMarioXPos, actualMarioYPos)) {
+					final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
+					final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
+					Assert.fail("Mario Wasn't close enough to the expected position" + 
+								"\nxdistance: " + distanceXMoved + 
+								"\nydistance: " + distanceYMoved + 
+								"\njump height: " + path.get(0).getMaxY() + 
+								"\nx: " + (expectedMarioXPos - actualMarioXPos) + 
+								"\ny: " + (expectedMarioYPos - actualMarioYPos) +
+								"\ntick: " + i);
+				}
 			}
 		}
 	}

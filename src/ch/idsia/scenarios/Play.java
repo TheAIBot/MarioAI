@@ -21,7 +21,8 @@ public class Play {
 			// Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("flatWithJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("jumpLevels/3Width.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {

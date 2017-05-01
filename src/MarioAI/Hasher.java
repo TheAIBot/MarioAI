@@ -30,7 +30,7 @@ public class Hasher {
 		return d | c | b | a;
 	}
 	
-	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 20;
+	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
 	public static int hashSpeed(float vx) {
 		return (int)(vx * FACTOR_NUMBER_OF_SPEED_NODES);
 	}

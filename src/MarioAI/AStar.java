@@ -88,7 +88,6 @@ public final class AStar {
 		openSet.add(start);
 		openSetMap.put(Integer.MAX_VALUE, start);
 		start.gScore = 0;
-		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
 		
 		while (!openSet.isEmpty()) {
@@ -106,7 +105,7 @@ public final class AStar {
 			// Current node has been explored.
 			final int endHash = Hasher.hashEndSpeedNode(current);
 			closedSet.add(endHash);
-			System.out.println(openSet.size()); //Used to check how AStar performs.
+			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {			
