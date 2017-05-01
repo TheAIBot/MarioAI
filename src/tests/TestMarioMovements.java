@@ -182,6 +182,8 @@ public class TestMarioMovements {
 	}
 	
 	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
+		float oldMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float actualMarioSpeed = 0;
 		for (int z = 0; z < path.size(); z++) {
 			final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -202,6 +204,9 @@ public class TestMarioMovements {
 				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 				
+				actualMarioSpeed = actualMarioXPos - oldMarioXPos;
+				oldMarioXPos = actualMarioXPos;
+				
 				if (!withinAcceptableError(expectedMarioXPos, expectedMarioYPos, actualMarioXPos, actualMarioYPos)) {
 					final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
 					final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
@@ -214,11 +219,27 @@ public class TestMarioMovements {
 								"\ntick: " + i);
 				}
 			}
+			
+			final float expectedMarioSpeed = moveInfo.getEndSpeed();
+			if (!withinAcceptableError(expectedMarioSpeed, actualMarioSpeed)) {
+				final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
+				final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
+				Assert.fail("Mario Wasn't close enough to the expected position" + 
+							"\nxdistance: " + distanceXMoved + 
+							"\nydistance: " + distanceYMoved + 
+							"\njump height: " + path.get(0).getMaxY() + 
+							"\nspeed diff: " + (expectedMarioSpeed - actualMarioSpeed));
+			}
+			
 		}
 	}
 	
 	private boolean withinAcceptableError(float x1, float y1, float x2, float y2) {
-		return 	Math.abs(x1 - x2) <= MarioControls.ACCEPTED_DEVIATION && 
-				Math.abs(y1 - y2) <= MarioControls.ACCEPTED_DEVIATION;
+		return 	withinAcceptableError(x1, x2) && 
+				withinAcceptableError(y1, y2);
+	}
+	
+	private boolean withinAcceptableError(float a, float b) {
+		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
 	}
 }

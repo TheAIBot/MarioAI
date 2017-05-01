@@ -296,9 +296,7 @@ public class MarioControls {
 	}
 			
 	public static float getNextTickSpeed(final float speed) {
-		final float a = 0.8899999428459493f;
-		final float b = 0.03750000378899981f;
-		return a * speed + b;
+		return speed * 0.89f + 0.0375f;
 	}
 	
 	private static ArrayList<Float> getDeaccelerationPositions(float speed) {
@@ -370,52 +368,4 @@ public class MarioControls {
 	public float getXVelocity() {
 		return currentXSpeed;
 	}
-	/*
-	 * ya = 7 * -1.9;
-	 * ya = 7 * -1.9;
-	 * ya = 6 * -1.9;
-	 * ya = 5 * -1.9;
-	 * ya = 4 * -1.9;
-	 * ya = 3 * -1.9;
-	 * ya = 2 * -1.9;
-	 * ya = 1 * -1.9;
-	 * 
-	 * 
-	 * 
-	 */
-	/*
-	public void move() {
-		if (keys[KEY_JUMP]) {
-			if (onGround && mayJump) {
-				xJumpSpeed = 0;
-				yJumpSpeed = -1.9f;
-				jumpTime = 7;
-				ya = jumpTime * yJumpSpeed;
-				onGround = false;
-				sliding = false;
-			}
-			} else if (jumpTime > 0) {
-				xa += xJumpSpeed;
-				ya = jumpTime * yJumpSpeed;
-				jumpTime--;
-			}
-		} else {
-			jumpTime = 0;
-		}
-		
-		//update xy pos
-
-
-		ya *= 0.85f;
-		if (onGround) {
-			xa *= GROUND_INERTIA;
-		} else {
-			xa *= AIR_INERTIA;
-		}
-
-		if (!onGround) {
-			ya += 3;
-		}
-	}
-	*/
 }
