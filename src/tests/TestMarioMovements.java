@@ -2,15 +2,13 @@ package tests;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
-import javax.crypto.interfaces.PBEKey;
-
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
@@ -25,10 +23,8 @@ public class TestMarioMovements {
 	public void testRightMovement() {
 		testRightSpeed(1);
 		testRightSpeed(2);
-		testRightSpeed(5);
-		testRightSpeed(8);
-		testRightSpeed(13);
-		testRightSpeed(21);
+		testRightSpeed(3);
+		testRightSpeed(4);
 	}
 	private void testRightSpeed(int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
@@ -38,13 +34,22 @@ public class TestMarioMovements {
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		
 		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge = new RunningEdge(startNode, endNode);
-		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
+		SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
 		speedNode.use();
+		path.add(speedNode.ancestorEdge);
 		
-		testEdgeMovement(observation, edge, agent, marioControls);
+		for (int i = 0; i < 10; i++) {
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceToMove, 0, 0);
+			speedNode.use();
+			path.add(speedNode.ancestorEdge);
+		}
+		
+		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
@@ -98,6 +103,7 @@ public class TestMarioMovements {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -107,17 +113,12 @@ public class TestMarioMovements {
 		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
 		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0);
 		speedNode1.use();
-		final MovementInformation moveInfo = speedNode1.getMoveInfo();
-		
-		final DirectedEdge edge2 = new RunningEdge(endNode, startNode);
-		final SpeedNode speedNode2 = new SpeedNode(startNode, null, startMarioXPos + moveInfo.getXMovementDistance(), moveInfo.getEndSpeed(), edge2, 0);
-		speedNode2.use();
-		
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		path.add(edge1);
-		path.add(edge2);
 		
-		testEdgeMovement(observation, edge1, agent, marioControls);
+		SpeedNode speedNode2 = createEdgeWithSpeedNode(endNode, speedNode1, -1, 0, 0);
+		path.add(speedNode2.ancestorEdge);
+		
+		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
@@ -175,31 +176,165 @@ public class TestMarioMovements {
 		testEdgeMovement(observation, edge, agent, marioControls);
 	}
 	
+	@Test
+	public void testRunningRightPathEqualities() {
+		MarioControls.setupYMovements();
+		
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
+				comparePaths(createPath(0, 0, i, j), createPath(0, 0, j, i));
+			}
+		}	
+	}
+	
+	@Test
+	public void testRunningLeftPathEqualities() {
+		MarioControls.setupYMovements();
+		
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
+				comparePaths(createPath(0, 0, -i, j), createPath(0, 0, -j, i));
+			}
+		}	
+	}
+	
+	
+	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int pathlength) {
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		
+		final Node startNode = new Node((short)startX, (short)startY,(byte)0);
+		final Node endNode = new Node((short)(startX + distanceX), (short)startY,(byte)0);
+		final DirectedEdge edge = new RunningEdge(startNode, endNode);
+		SpeedNode speedNode = new SpeedNode(endNode, null, startX, 0, edge, 0);
+		speedNode.use();
+		path.add(speedNode.ancestorEdge);
+		
+		for (int i = 0; i < pathlength - 1; i++) {
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, 0, 0);
+			speedNode.use();
+			path.add(speedNode.ancestorEdge);
+		}
+		
+		return path;
+	}
+	
+	private SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight) {
+		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
+		final DirectedEdge edge;
+		if (jumpHeight == 0) {
+			edge = new RunningEdge(startNode, endNode);
+		}
+		else {
+			edge = new JumpingEdge(startNode, endNode);
+			((JumpingEdge)edge).setTopPoint(0, startNode.x + Math.min(jumpHeight, 4));
+		}
+		final SpeedNode speedNode = new SpeedNode(endNode, startSpeedNode, edge, 0);
+		speedNode.use();
+		
+		return speedNode;
+	}
+	
+	private void comparePaths(ArrayList<DirectedEdge> path1, ArrayList<DirectedEdge> path2) {
+		final ArrayList<Point2D.Float> positions1 = new ArrayList<Point2D.Float>();
+		final ArrayList<Boolean> xActions1 = new ArrayList<Boolean>();
+		final ArrayList<Boolean> yActions1 = new ArrayList<Boolean>();
+		final ArrayList<Point2D.Float> speed1 = new ArrayList<Point2D.Float>(); 
+		convertPathToLists(path1, positions1, xActions1, yActions1, speed1);
+		
+		final ArrayList<Point2D.Float> positions2 = new ArrayList<Point2D.Float>();
+		final ArrayList<Boolean> xActions2 = new ArrayList<Boolean>();
+		final ArrayList<Boolean> yActions2 = new ArrayList<Boolean>();
+		final ArrayList<Point2D.Float> speed2 = new ArrayList<Point2D.Float>(); 
+		convertPathToLists(path2, positions2, xActions2, yActions2, speed2);
+		
+		assertEquals(positions1.size(), positions2.size());
+		assertEquals(xActions1.size(), xActions2.size());
+		assertEquals(yActions1.size(), yActions2.size());
+		assertEquals(speed1.size(), speed2.size());
+		
+		for (int i = 0; i < positions1.size(); i++) {
+			assertEquals(positions1.get(i).x, positions2.get(i).x, MarioControls.ACCEPTED_DEVIATION);
+			assertEquals(positions1.get(i).y, positions2.get(i).y, MarioControls.ACCEPTED_DEVIATION);
+			
+			assertEquals(xActions1.get(i), xActions2.get(i));
+			
+			assertEquals(yActions1.get(i), yActions2.get(i));
+		}
+		for (int i = 0; i < speed1.size(); i++) {
+			assertEquals(speed1.get(i).x, speed2.get(i).x, MarioControls.ACCEPTED_DEVIATION);
+			assertEquals(speed1.get(i).y, speed2.get(i).y, MarioControls.ACCEPTED_DEVIATION);
+		}
+	}
+	
+	private void convertPathToLists(ArrayList<DirectedEdge> path, ArrayList<Point2D.Float> positions, ArrayList<Boolean> xActions, ArrayList<Boolean> yActions, ArrayList<Point2D.Float> speed) {
+		float xOffset = 0;
+		float yOffset = 0;
+		
+		Point2D.Float oldPos = new Point2D.Float(0, 0);
+		
+		int speedIndexOffset = 0;
+		for (int i = 0; i < path.size(); i++) {
+			final DirectedEdge edge = path.get(i);
+			final MovementInformation moveInfo = edge.getMoveInfo();
+			
+			for (int z = 0; z < moveInfo.getMoveTime(); z++) {
+				final Point2D.Float position = moveInfo.getPositions()[z];
+				
+				final float x = position.x + xOffset;
+				final float y = position.y + yOffset;
+				
+				positions.add(new Point2D.Float(x, y));
+				
+				xActions.add(moveInfo.getPressXButton()[z]);
+				yActions.add(moveInfo.getPressYButton()[z]);
+				
+				final Point2D.Float currentSpeed = new Point2D.Float(x - oldPos.x, y - oldPos.y);
+				speed.add(currentSpeed);
+				
+				oldPos = new Point2D.Float(x, y);
+			}
+			
+			final float lastXSpeed = speed.get(moveInfo.getMoveTime() - 1 + speedIndexOffset).x;
+			assertTrue("Calculated speed " + lastXSpeed + " is not equal end speed " + moveInfo.getEndSpeed(),withinAcceptableError(lastXSpeed, moveInfo.getEndSpeed()));
+			speedIndexOffset += moveInfo.getMoveTime();
+			
+			
+			final Point2D.Float endPoint = moveInfo.getPositions()[moveInfo.getPositions().length - 1];
+			xOffset += endPoint.x;
+			yOffset += endPoint.y;
+		}
+		
+	}
+	
 	private void testEdgeMovement(Environment observation, DirectedEdge edge, UnitTestAgent agent, MarioControls marioControls) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		path.add(edge);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
+	
 	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		float oldMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float actualMarioSpeed = 0;
+		float xOffset = 0;
+		float yOffset = 0;
 		for (int z = 0; z < path.size(); z++) {
-			final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-			final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-			final MovementInformation moveInfo = path.get(0).getMoveInfo();
+			final DirectedEdge edge = path.get(0);
+			final MovementInformation moveInfo = edge.getMoveInfo();
 			
 			for (int i = 0; i < moveInfo.getPositions().length; i++) {
 				final Point2D.Float position = moveInfo.getPositions()[i];
 				
-				boolean[] newActions = marioControls.getNextAction(observation, path);
+				final boolean[] newActions = marioControls.getNextAction(observation, path);
 				for (int j = 0; j < newActions.length; j++) {
 					agent.action[j] = newActions[j];
 				}
 				TestTools.runOneTick(observation);
 				
-				final float expectedMarioXPos = startMarioXPos + position.x;
-				final float expectedMarioYPos = startMarioYPos - position.y;
+				final float expectedMarioXPos = startMarioXPos + position.x + xOffset;
+				final float expectedMarioYPos = startMarioYPos - position.y + yOffset;
 				
 				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -207,36 +342,40 @@ public class TestMarioMovements {
 				actualMarioSpeed = actualMarioXPos - oldMarioXPos;
 				oldMarioXPos = actualMarioXPos;
 				
-				if (!withinAcceptableError(expectedMarioXPos, expectedMarioYPos, actualMarioXPos, actualMarioYPos)) {
-					final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
-					final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
+				if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos)) {
+					final int distanceXMoved = edge.target.x - edge.source.x;
+					final int distanceYMoved = edge.target.y - edge.source.y;
 					Assert.fail("Mario Wasn't close enough to the expected position" + 
 								"\nxdistance: " + distanceXMoved + 
 								"\nydistance: " + distanceYMoved + 
-								"\njump height: " + path.get(0).getMaxY() + 
+								"\njump height: " + edge.getMaxY() + 
 								"\nx: " + (expectedMarioXPos - actualMarioXPos) + 
 								"\ny: " + (expectedMarioYPos - actualMarioYPos) +
-								"\ntick: " + i);
+								"\ntick: " + i + 
+								"\npath: " + z);
 				}
 			}
 			
 			final float expectedMarioSpeed = moveInfo.getEndSpeed();
 			if (!withinAcceptableError(expectedMarioSpeed, actualMarioSpeed)) {
-				final int distanceXMoved = path.get(0).target.x - path.get(0).source.x;
-				final int distanceYMoved = path.get(0).target.y - path.get(0).source.y;
+				final int distanceXMoved = edge.target.x - edge.source.x;
+				final int distanceYMoved = edge.target.y - edge.source.y;
 				Assert.fail("Mario Wasn't close enough to the expected position" + 
 							"\nxdistance: " + distanceXMoved + 
 							"\nydistance: " + distanceYMoved + 
-							"\njump height: " + path.get(0).getMaxY() + 
+							"\njump height: " + edge.getMaxY() + 
 							"\nspeed diff: " + (expectedMarioSpeed - actualMarioSpeed));
 			}
 			
+			final Point2D.Float endPoint = moveInfo.getPositions()[moveInfo.getPositions().length - 1];
+			xOffset += endPoint.x;
+			yOffset += endPoint.y;
 		}
 	}
 	
-	private boolean withinAcceptableError(float x1, float y1, float x2, float y2) {
-		return 	withinAcceptableError(x1, x2) && 
-				withinAcceptableError(y1, y2);
+	private boolean withinAcceptableError(float a1, float b1, float a2, float b2) {
+		return 	withinAcceptableError(a1, b1) && 
+				withinAcceptableError(a2, b2);
 	}
 	
 	private boolean withinAcceptableError(float a, float b) {

@@ -35,13 +35,17 @@ public class MarioControls {
 	
 	public MarioControls() {
 		if (!hasCreatedYMovements) {
-			for (int jumpHeightDifference = -LEVEL_HEIGHT; jumpHeightDifference <= MAX_JUMP_HEIGHT; jumpHeightDifference++) {
-				for (int jumpHeight = 0; jumpHeight < NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS; jumpHeight++) {
-					final int index = getIndexForYMovement(jumpHeight, jumpHeightDifference);
-					yMovements[index] = getJumpTime(jumpHeight, jumpHeightDifference, 0);
-				}
-			}
+			setupYMovements();
 			hasCreatedYMovements = true;
+		}
+	}
+	
+	public static void setupYMovements() {
+		for (int jumpHeightDifference = -LEVEL_HEIGHT; jumpHeightDifference <= MAX_JUMP_HEIGHT; jumpHeightDifference++) {
+			for (int jumpHeight = 0; jumpHeight < NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS; jumpHeight++) {
+				final int index = getIndexForYMovement(jumpHeight, jumpHeightDifference);
+				yMovements[index] = getJumpTime(jumpHeight, jumpHeightDifference, 0);
+			}
 		}
 	}
 		
@@ -242,11 +246,13 @@ public class MarioControls {
 		//and distance moved is within an accepted deviation.
 		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
 		while (distanceToTarget > ACCEPTED_DEVIATION) {
+			////BLOCK 1////
 			speed = getNextTickSpeed(speed);
 			distanceMoved += speed;
 			xPositions.add(distanceMoved);
 			pressButton.add(true);
 			totalTicks++;
+			////BLOCK 1////
 			
 			final float oldDistanceToTarget = distanceToTarget;
 			distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
@@ -266,18 +272,19 @@ public class MarioControls {
 		//which should be on ground
 		//this allows two jumping edges
 		//after each other.
+		////BLOCK 1 COPY////
 		speed = getNextTickSpeed(speed);
 		distanceMoved += speed;
 		xPositions.add(distanceMoved);
 		pressButton.add(true);
 		totalTicks++;
+		////BLOCK 1 COPY////
 		
-		//Put sign back on values as it was lost before
-		distanceMoved = (distanceIsNegative)? -1 * distanceMoved : distanceMoved;
-		speed         = (distanceIsNegative)? -1 * speed         : speed;
-		
-		//if distance is negative then turn all points around as the movement is in the wrong direction
+		//if distance is negative then put sign back on values as it was lost before and
+		//turn all points around as the movement is in the wrong direction
 		if (distanceIsNegative) {
+			distanceMoved *= -1;
+			speed *= -1;
 			for (int i = 0; i < xPositions.size(); i++) {
 				xPositions.set(i, -1 * xPositions.get(i));
 			}

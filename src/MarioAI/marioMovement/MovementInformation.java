@@ -108,4 +108,12 @@ public class MovementInformation {
 	public Point2D.Float[] getPositions() {
 		return positions;
 	}
+
+	public boolean[] getPressXButton() {
+		return pressXButton;
+	}
+	
+	public boolean[] getPressYButton() {
+		return pressYButton;
+	}
 }
