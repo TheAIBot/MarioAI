@@ -177,6 +177,29 @@ public class TestMarioMovements {
 	}
 	
 	@Test
+	public void testConsecutiveJumps() {
+		for (int pathLength = 1; pathLength < 10; pathLength++) {
+			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
+				for (int distanceX = 1; distanceX <= 4; distanceX++) {
+					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength);
+				}
+			}
+		}
+	}
+	private void testConsecutiveJumpMovement(int distanceX, int jumpHeight, int pathLength) {
+		final UnitTestAgent agent = new UnitTestAgent();	
+		final MarioControls marioControls = new MarioControls();
+		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		
+		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, pathLength);
+		
+		testEdgeMovement(observation, path, agent, marioControls);
+	}
+	
+	@Test
 	public void testRunningRightPathEqualities() {
 		MarioControls.setupYMovements();
 		
@@ -184,7 +207,7 @@ public class TestMarioMovements {
 		
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, i, j), createPath(0, 0, j, i));
+				comparePaths(createPath(0, 0, i, 0, j), createPath(0, 0, j, 0, i));
 			}
 		}	
 	}
@@ -195,13 +218,13 @@ public class TestMarioMovements {
 		
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, -i, j), createPath(0, 0, -j, i));
+				comparePaths(createPath(0, 0, -i, 0, j), createPath(0, 0, -j, 0, i));
 			}
 		}	
 	}
 	
 	
-	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int pathlength) {
+	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int pathlength) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
 		final Node startNode = new Node((short)startX, (short)startY,(byte)0);
@@ -212,7 +235,7 @@ public class TestMarioMovements {
 		path.add(speedNode.ancestorEdge);
 		
 		for (int i = 0; i < pathlength - 1; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, 0, 0);
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, 0, jumpHeight);
 			speedNode.use();
 			path.add(speedNode.ancestorEdge);
 		}
