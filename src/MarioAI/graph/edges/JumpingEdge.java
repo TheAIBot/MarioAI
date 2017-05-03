@@ -45,7 +45,6 @@ public class JumpingEdge extends DirectedEdge {
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
-	//
 	public void setToJumpPolynomial(Node startingPosition, int nodeColoumn, float jumpRange, float jumpHeight) {
 		a = -4 * jumpHeight / (jumpRange * jumpRange);
 		b = (8 * nodeColoumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);

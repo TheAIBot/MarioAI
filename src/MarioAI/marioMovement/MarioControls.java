@@ -364,7 +364,7 @@ public class MarioControls {
 			return speed;
 		}
 		else if (driftPositions.size() == 1) {
-			return driftPositions.get(0) - distanceMoved;
+			return driftPositions.get(0);
 		}
 		else {
 			final float last = driftPositions.get(driftPositions.size() - 1);
