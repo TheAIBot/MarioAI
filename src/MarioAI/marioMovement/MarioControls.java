@@ -209,6 +209,7 @@ public class MarioControls {
 				currentJumpHeight = (currentJumpHeight <= fallTo) ? fallTo : currentJumpHeight;
 				yPositions.add(currentJumpHeight);
 			}
+			
 			return new YMovementInformation(totalTicksJumped, yPositions, pressJumpButton);
 		}
 		return new YMovementInformation(0, new ArrayList<Float>(), new ArrayList<Boolean>());

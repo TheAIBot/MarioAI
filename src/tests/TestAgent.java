@@ -83,13 +83,13 @@ public class TestAgent implements Agent {
 		case TestTools.LEVEL_INIT_TICKS + 16:
 		case TestTools.LEVEL_INIT_TICKS + 17:
 		case TestTools.LEVEL_INIT_TICKS + 18:
-			System.out.println(currentXPos - prevX);
+			System.out.println(currentXPos - startX);
 			//System.out.println(currentYPos - startY);
 			prevX = currentXPos;
 			startY = currentYPos;
 			actions[Mario.KEY_RIGHT] = true;
 			break;
-
+/*
 		case TestTools.LEVEL_INIT_TICKS + 19:
 		case TestTools.LEVEL_INIT_TICKS + 20:
 		case TestTools.LEVEL_INIT_TICKS + 21:
@@ -117,15 +117,15 @@ public class TestAgent implements Agent {
 			startY = currentYPos;
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = true;
+			*/
 		}
-		
-		
 		
 		tick++;
 		return actions;
 	}
 	
     public static void main(String[] args) {
+    	/*
     	UnitTestAgent agent = new UnitTestAgent();
     	Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
     	float startXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -136,12 +136,13 @@ public class TestAgent implements Agent {
     	float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
     	float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
     	System.out.println((endXPos - startXPos) + ", " + (endYPos - startYPos));
-    	/*
+    	*/
+    	
         Agent agent = new TestAgent();
         Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
         //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", agent, true);
         TestTools.runWholeLevel(observation);
-    	 */ 
+    	
     }
 
 	public AGENT_TYPE getType() {

@@ -180,6 +180,8 @@ public class TestMarioMovements {
 	public void testRunningRightPathEqualities() {
 		MarioControls.setupYMovements();
 		
+		//comparePaths(createPath(0, 0, 3, 1), createPath(0, 0, 1, 3));
+		
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				comparePaths(createPath(0, 0, i, j), createPath(0, 0, j, i));
@@ -241,11 +243,15 @@ public class TestMarioMovements {
 		final ArrayList<Point2D.Float> speed1 = new ArrayList<Point2D.Float>(); 
 		convertPathToLists(path1, positions1, xActions1, yActions1, speed1);
 		
+		//positions1.stream().forEach(x -> System.out.println(x.x));
+		
 		final ArrayList<Point2D.Float> positions2 = new ArrayList<Point2D.Float>();
 		final ArrayList<Boolean> xActions2 = new ArrayList<Boolean>();
 		final ArrayList<Boolean> yActions2 = new ArrayList<Boolean>();
 		final ArrayList<Point2D.Float> speed2 = new ArrayList<Point2D.Float>(); 
 		convertPathToLists(path2, positions2, xActions2, yActions2, speed2);
+		
+		//positions2.stream().forEach(x -> System.out.println(x.x));
 		
 		assertEquals(positions1.size(), positions2.size());
 		assertEquals(xActions1.size(), xActions2.size());
@@ -316,22 +322,23 @@ public class TestMarioMovements {
 	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		float oldMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float oldMarioXPos = startMarioXPos;
 		float actualMarioSpeed = 0;
 		float xOffset = 0;
 		float yOffset = 0;
-		for (int z = 0; z < path.size(); z++) {
-			final DirectedEdge edge = path.get(0);
-			final MovementInformation moveInfo = edge.getMoveInfo();
-			
-			for (int i = 0; i < moveInfo.getPositions().length; i++) {
-				final Point2D.Float position = moveInfo.getPositions()[i];
-				
+		for (int z = 0; z < path.size(); z++) {	
+			DirectedEdge edge = path.get(0);
+			MovementInformation moveInfo = edge.getMoveInfo();
+			for (int i = 0; i < moveInfo.getPositions().length; i++) {				
 				final boolean[] newActions = marioControls.getNextAction(observation, path);
 				for (int j = 0; j < newActions.length; j++) {
 					agent.action[j] = newActions[j];
 				}
 				TestTools.runOneTick(observation);
+				
+				edge = path.get(0);
+				moveInfo = edge.getMoveInfo();
+				final Point2D.Float position = moveInfo.getPositions()[i];
 				
 				final float expectedMarioXPos = startMarioXPos + position.x + xOffset;
 				final float expectedMarioYPos = startMarioYPos - position.y + yOffset;
