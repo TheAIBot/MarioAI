@@ -19,6 +19,8 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestMarioMovements {
 	
+	private int hashNumber = 0;
+	
 	@Test
 	public void testRightMovement() {
 		testRightSpeed(1);
@@ -178,6 +180,7 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testConsecutiveJumps() {
+		testConsecutiveJumpMovement(1, 1, 2);
 		for (int pathLength = 1; pathLength < 10; pathLength++) {
 			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
 				for (int distanceX = 1; distanceX <= 4; distanceX++) {
@@ -229,8 +232,15 @@ public class TestMarioMovements {
 		
 		final Node startNode = new Node((short)startX, (short)startY,(byte)0);
 		final Node endNode = new Node((short)(startX + distanceX), (short)startY,(byte)0);
-		final DirectedEdge edge = new RunningEdge(startNode, endNode);
-		SpeedNode speedNode = new SpeedNode(endNode, null, startX, 0, edge, 0);
+		//final DirectedEdge edge = new RunningEdge(startNode, endNode);
+		final DirectedEdge edge;
+		if (jumpHeight == 0) {
+			edge = new RunningEdge(startNode, endNode);
+		}
+		else {
+			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
+		}
+		SpeedNode speedNode = new SpeedNode(endNode, null, startX, 0, edge, getHash());
 		speedNode.use();
 		path.add(speedNode.ancestorEdge);
 		
@@ -250,10 +260,9 @@ public class TestMarioMovements {
 			edge = new RunningEdge(startNode, endNode);
 		}
 		else {
-			edge = new JumpingEdge(startNode, endNode);
-			((JumpingEdge)edge).setTopPoint(0, startNode.x + Math.min(jumpHeight, 4));
+			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
 		}
-		final SpeedNode speedNode = new SpeedNode(endNode, startSpeedNode, edge, 0);
+		final SpeedNode speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash());
 		speedNode.use();
 		
 		return speedNode;
@@ -341,7 +350,6 @@ public class TestMarioMovements {
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
-	
 	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -410,5 +418,9 @@ public class TestMarioMovements {
 	
 	private boolean withinAcceptableError(float a, float b) {
 		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
+	}
+	
+	private int getHash() {
+		return hashNumber++;
 	}
 }

@@ -41,6 +41,7 @@ public class JumpingEdge extends DirectedEdge {
 	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
 		this(source, target);
 		this.ceiledTopPointY = ceiledTopPointY;
+		this.topPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
