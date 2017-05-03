@@ -15,7 +15,7 @@ public class MarioControls {
 	public static final float ACCEPTED_DEVIATION = 0.0002f;
 	
 	private static final double MIN_MARIO_SPEED = 0.03125f; // 0.5 / 16;
-	private static final float MAX_X_VELOCITY = 0.351f;
+	public static final float MAX_X_VELOCITY = 0.351f;
 	private static final float MARIO_START_X_POS = 2;
 		
 	private static final int NUMBER_OF_DIFFERENT_Y_JUMP_POSITIONS = 5;
