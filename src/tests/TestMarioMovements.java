@@ -180,7 +180,6 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testConsecutiveJumps() {
-		testConsecutiveJumpMovement(1, 1, 2);
 		for (int pathLength = 1; pathLength < 10; pathLength++) {
 			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
 				for (int distanceX = 1; distanceX <= 4; distanceX++) {
@@ -205,9 +204,6 @@ public class TestMarioMovements {
 	@Test
 	public void testRunningRightPathEqualities() {
 		MarioControls.setupYMovements();
-		
-		//comparePaths(createPath(0, 0, 3, 1), createPath(0, 0, 1, 3));
-		
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				comparePaths(createPath(0, 0, i, 0, j), createPath(0, 0, j, 0, i));
@@ -218,7 +214,6 @@ public class TestMarioMovements {
 	@Test
 	public void testRunningLeftPathEqualities() {
 		MarioControls.setupYMovements();
-		
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				comparePaths(createPath(0, 0, -i, 0, j), createPath(0, 0, -j, 0, i));
@@ -230,10 +225,9 @@ public class TestMarioMovements {
 	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int pathlength) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
-		final Node startNode = new Node((short)startX, (short)startY,(byte)0);
-		final Node endNode = new Node((short)(startX + distanceX), (short)startY,(byte)0);
-		//final DirectedEdge edge = new RunningEdge(startNode, endNode);
-		final DirectedEdge edge;
+		final Node startNode = new Node(startX, startY, (byte)0);
+		final Node endNode = new Node(startX + distanceX, startY, (byte)0);
+		DirectedEdge edge;
 		if (jumpHeight == 0) {
 			edge = new RunningEdge(startNode, endNode);
 		}
@@ -255,7 +249,7 @@ public class TestMarioMovements {
 	
 	private SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight) {
 		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
-		final DirectedEdge edge;
+		DirectedEdge edge;
 		if (jumpHeight == 0) {
 			edge = new RunningEdge(startNode, endNode);
 		}
@@ -275,15 +269,11 @@ public class TestMarioMovements {
 		final ArrayList<Point2D.Float> speed1 = new ArrayList<Point2D.Float>(); 
 		convertPathToLists(path1, positions1, xActions1, yActions1, speed1);
 		
-		//positions1.stream().forEach(x -> System.out.println(x.x));
-		
 		final ArrayList<Point2D.Float> positions2 = new ArrayList<Point2D.Float>();
 		final ArrayList<Boolean> xActions2 = new ArrayList<Boolean>();
 		final ArrayList<Boolean> yActions2 = new ArrayList<Boolean>();
 		final ArrayList<Point2D.Float> speed2 = new ArrayList<Point2D.Float>(); 
 		convertPathToLists(path2, positions2, xActions2, yActions2, speed2);
-		
-		//positions2.stream().forEach(x -> System.out.println(x.x));
 		
 		assertEquals(positions1.size(), positions2.size());
 		assertEquals(xActions1.size(), xActions2.size());
