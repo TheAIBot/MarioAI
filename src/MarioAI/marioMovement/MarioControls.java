@@ -56,6 +56,12 @@ public class MarioControls {
 		currentXSpeed = 0;
 	}
 	
+	public void update(Environment observation) {
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		currentXSpeed = marioXPos - oldX;
+		oldX = marioXPos;
+	}
+	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
 		if (edge instanceof RunningEdge) {
 			return true;
@@ -87,10 +93,6 @@ public class MarioControls {
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null) {			
-			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-			currentXSpeed = marioXPos - oldX;
-			oldX = marioXPos;
-			
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
 			if (next.equals(prevEdge) && movementTime == ticksOnThisEdge + 1) {
