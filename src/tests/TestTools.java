@@ -165,4 +165,12 @@ public class TestTools {
 		((MarioComponent)observation).render();
 		DebugDraw.resetGraphics(observation);
 	}
+	
+	public static void setMarioPosition(Environment observation, int x, int y) {
+		((MarioComponent)observation).setMarioPosition(x, y);
+	}
+	
+	public static void setMarioXPosition(Environment observation, int x) {
+		((MarioComponent)observation).setMarioXPosition(x);
+	}
 }
