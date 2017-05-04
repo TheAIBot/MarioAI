@@ -7,6 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import MarioAI.MarioMethods;
+import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
