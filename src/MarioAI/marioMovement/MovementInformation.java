@@ -77,8 +77,18 @@ public class MovementInformation {
 			throw new Error("Invalid tick given: " + tick);
 		}
 		
-		final int buttonXMovement = xMovedDistance > 0 ? Mario.KEY_RIGHT : Mario.KEY_LEFT;
-		actions[buttonXMovement] = pressXButton[tick];
+		if (xMovedDistance > 0) {
+			actions[Mario.KEY_RIGHT] = pressXButton[tick];
+			actions[Mario.KEY_LEFT] = false;
+		}
+		else if (xMovedDistance < 0) {
+			actions[Mario.KEY_RIGHT] = false;
+			actions[Mario.KEY_LEFT] = pressXButton[tick];
+		}
+		else {
+			actions[Mario.KEY_RIGHT] = false;
+			actions[Mario.KEY_LEFT] = false;
+		}
 		
 		actions[Mario.KEY_JUMP] = pressYButton[tick];
 		
