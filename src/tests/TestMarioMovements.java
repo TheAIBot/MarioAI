@@ -17,6 +17,7 @@ import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
+import jdk.nashorn.internal.runtime.FunctionInitializer;
 
 public class TestMarioMovements {
 	
@@ -34,23 +35,10 @@ public class TestMarioMovements {
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		
-		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
-		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge = new RunningEdge(startNode, endNode);
-		SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
-		speedNode.use();
-		path.add(speedNode.ancestorEdge);
-		
-		for (int i = 0; i < 10; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceToMove, 0, 0);
-			speedNode.use();
-			path.add(speedNode.ancestorEdge);
-		}
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, 0, 0, 10);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -59,38 +47,23 @@ public class TestMarioMovements {
 	public void testLeftMovement() {
 		testLeftSpeed(1);
 		testLeftSpeed(2);
-		testLeftSpeed(5);
-		testLeftSpeed(8);
-		testLeftSpeed(13);
-		testLeftSpeed(21);
+		testLeftSpeed(3);
+		testLeftSpeed(4);
 	}
 	private void testLeftSpeed(int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		//first move mario right so he doesn't hit the wall when going left
-		agent.action[Mario.KEY_RIGHT] = true;
-		for (int i = 0; i < 150; i++) {
-			TestTools.runOneTick(observation);
-		}
+		TestTools.setMarioXPosition(observation, 50);
+		TestTools.runOneTick(observation);
 		
-		//then just wait a few ticks for mario to completely stop
-		agent.action[Mario.KEY_RIGHT] = false;
-		for (int i = 0; i < 50; i++) {
-			TestTools.runOneTick(observation);
-		}
+		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, -distanceToMove, 0, 0, 10);
 		
-		final Node startNode = new Node((short)startMarioXPos, (short)startMarioYPos,(byte)0);
-		final Node endNode = new Node((short)(startMarioXPos - distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge = new RunningEdge(startNode, endNode);
-		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
-		speedNode.use();
-		
-		testEdgeMovement(observation, edge, agent, marioControls);
+		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
@@ -130,53 +103,48 @@ public class TestMarioMovements {
 		testJumpTime(2, 0, 0);
 		testJumpTime(3, 0, 0);
 		testJumpTime(4, 0, 0);
+		
 		for (int jumpHeight = 6; jumpHeight >= 0; jumpHeight--) {
 			for (int jumpDistance = 2; jumpDistance < 4; jumpDistance++) {
-				testJumpTime(1     , jumpHeight, jumpDistance);
-				testJumpTime(1.5f  , jumpHeight, jumpDistance);
-				testJumpTime(1.645f, jumpHeight, jumpDistance);
-				testJumpTime(3.4f  , jumpHeight, jumpDistance);
-				testJumpTime(4     , jumpHeight, jumpDistance);
-				testJumpTime(5.6f  , jumpHeight, jumpDistance);	
+				testJumpTime(1, jumpHeight, jumpDistance);
+				testJumpTime(2, jumpHeight, jumpDistance);
+				testJumpTime(3, jumpHeight, jumpDistance);
+				testJumpTime(4, jumpHeight, jumpDistance);
+				testJumpTime(5, jumpHeight, jumpDistance);	
 			}
 		}
 		
-		testJumpTime(1.5f, -1, 1);
-		testJumpTime(3.4f, -1, 1);
-		testJumpTime(5.6f, -1, 1);
-		testJumpTime(1.5f, -1, 2);
-		testJumpTime(3.4f, -1, 2);
-		testJumpTime(5.6f, -1, 2);
+		testJumpTime(2, -1, 1);
+		testJumpTime(3, -1, 1);
+		testJumpTime(4, -1, 1);
+		testJumpTime(2, -1, 2);
+		testJumpTime(3, -1, 2);
+		testJumpTime(4, -1, 2);
 		
-		testJumpTime(3.4f, -2, 1);
-		testJumpTime(5.6f, -2, 1);
-		testJumpTime(3.4f, -2, 2);
-		testJumpTime(5.6f, -2, 2);
+		testJumpTime(3, -2, 1);
+		testJumpTime(4, -2, 1);
+		testJumpTime(3, -2, 2);
+		testJumpTime(4, -2, 2);
 		
-		testJumpTime(3.4f, -3, 1);
-		testJumpTime(5.6f, -3, 1);
-		testJumpTime(3.4f, -3, 2);
-		testJumpTime(5.6f, -3, 2);
+		testJumpTime(4, -3, 1);
+		testJumpTime(5, -3, 1);
+		testJumpTime(4, -3, 2);
+		testJumpTime(5, -3, 2);
 		
-		testJumpTime(4.0f, -4, 1);
-		testJumpTime(5.6f, -4, 1);
+		testJumpTime(4, -4, 1);
+		testJumpTime(5, -4, 1);
 	}
-	private void testJumpTime(float jumpHeight, int heightDifference, int distanceToMove) {
+	private void testJumpTime(int jumpHeight, int heightDifference, int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown" + heightDifference + ".lvl", agent, false);
 		
-		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final Node startNode = new Node((int)startMarioXPos, (int)Math.round(startMarioYPos),(byte)0);
-		final Node endNode = new Node((int)(startMarioXPos + distanceToMove), (int)Math.round(startMarioYPos) + heightDifference,(byte)0);
-		final JumpingEdge edge = new JumpingEdge(startNode, endNode, (int)(jumpHeight));
-		edge.setTopPoint(0, Math.round(startMarioYPos) + Math.min(jumpHeight, 4));
-		final SpeedNode speedNode = new SpeedNode(endNode, null, startMarioXPos, 0, edge, 0);
-		speedNode.use();
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 0);
 		
-		testEdgeMovement(observation, edge, agent, marioControls);
+		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
@@ -197,7 +165,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, pathLength);
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, 0, pathLength);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -207,7 +175,7 @@ public class TestMarioMovements {
 		MarioControls.setupYMovements();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, i, 0, j), createPath(0, 0, j, 0, i));
+				comparePaths(createPath(0, 0, i, 0, 0, j), createPath(0, 0, j, 0, 0, i));
 			}
 		}	
 	}
@@ -217,7 +185,7 @@ public class TestMarioMovements {
 		MarioControls.setupYMovements();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, -i, 0, j), createPath(0, 0, -j, 0, i));
+				comparePaths(createPath(0, 0, -i, 0, 0, j), createPath(0, 0, -j, 0, 0, i));
 			}
 		}	
 	}
@@ -236,32 +204,24 @@ public class TestMarioMovements {
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("jumpLevels/only" + distanceX + "Width.lvl", agent, false);
 		TestTools.setMarioXPosition(observation, 3);
+		TestTools.runOneTick(observation);
 		
 		final int startY = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<DirectedEdge> path = createPath(3, startY, distanceX + 1, jumpHeight, 40); 
+		ArrayList<DirectedEdge> path = createPath(3, startY, distanceX + 1, jumpHeight, 0, 40); 
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 
-	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int pathlength) {
+	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
 		final Node startNode = new Node(startX, startY, (byte)0);
-		final Node endNode = new Node(startX + distanceX, startY, (byte)0);
-		DirectedEdge edge;
-		if (jumpHeight == 0) {
-			edge = new RunningEdge(startNode, endNode);
-		}
-		else {
-			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
-		}
-		SpeedNode speedNode = new SpeedNode(endNode, null, startX, 0, edge, getHash());
-		speedNode.use();
+		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX, heightDifference, jumpHeight);
 		path.add(speedNode.ancestorEdge);
 		
 		for (int i = 0; i < pathlength - 1; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, 0, jumpHeight);
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, heightDifference, jumpHeight);
 			speedNode.use();
 			path.add(speedNode.ancestorEdge);
 		}
@@ -271,6 +231,7 @@ public class TestMarioMovements {
 	
 	private SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight) {
 		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
+		
 		DirectedEdge edge;
 		if (jumpHeight == 0) {
 			edge = new RunningEdge(startNode, endNode);
@@ -278,7 +239,14 @@ public class TestMarioMovements {
 		else {
 			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
 		}
-		final SpeedNode speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash());
+		
+		SpeedNode speedNode;
+		if (startSpeedNode != null) {
+			speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash());
+		}
+		else {
+			speedNode = new SpeedNode(endNode, null, edge.source.x, 0, edge, getHash());
+		}
 		speedNode.use();
 		
 		return speedNode;
@@ -354,12 +322,6 @@ public class TestMarioMovements {
 			yOffset += endPoint.y;
 		}
 		
-	}
-	
-	private void testEdgeMovement(Environment observation, DirectedEdge edge, UnitTestAgent agent, MarioControls marioControls) {
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		path.add(edge);
-		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	private void testEdgeMovement(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
