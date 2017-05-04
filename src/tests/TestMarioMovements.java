@@ -221,7 +221,28 @@ public class TestMarioMovements {
 		}	
 	}
 	
-	
+	@Test
+	public void testXWidthJumpNoAstar() {
+		testJumpNoAstart(1, 2);
+		testJumpNoAstart(1, 3);
+		testJumpNoAstart(1, 4);
+		
+		testJumpNoAstart(2, 3);
+		testJumpNoAstart(2, 4);
+	}
+	private void testJumpNoAstart(int distanceX, int jumpHeight) {
+		final UnitTestAgent agent = new UnitTestAgent();	
+		final MarioControls marioControls = new MarioControls();
+		final Environment observation = TestTools.loadLevel("jumpLevels/only" + distanceX + "Width.lvl", agent, false);
+		TestTools.setMarioXPosition(observation, 3);
+		
+		final int startY = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		
+		ArrayList<DirectedEdge> path = createPath(3, startY, distanceX + 1, jumpHeight, 40); 
+		
+		testEdgeMovement(observation, path, agent, marioControls);
+	}
+
 	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int pathlength) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
