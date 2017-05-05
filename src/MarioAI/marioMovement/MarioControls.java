@@ -95,13 +95,17 @@ public class MarioControls {
 		if (path != null) {			
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
-			if (next.equals(prevEdge) && movementTime == ticksOnThisEdge + 1) {
+			if (prevEdge != null && 
+				next.getMoveInfo().equals(prevEdge.getMoveInfo()) && 
+				movementTime == ticksOnThisEdge + 1) 
+			{
 				path.remove(0);
 				next = path.get(0);
 				movementTime = next.getMoveInfo().getMoveTime();
 			}
 			
-			if (!next.equals(prevEdge)) {
+			if (prevEdge == null ||
+				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
 			}

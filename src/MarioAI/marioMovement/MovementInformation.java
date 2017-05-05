@@ -2,7 +2,9 @@ package MarioAI.marioMovement;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
 
 public class MovementInformation {
@@ -125,5 +127,38 @@ public class MovementInformation {
 	
 	public boolean[] getPressYButton() {
 		return pressYButton;
+	}
+	
+	@Override
+	public boolean equals(Object b) {
+		if (b == null) {
+			return false;
+		}
+		if (b instanceof MovementInformation) {
+			final MovementInformation bb = (MovementInformation) b;
+			if (bb.endSpeed != endSpeed) {
+				return false;
+			}
+			else if (bb.xMovedDistance != xMovedDistance) {
+				return false;
+			}
+			else if (bb.totalTicksJumped != totalTicksJumped) {
+				return false;
+			}
+			else if (bb.totalTicksXMoved != totalTicksXMoved) {
+				return false;
+			}
+			else if (!Arrays.equals(bb.pressXButton, pressXButton)) {
+				return false;
+			}
+			else if (!Arrays.equals(bb.pressYButton, pressYButton)) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 }
