@@ -24,7 +24,7 @@ import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.NodeCreator;
+import MarioAI.graph.nodes.World;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
@@ -35,7 +35,7 @@ import ch.idsia.mario.environments.Environment;
 public class TestAStar {
 	Agent agent = new UnitTestAgent();
 	Environment observation;
-	NodeCreator graph;
+	World graph;
 	EdgeCreator grapher;
 	EdgeCreator edgeCreator;
 	final float delta = 0.05f;
@@ -52,9 +52,9 @@ public class TestAStar {
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
-		graph = new NodeCreator();
+		graph = new World();
 		edgeCreator = new EdgeCreator();
-		graph.createStartGraph(observation);
+		graph.initialize(observation);
 		grapher = new EdgeCreator();
 		grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 		marioNode = graph.getMarioNode(observation);
@@ -107,13 +107,13 @@ public class TestAStar {
 		assertTrue(path != null);
 		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
 		while(numberOfActions <= 5){
-			if (MarioControls.reachedNextNode(observation, path) && graph.goalNodesChanged() || 
+			if (MarioControls.reachedNextNode(observation, path) && graph.hasGoalNodesChanged() || 
 				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
 				 numberOfActions++;
 				 path = fastAgent.getPath(observation);
 				 DebugDraw.resetGraphics(observation);
 				 DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-				 DebugDraw.drawPath(observation, path);
+				 DebugDraw.drawPathMovement(observation, path);
 				 TestTools.renderLevel(observation);
 				 assertTrue(path != null);
 				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
@@ -133,13 +133,13 @@ public class TestAStar {
 		setup("TestAStarJump", false, false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 
 		//TestTools.runOneTick(observation);
 		assertTrue(path != null);
 		
 		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-		DebugDraw.drawPath(observation, path);
+		DebugDraw.drawPathMovement(observation, path);
 		TestTools.renderLevel(observation);
 		assertEquals(10, path.size());
 		

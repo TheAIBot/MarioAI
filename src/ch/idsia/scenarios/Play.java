@@ -17,9 +17,11 @@ public class Play {
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			// Agent controller = new HumanKeyboardAgent();
-			Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
-			//Environment observation = TestTools.loadLevel("TestAStarJump.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
 	        Agent controller = new FastAndFurious();
@@ -40,7 +42,7 @@ public class Play {
 	        //options.setLevelRandSeed(650);
 	        //options.setLevelRandSeed(666);
 	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed(1581696905);
+	        //options.setLevelRandSeed(1028660435);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
 	        /*
 1549733898
@@ -51,7 +53,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(2);
+	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

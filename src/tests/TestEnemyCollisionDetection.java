@@ -38,7 +38,7 @@ public class TestEnemyCollisionDetection {
 	MarioControls marioController;
 	Node[][] level;
 	Node marioNode;
-	NodeCreator graph = new NodeCreator();
+	World graph = new World();
 	EdgeCreator grapher = new EdgeCreator();
 	
 	
@@ -46,7 +46,7 @@ public class TestEnemyCollisionDetection {
 		action = new boolean[Environment.numberOfButtons];	
 		agent = new UnitTestAgent();		
 		observation = TestTools.loadLevel("flat.lvl", agent, false);	
-		graph.createStartGraph(observation);
+		graph.initialize(observation);
 		level = graph.getLevelMatrix();
 		marioNode = graph.getMarioNode(observation);
 		marioController = new MarioControls();

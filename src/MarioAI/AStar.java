@@ -87,7 +87,6 @@ public final class AStar {
 		openSet.add(start);
 		openSetMap.put(Integer.MAX_VALUE, start);
 		start.gScore = 0;
-		//start.node.fScore = heuristicFunction(start.node, goal.node);
 		start.fScore = heuristicFunction(start, goal);
 		
 		while (!openSet.isEmpty()) {

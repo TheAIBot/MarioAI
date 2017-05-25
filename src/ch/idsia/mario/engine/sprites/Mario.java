@@ -706,4 +706,13 @@ public class Mario extends Sprite {
 	public boolean mayJump() {
 		return mayJump;
 	}
+	
+	public void setPosition(int x, int y) {
+		this.x = x * 16 - 8;
+		this.y = y * 16 - 2;
+	}
+	
+	public void setXPosition(int x) {
+		this.x = x * 16 - 8;
+	}
 }

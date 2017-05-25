@@ -4,22 +4,22 @@ import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.NodeCreator;
+import MarioAI.graph.nodes.World;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
 public class TestCompleteLevel {
 	Agent agent;
 	Environment observation;
-	NodeCreator graph;
+	World graph;
 	
 	public void setup(String levelName) {
 		agent = new FastAndFurious();
 		observation = TestTools.loadLevel(levelName + ".lvl", agent);
 		
 		TestTools.runOneTick(observation);
-		graph = new NodeCreator();
-		graph.createStartGraph(observation);
+		graph = new World();
+		graph.initialize(observation);
 		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	

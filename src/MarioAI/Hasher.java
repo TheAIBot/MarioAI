@@ -2,6 +2,7 @@ package MarioAI;
 
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
 
 public class Hasher {
 
@@ -11,7 +12,10 @@ public class Hasher {
 
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {
 		//the hash of the speed needs to be fixed
-		final long a = ((long)hashSpeed(vx)) << 32; 
+		//final long a = hashSpeed(vx) << 32;
+		final int speedHash = hashSpeed(vx);
+		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
+		final long a = ((long)hashSpeed(vx) << 32) | speedSign;
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
@@ -24,15 +28,21 @@ public class Hasher {
 		
 		final int a = x & 0xffff;
 		final int b = (y & 0xff) << 16;
-		final int c = hashSpeed(vx) << 24;
-		final int d = (((int)hashSpeed(vx)) & 0x80000000);
+		final int c = ((byte)hashSpeed(vx)) << 24;
+		final int d = hashSpeed(vx) & 0x80000000;
 		
 		return d | c | b | a;
 	}
 	
-	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 20;
+	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
 	public static int hashSpeed(float vx) {
-		return (int)(vx * FACTOR_NUMBER_OF_SPEED_NODES);
+		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (FACTOR_NUMBER_OF_SPEED_NODES * 2);
+		return (int)((vx + ADD_FOR_ROUND) * FACTOR_NUMBER_OF_SPEED_NODES);
+		/*
+		final int speedHash = hashSpeed(vx);
+		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
+		final long a = ((long)hashSpeed(vx) << 32) | speedSign;
+		*/
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

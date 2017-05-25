@@ -5,54 +5,29 @@ import java.util.*;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.World;
 
 public  class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
 	private static final float MAX_JUMP_RANGE = 5;
 	public  static final int GRID_HEIGHT = 15;
 	public  static final int GRID_WIDTH = 22;
-	private static final int MarioHeight = 2;
+	private static final int MARIO_HEIGHT = 2;
 	
 	private Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private int testPrintCounter = 24; // Rand value
 
-	public void printView(Node marioNode) {
-		testPrintCounter = testPrintCounter % 240;
-		if (true) {
-			System.out.printf("    ");
-			for (int j = 0; j < observationGraph[0].length; j++) {
-				System.out.printf("%03d ", j);
-			}
-			System.out.println();
-			
-			for (int i = 0; i < observationGraph.length; i++) {
-				System.out.printf("%03d ", i);				
-				for (int j = 0; j < observationGraph[i].length; j++) {
-					if (j == marioNode.y && i == GRID_WIDTH/2) 
-						System.out.printf("MMM ");
-					else {
-						if (observationGraph[i][j] == null) {
-							System.out.printf("%03d ", 0);									
-						} else System.out.printf("%03d ", observationGraph[i][j].type);						
-					}
-				}
-				System.out.println();
-			}	
-		}
-		testPrintCounter++;
-	}
-		
-	public void setMovementEdges(Node[][] levelMatrix, Node marioNode) {
-		observationGraph = levelMatrix;
+	public void setMovementEdges(World world, Node marioNode) {
+		observationGraph = world.getLevelMatrix();
 		marioNode.deleteAllEdges();
-		//printView(marioNode);
-		//For mario:
+		
+		//First connects all the edges for Mario:
 		if(isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) &&
 		   canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
 			connectNode(marioNode, GRID_WIDTH / 2, marioNode); 
 		}
-		//For the rest of the level matrix:
-
+		
+		//Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) {
 			for (int j = 0; j < observationGraph[i].length; j++) {
 				if (isOnLevelMatrix(i, j) &&
@@ -69,10 +44,11 @@ public  class EdgeCreator {
 	private void connectNode(Node node, int coloumn, Node marioNode) {
 		// Find the reachable nodes:
 		for (DirectedEdge connectingEdge : getConnectingEdges(node, coloumn)) {
-			if (connectingEdge.target != null && 
-				isOnLevelMatrix(connectingEdge.target, marioNode) && //why are the last 3 checks here?
-				canMarioStandThere(connectingEdge.target, marioNode) && 
-				connectingEdge.source.x != connectingEdge.target.x) { // FIX
+			if (connectingEdge.target != null && //Must go to actual block, not just air.
+				isOnLevelMatrix(connectingEdge.target, marioNode) && //It must be on the current level matrix.
+				canMarioStandThere(connectingEdge.target, marioNode) && //The edge must not go into for example a wall.
+				connectingEdge.source != connectingEdge.target) { // No movement to the same node. Notice that no equals method are needed.
+				//TODO (*) Maybe allow above.
 				node.addEdge(connectingEdge); 
 			}
 		}		
@@ -83,8 +59,8 @@ public  class EdgeCreator {
 	}
 
 	private boolean isOnLevelMatrix(int coloumn, int row) {
-		return (0 <= coloumn && coloumn < GRID_WIDTH &&
-				0 <= row 	 && row		< GRID_HEIGHT); 
+		return (0 <= coloumn && coloumn 	< GRID_WIDTH &&
+				  0 <= row 	 	&& row		< GRID_HEIGHT); 
 	}
 	
 	private int getColoumnRelativeToMario(Node node, Node marioNode) {
@@ -95,30 +71,28 @@ public  class EdgeCreator {
 	private List<DirectedEdge> getConnectingEdges(Node startingNode, int nodeColoumn) {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		boolean foundAllEdges = true;
-		//Three different ways to find the reachable nodes from a given position:
+		//Two different ways to find the reachable nodes from a given position:
 		foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
 		foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;
 		
-		if (foundAllEdges) {
-			startingNode.setIsAllEdgesMade(true);
-		}
+		if (foundAllEdges) startingNode.setIsAllEdgesMade(true);
+		
 		return listOfEdges;
 	}
 	
 	private boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
+
+		//Run to the right:
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
-			//Run to the right:
 			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
-		} else {
-			foundAllEdges = false;
-		}
+		} else foundAllEdges = false;
+		
+		//Run to the left:
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			//Run to the left:
 			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
-		}	else {
-			foundAllEdges = false;
-		}
+		}	else foundAllEdges = false;
+		
 		return foundAllEdges;
 	}
 
@@ -136,7 +110,6 @@ public  class EdgeCreator {
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; //TODO ERROR if removed on shortdeadend
 				
-				//TODO temp no left jump (*)
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;					
 			}
@@ -147,24 +120,28 @@ public  class EdgeCreator {
 	public boolean jumpAlongPolynomial(Node startingNode, int nodeColoumn, JumpingEdge polynomial, JumpDirection direction, List<DirectedEdge> listOfEdges) {
 		//Starts of from Mario's initial position:
 		int currentXPosition = nodeColoumn;
+		//If there is a wall collision, an offset between the height function (function of x)
+		//and the actual height, might build up. This is taken care of with this variable.
 		int xPositionOffsetForJump = 0;
 		int formerLowerYPosition = startingNode.y;
 		Collision collisionDetection = Collision.HIT_NOTHING;
 		//Gives the current direction of the jump:
 		JumpDirection currentJumpDirection = direction;
 
-		//column
+		//Switches modes from ascending to descending, when the top point has been reached.
 		boolean hasAlreadyPassedTopPoint = false;
 		boolean isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);;
+		
 		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
 			currentXPosition = currentXPosition + direction.getHorizontalDirectionAsInt();
 			float currentYPosition;
 			
 			if (isPastTopPointColumn && !hasAlreadyPassedTopPoint) {
 				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
-					currentXPosition--; //The toppunkt was in the current block (and not ending there).
+					currentXPosition--; //The toppoint was in the current block (and not ending there).
 					//Therefore the downward going part of that block needs to be checked.
-				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) {
+					//See more detailed explanation in the report.
+				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) { //Leftwards
 					currentXPosition++;
 				}
 				currentJumpDirection = direction.getOppositeVerticalDirection();				
@@ -222,9 +199,11 @@ public  class EdgeCreator {
 			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  (y, currentXPosition, collisionDetection, direction);
 			final Collision upperFacingMarioCorner   = upperFacingCornerCollision  (isHittingWall, y, formerLowerYPosition, currentXPosition, direction);	
 			final Collision upperOppositeMarioCorner = upperOppositeCornerCollision(y, currentXPosition, direction);	
-			//As it is ascending to the right, only worry about the two corners to the right
-			if (upperOppositeMarioCorner == Collision.HIT_CEILING  || 
-				upperFacingMarioCorner == Collision.HIT_CEILING){
+			final Collision middleFacingMarioCorner  = middleFacingCornerCollision(y, currentXPosition, direction);
+			//As it is ascending to the right, only worry about the two corners to the right/left,
+			//and maybe the middle right/left part, if Mario has height 2.
+			if (upperOppositeMarioCorner 	== Collision.HIT_CEILING  || 
+				 upperFacingMarioCorner 	== Collision.HIT_CEILING){
 				collisionDetection = Collision.HIT_CEILING;
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_NOTHING && 
@@ -235,13 +214,23 @@ public  class EdgeCreator {
 				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
-				lowerFacingMarioCorner == Collision.HIT_WALL) {
+						  lowerFacingMarioCorner == Collision.HIT_WALL) {
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				if (stopAtAnyCollision) {
 					break;
 				}
 				//No break.
+			} 
+			//Extra check if Mario has height 2. Can only be HIT_WALL, 
+			//and is always HIT_NOTHING if Mario has height less than 2.
+			//(*) TODO test this works.
+			else if (middleFacingMarioCorner == Collision.HIT_WALL) {
+				collisionDetection = Collision.HIT_WALL;
+				isHittingWall = true;
+				if (stopAtAnyCollision) {
+					break;
+				}
 			}
 		}
 		return collisionDetection;
@@ -344,7 +333,7 @@ public  class EdgeCreator {
 				 0 <= coloumn && coloumn < GRID_WIDTH) ||				
 				 observationGraph[coloumn][row] == null;// TODO(*) Fix
 	}
-			
+				
 	private Collision lowerFacingCornerCollision(int y, int currentXPosition, Collision collisionDetection, JumpDirection direction) {
 		if (direction.isUpwardsType()) { 
 			//In the case one is going upwards, one should not check for any other type of collisions, 
@@ -352,7 +341,7 @@ public  class EdgeCreator {
 			if (isHittingWallOrGroundUpwards(currentXPosition, y)) { //If it is hitting the ceiling, upperRight will notice.
 				return Collision.HIT_WALL;
 			} else {
-				if (isAir(currentXPosition, y - MarioHeight) && 
+				if (isAir(currentXPosition, y - MARIO_HEIGHT) && 
 					collisionDetection == Collision.HIT_WALL) {
 					return Collision.HIT_GROUND;
 				} else {
@@ -431,6 +420,20 @@ public  class EdgeCreator {
 		}
 	}
 
+	private Collision middleFacingCornerCollision(int y, int currentXPosition,JumpDirection direction){
+		//Mario must have height 2, before this is relevant:
+		if (MARIO_HEIGHT == 2) {
+			//Some blocks can be passed through going upwards, not downwards, so two cases are necessary:
+			//TODO check if it is nessecary(*)
+			if ((direction.isUpwardsType() 	&& isHittingWallOrGroundUpwards(currentXPosition, y)) 	||
+				 (direction.isLeftType()    	&& isHittingWallOrGroundDownwards(currentXPosition, y))) { //If it is hitting the ceiling, upperRight will notice.
+				return Collision.HIT_WALL;
+			} 
+			else return Collision.HIT_NOTHING;
+		} else return Collision.HIT_NOTHING; //Do not include it, which means, take it as having no collisions
+		//Can only lead to a wall collision, and this happens, if and only if it is in a wall:		
+	}
+	
 	public void clearAllEdges(Node[][] world) {
 		for (int i = 0; i < world.length; i++) {
 			for (int j = 0; j < world[i].length; j++) {
