@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.Function;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -169,9 +170,11 @@ public class MovementInformation implements Function{
 	}
 
 	public boolean hasCollisions(Node sourceNode) {
-		for (int i = 0; i < positions.length; i++) {
-			
-		}		
-		return false;
+		for (int i = 1; i < positions.length; i++) { //Can't collide at initial position, so i starts at i=1
+			//if(CollisionDetection.isColliding(positions[i],positions[i-1], sourceNode))
+			//	return true;
+		}	
+		return true;
+		//return false;
 	}
 }

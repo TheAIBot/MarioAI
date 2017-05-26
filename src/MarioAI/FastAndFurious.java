@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
+import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.nodes.World;
@@ -30,6 +31,7 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
+		CollisionDetection.setWorld(world);
 
 		if (tickCount == 30) {
 			world.initialize(observation);

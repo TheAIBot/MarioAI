@@ -1,6 +1,7 @@
 package ch.idsia.scenarios;
 
 import MarioAI.FastAndFurious;
+import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
@@ -13,6 +14,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
+		CollisionDetection.loadTileBehaviors();
 		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
@@ -36,7 +38,7 @@ public class Play {
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
 	        System.out.println("Seed = " + seed);
-	        //options.setLevelRandSeed(2);
+	        options.setLevelRandSeed(3261372);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);

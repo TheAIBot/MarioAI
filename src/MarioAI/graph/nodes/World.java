@@ -151,7 +151,7 @@ public class World {
 		savedColumns.put(x, column);
 	}
 
-	private Node[] getColumn(final int x) {
+	public Node[] getColumn(final int x) {
 		return savedColumns.get(x);
 	}
 	
