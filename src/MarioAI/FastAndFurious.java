@@ -12,6 +12,7 @@ import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import tests.TestTools;
 
 
 public class FastAndFurious implements Agent {
@@ -75,6 +76,8 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawPathEdgeTypes(observation, newestPath);
 				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
+				//TestTools.renderLevel(observation);
+				//System.out.println();
 			}
 		}
 		tickCount++;

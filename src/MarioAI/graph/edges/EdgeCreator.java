@@ -79,8 +79,9 @@ public  class EdgeCreator {
 		
 		return listOfEdges;
 	}
+
 	
-	private boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
+	public boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
 
 		//Run to the right:
@@ -421,12 +422,13 @@ public  class EdgeCreator {
 	}
 
 	private Collision middleFacingCornerCollision(int y, int currentXPosition,JumpDirection direction){
+		//TODO fix this, doens't work properly
 		//Mario must have height 2, before this is relevant:
 		if (MARIO_HEIGHT == 2) {
 			//Some blocks can be passed through going upwards, not downwards, so two cases are necessary:
 			//TODO check if it is nessecary(*)
 			if ((direction.isUpwardsType() 	&& isHittingWallOrGroundUpwards(currentXPosition, y)) 	||
-				 (direction.isLeftType()    	&& isHittingWallOrGroundDownwards(currentXPosition, y))) { //If it is hitting the ceiling, upperRight will notice.
+				 (!direction.isUpwardsType()    	&& isHittingWallOrGroundDownwards(currentXPosition, y))) { //If it is hitting the ceiling, upperRight will notice.
 				return Collision.HIT_WALL;
 			} 
 			else return Collision.HIT_NOTHING;

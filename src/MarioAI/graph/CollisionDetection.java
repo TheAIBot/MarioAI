@@ -8,6 +8,7 @@ import com.sun.javafx.scene.paint.GradientUtils.Point;
 import com.sun.javafx.scene.traversal.Direction;
 
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.graph.nodes.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.level.Level;
@@ -27,15 +28,20 @@ public class CollisionDetection {
    	//Test seed: 3261372
 	
 	
-	public static boolean isColliding(Point2D.Float currentPosition, Point2D.Float priorPosition, Node sourceNode){
+	public static boolean isColliding(Point2D.Float currentPosition, Point2D.Float priorPosition, SpeedNode sourceNode){
 		//TODO check correct directions.
 		//One block = 16
+		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
 		float xa = (currentPosition.x - priorPosition.x)*16;
-		float ya = (currentPosition.y - priorPosition.y)*16;
+		float ya = (priorPosition.y - currentPosition.y )*16; //yes, it is the correct placement.
 		//Change below to just use current position, if one want to get the actual position after the collision.
 		//Note how the y direction is handled.
-		Point2D.Float positionAfterCollisions = new Point2D.Float((currentPosition.x + sourceNode.x)*16,(sourceNode.y - currentPosition.y )*16);
-		return move(positionAfterCollisions, xa, ya);
+		//The minus one is needed to reflect how it is done by the mario code.
+		//TODO find out why,
+		Point2D.Float currentNewPosition = new Point2D.Float((priorPosition.x + sourceNode.xPos)*16 + 8,(sourceNode.yPos - priorPosition.y )*16 - 2);
+		
+		//(*) Do it of two times.
+		return !move(currentNewPosition, xa, ya);
 	}
 	
 	public static void setWorld(World newWorld){
@@ -73,11 +79,11 @@ public class CollisionDetection {
 		boolean collide = false;
 
 		//We don't care if it is just one of the blocking that is true, or multiple, so they are joiuned together
-		if (ya > 0 && 
-			(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-			 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-			 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya) || 
-			 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya))) {
+		if 			(ya > 0 && 
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya))) {
 			collide = true;
 		} else if 	(ya < 0 && 
 				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
@@ -86,14 +92,13 @@ public class CollisionDetection {
 			collide = true;
 		} else if 	(xa > 0 && 
 						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) || 
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
 			collide = true;
-		}else if (xa < 0 &&
-					(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-					 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-					 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) ||
-					 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
+		}else if 	(xa < 0 &&
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
 			collide = true;
 		}
 
@@ -132,16 +137,22 @@ public class CollisionDetection {
 	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya) {
 		int x = (int) (newX / 16);
 		int y = (int) (newY / 16);
+		//TODO check why this is necessary.
 		if (x == (int) (currentPosition.x / 16) && y == (int) (currentPosition.y / 16))
 			return false;
 		else {
 			Node[] column = world.getColumn(x);
-			if (column != null && column[y] != null) { //TODO (*)Check correct null check
-				boolean blocking = ((TILE_BEHAVIORS[column[y ].type & 0xff]) & BIT_BLOCK_ALL) > 0;
+			if (column != null && y >= 0 && y <= 15) { //TODO (*)Check correct null check
+				if (column[y] == null) {
+					return false;
+				}
+				boolean blocking = ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_ALL) > 0;
 				blocking |= (ya > 0) && ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_UPPER) > 0;
 				blocking |= (ya < 0) && ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
-			} else return true;//Haven't seen the column=collision.
+			} else {
+				return false;//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
+			}
 		}
 	}
 	
@@ -149,9 +160,10 @@ public class CollisionDetection {
 	public static void loadTileBehaviors(){
 		//TODO check done correctly
 		try {
-			new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")).readFully(Level.TILE_BEHAVIORS);
-	        }
-	   catch (IOException e){
+			new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")).readFully(CollisionDetection.TILE_BEHAVIORS);
+			System.out.println("meh");
+		}
+	   catch (Exception e){
 		   e.printStackTrace();
 	            System.exit(0);
 	        }

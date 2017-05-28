@@ -118,7 +118,11 @@ public final class AStar {
 				
 				if (!sn.isSpeedNodeUseable()) {
 					continue;
-				}	
+				}
+				
+				if (sn.getMoveInfo().hasCollisions(current)) {
+					//continue;
+				}
 				
 				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {

@@ -153,9 +153,10 @@ public class MarioControls {
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
 		MovementInformation movementInformation = getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
-		if (movementInformation.hasCollisions(edge.source)) {
-			//Curses!
-		}
+		//if (movementInformation.hasCollisions(edge)) {
+		//	//Curses!
+		//	return movementInformation;
+		//}
 		return movementInformation;
 	}
 	

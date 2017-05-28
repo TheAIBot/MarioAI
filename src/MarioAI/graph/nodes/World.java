@@ -79,13 +79,11 @@ public class World {
 		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
 		maxMarioXPos = newMaxMarioXPos;		
 		
-		if (changeX != 0 ||
-			changeY != 0) {
+		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
 			setMarioNode(observation);
 			hasWorldChanged = true;
-		}
-		hasWorldChanged = false; //TODO (*)If everything else is done correctly, this can be deleted.
+		} else hasWorldChanged = false; //TODO (*)If everything else is done correctly, this can be deleted.
 	}
 	
 	private void setMarioNode(final Environment observation) {

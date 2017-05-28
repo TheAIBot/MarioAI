@@ -3,6 +3,7 @@ package ch.idsia.scenarios;
 import MarioAI.FastAndFurious;
 import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
@@ -15,13 +16,17 @@ public class Play {
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
+			//Agent controller = new HumanKeyboardAgent();
 			// Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("jumpLevels/1Width.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("TheMazeError.lvl", controller, true);
+			//TODO bug i collision detection for level = TheMazeError.
+			//TODO bug i collision detection for level = thinStairs.
+			//TestTools.setMarioPosition(observation, 3, 9);
 			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
@@ -38,7 +43,8 @@ public class Play {
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(3261372);
+	        //options.setLevelRandSeed(1585046168);
+	        //options.setLevelRandSeed(3261372);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);
 	        //options.setLevelRandSeed(650);

@@ -518,7 +518,7 @@ public class Mario extends Sprite {
 	private boolean isBlocking(float _x, float _y, float xa, float ya) {
 		int x = (int) (_x / 16);
 		int y = (int) (_y / 16);
-		if (x == (int) (this.x / 16) && y == (int) (this.y / 16))
+		if (x == (int) (this.x / 16) && y == (int ) (this.y / 16))
 			return false;
 
 		boolean blocking = world.level.isBlocking(x, y, xa, ya);
