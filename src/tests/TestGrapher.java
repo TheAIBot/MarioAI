@@ -29,6 +29,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestGrapher {
 	EdgeCreator grapher = new EdgeCreator();
+	Environment observation;
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
 	public DirectedEdge runningEdgeType = new RunningEdge(null, null);
@@ -46,7 +47,7 @@ public class TestGrapher {
 
 	public World getStartLevelWorld(String level) {
 		BasicAIAgent agent = new BasicAIAgent("");
-		Environment observation = TestTools.loadLevel(level, agent);
+		observation = TestTools.loadLevel(level, agent);
 		TestTools.runOneTick(observation);
 		World graph = new World();
 		graph.initialize(observation);
@@ -259,6 +260,11 @@ public class TestGrapher {
 		}
 	}
 
+	public void testJumpingOneBlockAbove(){
+		//The block above should stop all the different jumps, thus there should only be running edges.
+		fail("Make the test");
+	}
+	
 	@Test
 	public void testAbleToJumpUpThroughCertainMaterials() {
 		EdgeCreator grapher = new EdgeCreator();
@@ -289,22 +295,64 @@ public class TestGrapher {
 		EdgeCreator grapher = new EdgeCreator();
 		World graph = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] world = graph.getLevelMatrix();
-		for (int i = 0; i < world.length; i++) {
-			world[i][(short) (marioNode.y - 3)] = new Node(getXPositionFromColoumn(marioNode, i),
-					(short) (marioNode.y - 3), (byte) 12);
-		}
-		grapher.setMovementEdges(graph, marioNode); // TODO remove -1
-								// after adding
-								// possibility
-								// for left
-								// jump.
-		for (int i = 0; i < world.length; i++) {
-			boolean hasEdgeToUpperLevel = false;
-			for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
-				if (edge.target.y == marioNode.y - 3)
-					hasEdgeToUpperLevel = true;
+		//TODO also make a test where it checks if it is only those edges that will lead to a crash, that are removed.
+		for (int height = 3; height <= 7; height++) {
+			//Adds the ceiling:
+			for (int i = 0; i < world.length; i++) {
+				world[i][(short) (marioNode.y - height)] = new Node(getXPositionFromColoumn(marioNode, i),
+						(short) (marioNode.y - height), (byte) 12);
 			}
-			assertFalse("Error at coloumn: " + i, hasEdgeToUpperLevel);
+			grapher.setMovementEdges(graph, marioNode); 
+			//TODO check why mario can't jump left at height=4.
+			System.out.println();
+			// TODO remove -1
+									// after adding
+									// possibility
+									// for left
+									// jump.
+			//It shouldn have any edges to the upper level:
+			for (int i = 0; i < world.length; i++) {
+				boolean hasEdgeToUpperLevel = false;
+				for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
+					if (edge.target.y == marioNode.y - height)
+						hasEdgeToUpperLevel = true;
+				}
+				assertFalse("Error at coloumn: " + i, hasEdgeToUpperLevel);
+			}
+			//It should have jumps of a certain height, but not any grater:
+			System.out.println();
+			//TODO change i back
+			for (int i = 0; i < world.length; i++) {
+				Node currentNode = world[i][marioNode.y];
+				boolean hasEdgeToExtremeHeights = false;
+				System.out.println(currentNode);
+				System.out.println(currentNode.edges.toString());
+				System.out.println();
+				boolean hasEdgesToRequiredHeights = false;
+				for (DirectedEdge edge : currentNode.getEdges()) {
+					// Math.round(getMaxY()) is the height of the jump/run, rounded (will always be relativly precise, 
+					//as the jumps are in integer for).
+					//TODO (*)change assumption if this is changed for the jumps.
+					if (Math.round(edge.getMaxY()) >= height - 2)
+						hasEdgeToExtremeHeights = true;
+					else if (height - 2 > Math.round(edge.getMaxY()) && Math.round(edge.getMaxY()) >= height - 3) { //required heights.
+						hasEdgesToRequiredHeights = true;
+					}
+					else{
+						System.out.println();
+					}
+				}
+				if (hasEdgeToExtremeHeights || !hasEdgesToRequiredHeights) {
+					assertFalse("Error at coloumn: " + i + ", at height = " + height, hasEdgeToExtremeHeights);
+					assertTrue("Error at coloumn: " + i + ", at height = " + height, hasEdgesToRequiredHeights);
+					
+				}
+				
+			}
+			//Removes the ceiling:
+			for (int i = 0; i < world.length; i++) {
+				world[i][(short) (marioNode.y - height)] = null;
+			}
 		}
 	}
 
@@ -323,7 +371,33 @@ public class TestGrapher {
 			}
 		}
 	}
-
+	@Test
+	public void testNoJumpingThroughWall() {
+		//A level has been made for this:
+		World world = getStartLevelWorld("noJumpsThroughWall2.lvl");
+		world.update(observation);
+		TestTools.setMarioPosition(observation, 15, 8);
+		world.update(observation);
+		TestTools.runOneTick(observation);
+		marioNode = world.getMarioNode(observation);
+		grapher.setMovementEdges(world, marioNode);
+		Node[][] level = world.getLevelMatrix();
+		for (int i = 9; i < level.length; i++) {
+			if (level[i][10] != null) {
+				String errorMessage = "Error at: i=" + i; 
+				boolean jumpIntoTheCeiling = level[i][10].edges.stream().anyMatch(edge -> Math.round(edge.getMaxY())  > 1);
+				boolean jumpThroughWall = level[i][10].edges.stream().anyMatch(edge -> edge.target.x >= 17);
+				boolean jumpAwayFromFloor = level[i][10].edges.stream().anyMatch(edge -> edge.target.y != 10);
+				if (jumpIntoTheCeiling || jumpThroughWall || jumpAwayFromFloor) {
+					System.out.println();
+				}
+				assertFalse(errorMessage, jumpIntoTheCeiling);
+				assertFalse(errorMessage, jumpThroughWall);
+				assertFalse(errorMessage, jumpAwayFromFloor);
+			}
+		}
+	}
+	
 	@Test
 	public void testAlwaysSameResultOnSetEdges() {
 		EdgeCreator grapher = new EdgeCreator();
@@ -344,8 +418,9 @@ public class TestGrapher {
 			for (int j = 0; j < world2[i].length; j++) {
 				if (world1[i][j] == null && world2[i][j] == null) {
 					continue;
-				} else if (world1[i][j] == null && world2[i][j] == null)
-					fail();
+				} else if (world1[i][j] != null && world2[i][j] != null){
+					//Nothing, the checks below should be made.					
+				} else fail();
 				// The number of edges going out from a given
 				// Node should be the same:
 				assertEquals(world1[i][j].getEdges().size(), world2[i][j].getEdges().size());
@@ -365,5 +440,16 @@ public class TestGrapher {
 			}
 		}
 
+	}
+	@Test
+	public void testCollisonDetectionLoweringIntoFloor() {
+		//In essence testing when exactely it should give a collision
+		fail("Make");
+	}
+	@Test	
+	public void testCollisonDetectionUpIntoCeiling() {
+		//In essence testing when exactely it should give a collision,
+		//by slowly increasing marios y position
+		fail("Make");
 	}
 }

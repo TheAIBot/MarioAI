@@ -130,6 +130,7 @@ public class TestCollisionDetector {
 	
 	@Test
 	public void testJumpIntoCeiling(){
+		//TODO go trough the test step by step, and check it is correct.
 		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Edges are made before the ceiling, to ensure that the movements are possible.
