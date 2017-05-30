@@ -51,17 +51,18 @@ public class FastAndFurious implements Agent {
 			}
 			
 			if   ((world.hasGoalNodesChanged() || 
-					 MarioControls.isPathInvalid(observation, newestPath) ||
-					 enemyPredictor.hasNewEnemySpawned() ) 
-					  && 
-					 marioController.canUpdatePath) 
+				   MarioControls.isPathInvalid(observation, newestPath) ||
+				   enemyPredictor.hasNewEnemySpawned() ) && 
+				  marioController.canUpdatePath) 
 			{
 				newestPath = getPath(observation);
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
 			
-			action = marioController.getNextAction(observation, newestPath);
+			if (newestPath.size() > 1) {
+				action = marioController.getNextAction(observation, newestPath);
+			}
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
@@ -75,8 +76,6 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawPathEdgeTypes(observation, newestPath);
 				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
-				//TestTools.renderLevel(observation);
-				//System.out.println();
 			}
 		}
 		tickCount++;
