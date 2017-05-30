@@ -30,7 +30,6 @@ public class EnemyPredictor {
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 	private boolean newEnemySpawned = false;
-	private final Semaphore threadLimiter = new Semaphore(PathMaster.MAX_THREAD_COUNT);
 	
 	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
@@ -101,50 +100,48 @@ public class EnemyPredictor {
 	}
 	
 	private void removeDeadEnemies(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		synchronized (verifiedEnemySimulations) {
-			final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
-			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-				final int kind = enemySimulation.getKind();
-				final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
-				final float simulationX = simulationPosition.x;
-				final float simulationY = simulationPosition.y;
+		final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+			final int kind = enemySimulation.getKind();
+			final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
+			final float simulationX = simulationPosition.x;
+			final float simulationY = simulationPosition.y;
+			
+			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
+			
+			if (enemyPositions != null) {
+				Point2D.Float simulatedPosition = null;
+				float leastDifference = Integer.MAX_VALUE;
 				
-				final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
-				
-				if (enemyPositions != null) {
-					Point2D.Float simulatedPosition = null;
-					float leastDifference = Integer.MAX_VALUE;
+				for (Point2D.Float enemyPosition : enemyPositions) {
+					final float deltaX = Math.abs(enemyPosition.x - simulationX);
+					final float deltaY = Math.abs(enemyPosition.y - simulationY);
 					
-					for (Point2D.Float enemyPosition : enemyPositions) {
-						final float deltaX = Math.abs(enemyPosition.x - simulationX);
-						final float deltaY = Math.abs(enemyPosition.y - simulationY);
-						
-						final float difference = deltaX + deltaY;
-						
-						if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
-							deltaY <= ACCEPTED_POSITION_DEVIATION && 
-							difference < leastDifference) {
-							simulatedPosition = enemyPosition;
-							leastDifference = difference;
-							break;
-						}
-					}
+					final float difference = deltaX + deltaY;
 					
-					if (simulatedPosition != null) {
-						enemyPositions.remove(simulatedPosition);
-						//enemySimulation.setX(simulatedPosition.x);
-						//enemySimulation.setY(simulatedPosition.y);
-						
-						notDeletedSimulations.add(enemySimulation);
-					}	
-					else {
-						System.out.println("removed");
+					if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
+						deltaY <= ACCEPTED_POSITION_DEVIATION && 
+						difference < leastDifference) {
+						simulatedPosition = enemyPosition;
+						leastDifference = difference;
+						break;
 					}
 				}
+				
+				if (simulatedPosition != null) {
+					enemyPositions.remove(simulatedPosition);
+					//enemySimulation.setX(simulatedPosition.x);
+					//enemySimulation.setY(simulatedPosition.y);
+					
+					notDeletedSimulations.add(enemySimulation);
+				}	
+				else {
+					System.out.println("removed");
+				}
 			}
-			
-			verifiedEnemySimulations = notDeletedSimulations;	
 		}
+		
+		verifiedEnemySimulations = notDeletedSimulations;	
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
@@ -173,9 +170,7 @@ public class EnemyPredictor {
 				
 				if (foundPoint != null) {
 					enemyPositions.remove(foundPoint);
-					synchronized (verifiedEnemySimulations) {
-						verifiedEnemySimulations.add(enemySimulation);	
-					}
+					verifiedEnemySimulations.add(enemySimulation);	
 					newEnemySpawned = true;
 				}
 			}
