@@ -7,7 +7,6 @@ import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.World;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -31,11 +30,13 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
-		CollisionDetection.setWorld(world);
 
 		if (tickCount == 30) {
 			world.initialize(observation);
 			grapher.setMovementEdges(world, world.getMarioNode(observation));
+			
+			CollisionDetection.setWorld(world);
+			CollisionDetection.loadTileBehaviors();
 			
 			newestPath = getPath(observation);
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
@@ -50,18 +51,19 @@ public class FastAndFurious implements Agent {
 				world.resetHasWorldChanged();
 			}
 			
-			if   ((world.hasGoalNodesChanged() || 
-					 MarioControls.isPathInvalid(observation, newestPath) ||
-					 enemyPredictor.hasNewEnemySpawned() ) 
-					  && 
-					 marioController.canUpdatePath) 
+			if ((world.hasGoalNodesChanged() || 
+				 MarioControls.isPathInvalid(observation, newestPath) ||
+				 enemyPredictor.hasNewEnemySpawned()) && 
+				marioController.canUpdatePath) 
 			{
 				newestPath = getPath(observation);
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
 			
-			action = marioController.getNextAction(observation, newestPath);
+			if (newestPath.size() > 1) {
+				action = marioController.getNextAction(observation, newestPath);
+			}
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
@@ -75,8 +77,6 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawPathEdgeTypes(observation, newestPath);
 				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
-				//TestTools.renderLevel(observation);
-				//System.out.println();
 			}
 		}
 		tickCount++;
@@ -89,9 +89,9 @@ public class FastAndFurious implements Agent {
 		
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		System.out.println("Starting x velocity: " + marioController.getXVelocity());
-		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, timeToRun);
-		return (path == null) ? newestPath : path;
+		System.out.println("AStar");
+		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
+		return (path == null)? newestPath : path;
 	}
 
 	public AGENT_TYPE getType() {

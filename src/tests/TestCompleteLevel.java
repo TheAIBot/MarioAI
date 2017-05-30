@@ -3,8 +3,8 @@ package tests;
 import org.junit.Test;
 
 import MarioAI.FastAndFurious;
+import MarioAI.World;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.World;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 
@@ -20,7 +20,7 @@ public class TestCompleteLevel {
 		TestTools.runOneTick(observation);
 		graph = new World();
 		graph.initialize(observation);
-		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		//new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
 	public void testLevel(String path) {

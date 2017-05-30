@@ -143,7 +143,6 @@ public class AStar {
 					continue;
 				}
 				
-				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
 				}

@@ -7,9 +7,9 @@ import java.io.IOException;
 import com.sun.javafx.scene.paint.GradientUtils.Point;
 import com.sun.javafx.scene.traversal.Direction;
 
+import MarioAI.World;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import MarioAI.graph.nodes.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -22,26 +22,28 @@ public class CollisionDetection {
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
-   public static final int BIT_BLOCK_LOWER = 1 << 2;   
+    public static final int BIT_BLOCK_LOWER = 1 << 2;   
 
-   public static byte[] TILE_BEHAVIORS = new byte[256];
+    public static byte[] TILE_BEHAVIORS = new byte[256];
    	//Test seed: 3261372
 	
 	
-	public static boolean isColliding(Point2D.Float currentPosition, Point2D.Float priorPosition, SpeedNode sourceNode){
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
-		float xa = (currentPosition.x - priorPosition.x)*16;
-		float ya = (priorPosition.y - currentPosition.y )*16; //yes, it is the correct placement.
+		final float xa =  (futureOffset.x - currentOffset.x) * 16;
+		final float ya = -(futureOffset.y - currentOffset.y) * 16; //yes, it is the correct placement.
 		//Change below to just use current position, if one want to get the actual position after the collision.
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		//TODO find out why,
-		Point2D.Float currentNewPosition = new Point2D.Float((priorPosition.x + sourceNode.xPos)*16 + 8,(sourceNode.yPos - priorPosition.y )*16 - 2);
+		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16 + MARIO_WIDTH * 2,
+															    -(currentOffset.y + sourceNode.yPos) * 16 - 2);
 		
 		//TODO (*) Do it of two times. First x, then y.
-		return !move(currentNewPosition, xa, ya);
+		return !move(currentPosition, xa, 0) || 
+			   !move(currentPosition, 0, ya);
 	}
 	
 	public static void setWorld(World newWorld){
@@ -85,17 +87,20 @@ public class CollisionDetection {
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya) || 
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya))) {
 			collide = true;
-		} else if 	(ya < 0 && 
+		} 
+		if 	(ya < 0 && 
 				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-				  		(collide || isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) ||
-				  		(collide || isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)))) {
+				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) {
 			collide = true;
-		} else if 	(xa > 0 && 
+		}
+		if 	(xa > 0 && 
 						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) || 
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
 			collide = true;
-		}else if 	(xa < 0 &&
+		}
+		if 	(xa < 0 &&
 						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
@@ -157,15 +162,17 @@ public class CollisionDetection {
 	}
 	
 	
-	public static void loadTileBehaviors(){
+	public static void loadTileBehaviors()
+	{
 		//TODO check done correctly
-		try {
+		try 
+		{
 			new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")).readFully(CollisionDetection.TILE_BEHAVIORS);
-			System.out.println("meh");
 		}
-	   catch (Exception e){
+		catch (Exception e)
+		{
 		   e.printStackTrace();
-	            System.exit(0);
-	        }
-	  }
+		   System.exit(0);
+		}
+	}
 }

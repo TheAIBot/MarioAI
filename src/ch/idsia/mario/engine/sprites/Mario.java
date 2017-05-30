@@ -441,7 +441,7 @@ public class Mario extends Sprite {
 
 		boolean collide = false;
 		if (ya > 0) {
-			if (isBlocking(x + xa - width, y + ya, xa, 0))
+			if (     isBlocking(x + xa - width, y + ya, xa, 0))
 				collide = true;
 			else if (isBlocking(x + xa + width, y + ya, xa, 0))
 				collide = true;
@@ -709,7 +709,7 @@ public class Mario extends Sprite {
 	
 	public void setPosition(int x, int y) {
 		this.x = x * 16 - 8;
-		this.y = y * 16 - 2;
+		this.y = y * 16;
 	}
 	
 	public void setXPosition(int x) {

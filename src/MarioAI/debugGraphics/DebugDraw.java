@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.simulators.EnemySimulator;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.World;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;

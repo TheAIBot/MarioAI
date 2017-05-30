@@ -173,16 +173,14 @@ public class MovementInformation implements Function{
 
 	public boolean hasCollisions(SpeedNode sourceNode) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		Point2D.Float currentPosition;
-		//Can't collide at initial position, so i starts at i=1
-		//TODO what is i=0?
+
 		for (int i = 0; i < positions.length; i++) { 
-			currentPosition = positions[i];
-			if(CollisionDetection.isColliding(currentPosition,previousPosition, sourceNode))
+			final Point2D.Float currentPosition = positions[i];
+			if (CollisionDetection.isColliding(currentPosition, previousPosition, sourceNode)) {
 				return true;
+			}
 			previousPosition = currentPosition;
 		}	
 		return false;
-		//return false;
 	}
 }

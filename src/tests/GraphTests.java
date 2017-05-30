@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.World;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphTests {

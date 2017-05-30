@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
