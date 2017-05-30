@@ -1,12 +1,11 @@
-package MarioAI.graph.nodes;
+package MarioAI;
 
 import java.util.HashMap;
 
-import MarioAI.MarioMethods;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
 public class World { 
-	//ザ・ワールド！ 時よ止まれ！
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;

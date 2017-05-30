@@ -2,10 +2,10 @@ package MarioAI.graph.edges;
 
 import java.util.*;
 
+import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.World;
 
 public  class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;

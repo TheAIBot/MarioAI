@@ -13,6 +13,7 @@ import org.junit.Test;
 import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;

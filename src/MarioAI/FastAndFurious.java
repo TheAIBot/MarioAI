@@ -7,7 +7,6 @@ import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.World;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;

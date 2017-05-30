@@ -7,9 +7,9 @@ import java.io.IOException;
 import com.sun.javafx.scene.paint.GradientUtils.Point;
 import com.sun.javafx.scene.traversal.Direction;
 
+import MarioAI.World;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import MarioAI.graph.nodes.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.sprites.Mario;
