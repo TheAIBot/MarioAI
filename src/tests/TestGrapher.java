@@ -13,6 +13,8 @@ import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
+import MarioAI.graph.Collision;
+import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
@@ -25,6 +27,9 @@ import ch.idsia.mario.environments.Environment;
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
+
+import com.sun.javafx.geom.Edge;
+import com.sun.javafx.scene.traversal.Direction;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestGrapher {
@@ -371,6 +376,7 @@ public class TestGrapher {
 			}
 		}
 	}
+	
 	@Test
 	public void testNoJumpingThroughWall() {
 		//A level has been made for this:
@@ -441,15 +447,125 @@ public class TestGrapher {
 		}
 
 	}
+	
 	@Test
 	public void testCollisonDetectionLoweringIntoFloor() {
-		//In essence testing when exactely it should give a collision
-		fail("Make");
+		//In essence testing when exactly it should give a collision
+		World world = totalFlatland(flatlandWorld(), marioNode); 
+		grapher.setMovementEdges(world, marioNode);
+		Node[][] level = world.getLevelMatrix();
+		//Therefore, the tests can be made:
+		
+		//Testing the descending function:
+		
+		for (int i = 0; i < level.length; i++) {
+			//They are at height 9.
+			
+			//Does not allow only the top to hit the ground, as this is not possible in reality.
+			//Does not start from 10, as this would lead to no ground collision
+			//TODO does i make sense that if j=10, then there should be Collision.HIT_NOTHING?
+			for (float j = (float) 0; j >= 8.01; j += 0.05) {
+				//Should only collide if Mario, at height = 1.8, is within the block, or on top of it.
+				
+				//Simply uses a random node for the starting node:
+				Node startingPosition = new Node(2, 9, (byte) 22);
+				Node targetPosition = new Node(5, 9, (byte) 22);
+				List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
+				JumpingEdge polynomial = new JumpingEdge(null, null);
+				polynomial.setToJumpPolynomial(startingPosition, 11, 5, 4);
+				Collision rightwardsCollision = grapher.descendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_DOWNWARDS, startingPosition, listOfEdges);
+				Collision leftwardsCollision = grapher.descendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_DOWNWARDS, startingPosition, listOfEdges);
+				
+				String errorMessage = "Failure at i = " + i + ", height/j = " + j;
+				if (j >= 9) {					
+					assertEquals(errorMessage, Collision.HIT_GROUND, rightwardsCollision);
+					assertEquals(errorMessage, Collision.HIT_GROUND, leftwardsCollision);
+					assertEquals(2, listOfEdges.size());
+					
+					double delta = 0.01;
+					//Checking if one got the correct edges:
+					assertEquals(level[i][(int) Math.floor(j)], listOfEdges.get(0).target);
+					assertEquals(startingPosition, listOfEdges.get(0).source);
+					assertEquals(polynomial.getParameterA(), ((JumpingEdge) listOfEdges.get(0)).getParameterA() ,delta );
+					assertEquals(polynomial.getParameterB(), ((JumpingEdge) listOfEdges.get(0)).getParameterB() ,delta);
+					assertEquals(polynomial.getParameterC(), ((JumpingEdge) listOfEdges.get(0)).getParameterC() ,delta);
+					
+					assertEquals(level[i][(int) Math.floor(j)], listOfEdges.get(1).target);
+					assertEquals(startingPosition, listOfEdges.get(1).source);
+					assertEquals(polynomial.getParameterA(), ((JumpingEdge) listOfEdges.get(1)).getParameterA() ,delta);
+					assertEquals(polynomial.getParameterB(), ((JumpingEdge) listOfEdges.get(1)).getParameterB() ,delta);
+					assertEquals(polynomial.getParameterC(), ((JumpingEdge) listOfEdges.get(1)).getParameterC() ,delta);
+				} else {
+					assertEquals(errorMessage, Collision.HIT_NOTHING, rightwardsCollision);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, leftwardsCollision);
+					assertEquals(0, listOfEdges.size());
+				}
+			}
+		}
 	}
+	
 	@Test	
 	public void testCollisonDetectionUpIntoCeiling() {
-		//In essence testing when exactely it should give a collision,
+		//In essence testing when exactly it should give a collision,
 		//by slowly increasing marios y position
-		fail("Make");
+		//In essence testing when exactly it should give a collision
+		
+		World world = totalFlatland(flatlandWorld(), marioNode); 
+		grapher.setMovementEdges(world, marioNode);
+		Node[][] level = world.getLevelMatrix();
+		
+		//Testing the ascending function:
+		
+		for (int i = 0; i < level.length; i++) {
+			//The blocks are at height = 9
+			
+			//Does not allow only the bottom to hit the ground, as this is not possible in reality.
+			
+			for (float j = (float) 14; j - EdgeCreator.MARIO_HEIGHT >= 9; j -= 0.05) {
+				//Should only collide if Mario, at height = 1.8, is within the block, or on top of it.
+				
+				//Simply uses a random node for the starting node:
+				Node startingPosition = new Node(2, 9, (byte) 22);
+				Node targetPosition = new Node(5, 9, (byte) 22);
+				List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
+				JumpingEdge polynomial = new JumpingEdge(null, null);
+				polynomial.setToJumpPolynomial(startingPosition, 11, 5, 4);
+				Collision rightwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_UPWARDS, startingPosition, listOfEdges);
+				Collision leftwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS, startingPosition, listOfEdges);
+				
+				String errorMessage = "Failure at i = " + i + ", height/j = " + j;
+				if (9 <= j - EdgeCreator.MARIO_HEIGHT && j - EdgeCreator.MARIO_HEIGHT <= 10 ) {		
+					if (i == 0) { 
+						//The left corner will not hit the ceiling, and it will think it is a wall collision
+						assertEquals(errorMessage, Collision.HIT_WALL, rightwardsCollision);
+					} else {
+						assertEquals(errorMessage, Collision.HIT_CEILING, rightwardsCollision);
+					}
+					
+					if (i == level.length - 1) {
+						//The right corner will not hit the ceiling, and it will think it is a wall collision
+						assertEquals(errorMessage, Collision.HIT_WALL, leftwardsCollision);
+					} else {
+						assertEquals(errorMessage, Collision.HIT_CEILING, leftwardsCollision);
+					}
+					assertEquals(0, listOfEdges.size());
+				} else {
+					if (rightwardsCollision != Collision.HIT_NOTHING || leftwardsCollision != Collision.HIT_NOTHING) {
+						rightwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_UPWARDS, startingPosition, listOfEdges);
+						leftwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS, startingPosition, listOfEdges);
+						
+					}
+					assertEquals(errorMessage, Collision.HIT_NOTHING, rightwardsCollision);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, leftwardsCollision);
+					assertEquals(0, listOfEdges.size());
+				}
+			}
+		}
 	}
+	
+	@Test
+	public void testMiddleCornerCollisionDetection(){
+		fail("Make the test.");
+	}
+	
 }

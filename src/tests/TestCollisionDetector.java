@@ -72,7 +72,7 @@ public class TestCollisionDetector {
 				ArrayList<DirectedEdge> rightWalkingPath = new ArrayList<DirectedEdge>();
 				for (int j = 0; j < GRID_WIDTH/2 - 1; j++) {
 					ArrayList<DirectedEdge> runningEdges = new ArrayList<DirectedEdge>();
-					grapher.getRunningReachableEdges(level[j+GRID_WIDTH/2][marioNode.y], j+GRID_WIDTH/2, runningEdges);
+					grapher.getRunningReachableEdges(level[j + GRID_WIDTH/2][marioNode.y], j + GRID_WIDTH/2, runningEdges);
 					DirectedEdge rightRunningEdge = runningEdges.stream().filter(edge -> (edge.target.x > edge.source.x)).findAny().get();
 					assertTrue(rightRunningEdge != null);
 					
@@ -205,6 +205,22 @@ public class TestCollisionDetector {
 	
 	@Test
 	public void testSimulatedRuns(){
+		fail("Make the test");
+	}
+	
+
+	@Test
+	public void testStepwiseRaiseIntoCeiling(){
+		fail("Make the test");
+	}
+
+	@Test
+	public void testStepwiseLowerIntoFloor(){
+		fail("Make the test");
+	}
+	
+	@Test
+	public void testStepwise(){
 		fail("Make the test");
 	}
 	
