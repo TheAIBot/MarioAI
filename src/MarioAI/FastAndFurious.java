@@ -52,10 +52,10 @@ public class FastAndFurious implements Agent {
 				world.resetHasWorldChanged();
 			}
 			
-			if   ((world.hasGoalNodesChanged() || 
-				   MarioControls.isPathInvalid(observation, newestPath) ||
-				   enemyPredictor.hasNewEnemySpawned() ) && 
-				  marioController.canUpdatePath) 
+			if ((world.hasGoalNodesChanged() || 
+				 MarioControls.isPathInvalid(observation, newestPath) ||
+				 enemyPredictor.hasNewEnemySpawned()) && 
+				marioController.canUpdatePath) 
 			{
 				newestPath = getPath(observation);
 				world.resetGoalNodesChanged();
@@ -88,7 +88,7 @@ public class FastAndFurious implements Agent {
 	public ArrayList<DirectedEdge> getPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		System.out.println("Starting x velocity: " + marioController.getXVelocity());
+		System.out.println("AStar");
 		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 		return (path == null)? newestPath : path;
 	}

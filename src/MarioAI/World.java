@@ -75,14 +75,17 @@ public class World {
 		oldMarioYPos = marioYPos;
 		
 		final int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + (SIGHT_WIDTH / 2) - 1);
-		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
+		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
 		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
 			setMarioNode(observation);
 			hasWorldChanged = true;
-		} else hasWorldChanged = false; //TODO (*)If everything else is done correctly, this can be deleted.
+		}
+		else {
+			hasWorldChanged = false;
+		}
 	}
 	
 	private void setMarioNode(final Environment observation) {
@@ -138,7 +141,7 @@ public class World {
 		for (int y = 0; y < byteColumn.length; y++) {
 			if (nodeColumn[y] == null &&
 				byteColumn[y] != 0) {
-				nodeColumn[y] = new Node((short) x, (short) y, byteColumn[y]);
+				nodeColumn[y] = new Node(x, y, byteColumn[y]);
 			}
 		}
 		return nodeColumn;

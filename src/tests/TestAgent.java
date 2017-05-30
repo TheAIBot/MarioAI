@@ -134,6 +134,7 @@ public class TestAgent implements Agent {
     	//agent.action[Mario.KEY_JUMP] = true;
     	TestTools.setMarioXPosition(observation, 3);
     	TestTools.runOneTick(observation);
+    	TestTools.renderLevel(observation);
     	float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
     	float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
     	System.out.println((endXPos - startXPos) + ", " + (endYPos - startYPos));

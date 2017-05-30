@@ -140,7 +140,7 @@ public class MarioControls {
 	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 1) {
 			final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-			final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+			final int marioYPos = Math.round(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
 			final DirectedEdge nextEdge = path.get(0);
 			
 			return (nextEdge.target.x == marioXPos &&
