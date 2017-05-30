@@ -12,7 +12,6 @@ import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
-import tests.TestTools;
 
 
 public class FastAndFurious implements Agent {
@@ -86,11 +85,13 @@ public class FastAndFurious implements Agent {
 	}
 	
 	public ArrayList<DirectedEdge> getPath(Environment observation) {
+		int timeToRun = Integer.MAX_VALUE; //TODO set proper value
+		
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		System.out.println("Starting x velocity: " + marioController.getXVelocity());
-		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
-		return (path == null)? newestPath : path;
+		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, timeToRun);
+		return (path == null) ? newestPath : path;
 	}
 
 	public AGENT_TYPE getType() {
