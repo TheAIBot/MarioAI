@@ -1,4 +1,4 @@
-package MarioAI.enemy.simulators;
+package MarioAI.enemySimuation.simulators;
 
 import java.util.ArrayList;
 

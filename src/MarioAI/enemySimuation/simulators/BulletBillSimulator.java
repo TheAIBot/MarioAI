@@ -1,4 +1,4 @@
-package MarioAI.enemy.simulators;
+package MarioAI.enemySimuation.simulators;
 
 
 public class BulletBillSimulator extends EnemySimulator

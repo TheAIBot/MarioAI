@@ -14,7 +14,7 @@ import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.enemy.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;

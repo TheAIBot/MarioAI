@@ -3,7 +3,7 @@ package MarioAI;
 import java.util.ArrayList;
 
 import MarioAI.debugGraphics.DebugDraw;
-import MarioAI.enemy.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;

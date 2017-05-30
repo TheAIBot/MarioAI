@@ -1,15 +1,17 @@
-package MarioAI.enemy;
+package MarioAI.enemySimuation;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
 
-import MarioAI.enemy.simulators.BulletBillSimulator;
-import MarioAI.enemy.simulators.EnemySimulator;
-import MarioAI.enemy.simulators.FlowerEnemy;
-import MarioAI.enemy.simulators.ShellSimulator;
-import MarioAI.enemy.simulators.WalkingEnemySimulator;
+import MarioAI.PathMaster;
+import MarioAI.enemySimuation.simulators.BulletBillSimulator;
+import MarioAI.enemySimuation.simulators.EnemySimulator;
+import MarioAI.enemySimuation.simulators.FlowerEnemy;
+import MarioAI.enemySimuation.simulators.ShellSimulator;
+import MarioAI.enemySimuation.simulators.WalkingEnemySimulator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
@@ -28,6 +30,7 @@ public class EnemyPredictor {
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 	private boolean newEnemySpawned = false;
+	private final Semaphore threadLimiter = new Semaphore(PathMaster.MAX_THREAD_COUNT);
 	
 	public void intialize(LevelScene levelScene) {
 		this.levelScene = levelScene;
@@ -47,7 +50,6 @@ public class EnemyPredictor {
 			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
 			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
-			
 			//check if the rectangle of mario intersects with the enemys rectangle
 			if (enemyX1 <= marioX2 && 
 				enemyX2 >= marioX1 &&
@@ -56,7 +58,7 @@ public class EnemyPredictor {
 				return true;
 			}
 		}
-		return false;
+		return false;	
 	}
 	
 	public void updateEnemies(final float[] enemyInfo) {
@@ -99,48 +101,50 @@ public class EnemyPredictor {
 	}
 	
 	private void removeDeadEnemies(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
-		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			final int kind = enemySimulation.getKind();
-			final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
-			final float simulationX = simulationPosition.x;
-			final float simulationY = simulationPosition.y;
-			
-			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
-			
-			if (enemyPositions != null) {
-				Point2D.Float simulatedPosition = null;
-				float leastDifference = Integer.MAX_VALUE;
+		synchronized (verifiedEnemySimulations) {
+			final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
+			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+				final int kind = enemySimulation.getKind();
+				final Point2D.Float simulationPosition = enemySimulation.getCurrentPosition();
+				final float simulationX = simulationPosition.x;
+				final float simulationY = simulationPosition.y;
 				
-				for (Point2D.Float enemyPosition : enemyPositions) {
-					final float deltaX = Math.abs(enemyPosition.x - simulationX);
-					final float deltaY = Math.abs(enemyPosition.y - simulationY);
+				final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
+				
+				if (enemyPositions != null) {
+					Point2D.Float simulatedPosition = null;
+					float leastDifference = Integer.MAX_VALUE;
 					
-					final float difference = deltaX + deltaY;
+					for (Point2D.Float enemyPosition : enemyPositions) {
+						final float deltaX = Math.abs(enemyPosition.x - simulationX);
+						final float deltaY = Math.abs(enemyPosition.y - simulationY);
+						
+						final float difference = deltaX + deltaY;
+						
+						if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
+							deltaY <= ACCEPTED_POSITION_DEVIATION && 
+							difference < leastDifference) {
+							simulatedPosition = enemyPosition;
+							leastDifference = difference;
+							break;
+						}
+					}
 					
-					if (deltaX <= ACCEPTED_POSITION_DEVIATION && 
-						deltaY <= ACCEPTED_POSITION_DEVIATION && 
-						difference < leastDifference) {
-						simulatedPosition = enemyPosition;
-						leastDifference = difference;
-						break;
+					if (simulatedPosition != null) {
+						enemyPositions.remove(simulatedPosition);
+						//enemySimulation.setX(simulatedPosition.x);
+						//enemySimulation.setY(simulatedPosition.y);
+						
+						notDeletedSimulations.add(enemySimulation);
+					}	
+					else {
+						System.out.println("removed");
 					}
 				}
-				
-				if (simulatedPosition != null) {
-					enemyPositions.remove(simulatedPosition);
-					//enemySimulation.setX(simulatedPosition.x);
-					//enemySimulation.setY(simulatedPosition.y);
-					
-					notDeletedSimulations.add(enemySimulation);
-				}	
-				else {
-					System.out.println("removed");
-				}
 			}
+			
+			verifiedEnemySimulations = notDeletedSimulations;	
 		}
-		
-		verifiedEnemySimulations = notDeletedSimulations;
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
@@ -169,7 +173,9 @@ public class EnemyPredictor {
 				
 				if (foundPoint != null) {
 					enemyPositions.remove(foundPoint);
-					verifiedEnemySimulations.add(enemySimulation);
+					synchronized (verifiedEnemySimulations) {
+						verifiedEnemySimulations.add(enemySimulation);	
+					}
 					newEnemySpawned = true;
 				}
 			}

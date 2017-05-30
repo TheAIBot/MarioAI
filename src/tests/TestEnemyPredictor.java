@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 
-import MarioAI.enemy.EnemyPredictor;
-import MarioAI.enemy.EnemyType;
-import MarioAI.enemy.simulators.EnemySimulator;
+import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyType;
+import MarioAI.enemySimuation.simulators.EnemySimulator;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;

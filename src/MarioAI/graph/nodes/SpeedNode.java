@@ -2,7 +2,7 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
-import MarioAI.enemy.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
