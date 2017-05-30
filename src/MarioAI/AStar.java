@@ -19,10 +19,12 @@ public class AStar {
 	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
 	
 	// Set of nodes already explored
-	HashSet<Integer> closedSet = new HashSet<Integer>();
+	private final HashSet<Integer> closedSet = new HashSet<Integer>();
 	// Set of nodes yet to be explored
-	PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
-	Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
+	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+	
+	private ArrayList<DirectedEdge> currentBestPath = null;
 	
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
@@ -77,9 +79,10 @@ public class AStar {
 	}
 	
 	public ArrayList<DirectedEdge> initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
-		closedSet = new HashSet<Integer>();
-		openSet = new PriorityQueue<SpeedNode>();
-		openSetMap = new HashMap<Integer, SpeedNode>();
+		closedSet.clear();
+		openSet.clear();
+		openSetMap.clear();
+		currentBestPath = null;
 		
 		// Initialization
 		openSet.add(start);
@@ -113,7 +116,8 @@ public class AStar {
 			
 			// If goal is reached return solution path.
 			if (current.node.equals(goal.node)) {
-				return reconstructPath(current);
+				currentBestPath = reconstructPath(current);
+				return currentBestPath;
 			}
 			//System.out.println("Current node:");
 			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
@@ -221,15 +225,7 @@ public class AStar {
 	}
 	
 	private ArrayList<DirectedEdge> getCurrentBestPath() {
-		SpeedNode currentSpeedNode = openSet.peek();
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		while (currentSpeedNode.parent != null) {
-			currentSpeedNode.use();
-			path.add(currentSpeedNode.ancestorEdge);
-			currentSpeedNode = currentSpeedNode.parent;
-		}
-		Collections.reverse(path);
-		return path;
+		return currentBestPath;
 	}
 	
 }
