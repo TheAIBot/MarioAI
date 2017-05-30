@@ -94,9 +94,9 @@ public class TestAStar {
 	}
 	
 	@Test
-	public void testTakeFastestJump(){
+	public void testTakeFastestJump() {
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
-		setup("flatWithJump", true, true);
+		setup("flatWithJump", false, true);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		MarioControls marioControls = new MarioControls();
 		FastAndFurious fastAgent = (FastAndFurious) agent;
@@ -357,7 +357,7 @@ public class TestAStar {
 		// Check last node in solution path is indeed one of the goal nodes
 		lastNode = null;
 		for (DirectedEdge directedEdge : path) {
-			lastNode = directedEdge.target;
+			lastNode = directedEdge.source;
 		}
 		boolean hasFoundGoal = false;
 		for (Node node : graph.getGoalNodes(0)) {
