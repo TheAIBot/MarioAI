@@ -10,34 +10,34 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	public static long hashSpeedNode(float vx, DirectedEdge edge) {
+	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {
 		//the hash of the speed needs to be fixed
 		//final long a = hashSpeed(vx) << 32;
-		final int speedHash = hashSpeed(vx);
+		final int speedHash = hashSpeed(vx, hashGranularity);
 		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx) << 32) | speedSign;
+		final long a = ((long)hashSpeed(vx, hashGranularity) << 32) | speedSign;
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
 	}
 	
-	public static int hashEndSpeedNode(SpeedNode sn) {
+	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
 		final int x = sn.node.x;
 		final int y = sn.node.y;
 		final float vx = sn.vx;
 		
 		final int a = x & 0xffff;
 		final int b = (y & 0xff) << 16;
-		final int c = ((byte)hashSpeed(vx)) << 24;
-		final int d = hashSpeed(vx) & 0x80000000;
+		final int c = ((byte)hashSpeed(vx, hashGranularity)) << 24;
+		final int d = hashSpeed(vx, hashGranularity) & 0x80000000;
 		
 		return d | c | b | a;
 	}
 	
-	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
-	public static int hashSpeed(float vx) {
-		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (FACTOR_NUMBER_OF_SPEED_NODES * 2);
-		return (int)((vx + ADD_FOR_ROUND) * FACTOR_NUMBER_OF_SPEED_NODES);
+	//public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
+	public static int hashSpeed(float vx, int hashGranularity) {
+		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (hashGranularity * 2);
+		return (int)((vx + ADD_FOR_ROUND) * hashGranularity);
 		/*
 		final int speedHash = hashSpeed(vx);
 		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;

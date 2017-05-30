@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import MarioAI.enemy.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
@@ -25,6 +25,11 @@ public class AStar {
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 	
 	private ArrayList<DirectedEdge> currentBestPath = null;
+	private final int hashGranularity;
+	
+	public AStar(int hashGranularity) {
+		this.hashGranularity = hashGranularity;
+	}
 	
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
@@ -78,7 +83,7 @@ public class AStar {
 		return path;
 	}
 	
-	public ArrayList<DirectedEdge> initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
+	private ArrayList<DirectedEdge> initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
@@ -124,7 +129,7 @@ public class AStar {
 			//System.out.println("Current node edges:");
 			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
-			final int endHash = Hasher.hashEndSpeedNode(current);
+			final int endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 			closedSet.add(endHash);
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
@@ -149,7 +154,7 @@ public class AStar {
 				
 				//If a similar enough node has already been run through
 				//no need to add this one at that point
-				final int snEndHash = Hasher.hashEndSpeedNode(sn);
+				final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
 				if (closedSet.contains(snEndHash)) {
 					continue;
 				}
@@ -180,7 +185,7 @@ public class AStar {
 	}
 	
 	public SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge);
+		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, hashGranularity);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
