@@ -36,11 +36,11 @@ public class FastAndFurious implements Agent {
 			world.initialize(observation);
 			grapher.setMovementEdges(world, world.getMarioNode(observation));
 			
-			newestPath = getPath(observation);
-			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
-			
 			CollisionDetection.setWorld(world);
 			CollisionDetection.loadTileBehaviors();
+			
+			newestPath = getPath(observation);
+			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
