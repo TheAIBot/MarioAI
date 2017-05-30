@@ -96,7 +96,8 @@ public class MarioControls {
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
 			if (prevEdge != null && 
-				next.getMoveInfo().equals(prevEdge.getMoveInfo()) && 
+				next.equals(prevEdge) &&
+				next.getMoveInfo().equals(prevEdge.getMoveInfo()) &&
 				movementTime == ticksOnThisEdge + 1) 
 			{
 				path.remove(0);
@@ -105,7 +106,8 @@ public class MarioControls {
 			}
 			
 			if (prevEdge == null ||
-				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ) {
+				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ||
+				!next.equals(prevEdge)) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
 			}
