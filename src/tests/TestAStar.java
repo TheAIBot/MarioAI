@@ -2,6 +2,7 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.AStar;
@@ -24,8 +26,8 @@ import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.World;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.World;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -42,7 +44,7 @@ public class TestAStar {
 	Node marioNode;
 
 	public void setup(String levelName) {
-		setup(levelName, false,false);
+		setup(levelName, false, false);
 	}
 	
 	public void setup(String levelName, boolean showLevel, boolean withFastAndFurius) {
@@ -56,10 +58,10 @@ public class TestAStar {
 		edgeCreator = new EdgeCreator();
 		graph.initialize(observation);
 		grapher = new EdgeCreator();
-		grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		grapher.setMovementEdges(graph, graph.getMarioNode(observation));
 		marioNode = graph.getMarioNode(observation);
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
 	}
 	
 	/**
@@ -96,6 +98,7 @@ public class TestAStar {
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
 		setup("flatWithJump", true, true);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		MarioControls marioControls = new MarioControls();
 		FastAndFurious fastAgent = (FastAndFurious) agent;
 		List<DirectedEdge> path = fastAgent.getPath(observation);
 		int numberOfActions = 1;
@@ -107,7 +110,7 @@ public class TestAStar {
 		assertTrue(path != null);
 		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
 		while(numberOfActions <= 5){
-			if (MarioControls.reachedNextNode(observation, path) && graph.hasGoalNodesChanged() || 
+			if (marioControls.canUpdatePath && graph.hasGoalNodesChanged() || 
 				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
 				 numberOfActions++;
 				 path = fastAgent.getPath(observation);
@@ -317,7 +320,85 @@ public class TestAStar {
 		assertTrue(end.isSpeedNodeUseable());
 		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
-
+	
+	
+	/**
+	 * Tests if A* is able to find a path when it is broken down into multiple ticks
+	 */
+	@Test
+	public void testAStarCanRunMoreThanOneTick() {
+		setup("flat");
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		AStar aStar = new AStar();
+		
+		// Should not find path in the given timespan
+		final int TIME_ALLOWED = 20;
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+		assertTrue(path == null);
+		ArrayList<DirectedEdge> pathSegment = aStar.getCurrentBestSegmentPath();
+		
+		// Check pathSegment does not reach end 
+		Node lastNode = null;
+		for (DirectedEdge directedEdge : pathSegment) {
+			lastNode = directedEdge.target;
+		}
+		for (Node node : graph.getGoalNodes(0)) {
+			assertNotEquals(lastNode, node);
+		}
+		
+		// Let A* run many times - enough times to make it find a solution path 
+		int c = 0;
+		do {
+			path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+			c++;
+			if (c >= 100) Assert.fail("AStar never finishes");
+		} while (path == null);
+		
+		// Check last node in solution path is indeed one of the goal nodes
+		lastNode = null;
+		for (DirectedEdge directedEdge : path) {
+			lastNode = directedEdge.target;
+		}
+		boolean hasFoundGoal = false;
+		for (Node node : graph.getGoalNodes(0)) {
+			if (node.equals(lastNode)) hasFoundGoal = true;
+		}
+		assertTrue(hasFoundGoal);
+		
+	}
+	
+	/**
+	 * Tests if A* is able to append more nodes on current best path segment
+	 * Note that the test level ensures this will be the way A* should progress towards a final solution
+	 */
+	@Test
+	public void testAStarRunMoreThanOneTickExtendPathSegment() {
+		setup("flat");
+		EnemyPredictor enemyPredictor = new EnemyPredictor();
+		AStar aStar = new AStar();
+		
+		// This time limit should be short enough to not make A* able to finish in two runs, but still be able to make progress by extending path fragments
+		final int TIME_ALLOWED = 20;
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+		
+		// The path should not be a complete solution but should include some nodes
+		assertTrue(path == null);
+		ArrayList<DirectedEdge> pathSegment = aStar.getCurrentBestSegmentPath();
+		assertTrue(pathSegment.size() > 0);
+		
+		// The path should be extended by next A* call but not finish
+		path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, 1);
+		assertTrue(path == null);
+		ArrayList<DirectedEdge> newPathSegment = aStar.getCurrentBestSegmentPath();
+		assertTrue(newPathSegment.size() > pathSegment.size());
+		
+		// For this level the nodes in the two pathsegments should be the same up until the end of the shortest one
+		for (int i = 0; i < pathSegment.size(); i++) {
+			assertEquals(pathSegment.get(i), newPathSegment.get(i));
+		}
+		
+	}
+	
 
 }
 

@@ -20,7 +20,7 @@ public class TestCompleteLevel {
 		TestTools.runOneTick(observation);
 		graph = new World();
 		graph.initialize(observation);
-		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
 	}
 	
 	public void testLevel(String path) {

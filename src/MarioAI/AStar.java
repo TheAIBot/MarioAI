@@ -27,6 +27,20 @@ public class AStar {
 	private ArrayList<DirectedEdge> currentBestPath = null;
 	
 	/**
+	 * TEMP method for running A* if no time is given
+	 * (Time to run is set to max possible value)
+	 * @param start
+	 * @param rightmostNodes
+	 * @param marioSpeed
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return
+	 */
+	public ArrayList<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+		return runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight, Integer.MAX_VALUE);
+	}
+	
+	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
 	 * 
 	 * @param start
@@ -226,6 +240,25 @@ public class AStar {
 	
 	private ArrayList<DirectedEdge> getCurrentBestPath() {
 		return currentBestPath;
+	}
+	
+	/**
+	 * @param currentSpeedNode
+	 * @return the path segment corresponding to the best path so far
+	 */
+	public ArrayList<DirectedEdge> getCurrentBestSegmentPath() {
+		SpeedNode currentSpeedNode = openSet.peek();
+		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		while (currentSpeedNode.parent != null) {
+			currentSpeedNode.use();
+			path.add(currentSpeedNode.ancestorEdge);
+			//if (currentSpeedNode.parent.parent == null) {
+			//	System.out.println("First transition speed: " + currentSpeedNode.vx);				
+			//}
+			currentSpeedNode = currentSpeedNode.parent;
+		}
+		Collections.reverse(path);
+		return path;
 	}
 	
 }
