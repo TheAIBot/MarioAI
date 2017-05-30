@@ -121,7 +121,7 @@ public final class AStar {
 				}
 				
 				if (sn.getMoveInfo().hasCollisions(current)) {
-					//continue;
+					continue;
 				}
 				
 				

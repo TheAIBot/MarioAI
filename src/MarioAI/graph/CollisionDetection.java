@@ -40,7 +40,7 @@ public class CollisionDetection {
 		//TODO find out why,
 		Point2D.Float currentNewPosition = new Point2D.Float((priorPosition.x + sourceNode.xPos)*16 + 8,(sourceNode.yPos - priorPosition.y )*16 - 2);
 		
-		//(*) Do it of two times.
+		//TODO (*) Do it of two times. First x, then y.
 		return !move(currentNewPosition, xa, ya);
 	}
 	
