@@ -298,10 +298,10 @@ public class MarioControls {
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction
 		if (distanceIsNegative) {
-			distanceMoved *= -1;
-			speed *= -1;
+			speed = -speed;
+			distanceMoved = -distanceMoved;
 			for (int i = 0; i < xPositions.size(); i++) {
-				xPositions.set(i, -1 * xPositions.get(i));
+				xPositions.set(i, -xPositions.get(i));
 			}
 		}
 

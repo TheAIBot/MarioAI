@@ -31,7 +31,6 @@ public class FastAndFurious implements Agent {
 
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
-		CollisionDetection.setWorld(world);
 
 		if (tickCount == 30) {
 			world.initialize(observation);
@@ -39,6 +38,9 @@ public class FastAndFurious implements Agent {
 			
 			newestPath = getPath(observation);
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+			
+			CollisionDetection.setWorld(world);
+			CollisionDetection.loadTileBehaviors();
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());

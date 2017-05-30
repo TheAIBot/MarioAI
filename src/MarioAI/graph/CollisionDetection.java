@@ -32,13 +32,13 @@ public class CollisionDetection {
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
-		float xa = (currentPosition.x - priorPosition.x)*16;
-		float ya = (priorPosition.y - currentPosition.y )*16; //yes, it is the correct placement.
+		float xa = (currentPosition.x - priorPosition.x) * 16;
+		float ya = (priorPosition.y - currentPosition.y )* 16; //yes, it is the correct placement.
 		//Change below to just use current position, if one want to get the actual position after the collision.
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		//TODO find out why,
-		Point2D.Float currentNewPosition = new Point2D.Float((priorPosition.x + sourceNode.xPos)*16 + 8,(sourceNode.yPos - priorPosition.y )*16 - 2);
+		Point2D.Float currentNewPosition = new Point2D.Float((priorPosition.x + sourceNode.xPos) * 16 + 8,(sourceNode.yPos - priorPosition.y ) * 16 - 2);
 		
 		//TODO (*) Do it of two times. First x, then y.
 		return !move(currentNewPosition, xa, ya);
@@ -157,15 +157,17 @@ public class CollisionDetection {
 	}
 	
 	
-	public static void loadTileBehaviors(){
+	public static void loadTileBehaviors()
+	{
 		//TODO check done correctly
-		try {
+		try 
+		{
 			new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")).readFully(CollisionDetection.TILE_BEHAVIORS);
-			System.out.println("meh");
 		}
-	   catch (Exception e){
+		catch (Exception e)
+		{
 		   e.printStackTrace();
-	            System.exit(0);
-	        }
-	  }
+		   System.exit(0);
+		}
+	}
 }
