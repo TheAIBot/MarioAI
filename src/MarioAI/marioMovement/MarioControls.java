@@ -152,7 +152,12 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
-		return getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
+		MovementInformation movementInformation = getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
+		//if (movementInformation.hasCollisions(edge)) {
+		//	//Curses!
+		//	return movementInformation;
+		//}
+		return movementInformation;
 	}
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -168,7 +173,8 @@ public class MarioControls {
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, YMovementInformation jumpInfo) {
 		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, jumpInfo.totalTicksJumped);
-		return new MovementInformation(xMovementInfo, jumpInfo);
+		MovementInformation movementInformation = new MovementInformation(xMovementInfo, jumpInfo);
+		return movementInformation;
 	}
 	
 	private static int getIndexForYMovement(int jumpHeight, int jumpHeightDifference) {

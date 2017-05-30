@@ -13,7 +13,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.NodeCreator;
+import MarioAI.graph.nodes.World;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -48,7 +48,7 @@ public class DebugDraw {
 		}
 	}
 
-	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final NodeCreator graph) {
+	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final World graph) {
  		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix = graph.getLevelMatrix();
@@ -159,7 +159,7 @@ public class DebugDraw {
 		addDebugDrawing(observation, new DebugPoints(Color.BLUE, allEndPoints, 4));
 	}
 
-	public static void drawMarioReachableNodes(final Environment observation, final NodeCreator graph) {
+	public static void drawMarioReachableNodes(final Environment observation, final World graph) {
 		final Node mario = graph.getMarioNode(observation);
 		final List<DirectedEdge> edges = mario.getEdges();
 
@@ -232,7 +232,7 @@ public class DebugDraw {
 		}
 	}
 	
-	public static void drawPathMovement(final Environment observation, final ArrayList<DirectedEdge> path) {
+	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
 		if (path != null) {
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {

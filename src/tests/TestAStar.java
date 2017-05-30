@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import MarioAI.AStar;
+import MarioAI.FastAndFurious;
 import MarioAI.Hasher;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
@@ -23,34 +24,42 @@ import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.NodeCreator;
+import MarioAI.graph.nodes.World;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
-	UnitTestAgent agent = new UnitTestAgent();
+	Agent agent = new UnitTestAgent();
 	Environment observation;
-	NodeCreator graph;
+	World graph;
+	EdgeCreator grapher;
 	EdgeCreator edgeCreator;
 	final float delta = 0.05f;
 	Node marioNode;
 
 	public void setup(String levelName) {
-		setup(levelName, false);
+		setup(levelName, false,false);
 	}
 	
-	public void setup(String levelName, boolean showLevel) {
+	public void setup(String levelName, boolean showLevel, boolean withFastAndFurius) {
+		if (withFastAndFurius) {
+			agent = new FastAndFurious();
+		} else agent = new UnitTestAgent();
 		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
-		graph = new NodeCreator();
+		graph = new World();
 		edgeCreator = new EdgeCreator();
-		graph.createStartGraph(observation);
-		edgeCreator.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+		graph.initialize(observation);
+		grapher = new EdgeCreator();
+		grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 		marioNode = graph.getMarioNode(observation);
+		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+		new EdgeCreator().setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
 	}
 	
 	/**
@@ -67,6 +76,16 @@ public class TestAStar {
 		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
 			assertTrue(directedEdge instanceof RunningEdge);
+			//assertEquals(directedEdge.target.gScore, c, delta);
+			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
+			assertTrue(directedEdge instanceof RunningEdge);
+//			try {
+//				Running test = (Running) directedEdge;
+//			} catch (ClassCastException e) {
+//				Assert.fail();
+//			}
+//			c++;
+			assertTrue(directedEdge instanceof RunningEdge);
 		}
 		assertEquals(12, path.get(path.size() - 1).target.x); //Correct x end destination
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
@@ -74,14 +93,36 @@ public class TestAStar {
 	
 	@Test
 	public void testTakeFastestJump(){
-		setup("flatWithJump", false);
+		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
+		setup("flatWithJump", true, true);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		AStar aStar = new AStar();
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		FastAndFurious fastAgent = (FastAndFurious) agent;
+		List<DirectedEdge> path = fastAgent.getPath(observation);
+		int numberOfActions = 1;
+		int numberOfTicks = 0;
+		DebugDraw.resetGraphics(observation);
+		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+		DebugDraw.drawPathMovement(observation, path);
+		TestTools.renderLevel(observation);
 		assertTrue(path != null);
+		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
+		while(numberOfActions <= 5){
+			if (MarioControls.reachedNextNode(observation, path) && graph.hasGoalNodesChanged() || 
+				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
+				 numberOfActions++;
+				 path = fastAgent.getPath(observation);
+				 DebugDraw.resetGraphics(observation);
+				 DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+				 DebugDraw.drawPathMovement(observation, path);
+				 TestTools.renderLevel(observation);
+				 assertTrue(path != null);
+				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
+			}			
+			TestTools.runOneTick(observation);
+			numberOfTicks++;
+		}
 		assertEquals(1, path.stream().filter(edge -> edge instanceof JumpingEdge).count());
-		TestTools.runWholeLevel(observation);
-		
+		TestTools.runWholeLevel(observation);		
 	}
 	
 	/**
@@ -89,7 +130,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setup("TestAStarJump", false);
+		setup("TestAStarJump", false, false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
 		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
@@ -118,7 +159,7 @@ public class TestAStar {
 	
 	@Test
 	public void testNumberOfSpeedNodes() {
-		setup("TestAStarJump", false);
+		setup("TestAStarJump", false, false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
 		
@@ -127,10 +168,10 @@ public class TestAStar {
 		final int MAX_NUMBER_OF_SPEED_NODES = Hasher.FACTOR_NUMBER_OF_SPEED_NODES * 2 + 1;
 		final int NUMBER_OF_TEST_TICKS = 100;
 		final HashSet<Long>searchedNodes = new HashSet<Long>(); 
-		
+		UnitTestAgent unitTestAgent = (UnitTestAgent) agent;
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 			TestTools.runOneTick(observation);
-			agent.action[Mario.KEY_RIGHT] = true;
+			unitTestAgent.action[Mario.KEY_RIGHT] = true;
 			aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 			
 			for (SpeedNode speedNode : speedNodes.values()) {
@@ -157,7 +198,7 @@ public class TestAStar {
 	
 	@Test
 	public void testJumpOverEnemy() {
-		setup("testAStarEnemyJumpOver",false);
+		setup("testAStarEnemyJumpOver",false, false);
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -184,7 +225,7 @@ public class TestAStar {
 
 	@Test
 	public void testCollideWithEnemy(){
-		setup("testAStarEnemyJumpOver",false);
+		setup("testAStarEnemyJumpOver",false, false);
 		
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -232,7 +273,7 @@ public class TestAStar {
 	
 	@Test
 	public void testNotCollideWithEnemy(){
-		setup("testAStarEnemyJumpOver",false);
+		setup("testAStarEnemyJumpOver",false,false);
 		
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();

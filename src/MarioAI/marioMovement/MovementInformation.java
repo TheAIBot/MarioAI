@@ -4,10 +4,14 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.graph.CollisionDetection;
+import MarioAI.graph.Function;
+import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
-public class MovementInformation {
+public class MovementInformation implements Function{
 	//vertical information
 	private final int totalTicksJumped;
 	
@@ -121,6 +125,11 @@ public class MovementInformation {
 		return positions;
 	}
 
+	@Override
+	public float f(float x) {
+		return 0;
+	}
+
 	public boolean[] getPressXButton() {
 		return pressXButton;
 	}
@@ -160,5 +169,20 @@ public class MovementInformation {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean hasCollisions(SpeedNode sourceNode) { //The x position should however suffice, as edges only comes from the ground.
+		Point2D.Float previousPosition = new Point2D.Float(0, 0);
+		Point2D.Float currentPosition;
+		//Can't collide at initial position, so i starts at i=1
+		//TODO what is i=0?
+		for (int i = 0; i < positions.length; i++) { 
+			currentPosition = positions[i];
+			if(CollisionDetection.isColliding(currentPosition,previousPosition, sourceNode))
+				return true;
+			previousPosition = currentPosition;
+		}	
+		return false;
+		//return false;
 	}
 }

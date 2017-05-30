@@ -38,7 +38,7 @@ public class TestEnemyCollisionDetection {
 	MarioControls marioController;
 	Node[][] level;
 	Node marioNode;
-	NodeCreator graph = new NodeCreator();
+	World graph = new World();
 	EdgeCreator grapher = new EdgeCreator();
 	
 	
@@ -46,13 +46,12 @@ public class TestEnemyCollisionDetection {
 		action = new boolean[Environment.numberOfButtons];	
 		agent = new UnitTestAgent();		
 		observation = TestTools.loadLevel("flat.lvl", agent, false);	
-		graph.createStartGraph(observation);
+		graph.initialize(observation);
 		level = graph.getLevelMatrix();
 		marioNode = graph.getMarioNode(observation);
 		marioController = new MarioControls();
 	}
-	
-	
+		
 	@Test
 	public void testCorrectMarioBlockPlacementDetection(){//TODO maek version with initial speed.
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -61,7 +60,7 @@ public class TestEnemyCollisionDetection {
 		JumpingEdge polynomial =  new JumpingEdge(marioNode, null);
 		List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		polynomial.setToJumpPolynomial(marioNode, 11, 4, 4);
-		grapher.setMovementEdges(graph.getLevelMatrix(), marioNode);
+		grapher.setMovementEdges(graph, marioNode);
 		grapher.jumpAlongPolynomial(marioNode, 11, polynomial, JumpDirection.RIGHT_UPWARDS, listOfEdges);
 		
 		assertEquals(1, listOfEdges.size());//One edge should exist.

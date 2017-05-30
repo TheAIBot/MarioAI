@@ -11,7 +11,7 @@ import MarioAI.graph.edges.DirectedEdge;
  */
 public class Node {
 	private final HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer, DirectedEdge>();
-	private final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
+	public final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 	private boolean allEdgesMade = false;
 	private final int hash;
 	

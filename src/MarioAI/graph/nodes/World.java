@@ -5,7 +5,8 @@ import java.util.HashMap;
 import MarioAI.MarioMethods;
 import ch.idsia.mario.environments.Environment;
 
-public class NodeCreator {
+public class World { 
+	//ザ・ワールド！ 時よ止まれ！
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
@@ -19,6 +20,7 @@ public class NodeCreator {
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 	private boolean goalNodesChanged = false;
+	private boolean hasWorldChanged = false; //Has the world been changed, with the new update.
 	
 	public void printMatrix(final Environment observation)
 	{
@@ -40,7 +42,8 @@ public class NodeCreator {
 		System.out.println();
 	}
 	
-	public void createStartGraph(final Environment observation) {
+	public void initialize(final Environment observation) {
+		//Creates the initial graph
 		updateWholeMatrix(observation);
 		setMarioNode(observation);
 		oldMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
@@ -62,7 +65,8 @@ public class NodeCreator {
 		}
 	}
 
-	public boolean updateMatrix(final Environment observation) {
+	public void update(final Environment observation) {
+		//Updates the world (Matrix)
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
@@ -75,14 +79,11 @@ public class NodeCreator {
 		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
 		maxMarioXPos = newMaxMarioXPos;		
 		
-		if (changeX != 0 ||
-			changeY != 0) {
+		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
 			setMarioNode(observation);
-			return true;
-		}
-		
-		return false;
+			hasWorldChanged = true;
+		} else hasWorldChanged = false; //TODO (*)If everything else is done correctly, this can be deleted.
 	}
 	
 	private void setMarioNode(final Environment observation) {
@@ -148,11 +149,11 @@ public class NodeCreator {
 		savedColumns.put(x, column);
 	}
 
-	private Node[] getColumn(final int x) {
+	public Node[] getColumn(final int x) {
 		return savedColumns.get(x);
 	}
 	
-	public boolean goalNodesChanged() {
+	public boolean hasGoalNodesChanged() {
 		return goalNodesChanged;
 	}
 	
@@ -162,5 +163,13 @@ public class NodeCreator {
 	
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
+	}
+
+	public boolean hasWorldChanged() {
+		return hasWorldChanged;
+	}
+	
+	public void resetHasWorldChanged() {
+		hasWorldChanged = false;
 	}
 }
