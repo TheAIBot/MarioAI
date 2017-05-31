@@ -9,7 +9,7 @@ import tickbased.main.State;
 public class Vertex implements State {
 
 	public final int x, y; // coordinates for the current position in the graph
-	public List<Action> directedEdges = new ArrayList<Action>(); //An arrayList (i.e. a dynamic array/table) is used rather than a linked list)
+	public List<Action> marioActions = new ArrayList<Action>(); //An arrayList (i.e. a dynamic array/table) is used rather than a linked list)
 	public int hash;
 
 	public Vertex(int x, int y) {
@@ -17,8 +17,8 @@ public class Vertex implements State {
 		this.y = y;
 	}
 
-	public void addEdge(DirectedEdge edge) {
-		directedEdges.add(edge);
+	public void addEdge(MarioAction action) {
+		marioActions.add(action);
 	}
 
 	public String toString() {

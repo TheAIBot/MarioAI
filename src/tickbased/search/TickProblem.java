@@ -13,28 +13,39 @@ public class TickProblem extends Problem {
 
 	@Override
 	public List<Action> actions(State state) {
-		List<boolean[]> actions = new ArrayList<boolean[]>();
+		Vertex vertex = (Vertex) state;
+		List<Action> actions = new ArrayList<Action>();
 
 		// move right
-		actions.add(createAction(false, true, false, false, true));
-		actions.add(createAction(false, true, false, true, true));
-		actions.add(createAction(false, true, false, false, false));
-		actions.add(createAction(false, true, false, true, false));
+		actions.add(new MarioAction(vertex, createAction(false, true, false, false, true)));
+		actions.add(new MarioAction(vertex, createAction(false, true, false, true, true)));
+		actions.add(new MarioAction(vertex, createAction(false, true, false, false, false)));
+		actions.add(new MarioAction(vertex, createAction(false, true, false, true, false)));
 
 		// move left
-		actions.add(createAction(true, false, false, false, false));
-		actions.add(createAction(true, false, false, true, false));
-		actions.add(createAction(true, false, false, false, true));
-		actions.add(createAction(true, false, false, true, true));
+		actions.add(new MarioAction(vertex, createAction(true, false, false, false, false)));
+		actions.add(new MarioAction(vertex, createAction(true, false, false, true, false)));
+		actions.add(new MarioAction(vertex, createAction(true, false, false, false, true)));
+		actions.add(new MarioAction(vertex, createAction(true, false, false, true, true)));
 
 		// jump straight up
-		actions.add(createAction(false, false, false, true, true));
+		actions.add(new MarioAction(vertex, createAction(false, false, false, true, true)));
 		
 		// stand still
-		actions.add(createAction(false, false, false, true, false));
+		actions.add(new MarioAction(vertex, createAction(false, false, false, true, false)));
 		
+		return actions;
 	}
 
+	/**
+	 * Auxiliary method
+	 * @param left
+	 * @param right
+	 * @param down
+	 * @param jump
+	 * @param speed
+	 * @return
+	 */
 	private boolean[] createAction(boolean left, boolean right, boolean down, boolean jump, boolean speed) {
 		boolean[] action = new boolean[5];
 		action[Mario.KEY_DOWN] = down;
@@ -48,19 +59,19 @@ public class TickProblem extends Problem {
 	@Override
 	public SearchNode childNode(SearchNode node, Action action) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public double pathCost(SearchNode n1, SearchNode n2) {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public double heuristicFunction(SearchNode node, SearchNode goal) {
-		// TODO Auto-generated method stub
-		return 0;
+		// TODO note: goal should be an auxiliary node far to the right
+		return Math.sqrt(Math.pow(((Vertex) goal.state).x, 2) + Math.pow(((Vertex) node.state).x, 2));
 	}
 
 	@Override

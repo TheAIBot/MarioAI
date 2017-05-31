@@ -10,9 +10,9 @@ public class MarioAction implements Action {
 	// action executed
 	boolean[] action = new boolean[5];
 	
-	public MarioAction(boolean[] action, Vertex parent) {
-		this.action = action;
+	public MarioAction(Vertex parent, boolean[] action) {
 		this.parent = parent;
+		this.action = action;
 	}
 	
 }
