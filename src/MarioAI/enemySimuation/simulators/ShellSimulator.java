@@ -162,4 +162,16 @@ public class ShellSimulator extends EnemySimulator
 
         return blocking;
     }
+
+	@Override
+	public EnemySimulator copy() {
+		ShellSimulator copy = new ShellSimulator(world, x, y, xa, ya);
+		copy.x = x;
+		copy.y = y;
+		copy.xa = xa;
+		copy.ya = ya;
+		copy.positionsIndexOffset = positionsIndexOffset;
+		
+		return copy;
+	}
 }

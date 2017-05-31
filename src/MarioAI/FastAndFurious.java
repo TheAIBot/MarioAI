@@ -59,7 +59,11 @@ public class FastAndFurious implements Agent {
 				 enemyPredictor.hasNewEnemySpawned()) && 
 				marioController.canUpdatePath) 
 			{
-				pathCreator.
+				pathCreator.stop();
+				pathCreator.updateBestPath();
+				pathCreator.syncWithRealWorld(world, enemyPredictor);
+				startFindingPath(observation);
+				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}

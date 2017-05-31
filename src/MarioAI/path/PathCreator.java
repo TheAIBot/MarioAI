@@ -6,9 +6,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
+import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.environments.Environment;
 
 public class PathCreator {
 	private static final int[] HASH_GRANULARITY = new int[] {2, 4, 8, 16, 24, 32, 40, 48};
@@ -16,6 +19,8 @@ public class PathCreator {
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
 	private ArrayList<DirectedEdge> bestPath = null;
+	private final World world = new World();
+	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	
 	public PathCreator(int threadCount) {
 		//There can't be threads than granularities as two threads
@@ -29,6 +34,10 @@ public class PathCreator {
 		for (int i = 0; i < threadCount; i++) {
 			aStars[i] = new AStar(HASH_GRANULARITY[i]);
 		}
+	}
+	
+	public void initialize(Environment observation) {
+		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
 	public void start(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
@@ -61,6 +70,11 @@ public class PathCreator {
 	
 	public ArrayList<DirectedEdge> getBestPath() {
 		return bestPath;
+	}
+	
+	public void syncWithRealWorld(World realWorld, EnemyPredictor realEnemyPredictor) {
+		world.syncFrom(realWorld);
+		enemyPredictor.syncFrom(realEnemyPredictor);
 	}
 	
 	public void stop() {

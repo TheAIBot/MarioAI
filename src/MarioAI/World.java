@@ -2,6 +2,8 @@ package MarioAI;
 
 import java.util.HashMap;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
@@ -154,6 +156,14 @@ public class World {
 
 	public Node[] getColumn(final int x) {
 		return savedColumns.get(x);
+	}
+	
+	public void syncFrom(World world) {
+		for (int x = 0; x < levelMatrix.length; x++) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				world.levelMatrix[x][y] = levelMatrix[x][y];
+			}
+		}
 	}
 	
 	public boolean hasGoalNodesChanged() {

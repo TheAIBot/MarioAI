@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 
+import MarioAI.World;
 import MarioAI.enemySimuation.simulators.BulletBillSimulator;
 import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.enemySimuation.simulators.FlowerEnemy;
@@ -95,7 +96,7 @@ public class EnemyPredictor {
 	
 	private void updateSimulations() {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			enemySimulation.moveTime();
+			enemySimulation.moveTimeForward();
 		}
 	}
 	
@@ -210,7 +211,7 @@ public class EnemyPredictor {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
 							//the xa and ya are 1 tick too old so they are updated here
 							potentialSimulation.moveEnemy();
-							potentialSimulation.moveTime();
+							potentialSimulation.moveTimeForward();
 							//but the position isn't too old so it's set here again
 							potentialSimulation.setX(x1);
 							potentialSimulation.setY(y1);
@@ -267,6 +268,27 @@ public class EnemyPredictor {
 			return Enemy.ENEMY_SPIKY;
 		}
 		throw new Error("Unkown kind: " + kind);
+	}
+	
+	public void moveIntoFuture(final int timeToMove) {
+		for (int i = 0; i < timeToMove; i++) {
+			updateSimulations();
+		}
+	}
+	
+	public void moveIntoPast(final int timeToMove) {
+		for (int i = 0; i < timeToMove; i++) {
+			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+				enemySimulation.moveTimeBackwards();
+			}
+		}
+	}
+	
+	public void syncFrom(EnemyPredictor correctPredictor) {
+		verifiedEnemySimulations = new ArrayList<EnemySimulator>();
+		for (EnemySimulator enemySimulator : correctPredictor.verifiedEnemySimulations) {
+			verifiedEnemySimulations.add(enemySimulator.copy());
+		}
 	}
 	
 	public ArrayList<EnemySimulator> getEnemies() {

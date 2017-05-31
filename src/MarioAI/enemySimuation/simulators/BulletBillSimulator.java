@@ -22,4 +22,16 @@ public class BulletBillSimulator extends EnemySimulator
         xa = facing * sideWaysSpeed;
         x += xa;
     }
+
+	@Override
+	public EnemySimulator copy() {
+		EnemySimulator copy = new BulletBillSimulator(x, y, facing, kind);
+		copy.x = x;
+		copy.y = y;
+		copy.xa = xa;
+		copy.ya = ya;
+		copy.positionsIndexOffset = positionsIndexOffset;
+		
+		return copy;
+	}
 }
