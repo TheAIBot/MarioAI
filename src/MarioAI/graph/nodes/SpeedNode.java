@@ -40,6 +40,20 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.hash = hash;
 	}
 	
+	public SpeedNode(Node node, float marioX, float vx, long hash) {
+		this.node = node;
+		this.moveInfo = null;
+		this.vx = vx;
+		this.parent = null;
+		this.parentXPos = node.x;
+		this.parentVx = 0;
+		this.ancestorEdge = null;
+		this.xPos = marioX;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+	}
+	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash) {
 		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash);
 	}
