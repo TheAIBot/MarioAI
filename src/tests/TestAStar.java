@@ -71,7 +71,7 @@ public class TestAStar {
 		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
@@ -135,7 +135,7 @@ public class TestAStar {
 		setup("TestAStarJump", false, false);
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		AStar aStar = new AStar();
-		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 
 		//TestTools.runOneTick(observation);
 		assertTrue(path != null);
@@ -174,7 +174,7 @@ public class TestAStar {
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 			TestTools.runOneTick(observation);
 			unitTestAgent.action[Mario.KEY_RIGHT] = true;
-			aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+			aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 			
 			for (SpeedNode speedNode : speedNodes.values()) {
 				if (!searchedNodes.contains(speedNode.hash)) {
@@ -217,7 +217,7 @@ public class TestAStar {
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.renderLevel(observation);
 		AStar aStar = new AStar();
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		
 		for (DirectedEdge edge : path) {
@@ -261,7 +261,7 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, 0, Long.MAX_VALUE);
+		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
 		AStar aStar = new AStar();
@@ -309,7 +309,7 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, 0, Long.MAX_VALUE);
+		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
 		AStar aStar = new AStar();

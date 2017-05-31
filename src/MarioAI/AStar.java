@@ -7,12 +7,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import com.sun.istack.internal.FinalArrayList;
+
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import ch.idsia.mario.environments.Environment;
 
 
 public final class AStar {
@@ -25,7 +28,7 @@ public final class AStar {
 	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public ArrayList<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+	public ArrayList<DirectedEdge> runMultiNodeAStar(final Environment observation, final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
 		
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
@@ -50,8 +53,9 @@ public final class AStar {
 			}
 		}
 
-		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), 
+		
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final ArrayList<DirectedEdge> path = runAStar(new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE), 
 										   			  new SpeedNode(goal, 0, Long.MIN_VALUE),
 										   			  enemyPredictor, 
 										   			  marioHeight);

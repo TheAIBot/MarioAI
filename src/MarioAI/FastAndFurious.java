@@ -89,7 +89,7 @@ public class FastAndFurious implements Agent {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		System.out.println("AStar");
-		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
+		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 		return (path == null)? newestPath : path;
 	}
 
