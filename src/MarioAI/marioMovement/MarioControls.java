@@ -96,7 +96,8 @@ public class MarioControls {
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
 			if (prevEdge != null && 
-				next.getMoveInfo().equals(prevEdge.getMoveInfo()) && 
+				next.equals(prevEdge) &&
+				next.getMoveInfo().equals(prevEdge.getMoveInfo()) &&
 				movementTime == ticksOnThisEdge + 1) 
 			{
 				path.remove(0);
@@ -105,7 +106,8 @@ public class MarioControls {
 			}
 			
 			if (prevEdge == null ||
-				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ) {
+				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ||
+				!next.equals(prevEdge)) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
 			}
@@ -138,7 +140,7 @@ public class MarioControls {
 	public static boolean isPathInvalid(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 1) {
 			final int marioXPos = (int)MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
-			final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+			final int marioYPos = Math.round(MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()));
 			final DirectedEdge nextEdge = path.get(0);
 			
 			return (nextEdge.target.x == marioXPos &&
@@ -296,10 +298,10 @@ public class MarioControls {
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction
 		if (distanceIsNegative) {
-			distanceMoved *= -1;
-			speed *= -1;
+			speed = -speed;
+			distanceMoved = -distanceMoved;
 			for (int i = 0; i < xPositions.size(); i++) {
-				xPositions.set(i, -1 * xPositions.get(i));
+				xPositions.set(i, -xPositions.get(i));
 			}
 		}
 

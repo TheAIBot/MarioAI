@@ -2,6 +2,8 @@ package tests;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -78,7 +80,7 @@ public class TestMarioMovements {
 	private void testDeaccelerating(int distanceToMove) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
@@ -91,8 +93,17 @@ public class TestMarioMovements {
 		speedNode1.use();
 		path.add(edge1);
 		
-		SpeedNode speedNode2 = createEdgeWithSpeedNode(endNode, speedNode1, -1, 0, 0);
-		path.add(speedNode2.ancestorEdge);
+		SpeedNode prevSpeedNode = speedNode1;
+		
+		for (int i = 0; i < 10; i++) {
+			SpeedNode speedNode2 = createEdgeWithSpeedNode(endNode, prevSpeedNode, -distanceToMove, 0, 0);
+			path.add(speedNode2.ancestorEdge);
+			
+			SpeedNode speedNode3 = createEdgeWithSpeedNode(startNode, speedNode2, distanceToMove, 0, 0);
+			path.add(speedNode3.ancestorEdge);
+			
+			prevSpeedNode = speedNode3;
+		}
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -160,7 +171,7 @@ public class TestMarioMovements {
 	private void testConsecutiveJumpMovement(int distanceX, int jumpHeight, int pathLength) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("flat.lvl", agent);
+		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
 		
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
@@ -192,14 +203,14 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testXWidthJumpNoAstar() {
-		testJumpNoAstart(1, 2);
-		testJumpNoAstart(1, 3);
-		testJumpNoAstart(1, 4);
+		testJumpNoAstar(1, 2);
+		testJumpNoAstar(1, 3);
+		testJumpNoAstar(1, 4);
 		
-		testJumpNoAstart(2, 3);
-		testJumpNoAstart(2, 4);
+		testJumpNoAstar(2, 3);
+		testJumpNoAstar(2, 4);
 	}
-	private void testJumpNoAstart(int distanceX, int jumpHeight) {
+	private void testJumpNoAstar(int distanceX, int jumpHeight) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("jumpLevels/only" + distanceX + "Width.lvl", agent, false);

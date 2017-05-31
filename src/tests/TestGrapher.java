@@ -1,35 +1,28 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
-import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
-import MarioAI.FastAndFurious;
-import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
-import MarioAI.graph.nodes.*;
-import MarioAI.marioMovement.MarioControls;
+import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
-
-import com.sun.javafx.geom.Edge;
-import com.sun.javafx.scene.traversal.Direction;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestGrapher {

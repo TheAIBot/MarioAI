@@ -12,13 +12,13 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import MarioAI.World;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import MarioAI.graph.nodes.World;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;
@@ -54,7 +54,8 @@ public class TestCollisionDetector {
 		
 	@Test
 	public void testRunIntoWall(){
-		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);//Adds a wall later, to force it to run into the wall.
+		World world = flatlandWorld();
+		world = TestGrapher.totalFlatland(world, marioNode);//Adds a wall later, to force it to run into the wall.
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Again, edge before the wall.
 		CollisionDetection.setWorld(world);
@@ -100,18 +101,23 @@ public class TestCollisionDetector {
 					}	
 					String errorMessage = "Size = " + size + ", i = " + i + ", j =" + j;
 					System.out.println(errorMessage);
-					boolean hasCollision = false;
+					boolean shouldHaveCollision = false;
 					for (int k = 0; k < snRight.getMoveInfo().getPositions().length; k++) {
 						Point2D.Float currentPosition = snRight.getMoveInfo().getPositions()[k];
 						double rightMarioPlace = snRight.parentXPos + currentPosition.getX() + 0.5;
-						if ((11+i <= rightMarioPlace + 0.25 && rightMarioPlace + 0.25 <= 11+i+1 && Math.floor(snRight.parentXPos) != Math.floor(rightMarioPlace + 0.25)) ||
-							 (11+i <= rightMarioPlace - 0.25 && rightMarioPlace - 0.25 <= 11+i+1 && Math.floor(snRight.parentXPos) != Math.floor(rightMarioPlace - 0.25))) {
-							hasCollision = true;
+						if ((11+i <= rightMarioPlace + CollisionDetection.MARIO_WIDTH/(2*16) && 
+							  rightMarioPlace + CollisionDetection.MARIO_WIDTH/(2*16) <= 11+i+1 
+							  && Math.floor(snRight.parentXPos) != Math.floor(rightMarioPlace + 0.25)) 
+							     ||
+							 (11+i <= rightMarioPlace - CollisionDetection.MARIO_WIDTH/(2*16) && 
+							 rightMarioPlace - CollisionDetection.MARIO_WIDTH/(2*16) <= 11+i+1 && 
+							 Math.floor(snRight.parentXPos) != Math.floor(rightMarioPlace - CollisionDetection.MARIO_WIDTH/(2*16)))) {
+							shouldHaveCollision = true;
 							break;
 						}
 					}
-					//If he collides with the block
-					if (hasCollision) {
+					//If he should collide with the block
+					if (shouldHaveCollision) {
 						assertTrue(errorMessage, snRight.getMoveInfo().hasCollisions(currentRight));
 						assertTrue(errorMessage + ". There are no collision.", snLeft.getMoveInfo().hasCollisions(currentLeft));
 					} else{
@@ -170,7 +176,6 @@ public class TestCollisionDetector {
 		fail("Make the test");		
 	}
 	
-
 	@Test	
 	public void testStandardMovementsAtDifferentSpeeds(){
 		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
@@ -207,20 +212,108 @@ public class TestCollisionDetector {
 	public void testSimulatedRuns(){
 		fail("Make the test");
 	}
-	
 
 	@Test
+	public void testCollisionWithAccellerationOverLimit(){
+		fail("Make the test");
+	}
+	
+	@Test
 	public void testStepwiseRaiseIntoCeiling(){
+
+		World world = flatlandWorld();
+		world = TestGrapher.totalFlatland(world, marioNode);
+		EdgeCreator grapher = new EdgeCreator();
+		grapher.setMovementEdges(world, marioNode);
+		CollisionDetection.setWorld(world);
+		CollisionDetection.loadTileBehaviors();
+		Node[][] level = world.getLevelMatrix();
+		
+		
+		//For all positions on the seen level:
+		for (float i = 0; i < EdgeCreator.GRID_WIDTH; i += 0.05) {
+			//Gradually raise into the ceiling:
+			Point2D.Float currentOffset = new Point2D.Float(0, 0);
+			Point2D.Float futureOffset;
+			for (float j = 0; j < 14; j += 0.05) {
+				//j does not need to be inverted, as we want this to be an upwards motion, and it is inverted in the method.
+				futureOffset = new Point2D.Float(0, j); 
+				
+				//Starts at the normal speed. Doesn't have any significans.
+				//Starts from the top. 
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) 12);
+				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
+				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode);
+				String errorMessage = "Error at height = " + j + ", at i = " + i;
+				//Plus 1.0/16, as 2.0/16 is added/subtracted, and then 1.0/16 is subtracted/added, inside the method.
+				//TODO discuss if this is fine, and the desired result. (*)
+				if (14 - j - CollisionDetection.MARIO_HEIGHT/16 <= 10 ) { //TODO check should it also hold true with j=9?
+					//If he is lowered below the floor, he should have a collision.
+					hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode);
+					assertTrue(errorMessage,hasCollision);
+				} else{
+					if (hasCollision) {
+						hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode);
+					}
+					assertFalse(errorMessage,hasCollision);
+				}
+				//currentOffset = futureOffset;
+			}
+		}
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testCollisionDetectionOffCurentView(){
 		fail("Make the test");
 	}
 
 	@Test
 	public void testStepwiseLowerIntoFloor(){
-		fail("Make the test");
+		
+		World world = flatlandWorld();
+		world = TestGrapher.totalFlatland(world, marioNode);
+		EdgeCreator grapher = new EdgeCreator();
+		grapher.setMovementEdges(world, marioNode);
+		CollisionDetection.setWorld(world);
+		CollisionDetection.loadTileBehaviors();
+		Node[][] level = world.getLevelMatrix();
+		
+		
+		//For all positions on the seen level:
+		for (float i = 0; i < EdgeCreator.GRID_WIDTH; i += 0.05) {
+			//Gradually lowered into the floor:
+			Point2D.Float currentOffset = new Point2D.Float(0, 0);
+			Point2D.Float futureOffset;
+			for (float j = 0; j < 14; j += 0.05) {
+				futureOffset = new Point2D.Float(0, -j); //It needs to be negative j, as it is inverted in the method.
+				
+				//Starts at the normal speed. Doesn't have any significans.
+				//Starts from the top	. 
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) 12);
+				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
+				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode);
+				String errorMessage = "Error at height = " + j + ", at i = " + i;
+				//Plus 1.0/16, as 2.0/16 is added/subtracted, and then 1.0/16 is subtracted/added, inside the method.
+				//TODO discuss if this is fine, and the desired result. (*)
+				if (9 + 1.0/16 <= j) { //TODO check should it also hold true with j=9?
+					//If he is lowered below the floor, he should have a collision.
+					assertTrue(errorMessage,hasCollision);
+				} else{
+					assertFalse(errorMessage,hasCollision);
+				}
+				//currentOffset = futureOffset;
+			}
+		}
 	}
 	
 	@Test
 	public void testStepwise(){
+		fail("Make the test");
+	}
+
+	@Test
+	public void testCompareWithMariosCollisionEngine(){
 		fail("Make the test");
 	}
 	

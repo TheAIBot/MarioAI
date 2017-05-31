@@ -16,7 +16,7 @@ public class Play {
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new HumanKeyboardAgent();
@@ -43,7 +43,7 @@ public class Play {
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
+	        //options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
 	        //options.setLevelRandSeed(1585046168);
 	        //options.setLevelRandSeed(3261372);
 	        //options.setLevelRandSeed(41);
