@@ -19,7 +19,7 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public final float parentVx;
 	public final long hash;
 	public final DirectedEdge ancestorEdge;
-	public final float xPos;
+	public float xPos;
 	public final int yPos;
 	public int gScore = 0;
 	public float fScore = 0;
