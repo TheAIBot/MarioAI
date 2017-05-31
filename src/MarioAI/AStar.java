@@ -23,8 +23,21 @@ public class AStar {
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+	private SpeedNode startSpeedNode = null;
+	private SpeedNode goalSpeedNode = null;
+	private EnemyPredictor enemyPredictor = null;
+	private int marioHeight;
+	private float marioSpeed;
+	
+	private boolean finishedARun = false; // true if AStar has found a path and false otherwise
+	private boolean initAStar; // true only in the first call of multinodeastar
 	
 	private ArrayList<DirectedEdge> currentBestPath = null;
+
+	
+	public AStar() {
+		initAStar = true;
+	}
 	
 	/**
 	 * TEMP method for running A* if no time is given
@@ -42,79 +55,101 @@ public class AStar {
 	
 	/**
 	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
-	 * 
 	 * @param start
 	 * @param rightmostNodes
-	 * @return optimal path
+	 * @param marioSpeed
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @param timeToRun
+	 * @return
 	 */
 	public ArrayList<DirectedEdge> runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		
-		// Add singleton goal node far to the right. This will ensure each
-		// vertical distance is minimal and all nodes in rightmost column will be
-		// pretty good goal positions to end up in after A* search 
-		int goalX = 0;
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			if (rightmostNodes[i] != null) {
-				goalX = rightmostNodes[i].x;
-				break;
-			}
-		}
-		goalX += 50;
-		
-		final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 		final DirectedEdge[] addedEdges = new DirectedEdge[rightmostNodes.length];
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			final Node node = rightmostNodes[i];
-			if (node != null) {
-				RunningEdge edge = new RunningEdge(node, goal);
-				node.addEdge(edge);
-				addedEdges[i] = edge;
+		if (finishedARun || initAStar) {
+			initAStar = false;
+			
+			// Add singleton goal node far to the right. This will ensure each
+			// vertical distance is minimal and all nodes in rightmost column will be
+			// pretty good goal positions to end up in after A* search 
+			int goalX = 0;
+			for (int i = 0; i < rightmostNodes.length; i++) {
+				if (rightmostNodes[i] != null) {
+					goalX = rightmostNodes[i].x;
+					break;
+				}
 			}
+			goalX += 50;
+			
+			final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
+			
+			startSpeedNode = new SpeedNode(start, marioSpeed, Long.MAX_VALUE);
+			goalSpeedNode = new SpeedNode(goal, 0, Long.MIN_VALUE);
+			
+			for (int i = 0; i < rightmostNodes.length; i++) {
+				final Node node = rightmostNodes[i];
+				if (node != null) {
+					RunningEdge edge = new RunningEdge(node, goal);
+					node.addEdge(edge);
+					addedEdges[i] = edge;
+				}
+			}
+			
+			// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
+			//final ArrayList<DirectedEdge> path = initAStar(timeToRun);
+			reset(startSpeedNode, 
+							goalSpeedNode,
+							marioSpeed,
+							enemyPredictor, 
+							marioHeight);
+			finishedARun = false;
 		}
-		
-		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final ArrayList<DirectedEdge> path = initAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), 
-										   			  new SpeedNode(goal, 0, Long.MIN_VALUE),
-										   			  enemyPredictor, 
-										   			  marioHeight, timeToRun);
+		final ArrayList<DirectedEdge> path = runAStar(startSpeedNode, 
+				goalSpeedNode,
+				marioSpeed,
+				enemyPredictor, 
+				marioHeight, timeToRun);
 		//speedNodes.remove(Long.MAX_VALUE);
 		//speedNodes.remove(Long.MIN_VALUE);
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
 			path.remove((path.size() - 1));
 		}
-		
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			final Node node = rightmostNodes[i];
-			if (node != null) {
-				node.removeEdge(addedEdges[i]);
+		if (finishedARun) {
+			for (int i = 0; i < rightmostNodes.length; i++) {
+				final Node node = rightmostNodes[i];
+				if (node != null) {
+					node.removeEdge(addedEdges[i]);
+				}
 			}
 		}
+		
 		return path;
 	}
 	
-	public ArrayList<DirectedEdge> initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
+	private void reset(final SpeedNode start, final SpeedNode goal, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+		startSpeedNode = start;
+		goalSpeedNode = goal;
+		this.marioHeight = marioHeight;
+		this.marioSpeed  = marioSpeed;
+		this.enemyPredictor = enemyPredictor;
+		
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
-		currentBestPath = null;
 		
 		// Initialization
-		openSet.add(start);
-		openSetMap.put(Integer.MAX_VALUE, start);
-		start.gScore = 0;
-		start.fScore = heuristicFunction(start, goal);
-		
-		return runAStar(start, goal, enemyPredictor, marioHeight, timeToRun);
+		openSet.add(startSpeedNode);
+		openSetMap.put(Integer.MAX_VALUE, startSpeedNode);
+		startSpeedNode.gScore = 0;
+		startSpeedNode.fScore = heuristicFunction(startSpeedNode, goalSpeedNode);
 	}
 
 	/**
 	 * Basic A* search algorithm
-	 * 
-	 * @param start
-	 * @param goal
+	 * @param timeToRun
 	 * @return
 	 */
-	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
+	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -129,8 +164,9 @@ public class AStar {
 			openSetMap.remove(current.hash);
 			
 			// If goal is reached return solution path.
-			if (current.node.equals(goal.node)) {
+			if (current.node.equals(goalSpeedNode.node)) {
 				currentBestPath = reconstructPath(current);
+				finishedARun = true;
 				return currentBestPath;
 			}
 			//System.out.println("Current node:");
@@ -184,7 +220,7 @@ public class AStar {
 				//by updating the scores and taking it in and out of the queue.
 				openSet.remove(sn);
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+				sn.fScore = sn.gScore + heuristicFunction(sn, goalSpeedNode) + neighborEdge.getWeight();
 				sn.parent = current;
 				openSet.add(sn);
 				openSetMap.put(snEndHash, sn);
