@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
 import MarioAI.World;
@@ -23,6 +22,7 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.*;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
+import MarioAI.path.AStar;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;

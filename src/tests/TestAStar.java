@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.Hasher;
 import MarioAI.World;
@@ -27,6 +26,7 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import MarioAI.path.AStar;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;

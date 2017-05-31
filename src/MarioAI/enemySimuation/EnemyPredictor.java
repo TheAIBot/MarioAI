@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 
-import MarioAI.PathMaster;
 import MarioAI.enemySimuation.simulators.BulletBillSimulator;
 import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.enemySimuation.simulators.FlowerEnemy;
 import MarioAI.enemySimuation.simulators.ShellSimulator;
 import MarioAI.enemySimuation.simulators.WalkingEnemySimulator;
+import MarioAI.path.PathCreator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
