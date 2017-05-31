@@ -26,12 +26,13 @@ public class TickProblem extends Problem {
 		actions.add(createAction(true, false, false, true, false));
 		actions.add(createAction(true, false, false, false, true));
 		actions.add(createAction(true, false, false, true, true));
-		
-		// jump straight up
-		actions.add(createAction(false, false, false, true, false));
-		actions.add(createAction(false, false, false, true, true));
 
-		return actions;
+		// jump straight up
+		actions.add(createAction(false, false, false, true, true));
+		
+		// stand still
+		actions.add(createAction(false, false, false, true, false));
+		
 	}
 
 	private boolean[] createAction(boolean left, boolean right, boolean down, boolean jump, boolean speed) {
