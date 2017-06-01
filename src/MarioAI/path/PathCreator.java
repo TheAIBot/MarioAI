@@ -29,8 +29,9 @@ public class PathCreator {
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private final CompletableFuture<Boolean>[] runningTasks;
 	
+	@SuppressWarnings("unchecked")
 	public PathCreator(int threadCount) {
-		//There can't be threads than granularities as two threads
+		//There can't be more threads than granularities as two threads
 		//would then have to share the same granularity.
 		threadCount = Math.min(threadCount, HASH_GRANULARITY.length);
 		threadPool = Executors.newFixedThreadPool(threadCount);
@@ -66,14 +67,15 @@ public class PathCreator {
 			final int q = i;
 			runningTasks[i] = CompletableFuture.supplyAsync(() -> 
 			{
-				aStars[q].runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight);
+				aStars[q].runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight, world);
 				return true;
 			}, threadPool);
 		}
-		
+		/*
 		for (AStar aStar : aStars) {
-			threadPool.submit(() -> aStar.runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight));
+			threadPool.submit(() -> aStar.runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight, world));
 		}
+		*/
 	}
 	
 	public void updateBestPath() {

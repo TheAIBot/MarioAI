@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import MarioAI.Hasher;
+import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
@@ -42,7 +43,7 @@ public class AStar {
 	 * @param rightmostNodes
 	 * @return optimal path
 	 */
-	public void runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+	public void runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
 		
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
@@ -68,7 +69,7 @@ public class AStar {
 		}
 		
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		initAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), new SpeedNode(goal, 0, Long.MIN_VALUE), enemyPredictor, marioHeight);
+		initAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), new SpeedNode(goal, 0, Long.MIN_VALUE), enemyPredictor, marioHeight, world);
 		//speedNodes.remove(Long.MAX_VALUE);
 		//speedNodes.remove(Long.MIN_VALUE);
 		
@@ -80,7 +81,7 @@ public class AStar {
 		}
 	}
 	
-	private void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight) {
+	private void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
@@ -95,7 +96,7 @@ public class AStar {
 		start.gScore = 0;
 		start.fScore = heuristicFunction(start, goal);
 		
-		runAStar(start, goal, enemyPredictor, marioHeight);
+		runAStar(start, goal, enemyPredictor, marioHeight, world);
 	}
 
 	/**
@@ -105,7 +106,7 @@ public class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight) {		
+	public void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {		
 		while (!openSet.isEmpty() && keepRunning) {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);
@@ -137,7 +138,7 @@ public class AStar {
 						continue;
 					}
 					
-					if (sn.getMoveInfo().hasCollisions(current)) {
+					if (sn.getMoveInfo().hasCollisions(current, world)) {
 						continue;
 					}
 					

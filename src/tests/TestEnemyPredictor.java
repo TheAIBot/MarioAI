@@ -87,6 +87,8 @@ public class TestEnemyPredictor {
 		Environment observation = TestTools.loadLevel(levelPath, new UnitTestAgent(), false);
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 		TestTools.setMarioInvulnerability(observation, true);
+		TestTools.setMarioXPosition(observation, 10);
+		TestTools.runOneTick(observation);
 		
 		testEnemy(observation, enemyPredictor, enemyType);
 	}
