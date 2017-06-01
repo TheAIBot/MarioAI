@@ -17,8 +17,8 @@ import ch.idsia.mario.engine.sprites.Sparkle;
 
 public class CollisionDetection {
 	private static World world;
-	private static final float MARIO_WIDTH = 4; //TODO Change depending on mario
-	private static final float MARIO_HEIGHT = 24; //(*)TODO Change depending on mario
+	public static final float MARIO_WIDTH = 4; //TODO Change depending on mario
+	public static final float MARIO_HEIGHT = 24; //(*)TODO Change depending on mario
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
@@ -28,7 +28,7 @@ public class CollisionDetection {
    	//Test seed: 3261372
 	
 	
-	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode){
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -38,12 +38,18 @@ public class CollisionDetection {
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		//TODO find out why,
-		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16 + MARIO_WIDTH * 2,
-															    -(currentOffset.y + sourceNode.yPos) * 16 - 2);
-		
-		//TODO (*) Do it of two times. First x, then y.
-		return !move(currentPosition, xa, 0) || 
-			   !move(currentPosition, 0, ya);
+		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16,
+															    (sourceNode.yPos - currentOffset.y) * 16 - 1);
+		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
+		//TODO change -2 back to -1
+		//TODO (*) Why -2 to the y position?. Should it be +2? test.
+		if (lastYValue == futureOffset.y) {
+			return !move(currentPosition, xa, 0);
+		}
+		else {
+			return !move(currentPosition, xa, 0) || 
+					 !move(currentPosition, 0, ya);
+		}
 	}
 	
 	public static void setWorld(World newWorld){

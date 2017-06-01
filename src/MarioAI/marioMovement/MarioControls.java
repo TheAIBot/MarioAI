@@ -286,7 +286,7 @@ public class MarioControls {
 		totalTicks += ticksDrifting;
 		
 		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
-		distanceMoved = xPositions.get(xPositions.size() - 1);
+		distanceMoved = (xPositions.size() == 0)? 0:xPositions.get(xPositions.size() - 1);
 		
 		//move the last tick
 		//which should be on ground

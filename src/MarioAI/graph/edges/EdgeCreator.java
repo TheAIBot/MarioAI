@@ -2,6 +2,8 @@ package MarioAI.graph.edges;
 
 import java.util.*;
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
@@ -12,7 +14,9 @@ public  class EdgeCreator {
 	private static final float MAX_JUMP_RANGE = 5;
 	public  static final int GRID_HEIGHT = 15;
 	public  static final int GRID_WIDTH = 22;
-	private static final float MARIO_HEIGHT = (float) 1.8;
+	public static final float MARIO_HEIGHT = (float) 1.8;
+	public static final boolean ALLOW_RUNNING = true;
+	public static final boolean ALLOW_JUMPING = true;
 	
 	private Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
 	private int testPrintCounter = 24; // Rand value
@@ -74,14 +78,43 @@ public  class EdgeCreator {
 		ArrayList<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		boolean foundAllEdges = true;
 		//Two different ways to find the reachable nodes from a given position:
-		foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
-		foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;
+		if (ALLOW_RUNNING) {
+			foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
+		}
+		if (ALLOW_JUMPING) {
+			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
+			foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
+		}
 		
 		if (foundAllEdges) startingNode.setIsAllEdgesMade(true);
 		
 		return listOfEdges;
 	}
 	
+	private boolean getJumpStraightUpEdges(Node startingNode, int nodeColoumn,	ArrayList<DirectedEdge> listOfEdges) {
+		//He will of course not collide with anything at his starting position.
+		Node currentLandingPosition = startingNode;
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+			int currentYPosition = startingNode.y - jumpHeight;
+			//All jumps will be to the greatest height where Mario can stand:
+			if (canMarioStandThere(nodeColoumn, currentYPosition)) {
+				currentLandingPosition = observationGraph[nodeColoumn][currentYPosition];
+			}
+			//He can only hit something upwards, with his top corners.
+			//The opposite corner here actually corresponds to his top part.
+			if (isHittingWallOrGroundUpwards(nodeColoumn, (int) Math.ceil(currentYPosition - MARIO_HEIGHT)) ) {
+				//All jumps of a greater height will end there:
+				//This corresponds to hitting the ceiling, which will not currently be allowed.
+				break;
+			} else {
+				//Else will Mario be able to jump up to this height, to the current target:
+				listOfEdges.add(new JumpingEdge(startingNode, currentLandingPosition, jumpHeight));
+			}
+		}
+		//TODO change so it depends on the situation.
+		return true;
+	}
+
 	public boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
 
@@ -197,7 +230,7 @@ public  class EdgeCreator {
 		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, null, direction, null, null, true, false);
 	}
 	
-	private Collision ascendingPolynomial(float formerLowerYPosition, float bound, int currentXPosition, Collision collisionDetection,
+	public Collision ascendingPolynomial(float formerLowerYPosition, float bound, int currentXPosition, Collision collisionDetection,
 												 JumpingEdge polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
 		return ascendingFunction(formerLowerYPosition, bound, currentXPosition, collisionDetection, polynomial, direction, startingPosition, listOfEdges, false, true);
 	}
@@ -257,8 +290,8 @@ public  class EdgeCreator {
 		return collisionDetection;
 	}
 	
-	private Collision descendingPolynomial(float formerLowerYPosition, float bound, int currentXPosition, Collision collisionDetection,
-												 JumpingEdge polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
+	public Collision descendingPolynomial(float formerLowerYPosition, float bound, int currentXPosition, Collision collisionDetection,
+												 	  JumpingEdge polynomial, JumpDirection direction, Node startingPosition, List<DirectedEdge> listOfEdges) {
 		boolean isHittingWall = false;		
 		//TODO make the internal part into a function. Replicate for ascending function.
 		//The Math.min(bound, GRID_HEIGHT - 1) + 0.99 plus the internal if statement, ensures the height at the end of the jump is included.
@@ -419,6 +452,7 @@ public  class EdgeCreator {
 	}
 
 	private Collision upperFacingCornerCollision(boolean isHittingWall, float y, float formerLowerYPosition, int currentXPosition, JumpDirection direction) {
+		//TODO likely error here with the direction.
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
@@ -440,7 +474,7 @@ public  class EdgeCreator {
 		} else {
 			//It can only hit a wall, or nothing, so:
 			//TODO check and discuss if ceiling the result is correct.
-			if (isHittingWallOrGroundDownwards(currentXPosition, (int) Math.floor(y - MARIO_HEIGHT))) {
+			if (isHittingWallOrGroundDownwards(currentXPosition, (int) Math.ceil(y - MARIO_HEIGHT))) {
 				return Collision.HIT_WALL;
 			} else {
 				return Collision.HIT_NOTHING;
@@ -485,8 +519,11 @@ public  class EdgeCreator {
 		if (MARIO_HEIGHT >= 1.5) {
 			//Some blocks can be passed through going upwards, not downwards, so two cases are necessary:
 			//TODO check if it is nessecary(*)
-			if ((direction.isUpwardsType() 	&& isHittingWallOrGroundUpwards(currentXPosition, (int) (y - MARIO_HEIGHT/2))) 	||
-				 (!direction.isUpwardsType()    	&& isHittingWallOrGroundDownwards(currentXPosition, (int) (y - MARIO_HEIGHT/2)))) { //If it is hitting the ceiling, upperRight will notice.
+			if ((direction.isUpwardsType()  && 
+				  isHittingWallOrGroundUpwards(currentXPosition, (int) Math.ceil(y - MARIO_HEIGHT/2))) 	
+				    ||
+				 (!direction.isUpwardsType() && 
+				  isHittingWallOrGroundDownwards(currentXPosition, (int) Math.ceil(y - MARIO_HEIGHT/2)))) { //If it is hitting the ceiling, upperRight will notice.
 				return Collision.HIT_WALL;
 			} 
 			else return Collision.HIT_NOTHING;
