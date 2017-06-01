@@ -62,7 +62,7 @@ public class FastAndFurious implements Agent {
 				enemyPredictor.resetNewEnemySpawned();
 			}
 			
-			if (newestPath.size() > 1) {
+			if (newestPath != null && newestPath.size() > 0) {
 				action = marioController.getNextAction(observation, newestPath);
 			}
 			

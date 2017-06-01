@@ -101,6 +101,11 @@ public class MarioControls {
 				movementTime == ticksOnThisEdge + 1) 
 			{
 				path.remove(0);
+				if (path.size() == 0) {
+					canUpdatePath = true;
+					Arrays.fill(actions, false);
+					return actions;
+				}
 				next = path.get(0);
 				movementTime = next.getMoveInfo().getMoveTime();
 			}
