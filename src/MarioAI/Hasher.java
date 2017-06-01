@@ -5,7 +5,7 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
 public class Hasher {
-
+	
 	public static int hashIntPoint(int x, int y) {
 		return x + Short.MAX_VALUE * y;
 	}
@@ -21,6 +21,10 @@ public class Hasher {
 		return a | edgeHash;
 	}
 	
+	public static int hashEndSpeedNode(int x, int y, float v, int speedGranularity) {
+		return hashEndSpeedNode(x,  y, v, speedGranularity);
+	}
+	
 	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
 		final int x = sn.node.x;
 		final int y = sn.node.y;
@@ -34,15 +38,14 @@ public class Hasher {
 		return d | c | b | a;
 	}
 	
-	//public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
-	public static int hashSpeed(float vx, int hashGranularity) {
+	public static byte hashSpeed(float vx, int hashGranularity) {
 		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (hashGranularity * 2);
-		return (int)((vx + ADD_FOR_ROUND) * hashGranularity);
-		/*
-		final int speedHash = hashSpeed(vx);
-		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx) << 32) | speedSign;
-		*/
+		if (vx >= 0) {
+			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
+		} else {
+			final int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
+			return (byte) (0x80 | hashWithOutSign);
+		}
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

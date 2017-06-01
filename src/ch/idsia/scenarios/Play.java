@@ -16,7 +16,7 @@ public class Play {
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new HumanKeyboardAgent();
@@ -43,6 +43,11 @@ public class Play {
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
 	        System.out.println("Seed = " + seed);
+	        		//hahahaha
+	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
+	        //options.setLevelRandSeed(860788790);
+	        //options.setLevelRandSeed(1145934057);
+	        //options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
 	        //options.setLevelRandSeed(1585046168);
 	        //options.setLevelRandSeed(3261372);
 	        //options.setLevelRandSeed(41);
@@ -52,16 +57,21 @@ public class Play {
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1028660435);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
+
 	        /*
+860788790 //Error at difficulty 2
+1145934057 //Difficulty -1. Error with mario movement.
+1145934057
 1549733898
 793284811
 640346535
 1772112418
 232887628
+500432374 //Difficulty 2, fejl i collision engine
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(2);
+	        options.setLevelDifficulty(1);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

@@ -88,6 +88,8 @@ private boolean isfirsttick = true;
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
 				DebugDraw.drawAction(observation, action);
+				//TestTools.renderLevel(observation);
+				//System.out.println();
 			}
 		}
 		tickCount++;
@@ -97,7 +99,9 @@ private boolean isfirsttick = true;
 	
 	public void startFindingPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		long startTime = System.currentTimeMillis();
 		pathCreator.start(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
+		System.out.println(System.currentTimeMillis() - startTime);
 	}
 
 	public AGENT_TYPE getType() {

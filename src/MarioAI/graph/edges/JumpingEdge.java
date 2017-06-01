@@ -110,4 +110,16 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		return jumpHeight | jumpType;
 	}
 	
+	public float getParameterA(){
+		return this.a;
+	}
+
+	public float getParameterB(){
+		return this.b;
+	}
+	
+	public float getParameterC(){
+		return this.c;
+	}
+	
 }

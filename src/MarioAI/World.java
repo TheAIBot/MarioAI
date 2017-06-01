@@ -2,8 +2,6 @@ package MarioAI;
 
 import java.util.HashMap;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
-
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
