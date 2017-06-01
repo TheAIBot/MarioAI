@@ -5,7 +5,11 @@ import java.util.HashMap;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
-public class World { 
+/**
+ * Previously called node creater
+ * Manages the world state space
+ */
+public class World {
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
