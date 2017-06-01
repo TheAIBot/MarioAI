@@ -12,6 +12,7 @@ import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import tests.TestTools;
 
 
 public class FastAndFurious implements Agent {
@@ -41,8 +42,10 @@ public class FastAndFurious implements Agent {
 			
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
+			/*
 			pathCreator.initialize(observation);
 			pathCreator.syncWithRealWorld(world, enemyPredictor);
+			*/
 			//start finding a path so it can be retrieved in the next tick
 			startFindingPath(observation);
 			
@@ -55,7 +58,7 @@ public class FastAndFurious implements Agent {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
 			}
-			
+			/*
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned()) && 
@@ -70,6 +73,10 @@ public class FastAndFurious implements Agent {
 				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
+			}
+			*/
+			if (tickCount % 30 == 0) {
+				TestTools.setMarioXPosition(observation, MarioMethods.getMarioXPos(observation.getMarioFloatPos()) + 2);
 			}
 			
 			if (pathCreator.getBestPath() != null && pathCreator.getBestPath().size() > 0) {
