@@ -23,7 +23,7 @@ public class Play {
 			// Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("pit12345.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);

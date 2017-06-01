@@ -5,7 +5,7 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
 public class Hasher {
-
+	
 	public static int hashIntPoint(int x, int y) {
 		return x + Short.MAX_VALUE * y;
 	}
@@ -52,9 +52,14 @@ public class Hasher {
 	}
 	
 	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
-	public static int hashSpeed(float vx, int granularity) {
+	public static byte hashSpeed(float vx, int granularity) {
 		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (granularity * 2);
-		return (int)((vx + ADD_FOR_ROUND) * granularity);
+		if (vx >= 0) {
+			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
+		} else {
+			int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
+			return (byte) (0x80 | hashWithOutSign);
+		}
 		/*
 		final int speedHash = hashSpeed(vx);
 		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
