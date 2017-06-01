@@ -1,5 +1,7 @@
 package MarioAI;
 
+import java.awt.geom.Point2D;
+
 /**
  * Class containing auxiliary getters and setters for info about Mario
  */

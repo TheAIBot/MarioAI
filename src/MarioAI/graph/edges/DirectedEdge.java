@@ -48,6 +48,6 @@ public abstract class DirectedEdge {
 	
 	@Override
 	public String toString() {
-		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + Math.round(getMaxY());
+		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + Math.round(getMaxY()) + "\n";
 	}
 }

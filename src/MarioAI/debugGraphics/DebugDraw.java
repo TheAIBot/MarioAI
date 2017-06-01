@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.simulators.EnemySimulator;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.NodeCreator;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -29,48 +29,26 @@ public class DebugDraw {
 		((MarioComponent) observation).resetDebugGraphics();
 	}
 
-	public static void drawPath(final Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-
-		final ArrayList<Point> pathLines = new ArrayList<Point>();
-		final ArrayList<Point> pathCirclesRunning = new ArrayList<Point>();
-
-		final Point2D.Float marioPoint = new Point2D.Float(marioXPos, marioYPos);
-		convertLevelPointToOnScreenPoint(observation, marioPoint);
-		pathLines.add(new Point((int)marioPoint.x, (int)marioPoint.y));
-
-		for (int i = 0; i < path.size(); i++) {
-			final Node node = path.get(i).target;
-			final Point point = new Point(node.x, node.y);
-
-			convertLevelPointToOnScreenPoint(observation, point);
-			pathLines.add(point);
-			pathCirclesRunning.add(point);
-		}
-
-		addDebugDrawing(observation, new DebugLines(Color.RED, pathLines, 1));
-		addDebugDrawing(observation, new DebugPoints(Color.RED, pathCirclesRunning, 4));
-	}
-	
-	public static void drawPathEdgeTypes(final Environment observation, final List<DirectedEdge> path) {
-		final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
-		final Point2D.Float topStringPosition = new Point2D.Float((marioXPos + 7), 1f);
-		final float distanceBetweenStrings = 0.4f;
-		
-		for (DirectedEdge directedEdge : path) {
-			final Point2D.Float stringPos = new Point2D.Float(topStringPosition.x, topStringPosition.y);
-			convertLevelPointToOnScreenPoint(observation, stringPos);
-			final Point correctedPos = new Point((int)stringPos.x, (int)stringPos.y);
+	public static void drawPathEdgeTypes(final Environment observation, final ArrayList<DirectedEdge> path) {
+		if (path != null) {
+			final float marioXPos = Math.max(MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), (LEVEL_WIDTH / 2) - 1);
+			final Point2D.Float topStringPosition = new Point2D.Float((marioXPos + 7), 1f);
+			final float distanceBetweenStrings = 0.4f;
 			
-			final String typeName = (directedEdge instanceof RunningEdge) ? "Running" : "Jumping";
-			addDebugDrawing(observation, new DebugString(typeName, correctedPos));
-			
-			topStringPosition.y += distanceBetweenStrings;
+			for (DirectedEdge directedEdge : path) {
+				final Point2D.Float stringPos = new Point2D.Float(topStringPosition.x, topStringPosition.y);
+				convertLevelPointToOnScreenPoint(observation, stringPos);
+				final Point correctedPos = new Point((int)stringPos.x, (int)stringPos.y);
+				
+				final String typeName = (directedEdge instanceof RunningEdge) ? "Running" : "Jumping";
+				addDebugDrawing(observation, new DebugString(typeName, correctedPos));
+				
+				topStringPosition.y += distanceBetweenStrings;
+			}	
 		}
 	}
 
-	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final NodeCreator graph) {
+	public static void drawBlockBeneathMarioNeighbors(final Environment observation, final World graph) {
  		final int marioXPos = Math.min(MarioMethods.getMarioXPos(observation.getMarioFloatPos()), LEVEL_WIDTH / 2);
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		final Node[][] levelMatrix = graph.getLevelMatrix();
@@ -181,7 +159,7 @@ public class DebugDraw {
 		addDebugDrawing(observation, new DebugPoints(Color.BLUE, allEndPoints, 4));
 	}
 
-	public static void drawMarioReachableNodes(final Environment observation, final NodeCreator graph) {
+	public static void drawMarioReachableNodes(final Environment observation, final World graph) {
 		final Node mario = graph.getMarioNode(observation);
 		final List<DirectedEdge> edges = mario.getEdges();
 
@@ -255,22 +233,24 @@ public class DebugDraw {
 	}
 	
 	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
-		ArrayList<Point> positions = new ArrayList<Point>(); 
-		for (DirectedEdge edge : path) {
-			for (Point2D.Float pos : edge.getMoveInfo().getPositions()) {
-				Point2D.Float correctPos = new Point2D.Float(edge.source.x + pos.x, edge.source.y - pos.y);
-				convertLevelPointToOnScreenPoint(observation, correctPos);
-				
-				positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+		if (path != null) {
+			final ArrayList<Point> positions = new ArrayList<Point>(); 
+			for (DirectedEdge edge : path) {
+				for (Point2D.Float pos : edge.getMoveInfo().getPositions()) {
+					Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + pos.x, edge.source.y - pos.y);
+					convertLevelPointToOnScreenPoint(observation, correctPos);
+					
+					positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+				}
 			}
+			addDebugDrawing(observation, new DebugLines(Color.RED, positions));
 		}
-		addDebugDrawing(observation, new DebugLines(Color.RED, positions));
 	}
 	
 	public static void drawMarioNode(final Environment observation, final Node marioNode) {
-		Point nodePos = new Point(marioNode.x - 1, marioNode.y - 1);
+		final Point nodePos = new Point(marioNode.x - 1, marioNode.y - 1);
 		convertLevelPointToOnScreenPoint(observation, nodePos);
-		Point size = new Point(BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER, BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER);
+		final Point size = new Point(BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER, BLOCK_PIXEL_SIZE * Art.SIZE_MULTIPLIER);
 		addDebugDrawing(observation, new DebugSquare(Color.GREEN, nodePos, size));
 	}
 

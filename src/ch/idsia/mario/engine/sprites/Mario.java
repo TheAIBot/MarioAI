@@ -441,7 +441,7 @@ public class Mario extends Sprite {
 
 		boolean collide = false;
 		if (ya > 0) {
-			if (isBlocking(x + xa - width, y + ya, xa, 0))
+			if (     isBlocking(x + xa - width, y + ya, xa, 0))
 				collide = true;
 			else if (isBlocking(x + xa + width, y + ya, xa, 0))
 				collide = true;
@@ -518,7 +518,7 @@ public class Mario extends Sprite {
 	private boolean isBlocking(float _x, float _y, float xa, float ya) {
 		int x = (int) (_x / 16);
 		int y = (int) (_y / 16);
-		if (x == (int) (this.x / 16) && y == (int) (this.y / 16))
+		if (x == (int) (this.x / 16) && y == (int ) (this.y / 16))
 			return false;
 
 		boolean blocking = world.level.isBlocking(x, y, xa, ya);
@@ -705,5 +705,14 @@ public class Mario extends Sprite {
 
 	public boolean mayJump() {
 		return mayJump;
+	}
+	
+	public void setPosition(int x, int y) {
+		this.x = x * 16 - 8;
+		this.y = y * 16;
+	}
+	
+	public void setXPosition(int x) {
+		this.x = x * 16 - 8;
 	}
 }

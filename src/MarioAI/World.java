@@ -1,11 +1,15 @@
-package MarioAI.graph.nodes;
+package MarioAI;
 
 import java.util.HashMap;
 
-import MarioAI.MarioMethods;
+import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
-public class NodeCreator {
+/**
+ * Previously called node creater
+ * Manages the world state space
+ */
+public class World {
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
@@ -19,6 +23,7 @@ public class NodeCreator {
 	private int maxMarioXPos = oldMarioXPos;
 	private Node marioNode;
 	private boolean goalNodesChanged = false;
+	private boolean hasWorldChanged = false; //Has the world been changed, with the new update.
 	
 	public void printMatrix(final Environment observation)
 	{
@@ -40,7 +45,8 @@ public class NodeCreator {
 		System.out.println();
 	}
 	
-	public void createStartGraph(final Environment observation) {
+	public void initialize(final Environment observation) {
+		//Creates the initial graph
 		updateWholeMatrix(observation);
 		setMarioNode(observation);
 		oldMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
@@ -62,7 +68,8 @@ public class NodeCreator {
 		}
 	}
 
-	public boolean updateMatrix(final Environment observation) {
+	public void update(final Environment observation) {
+		//Updates the world (Matrix)
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
@@ -72,17 +79,17 @@ public class NodeCreator {
 		oldMarioYPos = marioYPos;
 		
 		final int newMaxMarioXPos = Math.max(maxMarioXPos, marioXPos + (SIGHT_WIDTH / 2) - 1);
-		goalNodesChanged = (newMaxMarioXPos != maxMarioXPos || goalNodesChanged);
+		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
-		if (changeX != 0 ||
-			changeY != 0) {
+		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
 			setMarioNode(observation);
-			return true;
+			hasWorldChanged = true;
 		}
-		
-		return false;
+		else {
+			hasWorldChanged = false;
+		}
 	}
 	
 	private void setMarioNode(final Environment observation) {
@@ -138,7 +145,7 @@ public class NodeCreator {
 		for (int y = 0; y < byteColumn.length; y++) {
 			if (nodeColumn[y] == null &&
 				byteColumn[y] != 0) {
-				nodeColumn[y] = new Node((short) x, (short) y, byteColumn[y]);
+				nodeColumn[y] = new Node(x, y, byteColumn[y]);
 			}
 		}
 		return nodeColumn;
@@ -148,19 +155,27 @@ public class NodeCreator {
 		savedColumns.put(x, column);
 	}
 
-	private Node[] getColumn(final int x) {
+	public Node[] getColumn(final int x) {
 		return savedColumns.get(x);
 	}
 	
-	public boolean goalNodesChanged() {
+	public boolean hasGoalNodesChanged() {
 		return goalNodesChanged;
 	}
 	
-	public void setGoalNodesChanged(boolean value) {
-		goalNodesChanged = value;
+	public void resetGoalNodesChanged() {
+		goalNodesChanged = false;
 	}
 	
 	public Node[][] getLevelMatrix(){
 		return levelMatrix;
+	}
+
+	public boolean hasWorldChanged() {
+		return hasWorldChanged;
+	}
+	
+	public void resetHasWorldChanged() {
+		hasWorldChanged = false;
 	}
 }

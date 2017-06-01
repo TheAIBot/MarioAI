@@ -1,9 +1,11 @@
 package MarioAI.graph.edges;
 
+
 import MarioAI.Hasher;
+import MarioAI.graph.Function;
 import MarioAI.graph.nodes.Node;
 
-public class JumpingEdge extends DirectedEdge {
+public class JumpingEdge extends DirectedEdge implements Function{
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.
@@ -41,10 +43,10 @@ public class JumpingEdge extends DirectedEdge {
 	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
 		this(source, target);
 		this.ceiledTopPointY = ceiledTopPointY;
+		this.topPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
-	//
 	public void setToJumpPolynomial(Node startingPosition, int nodeColoumn, float jumpRange, float jumpHeight) {
 		a = -4 * jumpHeight / (jumpRange * jumpRange);
 		b = (8 * nodeColoumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);
@@ -106,6 +108,18 @@ public class JumpingEdge extends DirectedEdge {
 		//3 plus 1 but for jump type 
 		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 1;		
 		return jumpHeight | jumpType;
+	}
+	
+	public float getParameterA(){
+		return this.a;
+	}
+
+	public float getParameterB(){
+		return this.b;
+	}
+	
+	public float getParameterC(){
+		return this.c;
 	}
 	
 }

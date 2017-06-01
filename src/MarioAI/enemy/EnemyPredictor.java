@@ -144,7 +144,8 @@ public class EnemyPredictor {
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		newEnemySpawned = false;
+		//keep true until set false;
+		newEnemySpawned = newEnemySpawned || false;
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
@@ -273,5 +274,9 @@ public class EnemyPredictor {
 	
 	public boolean hasNewEnemySpawned() {
 		return newEnemySpawned;
+	}
+
+	public void resetNewEnemySpawned() {
+		newEnemySpawned = false;
 	}
 }

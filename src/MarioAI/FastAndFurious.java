@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
+import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.NodeCreator;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -14,7 +14,7 @@ import ch.idsia.mario.environments.Environment;
 
 
 public class FastAndFurious implements Agent {
-	private final NodeCreator graph = new NodeCreator();
+	private final World world = new World();
 	private final EdgeCreator grapher = new EdgeCreator();
 	private final AStar aStar = new AStar();
 	private final MarioControls marioController = new MarioControls();
@@ -32,58 +32,61 @@ public class FastAndFurious implements Agent {
 		boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
-			graph.createStartGraph(observation);
-			grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
+			world.initialize(observation);
+			grapher.setMovementEdges(world, world.getMarioNode(observation));
+			
+			CollisionDetection.setWorld(world);
+			CollisionDetection.loadTileBehaviors();
+			
 			newestPath = getPath(observation);
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			marioController.update(observation);
+			world.update(observation);
 			
-			if (graph.updateMatrix(observation)) {
-				//graph.printMatrix(observation);
-				//long startTime = System.currentTimeMillis();
-				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation));
-				//System.out.println(System.currentTimeMillis() - startTime);
+			if (world.hasWorldChanged()) {
+				grapher.setMovementEdges(world, world.getMarioNode(observation));
+				world.resetHasWorldChanged();
+			}
+			
+			boolean blue = false;
+			if (world.hasGoalNodesChanged() || 
+				 MarioControls.isPathInvalid(observation, newestPath) ||
+				 enemyPredictor.hasNewEnemySpawned()) {
+				blue = true;
+			}
+			
+			if ((world.hasGoalNodesChanged() || 
+				 MarioControls.isPathInvalid(observation, newestPath) ||
+				 enemyPredictor.hasNewEnemySpawned()) && 
+				marioController.canUpdatePath) 
+			{
+				//if path changed then blue = false
+				newestPath = getPath(observation);
+				world.resetGoalNodesChanged();
+				enemyPredictor.resetNewEnemySpawned();
+			}
+			
+			if (newestPath != null && newestPath.size() > 0) {
+				action = marioController.getNextAction(observation, newestPath);
 			}
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-				DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-				DebugDraw.drawEdges(observation, graph.getLevelMatrix());
-				DebugDraw.drawMarioReachableNodes(observation, graph);
-				DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
+				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
+				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
+				DebugDraw.drawEdges(observation, world.getLevelMatrix());
+				DebugDraw.drawMarioReachableNodes(observation, world);
+				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
 				//DebugDraw.drawEnemies(observation, enemyPredictor);
-				DebugDraw.drawMarioNode(observation, graph.getMarioNode(observation));
-			}
-			
-			if (newestPath == null || newestPath.size() == 0) {
-				grapher.setMovementEdges(graph.getLevelMatrix(), graph.getMarioNode(observation)); // TODO probably not nessesary
-				newestPath = getPath(observation);
-			}
-			
-			if (newestPath != null && newestPath.size() > 0) { //TODO Must also allowed to be 1, but adding this gives an error
-				if (MarioControls.reachedNextNode(observation, newestPath) && graph.goalNodesChanged() || 
-					newestPath.size() > 0 && MarioControls.isPathInvalid(observation, newestPath) ||
-					enemyPredictor.hasNewEnemySpawned()) {
-					newestPath = getPath(observation);
-					graph.setGoalNodesChanged(false);
-				}
-				
-				if (newestPath != null && newestPath.size() > 0) {
-					action = marioController.getNextAction(observation, newestPath);
-				}
-				
-				if (DEBUG) {
-					//DebugDraw.drawPath(observation, newestPath);
-					DebugDraw.drawPathEdgeTypes(observation, newestPath);
-					DebugDraw.drawPathMovement(observation, newestPath);
-				}
-			}
-			
-			if (DEBUG) {
+				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+				DebugDraw.drawPathEdgeTypes(observation, newestPath);
+				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
+				//TestTools.renderLevel(observation);
+				//System.out.println();
 			}
 		}
 		tickCount++;
@@ -91,13 +94,14 @@ public class FastAndFurious implements Agent {
 		return action;
 	}
 	
-	private ArrayList<DirectedEdge> getPath(Environment observation) {
-		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
-		//long startTime = System.currentTimeMillis();
-		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(graph.getMarioNode(observation), graph.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
-		//System.out.println(System.currentTimeMillis() - startTime);
+	public ArrayList<DirectedEdge> getPath(Environment observation) {
+		int timeToRun = Integer.MAX_VALUE; //TODO set proper value
 		
-		return (path == null)? newestPath : path;
+		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		long startTime = System.currentTimeMillis();
+		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, timeToRun);
+		System.out.println(System.currentTimeMillis() - startTime);
+		return (path == null) ? newestPath : path;
 	}
 
 	public AGENT_TYPE getType() {
@@ -105,10 +109,11 @@ public class FastAndFurious implements Agent {
 	}
 
 	public String getName() {
-		return "\';DROP TABLE Grades;";
+		return "'; DROP TABLE Grades; --";
 	}
 
 	public void setName(String name) {
 	}
 
+	
 }
