@@ -27,7 +27,7 @@ public class FastAndFurious implements Agent {
 	public void reset() {
 		marioController.reset();
 	}
-
+private boolean isfirsttick = true;
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
 
@@ -39,10 +39,12 @@ public class FastAndFurious implements Agent {
 			CollisionDetection.setWorld(world);
 			CollisionDetection.loadTileBehaviors();
 			
+			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+			
+			pathCreator.initialize(observation);
+			pathCreator.syncWithRealWorld(world, enemyPredictor);
 			//start finding a path so it can be retrieved in the next tick
 			startFindingPath(observation);
-			
-			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
@@ -57,8 +59,10 @@ public class FastAndFurious implements Agent {
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned()) && 
-				marioController.canUpdatePath) 
+				marioController.canUpdatePath ||
+				isfirsttick) 
 			{
+				isfirsttick = false;
 				pathCreator.stop();
 				pathCreator.updateBestPath();
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
@@ -68,7 +72,7 @@ public class FastAndFurious implements Agent {
 				enemyPredictor.resetNewEnemySpawned();
 			}
 			
-			if (pathCreator.getBestPath().size() > 1) {
+			if (pathCreator.getBestPath() != null && pathCreator.getBestPath().size() > 0) {
 				action = marioController.getNextAction(observation, pathCreator.getBestPath());
 			}
 			

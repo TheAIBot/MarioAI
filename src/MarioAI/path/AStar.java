@@ -174,6 +174,8 @@ public class AStar {
 				}	
 			}
 		}
+		currentBestPath = null;
+		foundBestPath = false;
 	}
 	
 	public SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
@@ -204,20 +206,25 @@ public class AStar {
 	 */
 	private ArrayList<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		while (currentSpeedNode.parent != null) {
-			currentSpeedNode.use();
-			path.add(currentSpeedNode.ancestorEdge);
-			//if (currentSpeedNode.parent.parent == null) {
-			//	System.out.println("First transition speed: " + currentSpeedNode.vx);				
-			//}
-			currentSpeedNode = currentSpeedNode.parent;
+		if (currentSpeedNode != null) {
+			while (currentSpeedNode.parent != null) {
+				currentSpeedNode.use();
+				path.add(currentSpeedNode.ancestorEdge);
+				//if (currentSpeedNode.parent.parent == null) {
+				//	System.out.println("First transition speed: " + currentSpeedNode.vx);				
+				//}
+				currentSpeedNode = currentSpeedNode.parent;
+			}
+			Collections.reverse(path);
+			
+			if (path.size() > 0) {
+				path.remove((path.size() - 1));
+			}
+			return path;	
+		} 
+		else {
+			return path;
 		}
-		Collections.reverse(path);
-		
-		if (path.size() > 0) {
-			path.remove((path.size() - 1));
-		}
-		return path;
 	}
 	
 	public AStarPath getCurrentBestPath() {

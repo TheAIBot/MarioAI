@@ -133,7 +133,6 @@ public class World {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}
 		return byteColumn;
-		
 	}
 
 	private Node[] convertByteColumnToNodeColumn(final byte[] byteColumn, final int x) {
@@ -161,7 +160,7 @@ public class World {
 	public void syncFrom(World world) {
 		for (int x = 0; x < levelMatrix.length; x++) {
 			for (int y = 0; y < levelMatrix[x].length; y++) {
-				world.levelMatrix[x][y] = levelMatrix[x][y];
+				levelMatrix[x][y] = world.levelMatrix[x][y];
 			}
 		}
 	}
