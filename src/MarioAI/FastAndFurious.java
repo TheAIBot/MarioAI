@@ -95,7 +95,7 @@ public class FastAndFurious implements Agent {
 	}
 	
 	public ArrayList<DirectedEdge> getPath(Environment observation) {
-		int timeToRun = Integer.MAX_VALUE; //TODO set proper value
+		int timeToRun = 1000; //TODO set proper value
 		
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
