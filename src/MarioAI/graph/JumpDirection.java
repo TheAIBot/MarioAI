@@ -1,6 +1,60 @@
 package MarioAI.graph;
 
 public enum JumpDirection { 
+	STRAIGHT_UPWARDS{
+		@Override
+		public int getHorizontalDirectionAsInt() {
+			return 0;
+		}
+
+		@Override
+		public int getVerticalDirectionAsInt() {
+			return -1;
+		}
+
+		@Override
+		public JumpDirection getOppositeDirection() {
+			return STRAIGHT_DOWNWARDS;
+		}
+
+		@Override
+		public JumpDirection getOppositeHorizontalDirection() {
+			return null; //There is no opposite.
+		}
+
+		@Override
+		public JumpDirection getOppositeVerticalDirection() {
+			return STRAIGHT_DOWNWARDS;
+		}
+		
+	},
+	STRAIGHT_DOWNWARDS{
+		@Override
+		public int getHorizontalDirectionAsInt() {
+			return 0;
+		}
+
+		@Override
+		public int getVerticalDirectionAsInt() {
+			return 1;
+		}
+
+		@Override
+		public JumpDirection getOppositeDirection() {
+			return STRAIGHT_DOWNWARDS;
+		}
+
+		@Override
+		public JumpDirection getOppositeHorizontalDirection() {
+			return null; //There is no opposite.
+		}
+
+		@Override
+		public JumpDirection getOppositeVerticalDirection() {
+			return STRAIGHT_DOWNWARDS;
+		}
+		
+	},
 	LEFT_UPWARDS {
 		@Override
 		public int getHorizontalDirectionAsInt() {

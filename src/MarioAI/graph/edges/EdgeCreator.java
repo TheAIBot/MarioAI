@@ -2,6 +2,8 @@ package MarioAI.graph.edges;
 
 import java.util.*;
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
@@ -80,7 +82,8 @@ public  class EdgeCreator {
 			foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
 		}
 		if (ALLOW_JUMPING) {
-			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;			
+			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
+			foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
 		}
 		
 		if (foundAllEdges) startingNode.setIsAllEdgesMade(true);
@@ -88,6 +91,30 @@ public  class EdgeCreator {
 		return listOfEdges;
 	}
 	
+	private boolean getJumpStraightUpEdges(Node startingNode, int nodeColoumn,	ArrayList<DirectedEdge> listOfEdges) {
+		//He will of course not collide with anything at his starting position.
+		Node currentLandingPosition = startingNode;
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+			int currentYPosition = startingNode.y - jumpHeight;
+			//All jumps will be to the greatest height where Mario can stand:
+			if (canMarioStandThere(nodeColoumn, currentYPosition)) {
+				currentLandingPosition = observationGraph[nodeColoumn][currentYPosition];
+			}
+			//He can only hit something upwards, with his top corners.
+			//The opposite corner here actually corresponds to his top part.
+			if (isHittingWallOrGroundUpwards(nodeColoumn, (int) Math.ceil(currentYPosition - MARIO_HEIGHT)) ) {
+				//All jumps of a greater height will end there:
+				//This corresponds to hitting the ceiling, which will not currently be allowed.
+				break;
+			} else {
+				//Else will Mario be able to jump up to this height, to the current target:
+				listOfEdges.add(new JumpingEdge(startingNode, currentLandingPosition, jumpHeight));
+			}
+		}
+		//TODO change so it depends on the situation.
+		return true;
+	}
+
 	public boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
 
@@ -425,6 +452,7 @@ public  class EdgeCreator {
 	}
 
 	private Collision upperFacingCornerCollision(boolean isHittingWall, float y, float formerLowerYPosition, int currentXPosition, JumpDirection direction) {
+		//TODO likely error here with the direction.
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
