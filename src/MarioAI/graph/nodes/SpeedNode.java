@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
@@ -61,18 +62,29 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
-		this.vx = moveInfo.getEndSpeed();
+		if (!(ancestorEdge instanceof FallEdge)) {
+			this.vx = moveInfo.getEndSpeed();
+			this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		} else this.vx = 0; //TODO change when implemented.
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
-		this.xPos = parentXPos + moveInfo.getXMovementDistance();
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable();
 		this.hash = hash;
 	}
 	
 	private boolean determineIfThisNodeIsUseable() {
+		
+
+		//There are a lot of possible problems for a fall edge.
+		//TODO move below, when implemented
+		if (this.ancestorEdge instanceof FallEdge &&
+			 !MarioControls.canMarioUseFallEdge(ancestorEdge, xPos)) {
+			return false;
+		}
+		
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible

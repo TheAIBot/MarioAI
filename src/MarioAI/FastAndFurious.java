@@ -104,7 +104,13 @@ public class FastAndFurious implements Agent {
 		return action;
 	}
 	
+<<<<<<< HEAD
 	public void startFindingPath(Environment observation) {
+=======
+	public ArrayList<DirectedEdge> getPath(Environment observation) {
+		int timeToRun = 1000; //TODO set proper value
+		
+>>>>>>> refs/remotes/origin/CollisionMarioEngine
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		long startTime = System.currentTimeMillis();
 		pathCreator.start(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);

@@ -18,7 +18,7 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	// even though it is only one it should be possible to reach. Mario changing
 	// position in the air can compensate for this.
 	public int ceiledTopPointX; //TODO change to private after tests.
-	public int ceiledTopPointY; // Ceildes coordinates of the toppunkt
+	public int ceiledTopPointY; // Ceild coordinates of the toppunkt
 	
 	public JumpingEdge(Node source, Node target, JumpingEdge polynomial) {
 		super(source, target);
@@ -42,16 +42,34 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	
 	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
 		this(source, target);
-		this.ceiledTopPointY = ceiledTopPointY;
+		this.ceiledTopPointY = ceiledTopPointY + source.y;
 		this.topPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	public void setToJumpPolynomial(Node startingPosition, int nodeColoumn, float jumpRange, float jumpHeight) {
+		//The x coordinate is measured as a function of it position in the level matrix.
+		//This does not cause any problems, as a given edge is only made using one and only one level matrix,
+		//and the equals method does not discern edges based on this.
+		
+		//TODO described it in the report.
+		
+		
 		a = -4 * jumpHeight / (jumpRange * jumpRange);
 		b = (8 * nodeColoumn + 4 * jumpRange) * jumpHeight / (jumpRange * jumpRange);
 		c = (-4 * nodeColoumn * (nodeColoumn + jumpRange) * jumpHeight + startingPosition.y * jumpRange * jumpRange) / (jumpRange * jumpRange);
 		setTopPoint();
+	}
+	
+	public void setToFallPolynomil(Node startingPosition, int nodeColumn, float fallRange) {
+		a = 4 / (fallRange*fallRange);
+		b = - ( (8*nodeColumn)/(fallRange*fallRange));
+		c = - (- startingPosition.y * fallRange * fallRange + 4 * nodeColumn * nodeColumn)/(fallRange*fallRange);
+		//We want to directly set the toppoint, as this must be precise, 
+		//to ensure that the jumpAlong algorithm makes no mistakes.
+		
+		//Its toppoint is exactely at its starting position
+		setTopPoint(nodeColumn, startingPosition.y);
 	}
 
 	public boolean isPastTopPoint(int startPosition, int currentPosition) {
@@ -106,8 +124,12 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		final int jumpType = 1; //it is a jump edge type
 		//Its jump height. Max is 4 min is 0, giving 3 bits.
 		//3 plus 1 but for jump type 
-		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 1;		
+		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 2; 
 		return jumpHeight | jumpType;
+	}
+	
+	public FallEdge getCorrespondingFallEdge(){
+		return new FallEdge(this.source, this.target);
 	}
 	
 	public float getParameterA(){

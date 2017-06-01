@@ -43,6 +43,8 @@ public class Play {
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
 	        System.out.println("Seed = " + seed);
+	        
+	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        		//hahahaha
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
 	        //options.setLevelRandSeed(860788790);
