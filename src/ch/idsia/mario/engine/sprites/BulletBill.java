@@ -9,7 +9,7 @@ public class BulletBill extends Sprite
     private int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private tickbased.game.world.LevelScene world;
     public int facing;
 
     public boolean avoidCliffs = false;
@@ -19,14 +19,14 @@ public class BulletBill extends Sprite
     private int deadTime = 0;
 
 
-    public BulletBill(LevelScene world, float x, float y, int dir)
+    public BulletBill(tickbased.game.world.LevelScene levelScene, float x, float y, int dir)
     {
         kind = KIND_BULLET_BILL;     //added by SK
         sheet = Art.enemies;
 
         this.x = x;
         this.y = y;
-        this.world = world;
+        this.world = levelScene;
         xPicO = 8;
         yPicO = 31;
 

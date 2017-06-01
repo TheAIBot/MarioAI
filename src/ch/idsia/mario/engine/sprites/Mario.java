@@ -111,6 +111,9 @@ public class Mario extends Sprite {
 		setLarge(Mario.large, Mario.fire);
 	}
 
+	public Mario(LevelScene levelScene) {
+	}
+
 	private boolean lastLarge;
 	private boolean lastFire;
 	private boolean newLarge;
