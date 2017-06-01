@@ -436,15 +436,18 @@ public class TestAStar {
 	 * @param originalGoalNodes
 	 */
 	private void verifyPath(AStar aStar, List<DirectedEdge> path, Node[] originalGoalNodes) {
-		Node nextNode = path.get(0).target;
-		List<DirectedEdge> newPath = aStar.runMultiNodeAStar(nextNode, originalGoalNodes, 0, enemyPredictor, 2);
-		
-		// Go through edges and check they are same and verify the movement 
 		Iterator<DirectedEdge> iter = path.iterator();
-		iter.next();
-		for (DirectedEdge edge : newPath) {
-			assertEquals(edge, iter.next());
-			verifyMoveAlongEdge(aStar, edge);
+		
+		for (int i = 0; i < path.size(); i++) {
+			Node nextNode = path.get(i).source;
+			List<DirectedEdge> newPath = aStar.runMultiNodeAStar(nextNode, originalGoalNodes, path.get(i).getMoveInfo().getEndSpeed(), enemyPredictor, 2);
+			
+			// Go through edges and check they are same and verify the movement 
+			iter.next();
+			for (DirectedEdge edge : newPath) {
+				assertEquals(edge, iter.next());
+				verifyMoveAlongEdge(aStar, edge);
+			}
 		}
 	}
 
