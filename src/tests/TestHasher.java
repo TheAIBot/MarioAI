@@ -104,7 +104,6 @@ public class TestHasher {
 	
 	@Test
 	public void testSpeedNodeHashCodes() {
-		
 		for (int g = 1; g < 20; g += 3) {
 			final HashSet<Integer> allSpeedNodesHashed = new HashSet<Integer>();
 			
@@ -165,5 +164,88 @@ public class TestHasher {
 		return allSpeedHashcodes;
 	}
 	
+	@Test
+	public void testSpeedNodeWithEdgesHashing() {
+		for (int g = 1; g < 20; g += 7) {
+			final HashSet<Long> allSpeedNodesHashed = new HashSet<Long>();
+			
+			//adding the edges twice should give the same size unlees some hashes are the same
+			for (int i = 0; i < 2; i++) {
+				//Because of the small state space, brute force over the statespace will be used to check its correctness.
+				final List<Long> allSpeedNodesList = getAllPossibleSpeedNodesWithEdgesHashcodes(g);
+				allSpeedNodesHashed.addAll(allSpeedNodesList);
+				assertEquals(allSpeedNodesList.size(), allSpeedNodesHashed.size());
+			}
+		}
+	}
+	
+	private ArrayList<Long> getAllPossibleSpeedNodesWithEdgesHashcodes(int speedGranularity) {
+		final int limitY = 10;
+		final int limitX = 20;
+		final float speedLimit = MarioControls.MAX_X_VELOCITY;
+		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1);
+		ArrayList<Long> allRunningEdgesHashcodes = new ArrayList<Long>();
+		
+		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
+			for (short sourceX = 0; sourceX <= limitX; sourceX++) {						
+				for (short targetY = 0; targetY <= limitY; targetY++) {
+					for (short targetX = 0; targetX <= limitX; targetX++) {
+						final RunningEdge edge = new RunningEdge(new Node(sourceX, sourceY, (byte)10), 
+								new Node(targetX, targetY, (byte)10));
+						for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedLimit / speedGranularity) {
+							//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
+							allRunningEdgesHashcodes.add(Hasher.hashSpeedNode(v, edge));
+						}
+					}
+				}
+			}
+		}
+		assertEquals(expectedHashes, allRunningEdgesHashcodes.size());
+		return allRunningEdgesHashcodes;
+	}
+	
+	@Test
+	public void testSpeedNodeWithEdgesHashing2() {
+		for (int g = 1; g < 20; g += 7) {
+			final HashSet<Long> allSpeedNodesHashed = new HashSet<Long>();
+			
+			//adding the edges twice should give the same size unlees some hashes are the same
+			for (int i = 0; i < 2; i++) {
+				//Because of the small state space, brute force over the statespace will be used to check its correctness.
+				final List<Long> allSpeedNodesList = getAllPossibleSpeedNodesWithEdgesHashcodes2(g);
+				allSpeedNodesHashed.addAll(allSpeedNodesList);
+				assertEquals(allSpeedNodesList.size(), allSpeedNodesHashed.size());
+			}
+		}
+	}
+	
+	private ArrayList<Long> getAllPossibleSpeedNodesWithEdgesHashcodes2(int speedGranularity) {
+		final int limitY = 10;
+		final int limitX = 20;
+		final int heightLimit = 4;
+		final float speedLimit = MarioControls.MAX_X_VELOCITY;
+		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1) * heightLimit;
+		ArrayList<Long> allRunningEdgesHashcodes = new ArrayList<Long>();
+		
+		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
+			for (short sourceX = 0; sourceX <= limitX; sourceX++) {						
+				for (short targetY = 0; targetY <= limitY; targetY++) {
+					for (short targetX = 0; targetX <= limitX; targetX++) {
+						for (int h = 1; h <= heightLimit; h++) {
+							final JumpingEdge edge = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), 
+																	new Node(targetX, targetY, (byte)10),
+																	h);
+							for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedLimit / speedGranularity) {
+								//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
+								allRunningEdgesHashcodes.add(Hasher.hashSpeedNode(v, edge));
+							}
+						}
+					}
+				}
+			}
+		}
+		assertEquals(expectedHashes, allRunningEdgesHashcodes.size());
+		return allRunningEdgesHashcodes;
+	}
 	
 }
