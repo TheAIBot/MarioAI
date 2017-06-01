@@ -71,11 +71,6 @@ public class PathCreator {
 				return true;
 			}, threadPool);
 		}
-		/*
-		for (AStar aStar : aStars) {
-			threadPool.submit(() -> aStar.runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight, world));
-		}
-		*/
 	}
 	
 	public void updateBestPath() {
