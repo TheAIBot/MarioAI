@@ -16,6 +16,7 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.environments.Environment;
+import sun.management.counter.Variability;
 
 
 public class AStar {
@@ -28,19 +29,10 @@ public class AStar {
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 	private SpeedNode startSpeedNode = null;
 	private SpeedNode goalSpeedNode = null;
-	private EnemyPredictor enemyPredictor = null;
-	private int marioHeight;
-	private float marioSpeed;
 	
-	private boolean finishedARun = false; // true if AStar has found a path and false otherwise
-	private boolean initAStar; // true only in the first call of multinodeastar
+	private boolean finishedARun = true; // true if AStar has found a path and false otherwise
 	
 	private ArrayList<DirectedEdge> currentBestPath = null;
-
-	
-	public AStar() {
-		initAStar = true;
-	}
 	
 	/**
 	 * TEMP method for running A* if no time is given
@@ -69,8 +61,7 @@ public class AStar {
 	public ArrayList<DirectedEdge> runMultiNodeAStar(final Environment observation, final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		
 		final DirectedEdge[] addedEdges = new DirectedEdge[rightmostNodes.length];
-		if (finishedARun || initAStar) {
-			initAStar = false;
+		if (finishedARun) {
 			
 			// Add singleton goal node far to the right. This will ensure each
 			// vertical distance is minimal and all nodes in rightmost column will be
@@ -101,18 +92,14 @@ public class AStar {
 			
 			// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
 			//final ArrayList<DirectedEdge> path = initAStar(timeToRun);
-			reset(startSpeedNode, 
-							goalSpeedNode,
-							marioSpeed,
-							enemyPredictor, 
-							marioHeight);
+			reset(startSpeedNode, goalSpeedNode);
 			finishedARun = false;
 		}
 		final ArrayList<DirectedEdge> path = runAStar(startSpeedNode, 
 																	 goalSpeedNode,
-																	 marioSpeed,
 																	 enemyPredictor, 
-																	 marioHeight, timeToRun);
+																	 marioHeight, 
+																	 timeToRun);
 		//speedNodes.remove(Long.MAX_VALUE);
 		//speedNodes.remove(Long.MIN_VALUE);
 		if (path != null && path.size() > 0) { //TODO remove when error is fixed
@@ -130,12 +117,9 @@ public class AStar {
 		return path;
 	}
 	
-	private void reset(final SpeedNode start, final SpeedNode goal, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
+	private void reset(final SpeedNode start, final SpeedNode goal) {
 		startSpeedNode = start;
 		goalSpeedNode = goal;
-		this.marioHeight = marioHeight;
-		this.marioSpeed  = marioSpeed;
-		this.enemyPredictor = enemyPredictor;
 		
 		closedSet.clear();
 		openSet.clear();
@@ -153,7 +137,7 @@ public class AStar {
 	 * @param timeToRun
 	 * @return
 	 */
-	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
+	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -169,9 +153,9 @@ public class AStar {
 			
 			// If goal is reached return solution path.
 			if (current.node.equals(goalSpeedNode.node)) {
-				currentBestPath = reconstructPath(current);
+				ArrayList<DirectedEdge> cuasrrentBestPath = reconstructPath(current);
 				finishedARun = true;
-				return currentBestPath;
+				return cuasrrentBestPath;
 			}
 			//System.out.println("Current node:");
 			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
@@ -230,6 +214,7 @@ public class AStar {
 			}
 		}
 		// No solution was found
+		finishedARun = true;
 		return null;
 	}
 	
