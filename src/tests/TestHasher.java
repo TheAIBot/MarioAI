@@ -97,4 +97,9 @@ public class TestHasher {
 		assertEquals(expectedHashes, allRunningEdgesHashcodes.size());
 		return allRunningEdgesHashcodes;
 	}
+	
+	@Test
+	public void testHashSpeedNodes() {
+		
+	}
 }

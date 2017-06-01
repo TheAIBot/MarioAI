@@ -1,66 +1,74 @@
-package ch.idsia.mario.engine.sprites;
+package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.LevelScene;
 
 
-public class Fireball extends Sprite
+public class Mushroom extends Sprite
 {
     private static float GROUND_INERTIA = 0.89f;
     private static float AIR_INERTIA = 0.89f;
 
     private float runTime;
     private boolean onGround = false;
+    private boolean mayJump = false;
+    private int jumpTime = 0;
+    private float xJumpSpeed;
+    private float yJumpSpeed;
 
     private int width = 4;
     int height = 24;
 
-    private tickbased.game.world.LevelScene world;
+    private LevelScene world;
     public int facing;
 
     public boolean avoidCliffs = false;
-    public int anim;
+    private int life;
 
-    public boolean dead = false;
-    private int deadTime = 0;
-
-    public Fireball(tickbased.game.world.LevelScene world2, float x, float y, int facing)
+    public Mushroom(LevelScene world, int x, int y)
     {
-        kind = KIND_FIREBALL;
-        sheet = Art.particles;
+        kind = KIND_MUSHROOM;
+        sheet = Art.items;
 
         this.x = x;
         this.y = y;
-        this.world = world2;
-        xPicO = 4;
-        yPicO = 4;
+        this.world = world;
+        xPicO = 8;
+        yPicO = 15;
 
-        yPic = 3;
-        height = 8;
-        this.facing = facing;
-        wPic = 8;
-        hPic = 8;
+        yPic = 0;
+        height = 12;
+        facing = 1;
+        wPic  = hPic = 16;
+        life = 0;
+    }
 
-        xPic = 4;
-        ya = 4;
+    public void collideCheck()
+    {
+        float xMarioD = world.mario.x - x;
+        float yMarioD = world.mario.y - y;
+        float w = 16;
+        if (xMarioD > -16 && xMarioD < 16)
+        {
+            if (yMarioD > -height && yMarioD < world.mario.height)
+            {
+                world.mario.getMushroom();
+                spriteContext.removeSprite(this);
+            }
+        }
     }
 
     public void move()
     {
-        if (deadTime > 0)
+        if (life<9)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                world.addSprite(new Sparkle((int) (x + Math.random() * 8 - 4)+4, (int) (y + Math.random() * 8-4)+2, (float) Math.random() * 2 - 1-facing, (float) Math.random() *2 -1, 0, 1, 5));
-            }
-            spriteContext.removeSprite(this);
-
+            layer = 0;
+            y--;
+            life++;
             return;
         }
-
-        if (facing != 0) anim++;
-
-        float sideWaysSpeed = 8f;
+        float sideWaysSpeed = 1.75f;
+        layer = 1;
         //        float sideWaysSpeed = onGround ? 2.5f : 1.2f;
 
         if (xa > 2)
@@ -74,26 +82,19 @@ public class Fireball extends Sprite
 
         xa = facing * sideWaysSpeed;
 
-        world.checkFireballCollide(this);
+        mayJump = (onGround);
 
         xFlipPic = facing == -1;
 
         runTime += (Math.abs(xa)) + 5;
 
-        xPic = (anim) % 4;
 
 
-
-        if (!move(xa, 0))
-        {
-            die();
-        }
-        
+        if (!move(xa, 0)) facing = -facing;
         onGround = false;
         move(0, ya);
-        if (onGround) ya = -10;
 
-        ya *= 0.95f;
+        ya *= 0.85f;
         if (onGround)
         {
             xa *= GROUND_INERTIA;
@@ -105,7 +106,7 @@ public class Fireball extends Sprite
 
         if (!onGround)
         {
-            ya += 1.5;
+            ya += 2;
         }
     }
 
@@ -178,6 +179,7 @@ public class Fireball extends Sprite
             if (ya < 0)
             {
                 y = (int) ((y - height) / 16) * 16 + height;
+                jumpTime = 0;
                 this.ya = 0;
             }
             if (ya > 0)
@@ -208,12 +210,13 @@ public class Fireball extends Sprite
         return blocking;
     }
 
-    public void die()
+    public void bumpCheck(int xTile, int yTile)
     {
-        dead = true;
-
-        xa = -facing * 2;
-        ya = -5;
-        deadTime = 100;
+        if (x + width > xTile * 16 && x - width < xTile * 16 + 16 && yTile==(int)((y-1)/16))
+        {
+            facing = -world.mario.facing;
+            ya = -10;
+        }
     }
+
 }

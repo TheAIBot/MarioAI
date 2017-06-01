@@ -1,10 +1,10 @@
-package ch.idsia.mario.engine.sprites;
+package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.LevelScene;
 
 
-public class Fireball extends Sprite
+public class Shell extends Sprite
 {
     private static float GROUND_INERTIA = 0.89f;
     private static float AIR_INERTIA = 0.89f;
@@ -15,7 +15,7 @@ public class Fireball extends Sprite
     private int width = 4;
     int height = 24;
 
-    private tickbased.game.world.LevelScene world;
+    private LevelScene world;
     public int facing;
 
     public boolean avoidCliffs = false;
@@ -23,44 +23,127 @@ public class Fireball extends Sprite
 
     public boolean dead = false;
     private int deadTime = 0;
+    public boolean carried;
 
-    public Fireball(tickbased.game.world.LevelScene world2, float x, float y, int facing)
+
+    public Shell(LevelScene world, float x, float y, int type)
     {
-        kind = KIND_FIREBALL;
-        sheet = Art.particles;
+        kind = KIND_SHELL;
+        sheet = Art.enemies;
 
         this.x = x;
         this.y = y;
-        this.world = world2;
-        xPicO = 4;
-        yPicO = 4;
+        this.world = world;
+        xPicO = 8;
+        yPicO = 31;
 
-        yPic = 3;
-        height = 8;
-        this.facing = facing;
-        wPic = 8;
-        hPic = 8;
+        yPic = type;
+        height = 12;
+        facing = 0;
+        wPic = 16;
 
         xPic = 4;
-        ya = 4;
+        ya = -5;
+    }
+    
+    public boolean fireballCollideCheck(Fireball fireball)
+    {
+        if (deadTime != 0) return false;
+
+        float xD = fireball.x - x;
+        float yD = fireball.y - y;
+
+        if (xD > -16 && xD < 16)
+        {
+            if (yD > -height && yD < fireball.height)
+            {
+                if (facing!=0) return true;
+                
+                xa = fireball.facing * 2;
+                ya = -5;
+                if (spriteTemplate != null) spriteTemplate.isDead = true;
+                deadTime = 100;
+                hPic = -hPic;
+                yPicO = -yPicO + 16;
+                return true;
+            }
+        }
+        return false;
+    }    
+
+    public void collideCheck()
+    {
+        if (carried || dead || deadTime>0) return;
+
+        float xMarioD = world.mario.x - x;
+        float yMarioD = world.mario.y - y;
+        float w = 16;
+        if (xMarioD > -16 && xMarioD < 16)
+        {
+            if (yMarioD > -height && yMarioD < world.mario.height)
+            {
+                if (world.mario.ya > 0 && yMarioD <= 0 && (!world.mario.onGround || !world.mario.wasOnGround))
+                {
+                    world.mario.stomp(this);
+                    if (facing != 0)
+                    {
+                        xa = 0;
+                        facing = 0;
+                    }
+                    else
+                    {
+                        facing = world.mario.facing;
+                    }
+                }
+                else
+                {
+                    if (facing != 0)
+                    {
+                        world.mario.getHurt();
+                    }
+                    else
+                    {
+                        world.mario.kick(this);
+                        facing = world.mario.facing;
+                    }
+                }
+            }
+        }
     }
 
     public void move()
     {
+        if (carried)
+        {
+            world.checkShellCollide(this);
+            return;
+        }
+
         if (deadTime > 0)
         {
-            for (int i = 0; i < 8; i++)
+            deadTime--;
+
+            if (deadTime == 0)
             {
-                world.addSprite(new Sparkle((int) (x + Math.random() * 8 - 4)+4, (int) (y + Math.random() * 8-4)+2, (float) Math.random() * 2 - 1-facing, (float) Math.random() *2 -1, 0, 1, 5));
+                deadTime = 1;
+                for (int i = 0; i < 8; i++)
+                {
+                    world.addSprite(new Sparkle((int) (x + Math.random() * 16 - 8) + 4, (int) (y - Math.random() * 8) + 4, (float) (Math.random() * 2 - 1), (float) Math.random() * -1, 0, 1, 5));
+                }
+                spriteContext.removeSprite(this);
             }
-            spriteContext.removeSprite(this);
+
+            x += xa;
+            y += ya;
+            ya *= 0.95;
+            ya += 1;
 
             return;
         }
 
         if (facing != 0) anim++;
 
-        float sideWaysSpeed = 8f;
+        float sideWaysSpeed = 11f;
         //        float sideWaysSpeed = onGround ? 2.5f : 1.2f;
 
         if (xa > 2)
@@ -74,26 +157,27 @@ public class Fireball extends Sprite
 
         xa = facing * sideWaysSpeed;
 
-        world.checkFireballCollide(this);
+        if (facing != 0)
+        {
+            world.checkShellCollide(this);
+        }
 
         xFlipPic = facing == -1;
 
         runTime += (Math.abs(xa)) + 5;
 
-        xPic = (anim) % 4;
+        xPic = (anim / 2) % 4 + 3;
 
 
 
         if (!move(xa, 0))
         {
-            die();
+            facing = -facing;
         }
-        
         onGround = false;
         move(0, ya);
-        if (onGround) ya = -10;
 
-        ya *= 0.95f;
+        ya *= 0.85f;
         if (onGround)
         {
             xa *= GROUND_INERTIA;
@@ -105,7 +189,7 @@ public class Fireball extends Sprite
 
         if (!onGround)
         {
-            ya += 1.5;
+            ya += 2;
         }
     }
 
@@ -204,16 +288,64 @@ public class Fireball extends Sprite
         boolean blocking = world.level.isBlocking(x, y, xa, ya);
 
         byte block = world.level.getBlock(x, y);
+        
+        if (blocking && ya == 0 && xa!=0)
+        {
+            world.bump(x, y, true);
+        }
 
         return blocking;
+    }
+
+    public void bumpCheck(int xTile, int yTile)
+    {
+        if (x + width > xTile * 16 && x - width < xTile * 16 + 16 && yTile == (int) ((y - 1) / 16))
+        {
+            facing = -world.mario.facing;
+            ya = -10;
+        }
     }
 
     public void die()
     {
         dead = true;
 
+        carried = false;
+
         xa = -facing * 2;
         ya = -5;
         deadTime = 100;
+    }
+
+    public boolean shellCollideCheck(Shell shell)
+    {
+        if (deadTime != 0) return false;
+
+        float xD = shell.x - x;
+        float yD = shell.y - y;
+
+        if (xD > -16 && xD < 16)
+        {
+            if (yD > -height && yD < shell.height)
+            {
+                if (world.mario.carried == shell || world.mario.carried == this)
+                {
+                    world.mario.carried = null;
+                }
+
+                die();
+                shell.die();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public void release(Mario mario)
+    {
+        carried = false;
+        facing = mario.facing;
+        x += facing * 8;
     }
 }

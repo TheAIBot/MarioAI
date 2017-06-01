@@ -1,4 +1,4 @@
-package ch.idsia.mario.engine.sprites;
+package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.GlobalOptions;
@@ -83,7 +83,7 @@ public class Mario extends Sprite {
 	int width = 4;
 	int height = 24;
 
-	public tickbased.game.world.LevelScene world;
+	public LevelScene world;
 	public int facing;
 	private int powerUpTime = 0; // exclude pause for rendering changes
 
@@ -96,10 +96,10 @@ public class Mario extends Sprite {
 	public Sprite carried = null;
 	private static Mario instance;
 
-	public Mario(tickbased.game.world.LevelScene levelScene) {
+	public Mario(LevelScene world) {
 		kind = KIND_MARIO;
 		Mario.instance = this;
-		this.world = levelScene;
+		this.world = world;
 		keys = Scene.keys; // SK: in fact, this is already redundant due
 					// to using Agent
 		cheatKeys = Scene.keys; // SK: in fact, this is already
