@@ -20,6 +20,7 @@ public class FastAndFurious implements Agent {
 	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 1);
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
+	private boolean isfirsttick = true;
 	private int tickCount = 0;
 	
 	public boolean DEBUG = true;
@@ -27,7 +28,7 @@ public class FastAndFurious implements Agent {
 	public void reset() {
 		marioController.reset();
 	}
-private boolean isfirsttick = true;
+	
 	public boolean[] getAction(Environment observation) {
 		boolean[] action = new boolean[Environment.numberOfButtons];
 

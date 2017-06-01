@@ -1,6 +1,8 @@
 package MarioAI;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
@@ -156,10 +158,21 @@ public class World {
 	}
 	
 	public void syncFrom(World world) {
+		//copy levelMatrix
 		for (int x = 0; x < levelMatrix.length; x++) {
 			for (int y = 0; y < levelMatrix[x].length; y++) {
 				levelMatrix[x][y] = world.levelMatrix[x][y];
 			}
+		}
+		
+		//copy savedColumn
+		savedColumns.clear();
+		for (Entry<Integer, Node[]> entry : world.savedColumns.entrySet()) {
+			Node[] columnCopy = new Node[entry.getValue().length];
+			for (int i = 0; i < columnCopy.length; i++) {
+				columnCopy[i] = entry.getValue()[i];
+			}
+			savedColumns.put(entry.getKey().intValue(), columnCopy);
 		}
 	}
 	

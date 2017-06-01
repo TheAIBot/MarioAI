@@ -112,10 +112,6 @@ public class PathCreator {
 			aStar.stop();
 		}
 		try {
-			/*
-			threadPool.shutdown();
-			threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-			*/
 			CompletableFuture.allOf(runningTasks);
 		} catch (Exception e) {
 			System.out.println("Threadpool in PathCreator failed to shutdown the threads in an orderly manner.\n" + e.getMessage());
