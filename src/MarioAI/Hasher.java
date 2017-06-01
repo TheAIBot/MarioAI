@@ -10,6 +10,12 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
+	/**
+	 * Hash speednode based on veloctiy and the edge leading to this speedNode
+	 * @param vx
+	 * @param edge
+	 * @return
+	 */
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {
 		//the hash of the speed needs to be fixed
 		//final long a = hashSpeed(vx) << 32;
@@ -21,11 +27,18 @@ public class Hasher {
 		return a | edgeHash;
 	}
 	
+	/**
+	 * Hash speednode based on x, y coords and velocity.
+	 * To be used for checking if we have seen this speedNode before.
+	 * Used in closed set.
+	 * @param sn
+	 * @return
+	 */
 	public static int hashEndSpeedNode(SpeedNode sn) {
-		final int x = sn.node.x;
-		final int y = sn.node.y;
-		final float vx = sn.vx;
-		
+		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx);
+	}
+	
+	public static int hashEndSpeedNode(int x, int y, float vx) {
 		final int a = x & 0xffff;
 		final int b = (y & 0xff) << 16;
 		final int c = ((byte)hashSpeed(vx)) << 24;
