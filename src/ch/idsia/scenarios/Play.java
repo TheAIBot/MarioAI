@@ -16,7 +16,7 @@ public class Play {
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new HumanKeyboardAgent();
@@ -24,6 +24,7 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
+			TestTools.setMarioPosition(observation, 3, 12);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);

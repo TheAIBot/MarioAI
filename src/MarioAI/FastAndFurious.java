@@ -22,7 +22,7 @@ public class FastAndFurious implements Agent {
 	private ArrayList<DirectedEdge> newestPath = null;
 	private int tickCount = 0;
 	
-	public boolean DEBUG = false;
+	public boolean DEBUG = true;
 
 	public void reset() {
 		marioController.reset();

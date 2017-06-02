@@ -426,8 +426,9 @@ public class TestAStar {
 		graph.update(observation);		
 		Node orignalMarioNode = graph.getMarioNode(observation);
 		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
-
+		Node[][] level = graph.getLevelMatrix();
 		TestTools.renderLevel(observation);
+		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
 		
 		Node[] originalGoalNodes = graph.getGoalNodes(0);
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
@@ -437,6 +438,13 @@ public class TestAStar {
 		assertTrue(path.get(0) instanceof JumpingEdge);
 		assertTrue(path.get(1) instanceof JumpingEdge);
 		assertTrue(path.get(2) instanceof JumpingEdge);
+		//Check if he jumps straight up:
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y]		, path.get(0).source);
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 3]	, path.get(0).target);
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 3]	, path.get(1).source);
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 6]	, path.get(1).target);
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 6]	, path.get(2).source);
+		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 9]	, path.get(2).target);
 		
 		verifyPath(aStar, path, originalGoalNodes);
 	}

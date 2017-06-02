@@ -451,7 +451,7 @@ public  class EdgeCreator {
 	//TODO update this to use the height data.
 	private boolean canMarioStandThere(int coloumn,int row) {
 		return 0 < row && row < GRID_HEIGHT &&
-			   isOnSolidGround(row, coloumn) && observationGraph[coloumn][row - 1] == null;
+			   isOnSolidGround(row, coloumn) && !isSolid(observationGraph[coloumn][row-1]);
 	}
 
 	private boolean isOnSolidGround(int row, int coloumn) {
