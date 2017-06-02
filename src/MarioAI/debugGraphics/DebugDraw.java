@@ -10,6 +10,7 @@ import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.enemySimuation.simulators.EnemySimulator;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
@@ -125,16 +126,18 @@ public class DebugDraw {
 				if (levelMatrix[x][y] != null) {
 					final Node toCheck = levelMatrix[x][y];
 					for (DirectedEdge edge : toCheck.getEdges()) {
-						final Point pSource = new Point(edge.source.x, edge.source.y);
-						convertLevelPointToOnScreenPoint(observation, pSource);
-						
-						final Point pTarget = new Point(edge.target.x,edge.target.y);
-						convertLevelPointToOnScreenPoint(observation, pTarget);
-						if (pSource.y >= pTarget.y) {
-							addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource,pTarget, 1));
-						}
-						else {
-							addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource,pTarget, 1));
+						if (!(edge instanceof AStarHelperEdge)) {
+							final Point pSource = new Point(edge.source.x, edge.source.y);
+							convertLevelPointToOnScreenPoint(observation, pSource);
+							
+							final Point pTarget = new Point(edge.target.x,edge.target.y);
+							convertLevelPointToOnScreenPoint(observation, pTarget);
+							if (pSource.y >= pTarget.y) {
+								addDebugDrawing(observation, new DebugLines(Color.GREEN, pSource, pTarget, 1));
+							}
+							else {
+								addDebugDrawing(observation, new DebugLines(Color.ORANGE, pSource, pTarget, 1));
+							}
 						}
 					}
 				}

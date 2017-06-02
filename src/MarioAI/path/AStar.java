@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
@@ -57,21 +58,26 @@ public class AStar {
 		}
 		goalX += 50;
 		
-		final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
-		final DirectedEdge[] addedEdges = new DirectedEdge[rightmostNodes.length];
+		//added hashgranularity to the distance because otherwise two threads
+		//can create the exact same node which will have the same hashcode
+		//which two nodes aren't allowed to have
+		final Node goal = new Node(goalX + hashGranularity, 2, (byte) 3);
+		final AStarHelperEdge[] addedEdges = new AStarHelperEdge[rightmostNodes.length];
 		for (int i = 0; i < rightmostNodes.length; i++) {
 			final Node node = rightmostNodes[i];
 			if (node != null) {
-				RunningEdge edge = new RunningEdge(node, goal);
+				AStarHelperEdge edge = new AStarHelperEdge(node, goal);
 				node.addEdge(edge);
 				addedEdges[i] = edge;
 			}
 		}
 		
 		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		initAStar(new SpeedNode(start, marioSpeed, Long.MAX_VALUE), new SpeedNode(goal, 0, Long.MIN_VALUE), enemyPredictor, marioHeight, world);
-		//speedNodes.remove(Long.MAX_VALUE);
-		//speedNodes.remove(Long.MIN_VALUE);
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioSpeed, Long.MAX_VALUE);
+		final SpeedNode endSpeedNode   = new SpeedNode(goal, 0, Long.MIN_VALUE);
+		initAStar(startSpeedNode, endSpeedNode, enemyPredictor, marioHeight, world);
+		speedNodes.remove(Long.MAX_VALUE);
+		speedNodes.remove(Long.MIN_VALUE);
 		
 		for (int i = 0; i < rightmostNodes.length; i++) {
 			final Node node = rightmostNodes[i];
@@ -106,7 +112,7 @@ public class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {		
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {		
 		while (!openSet.isEmpty() && keepRunning) {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);
@@ -179,7 +185,7 @@ public class AStar {
 		foundBestPath = false;
 	}
 	
-	public SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
+	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, hashGranularity);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
@@ -197,7 +203,7 @@ public class AStar {
 	 * @param goal
 	 * @return
 	 */
-	public int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
+	private int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		return MarioControls.getTicksToTarget(goal.node.x - current.xPos, current.vx);
 	}
 
@@ -206,8 +212,8 @@ public class AStar {
 	 * @return path
 	 */
 	private ArrayList<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		if (currentSpeedNode != null) {
+			final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 			while (currentSpeedNode.parent != null) {
 				currentSpeedNode.use();
 				path.add(currentSpeedNode.ancestorEdge);
@@ -224,7 +230,7 @@ public class AStar {
 			return path;	
 		} 
 		else {
-			return path;
+			return null;
 		}
 	}
 	

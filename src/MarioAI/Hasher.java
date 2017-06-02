@@ -21,19 +21,15 @@ public class Hasher {
 		return a | edgeHash;
 	}
 	
-	public static int hashEndSpeedNode(int x, int y, float v, int speedGranularity) {
-		return hashEndSpeedNode(x,  y, v, speedGranularity);
+	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
+		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx, hashGranularity);
 	}
 	
-	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
-		final int x = sn.node.x;
-		final int y = sn.node.y;
-		final float vx = sn.vx;
-		
+	public static int hashEndSpeedNode(int x, int y, float vx, int speedGranularity) {
 		final int a = x & 0xffff;
 		final int b = (y & 0xff) << 16;
-		final int c = ((byte)hashSpeed(vx, hashGranularity)) << 24;
-		final int d = hashSpeed(vx, hashGranularity) & 0x80000000;
+		final int c = ((byte)hashSpeed(vx, speedGranularity)) << 24;
+		final int d = hashSpeed(vx, speedGranularity) & 0x80000000;
 		
 		return d | c | b | a;
 	}

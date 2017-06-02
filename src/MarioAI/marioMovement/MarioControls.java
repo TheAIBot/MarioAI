@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import MarioAI.MarioMethods;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
@@ -64,7 +65,8 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
-		if (edge instanceof RunningEdge) {
+		if (edge instanceof RunningEdge ||
+			edge instanceof AStarHelperEdge) {
 			return true;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
@@ -93,7 +95,7 @@ public class MarioControls {
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
-		if (path != null) {			
+		if (path != null && path.size() > 0) {			
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
 			if (prevEdge != null && 
@@ -170,12 +172,11 @@ public class MarioControls {
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		YMovementInformation jumpInfo;
-		if (edge instanceof RunningEdge) {
+		if (edge instanceof RunningEdge ||
+			edge instanceof AStarHelperEdge) {
 			jumpInfo = getYMovement(0, 0, 0);
-		} else if (edge instanceof JumpingEdge) {
-			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
 		} else {
-			return null;
+			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
 		}
 		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo);
 	}

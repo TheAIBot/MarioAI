@@ -21,7 +21,6 @@ public class FastAndFurious implements Agent {
 	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 1);
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
-	private boolean isfirsttick = true;
 	private int tickCount = 0;
 	
 	public boolean DEBUG = true;
@@ -42,12 +41,9 @@ public class FastAndFurious implements Agent {
 			
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
-			/*
+			
 			pathCreator.initialize(observation);
 			pathCreator.syncWithRealWorld(world, enemyPredictor);
-			*/
-			//start finding a path so it can be retrieved in the next tick
-			startFindingPath(observation);
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
@@ -58,30 +54,49 @@ public class FastAndFurious implements Agent {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
 			}
-			/*
+			
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
-				 enemyPredictor.hasNewEnemySpawned()) && 
-				marioController.canUpdatePath ||
-				isfirsttick) 
+				 enemyPredictor.hasNewEnemySpawned() ||
+				 pathCreator.getBestPath() == null) && 
+				marioController.canUpdatePath) 
 			{
-				isfirsttick = false;
-				pathCreator.stop();
-				pathCreator.updateBestPath();
-				pathCreator.syncWithRealWorld(world, enemyPredictor);
-				startFindingPath(observation);
+				if (pathCreator.isRunning) {
+					pathCreator.stop();
+					pathCreator.updateBestPath();
+					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					
+					if (pathCreator.getBestPath() == null ||
+						pathCreator.getBestPath().size() == 0) {
+						findPath(observation);
+					}
+					else {
+						startFindingPathFromPreviousPath(observation);	
+					}	
+				}
+				else if (pathCreator.getBestPath() == null ||
+					pathCreator.getBestPath().size() == 0) {
+					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					findPath(observation);
+				}
+				else if (!pathCreator.isRunning) {
+					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					startFindingPathFromPreviousPath(observation);
+				}
 				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			*/
+			
+			/*
 			if (tickCount % 30 == 0) {
 				TestTools.setMarioXPosition(observation, MarioMethods.getMarioXPos(observation.getMarioFloatPos()) + 2);
 			}
+			*/
 			
-			if (pathCreator.getBestPath() != null && pathCreator.getBestPath().size() > 0) {
+			//if (pathCreator.getBestPath() != null && pathCreator.getBestPath().size() > 0) {
 				action = marioController.getNextAction(observation, pathCreator.getBestPath());
-			}
+			//}
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
@@ -104,11 +119,17 @@ public class FastAndFurious implements Agent {
 		return action;
 	}
 	
-	public void startFindingPath(Environment observation) {
+	public void findPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
-		long startTime = System.currentTimeMillis();
-		pathCreator.start(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
-		System.out.println(System.currentTimeMillis() - startTime);
+		//long startTime = System.currentTimeMillis();
+		pathCreator.blokingFindPath(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
+		//System.out.println(System.currentTimeMillis() - startTime);
+	}
+	
+	public void startFindingPathFromPreviousPath(Environment observation) {
+		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		//long startTime = System.currentTimeMillis();
+		pathCreator.start(pathCreator.getBestPath(), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight);
 	}
 
 	public AGENT_TYPE getType() {

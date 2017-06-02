@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.validator.PublicClassValidator;
+
 import com.sun.istack.internal.FinalArrayList;
 import com.sun.jndi.rmi.registry.RegistryContext;
 
@@ -28,6 +30,7 @@ public class PathCreator {
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private final CompletableFuture<Boolean>[] runningTasks;
+	public boolean isRunning = false;
 	
 	@SuppressWarnings("unchecked")
 	public PathCreator(int threadCount) {
@@ -49,7 +52,7 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final ArrayList<DirectedEdge>path , 
+	public void start(final ArrayList<DirectedEdge> path, 
 					  final Node[] rightmostNodes, 
 					  float marioSpeed, 
 					  final EnemyPredictor enemyPredictor, 
@@ -63,6 +66,7 @@ public class PathCreator {
 	}
 	
 	public void start(final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight) {
+		isRunning = true;
 		for (int i = 0; i < aStars.length; i++) {
 			final int q = i;
 			runningTasks[i] = CompletableFuture.supplyAsync(() -> 
@@ -71,6 +75,12 @@ public class PathCreator {
 				return true;
 			}, threadPool);
 		}
+	}
+	
+	public void blokingFindPath(final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight) {
+		aStars[aStars.length - 1].runMultiNodeAStar(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight, world);
+		aStars[aStars.length - 1].stop();
+		bestPath = aStars[aStars.length - 1].getCurrentBestPath().path;
 	}
 	
 	public void updateBestPath() {
@@ -113,10 +123,6 @@ public class PathCreator {
 		} catch (Exception e) {
 			System.out.println("Threadpool in PathCreator failed to shutdown the threads in an orderly manner.\n" + e.getMessage());
 		}
-	}
-	
-	public void reset(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight) {
-		stop();
-		start(start, rightmostNodes, marioSpeed, enemyPredictor, marioHeight);
+		isRunning = false;
 	}
 }
