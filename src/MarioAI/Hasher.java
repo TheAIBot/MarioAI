@@ -19,9 +19,20 @@ public class Hasher {
 	public static long hashSpeedNode(float vx, DirectedEdge edge) {
 		//the hash of the speed needs to be fixed
 		//final long a = hashSpeed(vx) << 32;
-		final int speedHash = hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES);
-		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES) << 32) | speedSign;
+		//final int speedHash = hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES);
+		//final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
+		final long a = ((long)hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES) << 32);
+		final long edgeHash = edge.hashCode();
+		
+		return a | edgeHash;
+	}
+	
+	public static long hashSpeedNode(float vx, DirectedEdge edge, int factorNumberOfSpeedNodes) {
+		//the hash of the speed needs to be fixed
+		//final long a = hashSpeed(vx) << 32;
+		//final int speedHash = hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES);
+		//final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
+		final long a = ((long)hashSpeed(vx, factorNumberOfSpeedNodes) << 32);
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
@@ -58,6 +69,7 @@ public class Hasher {
 			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
 		} else {
 			int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
+			if (hashWithOutSign == 0) return (byte) hashWithOutSign;
 			return (byte) (0x80 | hashWithOutSign);
 		}
 		/*
