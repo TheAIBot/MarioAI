@@ -78,7 +78,7 @@ public class AStar {
 			
 			final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 
-			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
 			startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 			goalSpeedNode = new SpeedNode(goal, 0, Long.MIN_VALUE);
 			
@@ -178,10 +178,6 @@ public class AStar {
 					continue;
 				}
 				
-				if (sn.getMoveInfo().hasCollisions(current)) {
-					continue;
-				}
-				
 				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 					continue;
 				}
@@ -199,14 +195,19 @@ public class AStar {
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
-				if (openSetMap.containsKey(snEndHash) &&
+				boolean isContainedInOpenSet = openSetMap.containsKey(snEndHash);
+				if (isContainedInOpenSet &&
 					tentativeGScore >= openSetMap.get(snEndHash).gScore) {
 					continue;
 				}  
 				
 				//Update the edges position in the priority queue
 				//by updating the scores and taking it in and out of the queue.
-				openSet.remove(sn);
+				
+				//The element is only removed from the open set, if it exists:
+				if (isContainedInOpenSet) {
+					openSet.remove(sn);					
+				}
 				sn.gScore = tentativeGScore;
 				sn.fScore = sn.gScore + heuristicFunction(sn, goalSpeedNode) + neighborEdge.getWeight();
 				sn.parent = current;

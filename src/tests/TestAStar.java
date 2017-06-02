@@ -25,6 +25,7 @@ import MarioAI.World;
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.enemy.EnemyType;
+import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
@@ -47,8 +48,8 @@ public class TestAStar {
 	final float delta = 0.05f;
 	Node marioNode;
 	EnemyPredictor enemyPredictor;
-	MarioControls marioControls = new MarioControls();
 	AStar aStar;
+	MarioControls marioControls;
 	
 	public void setup(String levelName) {
 		setup(levelName, false, false);
@@ -62,6 +63,7 @@ public class TestAStar {
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
 		graph = new World();
+		CollisionDetection.setWorld(graph);
 		edgeCreator = new EdgeCreator();
 		graph.initialize(observation);
 		grapher = new EdgeCreator();
@@ -69,6 +71,7 @@ public class TestAStar {
 		enemyPredictor = new EnemyPredictor();
 		marioNode = graph.getMarioNode(observation);
 		aStar = new AStar();
+		new MarioControls();
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
 	}
@@ -99,11 +102,10 @@ public class TestAStar {
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
 	}
 	
-	@Test
+	//@Test
 	public void testTakeFastestJump() {
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
-		setup("flatWithJump", false, true);
-		MarioControls marioControls = new MarioControls();
+		setup("flatWithJump", false, false);
 		FastAndFurious fastAgent = (FastAndFurious) agent;
 		List<DirectedEdge> path = fastAgent.getPath(observation);
 		int numberOfActions = 1;
@@ -139,8 +141,6 @@ public class TestAStar {
 	@Test
 	public void testAStarJumping() {
 		setup("TestAStarJump", false, false);
-		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		AStar aStar = new AStar();
 		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 
 		//TestTools.runOneTick(observation);
@@ -449,17 +449,18 @@ public class TestAStar {
 	 * @param originalGoalNodes
 	 */
 	private void verifyPath(AStar aStar, List<DirectedEdge> path, Node[] originalGoalNodes) {
-		Iterator<DirectedEdge> iter = path.iterator();
 		
 		for (int i = 0; i < path.size(); i++) {
 			Node nextNode = path.get(i).source;
 			List<DirectedEdge> newPath = aStar.runMultiNodeAStar(observation, nextNode, originalGoalNodes, path.get(i).getMoveInfo().getEndSpeed(), enemyPredictor, 2);
 			
+			assertEquals(path.size() - i, newPath.size());
 			// Go through edges and check they are same and verify the movement 
-			iter.next();
-			for (DirectedEdge edge : newPath) {
-				assertEquals(edge, iter.next());
-				verifyMoveAlongEdge(aStar, edge);
+			//iter.next();
+			
+			for (int j = 0; j < originalGoalNodes.length; j++) {
+				assertEquals(path.get(j + i), newPath.get(i));
+				verifyMoveAlongEdge(aStar, newPath.get(i));				
 			}
 		}
 	}
@@ -470,11 +471,13 @@ public class TestAStar {
 	 * @param edge
 	 */
 	private void verifyMoveAlongEdge(AStar aStar, DirectedEdge edge) {
-		final int maxTicksAllowedToRun = 1000;
+		final int maxTicksAllowedToRun = 50;
 		int c = 0;
 		while (graph.getMarioNode(observation) != edge.target) {
 			c++;
 			TestTools.runOneTick(observation);
+			TestTools.renderLevel(observation);
+			graph.update(observation);
 			if (c >= maxTicksAllowedToRun) Assert.fail("Hueston we have a problem. Never reaches destination."); 
 		}
 		

@@ -79,13 +79,13 @@ public  class EdgeCreator {
 		boolean foundAllEdges = true;
 		//Two different ways to find the reachable nodes from a given position:
 		if (ALLOW_RUNNING) {
-			//foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
+			foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
 		}
 		if (ALLOW_JUMPING) {
-			//foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
+			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
 			foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
 			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS, listOfEdges);
+			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS, listOfEdges) && foundAllEdges;
 		}
 		
 		if (foundAllEdges) startingNode.setIsAllEdgesMade(true);

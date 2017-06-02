@@ -100,6 +100,10 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 			return false;
 		}
 		
+		if (getMoveInfo().hasCollisions(parent)) {
+			return false;
+		}
+		
 		//TODO: add check for whether this edge runs into any blocks
 		return true;
 	}
