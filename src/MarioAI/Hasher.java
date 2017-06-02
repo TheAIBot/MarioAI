@@ -11,11 +11,7 @@ public class Hasher {
 	}
 
 	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {
-		//the hash of the speed needs to be fixed
-		//final long a = hashSpeed(vx) << 32;
-		final int speedHash = hashSpeed(vx, hashGranularity);
-		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx, hashGranularity) << 32) | speedSign;
+		final long a = ((long)hashSpeed(vx, hashGranularity) << 32);
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
@@ -40,7 +36,12 @@ public class Hasher {
 			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
 		} else {
 			final int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
-			return (byte) (0x80 | hashWithOutSign);
+			if (hashWithOutSign == 0) {
+				return (byte) hashWithOutSign;
+			}
+			else {
+				return (byte) (0x80 | hashWithOutSign);	
+			}
 		}
 	}
 

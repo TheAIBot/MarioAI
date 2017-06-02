@@ -22,8 +22,6 @@ import MarioAI.Hasher;
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.debugGraphics.DebugDraw;
-import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.enemySimuation.EnemyType;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
@@ -48,6 +46,7 @@ public class TestAStar {
 //	Node marioNode;
 //	EnemyPredictor enemyPredictor;
 //	AStar aStar;
+//	MarioControls marioControls;
 //	
 //	public void setup(String levelName) {
 //		setup(levelName, false, false);
@@ -67,7 +66,9 @@ public class TestAStar {
 //		grapher.setMovementEdges(graph, graph.getMarioNode(observation));
 //		enemyPredictor = new EnemyPredictor();
 //		marioNode = graph.getMarioNode(observation);
+//		marioControls = new MarioControls();
 //		aStar = new AStar();
+//		new MarioControls();
 //		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 //		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
 //	}
@@ -85,14 +86,6 @@ public class TestAStar {
 //			assertTrue(directedEdge instanceof RunningEdge);
 //			//assertEquals(directedEdge.target.gScore, c, delta);
 //			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
-////			assertTrue(directedEdge instanceof RunningEdge);
-////			try {
-////				Running test = (Running) directedEdge;
-////			} catch (ClassCastException e) {
-////				Assert.fail();
-////			}
-////			c++;
-////			assertTrue(directedEdge instanceof RunningEdge);
 //		}
 //		assertEquals(12, path.get(path.size() - 1).target.x); //Correct x end destination
 //		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
@@ -101,8 +94,8 @@ public class TestAStar {
 //	@Test
 //	public void testTakeFastestJump() {
 //		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
+//		//setup("flatWithJump", true, true);
 //		setup("flatWithJump", false, true);
-//		MarioControls marioControls = new MarioControls();
 //		FastAndFurious fastAgent = (FastAndFurious) agent;
 //		List<DirectedEdge> path = fastAgent.getPath(observation);
 //		int numberOfActions = 1;
@@ -113,6 +106,7 @@ public class TestAStar {
 //		TestTools.renderLevel(observation);
 //		assertTrue(path != null);
 //		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
+//		Assert.fail("Test will run forever after this line, though it works as expected");
 //		while(numberOfActions <= 5){
 //			if (marioControls.canUpdatePath && graph.hasGoalNodesChanged() || 
 //				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
@@ -129,7 +123,7 @@ public class TestAStar {
 //			numberOfTicks++;
 //		}
 //		assertEquals(1, path.stream().filter(edge -> edge instanceof JumpingEdge).count());
-//		TestTools.runWholeLevel(observation);		
+//		TestTools.runWholeLevel(observation);
 //	}
 //	
 //	/**
@@ -138,8 +132,6 @@ public class TestAStar {
 //	@Test
 //	public void testAStarJumping() {
 //		setup("TestAStarJump", false, false);
-//		EnemyPredictor enemyPredictor = new EnemyPredictor();
-//		AStar aStar = new AStar();
 //		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 //
 //		//TestTools.runOneTick(observation);
@@ -215,7 +207,6 @@ public class TestAStar {
 //		TestTools.runOneTick(observation);
 //		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 //		TestTools.renderLevel(observation);
-//		AStar aStar = new AStar();
 //		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 //		assertTrue(path != null);
 //		
@@ -263,10 +254,8 @@ public class TestAStar {
 //		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 //		start.gScore = 0;
 //		start.fScore = 0;
-//		AStar aStar = new AStar();
 //		
 //		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
-//		
 //		
 //		assertTrue(end.isSpeedNodeUseable());
 //		assertTrue(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
@@ -274,7 +263,7 @@ public class TestAStar {
 //	
 //	@Test
 //	public void testNotCollideWithEnemy(){
-//		setup("testAStarEnemyJumpOver",false,false);
+//		setup("testAStarEnemyJumpOver",true,false);
 //		
 //		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 //		EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -304,14 +293,13 @@ public class TestAStar {
 //		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
 //		
 //		assertEquals(1, edges.size());
-//		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);		
+//		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);
 //		assertEquals(target.x, polynomialEdge.target.x);
 //		assertEquals(target.y, polynomialEdge.target.y);
 //		
 //		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 //		start.gScore = 0;
 //		start.fScore = 0;
-//		AStar aStar = new AStar();
 //		
 //		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
 //				
@@ -416,10 +404,18 @@ public class TestAStar {
 //		setup("jumpLevels/jumpStraightUp", true, false);
 //		TestTools.setMarioPosition(observation, 3, 12);
 //		TestTools.runOneTick(observation);
-//		TestTools.renderLevel(observation);
-//		graph.update(observation);
-//		
+//
+//		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+//		DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+//		DebugDraw.drawEdges(observation, graph.getLevelMatrix());
+//		DebugDraw.drawMarioReachableNodes(observation, graph);
+//		DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
+//		graph.update(observation);		
 //		Node orignalMarioNode = graph.getMarioNode(observation);
+//		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
+//
+//		TestTools.renderLevel(observation);
+//		
 //		Node[] originalGoalNodes = graph.getGoalNodes(0);
 //		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
 //		assertNotNull(path);
@@ -440,21 +436,21 @@ public class TestAStar {
 //	 * @param originalGoalNodes
 //	 */
 //	private void verifyPath(AStar aStar, List<DirectedEdge> path, Node[] originalGoalNodes) {
-//		Iterator<DirectedEdge> iter = path.iterator();
 //		
 //		for (int i = 0; i < path.size(); i++) {
 //			Node nextNode = path.get(i).source;
 //			List<DirectedEdge> newPath = aStar.runMultiNodeAStar(observation, nextNode, originalGoalNodes, path.get(i).getMoveInfo().getEndSpeed(), enemyPredictor, 2);
 //			
+//			assertEquals(path.size() - i, newPath.size());
 //			// Go through edges and check they are same and verify the movement 
-//			iter.next();
-//			for (DirectedEdge edge : newPath) {
-//				assertEquals(edge, iter.next());
-//				verifyMoveAlongEdge(aStar, edge);
+//			//iter.next();
+//			
+//			for (int j = 0; j < originalGoalNodes.length; j++) {
+//				assertEquals(path.get(j + i), newPath.get(i));
+//				verifyMoveAlongEdge(aStar, newPath.get(i));				
 //			}
 //		}
 //	}
-//>>>>>>> refs/remotes/origin/tests
 //
 //	/**
 //	 * Verify that Mario's actual position is in accordance with the expected position given by the speedNode within A* 
@@ -462,11 +458,13 @@ public class TestAStar {
 //	 * @param edge
 //	 */
 //	private void verifyMoveAlongEdge(AStar aStar, DirectedEdge edge) {
-//		final int maxTicksAllowedToRun = 1000;
+//		final int maxTicksAllowedToRun = 50;
 //		int c = 0;
 //		while (graph.getMarioNode(observation) != edge.target) {
 //			c++;
 //			TestTools.runOneTick(observation);
+//			TestTools.renderLevel(observation);
+//			graph.update(observation);
 //			if (c >= maxTicksAllowedToRun) Assert.fail("Hueston we have a problem. Never reaches destination."); 
 //		}
 //		
