@@ -133,7 +133,7 @@ public class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
-			//return speedNode; //TODO temp for testing purposes
+			return speedNode; //TODO temp for testing purposes
 		}
 		
 		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);

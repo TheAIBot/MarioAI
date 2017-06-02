@@ -57,8 +57,10 @@ public class FastAndFurious implements Agent {
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
+				
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
+				
 				/*
 				if (pathCreator.isRunning) {
 					pathCreator.stop();
@@ -73,6 +75,7 @@ public class FastAndFurious implements Agent {
 					startFindingPathFromPreviousPath(observation);
 				}
 				*/
+				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
@@ -103,14 +106,14 @@ public class FastAndFurious implements Agent {
 	public void findPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.blokingFindPath(world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), marioHeight);
+		pathCreator.blokingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), marioHeight);
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	
 	public void startFindingPathFromPreviousPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.start(pathCreator.getBestPath(), world.getGoalNodes(0), marioController.getXVelocity(), marioHeight);
+		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioController.getXVelocity(), marioHeight);
 	}
 
 	public AGENT_TYPE getType() {

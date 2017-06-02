@@ -32,6 +32,9 @@ public class AStarPath {
 			if (path.size() > 0) {
 				path.remove((path.size() - 1));
 			}
+			if (path.size() == 0) {
+				return null;
+			}
 			return path;	
 		} 
 		else {

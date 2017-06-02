@@ -13,6 +13,7 @@ import org.junit.validator.PublicClassValidator;
 import com.sun.istack.internal.FinalArrayList;
 import com.sun.jndi.rmi.registry.RegistryContext;
 
+import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.AStarHelperEdge;
@@ -56,19 +57,21 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioSpeed, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioSpeed, int marioHeight) 
 	{
 		final Node startNode = path.get(0).target;
 		final int timeForward = path.get(0).getMoveInfo().getMoveTime();
 		enemyPredictor.moveIntoFuture(timeForward);
 		
-		start(startNode, rightmostNodes, marioSpeed, marioHeight);
+		start(observation, startNode, rightmostNodes, marioSpeed, marioHeight);
 	}
 	
-	private void start(final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	private void start(final Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
 		isRunning = true;
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioSpeed, Long.MAX_VALUE);
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
@@ -121,8 +124,10 @@ public class PathCreator {
 		}
 	}
 	
-	public void blokingFindPath(final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioSpeed, Long.MAX_VALUE);
+	public void blokingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
@@ -131,8 +136,10 @@ public class PathCreator {
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
-		path.usePath();
-		bestPath = path.path;
+		if (shouldUpdateToNewPath(path.path)) {
+			path.usePath();
+			bestPath = path.path;	
+		}
 	}
 	
 	public void updateBestPath() {
@@ -153,10 +160,21 @@ public class PathCreator {
 			}
 		}
 		
-		//Otherwise chose the path from the astar
-		//with the highest granularity
-		paths[paths.length - 1].usePath();
-		bestPath = paths[paths.length - 1].path;
+		if (shouldUpdateToNewPath(paths[paths.length - 1].path)) {
+			//Otherwise chose the path from the astar
+			//with the highest granularity
+			paths[paths.length - 1].usePath();
+			bestPath = paths[paths.length - 1].path;	
+		}
+	}
+	
+	private boolean shouldUpdateToNewPath(ArrayList<DirectedEdge> newPotentialPath) {
+		if (newPotentialPath == null) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 	
 	public ArrayList<DirectedEdge> getBestPath() {
