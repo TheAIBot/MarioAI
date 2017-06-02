@@ -13,26 +13,26 @@ public class TickProblem extends Problem {
 
 	@Override
 	public List<Action> actions(State state) {
-		Vertex vertex = (Vertex) state;
+		Node node = (Node) state;
 		List<Action> actions = new ArrayList<Action>();
 
 		// move right
-		actions.add(new MarioAction(vertex, createAction(false, true, false, false, true)));
-		actions.add(new MarioAction(vertex, createAction(false, true, false, true, true)));
-		actions.add(new MarioAction(vertex, createAction(false, true, false, false, false)));
-		actions.add(new MarioAction(vertex, createAction(false, true, false, true, false)));
+		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
+		actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
+		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
+		actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
 
 		// move left
-		actions.add(new MarioAction(vertex, createAction(true, false, false, false, false)));
-		actions.add(new MarioAction(vertex, createAction(true, false, false, true, false)));
-		actions.add(new MarioAction(vertex, createAction(true, false, false, false, true)));
-		actions.add(new MarioAction(vertex, createAction(true, false, false, true, true)));
+		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
+		actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+		actions.add(new MarioAction(node, createAction(true, false, false, false, true)));
+		actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
 
 		// jump straight up
-		actions.add(new MarioAction(vertex, createAction(false, false, false, true, true)));
+		actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
 		
 		// stand still
-		actions.add(new MarioAction(vertex, createAction(false, false, false, true, false)));
+		actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
 		
 		return actions;
 	}
@@ -71,7 +71,7 @@ public class TickProblem extends Problem {
 	@Override
 	public double heuristicFunction(SearchNode node, SearchNode goal) {
 		// TODO note: goal should be an auxiliary node far to the right
-		return Math.sqrt(Math.pow(((Vertex) goal.state).x, 2) + Math.pow(((Vertex) node.state).x, 2));
+		return Math.sqrt(Math.pow(((Node) goal.state).x, 2) + Math.pow(((Node) node.state).x, 2));
 	}
 
 	@Override

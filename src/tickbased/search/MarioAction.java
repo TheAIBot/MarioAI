@@ -8,9 +8,9 @@ public class MarioAction implements Action {
 	public int hash;
 	
 	// action executed
-	boolean[] action = new boolean[5];
+	public boolean[] action = new boolean[5];
 	
-	public MarioAction(Vertex parent, boolean[] action) {
+	public MarioAction(Node parent, boolean[] action) {
 		this.parent = parent;
 		this.action = action;
 	}
