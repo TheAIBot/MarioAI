@@ -47,6 +47,7 @@ public class TestAStar {
 	final float delta = 0.05f;
 	Node marioNode;
 	EnemyPredictor enemyPredictor;
+	MarioControls marioControls = new MarioControls();
 	AStar aStar;
 	
 	public void setup(String levelName) {
@@ -416,10 +417,18 @@ public class TestAStar {
 		setup("jumpLevels/jumpStraightUp", true, false);
 		TestTools.setMarioPosition(observation, 3, 12);
 		TestTools.runOneTick(observation);
-		TestTools.renderLevel(observation);
-		graph.update(observation);
-		
+
+		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+		DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+		DebugDraw.drawEdges(observation, graph.getLevelMatrix());
+		DebugDraw.drawMarioReachableNodes(observation, graph);
+		DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
+		graph.update(observation);		
 		Node orignalMarioNode = graph.getMarioNode(observation);
+		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
+
+		TestTools.renderLevel(observation);
+		
 		Node[] originalGoalNodes = graph.getGoalNodes(0);
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
 		assertNotNull(path);

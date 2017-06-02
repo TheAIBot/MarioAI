@@ -35,8 +35,9 @@ public class AStar {
 	private ArrayList<DirectedEdge> currentBestPath = null;
 	
 	/**
-	 * TEMP method for running A* if no time is given
+	 *  TEMP method for running A* if no time is given
 	 * (Time to run is set to max possible value)
+	 * @param observation
 	 * @param start
 	 * @param rightmostNodes
 	 * @param marioSpeed
