@@ -70,6 +70,7 @@ public class TestAStar {
 		grapher.setMovementEdges(graph, graph.getMarioNode(observation));
 		enemyPredictor = new EnemyPredictor();
 		marioNode = graph.getMarioNode(observation);
+		marioControls = new MarioControls();
 		aStar = new AStar();
 		new MarioControls();
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -104,9 +105,9 @@ public class TestAStar {
 	
 	@Test
 	public void testTakeFastestJump() {
-		Assert.fail("Test runs forever");
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
-		setup("flatWithJump", false, false);
+		//setup("flatWithJump", true, true);
+		setup("flatWithJump", false, true);
 		FastAndFurious fastAgent = (FastAndFurious) agent;
 		List<DirectedEdge> path = fastAgent.getPath(observation);
 		int numberOfActions = 1;
@@ -117,6 +118,7 @@ public class TestAStar {
 		TestTools.renderLevel(observation);
 		assertTrue(path != null);
 		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
+		Assert.fail("Test will run forever after this line, though it works as expected");
 		while(numberOfActions <= 5){
 			if (marioControls.canUpdatePath && graph.hasGoalNodesChanged() || 
 				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
@@ -133,7 +135,7 @@ public class TestAStar {
 			numberOfTicks++;
 		}
 		assertEquals(1, path.stream().filter(edge -> edge instanceof JumpingEdge).count());
-		TestTools.runWholeLevel(observation);		
+		TestTools.runWholeLevel(observation);
 	}
 	
 	/**
@@ -217,7 +219,6 @@ public class TestAStar {
 		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.renderLevel(observation);
-		AStar aStar = new AStar();
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
 		assertTrue(path != null);
 		
@@ -265,10 +266,8 @@ public class TestAStar {
 		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
-		AStar aStar = new AStar();
 		
 		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
-		
 		
 		assertTrue(end.isSpeedNodeUseable());
 		assertTrue(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
@@ -276,7 +275,7 @@ public class TestAStar {
 	
 	@Test
 	public void testNotCollideWithEnemy(){
-		setup("testAStarEnemyJumpOver",false,false);
+		setup("testAStarEnemyJumpOver",true,false);
 		
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -306,14 +305,13 @@ public class TestAStar {
 		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
 		
 		assertEquals(1, edges.size());
-		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);		
+		JumpingEdge polynomialEdge = (JumpingEdge) edges.get(0);
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
 		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
-		AStar aStar = new AStar();
 		
 		SpeedNode end = aStar.getSpeedNode(polynomialEdge, start);
 				
