@@ -89,7 +89,7 @@ public class TestMarioMovements {
 		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
 		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
 		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
-		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0, world);
+		final SpeedNode speedNode1 = new SpeedNode(endNode, startMarioXPos, 0, edge1, 0, world);
 		speedNode1.use();
 		path.add(edge1);
 		
@@ -261,7 +261,7 @@ public class TestMarioMovements {
 			speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash(), world);
 		}
 		else {
-			speedNode = new SpeedNode(endNode, null, edge.source.x, 0, edge, getHash(), world);
+			speedNode = new SpeedNode(endNode, edge.source.x, 0, edge, getHash(), world);
 		}
 		speedNode.use();
 		

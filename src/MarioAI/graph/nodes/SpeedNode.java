@@ -56,6 +56,20 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.hash = hash;
 	}
 	
+	///Should only be used for testing purposes
+	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+		this.node = node;
+		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.parentXPos = parentXPos;
+		this.parentVx = parentVx;
+		this.ancestorEdge = ancestorEdge;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+	}
+	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
 		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
 	}
@@ -63,10 +77,8 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
-		if (!(ancestorEdge instanceof FallEdge)) {
-			this.vx = moveInfo.getEndSpeed();
-			this.xPos = parentXPos + moveInfo.getXMovementDistance();
-		} else this.vx = 0; //TODO change when implemented.
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
