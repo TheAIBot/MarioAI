@@ -138,6 +138,8 @@ public class AStar {
 	public ArrayList<DirectedEdge> runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, int timeToRun) {
 		
 		long startTime = System.currentTimeMillis();
+		final int PENALTY_VALUE = 1000; // arbitrary number
+		int penalty = 0;
 		
 		while (!openSet.isEmpty()) {
 			//System.out.println("Current open set:");
@@ -171,14 +173,6 @@ public class AStar {
 				//System.out.println("Current edge: ");
 				//System.out.println(neighborEdge + "\n");
 				
-				if (!sn.isSpeedNodeUseable()) {
-					continue;
-				}
-				
-				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-					continue;
-				}
-				
 				//If a similar enough node has already been run through
 				//no need to add this one at that point
 				final int snEndHash = Hasher.hashEndSpeedNode(sn);
@@ -194,9 +188,19 @@ public class AStar {
 				//current one
 				boolean isContainedInOpenSet = openSetMap.containsKey(snEndHash);
 				if (isContainedInOpenSet &&
-					tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+						tentativeGScore >= openSetMap.get(snEndHash).gScore) {
 					continue;
 				}  
+				
+				if (!sn.isSpeedNodeUseable()) {
+					continue;
+				}
+				
+				if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+					penalty = PENALTY_VALUE;
+					//continue;
+				}
+				
 				
 				//Update the edges position in the priority queue
 				//by updating the scores and taking it in and out of the queue.
@@ -206,10 +210,12 @@ public class AStar {
 					openSet.remove(sn);					
 				}
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goalSpeedNode) + neighborEdge.getWeight();
+				sn.fScore = sn.gScore + heuristicFunction(sn, goalSpeedNode) + neighborEdge.getWeight() + penalty;
 				sn.parent = current;
 				openSet.add(sn);
 				openSetMap.put(snEndHash, sn);
+				
+				penalty = 0;
 			}
 		}
 		// No solution was found
