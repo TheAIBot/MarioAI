@@ -80,30 +80,27 @@ public class TestMarioMovements {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		final Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
-		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
-		final SpeedNode speedNode1 = new SpeedNode(endNode, startMarioXPos, 0, edge1, 0, world);
-		speedNode1.use();
-		path.add(edge1);
-		
-		SpeedNode prevSpeedNode = speedNode1;
-		
-		for (int i = 0; i < 10; i++) {
-			SpeedNode speedNode2 = createEdgeWithSpeedNode(endNode, prevSpeedNode, -distanceToMove, 0, 0, world);
-			path.add(speedNode2.ancestorEdge);
-			
-			SpeedNode speedNode3 = createEdgeWithSpeedNode(startNode, speedNode2, distanceToMove, 0, 0, world);
-			path.add(speedNode3.ancestorEdge);
-			
-			prevSpeedNode = speedNode3;
+		final int REPEAT_COUNT = 10;
+		int[] moveVector = new int[distanceToMove * REPEAT_COUNT * 2];
+		int index = 0;
+		for (int i = 0; i < REPEAT_COUNT; i++) {
+			for (int x = 0; x < distanceToMove; x++) {
+				moveVector[index] = 1;
+				index++;
+			}
+			for (int x = 0; x < distanceToMove; x++) {
+				moveVector[index] = -1;
+				index++;
+			}
 		}
+		
+		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
+		final ArrayList<DirectedEdge> path = createPath(startNode.x, startNode.y, moveVector, 0, 0, distanceToMove * REPEAT_COUNT, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -154,7 +151,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 0, world);
+		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 1, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -230,14 +227,22 @@ public class TestMarioMovements {
 	}
 
 	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
+		int[] distanceXArray = new int[pathlength];
+		for (int i = 0; i < distanceXArray.length; i++) {
+			distanceXArray[i] = distanceX;
+		}
+		return createPath(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world);
+	}
+	
+	private ArrayList<DirectedEdge> createPath(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
 		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
 		
 		final Node startNode = new Node(startX, startY, (byte)0);
-		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX, heightDifference, jumpHeight, world);
+		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX[0], heightDifference, jumpHeight, world);
 		path.add(speedNode.ancestorEdge);
 		
-		for (int i = 0; i < pathlength - 1; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, heightDifference, jumpHeight, world);
+		for (int i = 1; i < pathlength; i++) {
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX[i], heightDifference, jumpHeight, world);
 			speedNode.use();
 			path.add(speedNode.ancestorEdge);
 		}
