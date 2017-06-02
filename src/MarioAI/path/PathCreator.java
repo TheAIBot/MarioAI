@@ -57,13 +57,13 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioSpeed, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, int marioHeight) 
 	{
 		final Node startNode = path.get(0).target;
 		final int timeForward = path.get(0).getMoveInfo().getMoveTime();
 		enemyPredictor.moveIntoFuture(timeForward);
 		
-		start(observation, startNode, rightmostNodes, marioSpeed, marioHeight);
+		start(observation, startNode, rightmostNodes, path.get(0).getMoveInfo().getEndSpeed(), marioHeight);
 	}
 	
 	private void start(final Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
