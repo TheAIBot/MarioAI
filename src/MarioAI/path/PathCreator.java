@@ -59,17 +59,22 @@ public class PathCreator {
 	
 	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, int marioHeight) 
 	{
-		final Node startNode = path.get(0).target;
-		final int timeForward = path.get(0).getMoveInfo().getMoveTime();
+		final DirectedEdge currentEdge = path.get(0);
+		
+		final Node futureStartNode = currentEdge.target;
+		final int timeForward = currentEdge.getMoveInfo().getMoveTime();
 		enemyPredictor.moveIntoFuture(timeForward);
 		
-		start(observation, startNode, rightmostNodes, path.get(0).getMoveInfo().getEndSpeed(), marioHeight);
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float futureMarioXPos = marioXPos + currentEdge.getMoveInfo().getXMovementDistance();
+		
+		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();
+		
+		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
 	
-	private void start(final Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
 		isRunning = true;
-		
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
