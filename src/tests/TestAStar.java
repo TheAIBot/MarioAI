@@ -101,7 +101,7 @@ public class TestAStar {
 	@Test
 	public void testTakeFastestJump() {
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
-		setup("flatWithJump", false, true);
+		setup("flatWithJump", false, false);
 		MarioControls marioControls = new MarioControls();
 		FastAndFurious fastAgent = (FastAndFurious) agent;
 		List<DirectedEdge> path = fastAgent.getPath(observation);

@@ -22,7 +22,7 @@ public class FastAndFurious implements Agent {
 	private ArrayList<DirectedEdge> newestPath = null;
 	private int tickCount = 0;
 	
-	public boolean DEBUG = true;
+	public boolean DEBUG = false;
 
 	public void reset() {
 		marioController.reset();
@@ -98,9 +98,9 @@ public class FastAndFurious implements Agent {
 		int timeToRun = Integer.MAX_VALUE; //TODO set proper value
 		
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
-		long startTime = System.currentTimeMillis();
+		//long startTime = System.currentTimeMillis();
 		final ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, timeToRun);
-		System.out.println(System.currentTimeMillis() - startTime);
+		//System.out.println(System.currentTimeMillis() - startTime);
 		return (path == null) ? newestPath : path;
 	}
 
