@@ -65,8 +65,7 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
-		if (edge instanceof RunningEdge ||
-			edge instanceof AStarHelperEdge) {
+		if (edge instanceof RunningEdge) {
 			return true;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
@@ -172,8 +171,7 @@ public class MarioControls {
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
 		YMovementInformation jumpInfo;
-		if (edge instanceof RunningEdge ||
-			edge instanceof AStarHelperEdge) {
+		if (edge instanceof RunningEdge) {
 			jumpInfo = getYMovement(0, 0, 0);
 		} else {
 			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
@@ -193,6 +191,9 @@ public class MarioControls {
 	
 	private static YMovementInformation getYMovement(int jumpHeight, int marioYPos, int targetYPos) {
 		final int index = getIndexForYMovement(jumpHeight, marioYPos - targetYPos);
+		if (index < 0 || index >= yMovements.length) {
+			System.out.println("");
+		}
 		return yMovements[index];
 	}
 	

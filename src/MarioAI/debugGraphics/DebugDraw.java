@@ -41,7 +41,7 @@ public class DebugDraw {
 				convertLevelPointToOnScreenPoint(observation, stringPos);
 				final Point correctedPos = new Point((int)stringPos.x, (int)stringPos.y);
 				
-				final String typeName = (directedEdge instanceof RunningEdge || directedEdge instanceof AStarHelperEdge) ? "Running" : "Jumping";
+				final String typeName = (directedEdge instanceof RunningEdge) ? "Running" : "Jumping";
 				addDebugDrawing(observation, new DebugString(typeName, correctedPos));
 				
 				topStringPosition.y += distanceBetweenStrings;

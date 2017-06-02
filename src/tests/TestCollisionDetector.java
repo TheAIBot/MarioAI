@@ -95,9 +95,9 @@ public class TestCollisionDetector {
 					DirectedEdge currentLeftEdge 	= leftWalkingPath.get(j);
 					
 					final SpeedNode snRight = new SpeedNode(currentRightEdge.target, currentRight	,
-							                                  currentRightEdge, 0); //Don't care about the hash.
+							                                  currentRightEdge, 0, world); //Don't care about the hash.
 					final SpeedNode snLeft 	= new SpeedNode(currentLeftEdge.target	, currentLeft	,
-							                                  currentLeftEdge	, 0); //Don't care about the hash.
+							                                  currentLeftEdge	, 0, world); //Don't care about the hash.
 					if (!snRight.isSpeedNodeUseable() ||
 						 !snLeft .isSpeedNodeUseable()) {
 						fail();
@@ -178,7 +178,7 @@ public class TestCollisionDetector {
 			final int currentHeight = height;
 			SpeedNode startNode = new SpeedNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0); //Don't care about the hash.
+				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable()) { //Does not take the ceiling into account
 					if (Arrays.asList(sn.getMoveInfo().getPositions()).stream().anyMatch(position -> position.y + 2 > currentHeight - 1)) { //If it collides with the ceiling
@@ -214,7 +214,7 @@ public class TestCollisionDetector {
 		for (float speed = (float) -0.35; speed < 0.35; speed += 0.01) {
 			SpeedNode startNode = new SpeedNode(marioNode, speed, Long.MAX_VALUE);
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0); //Don't care about the hash.
+				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable()) {
 					assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));

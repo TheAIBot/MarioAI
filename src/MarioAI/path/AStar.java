@@ -7,14 +7,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import com.sun.swing.internal.plaf.metal.resources.metal;
-
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
@@ -28,7 +24,7 @@ public class AStar {
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 	
-	private ArrayList<DirectedEdge> currentBestPath = null;
+	private SpeedNode currentBestPathEnd = null;
 	private final int hashGranularity;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
@@ -38,61 +34,11 @@ public class AStar {
 		this.hashGranularity = hashGranularity;
 	}
 	
-	/**
-	 * A* algorithm for multiple goal nodes (tries to find path to just one of them). Method to be used with the right most column of the screen
-	 * 
-	 * @param start
-	 * @param rightmostNodes
-	 * @return optimal path
-	 */
-	public void runMultiNodeAStar(final Node start, final Node[] rightmostNodes, float marioSpeed, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
-		
-		// Add singleton goal node far to the right. This will ensure each
-		// vertical distance is minimal and all nodes in rightmost column will be
-		// pretty good goal positions to end up in after A* search 
-		int goalX = 0;
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			if (rightmostNodes[i] != null) {
-				goalX = rightmostNodes[i].x;
-				break;
-			}
-		}
-		goalX += 50;
-		
-		//added hashgranularity to the distance because otherwise two threads
-		//can create the exact same node which will have the same hashcode
-		//which two nodes aren't allowed to have
-		final Node goal = new Node(goalX + hashGranularity, 2, (byte) 3);
-		final AStarHelperEdge[] addedEdges = new AStarHelperEdge[rightmostNodes.length];
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			final Node node = rightmostNodes[i];
-			if (node != null) {
-				AStarHelperEdge edge = new AStarHelperEdge(node, goal);
-				node.addEdge(edge);
-				addedEdges[i] = edge;
-			}
-		}
-		
-		// Remove auxiliary goal node and update nodes having it as a neighbor accordingly
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioSpeed, Long.MAX_VALUE);
-		final SpeedNode endSpeedNode   = new SpeedNode(goal, 0, Long.MIN_VALUE);
-		initAStar(startSpeedNode, endSpeedNode, enemyPredictor, marioHeight, world);
-		speedNodes.remove(Long.MAX_VALUE);
-		speedNodes.remove(Long.MIN_VALUE);
-		
-		for (int i = 0; i < rightmostNodes.length; i++) {
-			final Node node = rightmostNodes[i];
-			if (node != null) {
-				node.removeEdge(addedEdges[i]);
-			}
-		}
-	}
-	
-	private void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
+	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
-		currentBestPath = null;
+		currentBestPathEnd = null;
 		
 		keepRunning = true;
 		foundBestPath = false;
@@ -124,9 +70,9 @@ public class AStar {
 				
 				// If goal is reached return solution path.
 				if (current.node.equals(goal.node)) {
-					currentBestPath = reconstructPath(current);
+					currentBestPathEnd = current;
 					foundBestPath = true;
-					break;
+					return;
 				}
 				//System.out.println("Current node:");
 				//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
@@ -178,7 +124,7 @@ public class AStar {
 				}	
 			}
 		}
-		currentBestPath = null;
+		currentBestPathEnd = null;
 		foundBestPath = false;
 	}
 	
@@ -203,43 +149,16 @@ public class AStar {
 	private int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		return MarioControls.getTicksToTarget(goal.node.x - current.xPos, current.vx);
 	}
-
-	/**
-	 * @param current
-	 * @return path
-	 */
-	private ArrayList<DirectedEdge> reconstructPath(SpeedNode currentSpeedNode) {
-		if (currentSpeedNode != null) {
-			final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-			while (currentSpeedNode.parent != null) {
-				currentSpeedNode.use();
-				path.add(currentSpeedNode.ancestorEdge);
-				//if (currentSpeedNode.parent.parent == null) {
-				//	System.out.println("First transition speed: " + currentSpeedNode.vx);				
-				//}
-				currentSpeedNode = currentSpeedNode.parent;
-			}
-			Collections.reverse(path);
-			
-			if (path.size() > 0) {
-				path.remove((path.size() - 1));
-			}
-			return path;	
-		} 
-		else {
-			return null;
-		}
-	}
 	
 	public AStarPath getCurrentBestPath() {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
 			if (foundBestPath) {
-				return new AStarPath(currentBestPath, true, hashGranularity);
+				return new AStarPath(currentBestPathEnd, true, hashGranularity);
 			}
 			else {
-			return new AStarPath(reconstructPath(openSet.peek()), false, hashGranularity);
+				return new AStarPath(openSet.peek(), false, hashGranularity);
 			}
 		}
 	}
