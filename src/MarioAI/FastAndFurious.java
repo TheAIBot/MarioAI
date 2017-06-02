@@ -40,6 +40,7 @@ public class FastAndFurious implements Agent {
 			
 			pathCreator.initialize(observation);
 			pathCreator.syncWithRealWorld(world, enemyPredictor);
+			findPath(observation);
 			
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
@@ -57,27 +58,41 @@ public class FastAndFurious implements Agent {
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
-				
+				/*
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
+				*/
+				if (world.hasGoalNodesChanged()) {
+					System.out.println("Reason: World");
+				}
+				if (MarioControls.isPathInvalid(observation, pathCreator.getBestPath())) {
+					System.out.println("Reason: Path invalid");
+				}
+				if (enemyPredictor.hasNewEnemySpawned()) {
+					System.out.println("Reason: New enemies");
+				}
+				if (pathCreator.getBestPath() == null) {
+					System.out.println("Reason: No path");
+				}
 				
-				/*
 				if (pathCreator.isRunning) {
 					pathCreator.stop();
 					pathCreator.updateBestPath();
-				}
-				if (pathCreator.getBestPath() == null) {
-					pathCreator.syncWithRealWorld(world, enemyPredictor);
-					findPath(observation);
+					System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					startFindingPathFromPreviousPath(observation);
+					System.out.println("Tick: " + tickCount + " Started\n");
 				}
-				*/
+				
 				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
+			}
+			else if (marioController.canUpdatePath) {
+				pathCreator.stop();
+				System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			
 			action = marioController.getNextAction(observation, pathCreator.getBestPath());
@@ -113,7 +128,7 @@ public class FastAndFurious implements Agent {
 	public void startFindingPathFromPreviousPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioController.getXVelocity(), marioHeight);
+		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioHeight);
 	}
 
 	public AGENT_TYPE getType() {
