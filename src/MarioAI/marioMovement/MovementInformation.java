@@ -11,7 +11,7 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
-public class MovementInformation implements Function{
+public class MovementInformation{
 	//vertical information
 	private final int totalTicksJumped;
 	
@@ -123,11 +123,6 @@ public class MovementInformation implements Function{
 	
 	public Point2D.Float[] getPositions() {
 		return positions;
-	}
-
-	@Override
-	public float f(float x) {
-		return 0;
 	}
 
 	public boolean[] getPressXButton() {

@@ -79,11 +79,11 @@ public  class EdgeCreator {
 		boolean foundAllEdges = true;
 		//Two different ways to find the reachable nodes from a given position:
 		if (ALLOW_RUNNING) {
-			foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
+			//foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges; 
 		}
 		if (ALLOW_JUMPING) {
-			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
-			foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
+			//foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
+			//foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
 			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
 			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS, listOfEdges) && foundAllEdges;
 		}
@@ -136,9 +136,10 @@ public  class EdgeCreator {
 			
 		} else return false;
 		//First falling straight down:
-		for (int height = startingNode.y - 1; height >= 0; height--) {
+		for (int height = startingNode.y + 1; height < GRID_HEIGHT; height++) {
 			if (isHittingWallOrGroundDownwards(initialXPosition, height)) {
 				listOfEdges.add(new FallEdge(startingNode, observationGraph[initialXPosition][height]));
+				break;
 			}
 		}
 		
@@ -146,10 +147,13 @@ public  class EdgeCreator {
 		JumpingEdge polynomial = new JumpingEdge(null, null);
 		List<DirectedEdge> jumpDownEdges = new ArrayList<DirectedEdge>();
 		//Does not include falling straight down.
-		for (int fallRange = direction.getHorizontalDirectionAsInt(); fallRange <= MAX_JUMP_RANGE*direction.getHorizontalDirectionAsInt(); fallRange += direction.getHorizontalDirectionAsInt()) {
+		for (int fallRange = 1; fallRange <= MAX_JUMP_RANGE; fallRange++) {
 			//it should start from initialXPosition, as Mario first needs to go of the ledge.
-			polynomial.setToFallPolynomil(startingNode, initialXPosition, fallRange); 
-			foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, jumpDownEdges) && foundAllEdges;
+			int currentFallRange = fallRange*direction.getHorizontalDirectionAsInt();
+			polynomial.setToFallPolynomial(startingNode, initialXPosition, currentFallRange); 
+			//The opposite vertical direction is used, as it is inverted in the method.
+			//Plus  direction.getHorizontalDirectionAsInt(), as it moved one back later.
+			foundAllEdges = jumpAlongPolynomial(startingNode, initialXPosition + direction.getHorizontalDirectionAsInt(), polynomial, direction.getOppositeVerticalDirection(), jumpDownEdges) && foundAllEdges;
 		}		
 		//The edges added by the method above, is polynomials. 
 		//They need to be converted to fallDownEdges:
@@ -211,7 +215,7 @@ public  class EdgeCreator {
 
 		//Switches modes from ascending to descending, when the top point has been reached.
 		boolean hasAlreadyPassedTopPoint = false;
-		boolean isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
+		boolean isPastTopPointColumn = polynomial.isPastTopPoint(direction,  currentXPosition + xPositionOffsetForJump);
 		
 		//TODO go stepwise through it and ensure that it works.
 		
@@ -232,7 +236,7 @@ public  class EdgeCreator {
 			}
 			
 			if (!isPastTopPointColumn && 
-				  polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump)) { //TODO fix here, probably a bug.
+				  polynomial.isPastTopPoint(direction,  currentXPosition + xPositionOffsetForJump)) { //TODO fix here, probably a bug.
 				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump)); //TODO no max needed?
 				currentYPosition = roundWithingMargin(currentYPosition, (float) 0.02);
 				//TODO error in rounding, does not always give decimal number.
@@ -264,7 +268,7 @@ public  class EdgeCreator {
 				return false;
 			}
 			
-			isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
+			isPastTopPointColumn = polynomial.isPastTopPoint(direction,  currentXPosition + xPositionOffsetForJump);
 			formerLowerYPosition = bound;
 		}
 		return false;

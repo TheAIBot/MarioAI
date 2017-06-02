@@ -1,16 +1,18 @@
 package MarioAI.graph.edges;
 
+import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public class FallEdge extends DirectedEdge {
 
 	public FallEdge(Node source, Node target) {
 		super(source, target);
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	@Override
 	public float getMaxY() {
-		return source.y;
+		return 0;
 	}
 
 	@Override

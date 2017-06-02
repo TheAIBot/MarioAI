@@ -1,8 +1,11 @@
 package MarioAI.graph.edges;
 
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import MarioAI.Hasher;
 import MarioAI.graph.Function;
+import MarioAI.graph.JumpDirection;
 import MarioAI.graph.nodes.Node;
 
 public class JumpingEdge extends DirectedEdge implements Function{
@@ -18,7 +21,7 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	// even though it is only one it should be possible to reach. Mario changing
 	// position in the air can compensate for this.
 	public int ceiledTopPointX; //TODO change to private after tests.
-	public int ceiledTopPointY; // Ceild coordinates of the toppunkt
+	public int ceiledTopPointY; // Ceiled coordinates of the toppunkt
 	
 	public JumpingEdge(Node source, Node target, JumpingEdge polynomial) {
 		super(source, target);
@@ -38,6 +41,8 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		this.a = 0;
 		this.b = 0;
 		this.c = 0;
+		//This shouldn't be hashed
+		//hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 	
 	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
@@ -61,20 +66,20 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		setTopPoint();
 	}
 	
-	public void setToFallPolynomil(Node startingPosition, int nodeColumn, float fallRange) {
-		a = 4 / (fallRange*fallRange);
-		b = - ( (8*nodeColumn)/(fallRange*fallRange));
+	public void setToFallPolynomial(Node startingPosition, int nodeColumn, float fallRange) {
+		a = (-4) / (fallRange*fallRange);
+		b = ((8*nodeColumn)/(fallRange*fallRange));
 		c = - (- startingPosition.y * fallRange * fallRange + 4 * nodeColumn * nodeColumn)/(fallRange*fallRange);
 		//We want to directly set the toppoint, as this must be precise, 
 		//to ensure that the jumpAlong algorithm makes no mistakes.
 		
-		//Its toppoint is exactely at its starting position
+		//Its toppoint is exactly at its starting position
 		setTopPoint(nodeColumn, startingPosition.y);
 	}
 
-	public boolean isPastTopPoint(int startPosition, int currentPosition) {
-		return (startPosition <= topPointX && topPointX <= currentPosition || //Going right
-				  startPosition >= topPointX && topPointX >= currentPosition);  //Going left.
+	public boolean isPastTopPoint(JumpDirection direction, int currentXPosition) {
+		return (direction.getHorizontalDirectionAsInt() == 1 	&& topPointX <= currentXPosition || //Going right
+				  direction.getHorizontalDirectionAsInt() == -1 && topPointX >= currentXPosition);  //Going left.
 	}
 
 	public float getTopPointX() {
