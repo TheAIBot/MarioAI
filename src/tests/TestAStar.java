@@ -408,7 +408,8 @@ public class TestAStar {
 		
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
-		assertNull(path);
+		//assertNull(path);
+		assertNotNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway eventhough the fscore is high.
 	}
 	
 	@Test
