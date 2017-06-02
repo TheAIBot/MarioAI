@@ -429,7 +429,8 @@ public class TestAStar {
 		TestTools.renderLevel(observation);
 		
 		Node[] originalGoalNodes = world.getGoalNodes(0);
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNotNull(path);
 		
 		// Check the first elements in the path only consists of jumps
@@ -437,7 +438,7 @@ public class TestAStar {
 		assertTrue(path.get(1) instanceof JumpingEdge);
 		assertTrue(path.get(2) instanceof JumpingEdge);
 		
-		verifyPath(aStar, path, originalGoalNodes);
+		verifyPath(path, originalGoalNodes);
 	}
 
 	/**
@@ -447,11 +448,12 @@ public class TestAStar {
 	 * @param path
 	 * @param originalGoalNodes
 	 */
-	private void verifyPath(AStar aStar, List<DirectedEdge> path, Node[] originalGoalNodes) {
+	private void verifyPath(List<DirectedEdge> path, Node[] originalGoalNodes) {
 		
 		for (int i = 0; i < path.size(); i++) {
 			Node nextNode = path.get(i).source;
-			List<DirectedEdge> newPath = aStar.runMultiNodeAStar(observation, nextNode, originalGoalNodes, path.get(i).getMoveInfo().getEndSpeed(), enemyPredictor, 2);
+			agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+			List<DirectedEdge> newPath = agent.pathCreator.getBestPath();
 			
 			assertEquals(path.size() - i, newPath.size());
 			// Go through edges and check they are same and verify the movement 
@@ -459,7 +461,7 @@ public class TestAStar {
 			
 			for (int j = 0; j < originalGoalNodes.length; j++) {
 				assertEquals(path.get(j + i), newPath.get(i));
-				verifyMoveAlongEdge(aStar, newPath.get(i));				
+				verifyMoveAlongEdge(newPath.get(i));				
 			}
 		}
 	}
@@ -469,7 +471,7 @@ public class TestAStar {
 	 * @param aStar
 	 * @param edge
 	 */
-	private void verifyMoveAlongEdge(AStar aStar, DirectedEdge edge) {
+	private void verifyMoveAlongEdge(DirectedEdge edge) {
 		final int maxTicksAllowedToRun = 50;
 		int c = 0;
 		while (world.getMarioNode(observation) != edge.target) {
