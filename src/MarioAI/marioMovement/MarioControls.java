@@ -191,9 +191,6 @@ public class MarioControls {
 	
 	private static YMovementInformation getYMovement(int jumpHeight, int marioYPos, int targetYPos) {
 		final int index = getIndexForYMovement(jumpHeight, marioYPos - targetYPos);
-		if (index < 0 || index >= yMovements.length) {
-			System.out.println("");
-		}
 		return yMovements[index];
 	}
 	
