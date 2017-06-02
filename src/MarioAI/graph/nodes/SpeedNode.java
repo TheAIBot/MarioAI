@@ -2,6 +2,7 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
@@ -55,11 +56,11 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash) {
-		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash);
+	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
+		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash) {
+	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		if (!(ancestorEdge instanceof FallEdge)) {
@@ -71,11 +72,11 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
 		this.yPos = node.y;
-		this.isSpeedNodeUseable = determineIfThisNodeIsUseable();
+		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
 	}
 	
-	private boolean determineIfThisNodeIsUseable() {
+	private boolean determineIfThisNodeIsUseable(World world) {
 		
 
 		//There are a lot of possible problems for a fall edge.
@@ -100,7 +101,11 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 			return false;
 		}
 		
-		//TODO: add check for whether this edge runs into any blocks
+		//TODO remove this when changed moveinformation is implemented
+		if (getMoveInfo().hasCollisions(parent, world)) {
+			return false;
+		}
+		
 		return true;
 	}
 	

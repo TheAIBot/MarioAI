@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import com.sun.swing.internal.plaf.metal.resources.metal;
+
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
@@ -137,13 +139,9 @@ public class AStar {
 				
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : current.node.getEdges()) {			
-					final SpeedNode sn = getSpeedNode(neighborEdge, current);
+					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
 					
 					if (!sn.isSpeedNodeUseable()) {
-						continue;
-					}
-					
-					if (sn.getMoveInfo().hasCollisions(current, world)) {
 						continue;
 					}
 					
@@ -184,7 +182,7 @@ public class AStar {
 		foundBestPath = false;
 	}
 	
-	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current) {
+	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, hashGranularity);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
@@ -192,7 +190,7 @@ public class AStar {
 			//return speedNode; //TODO temp for testing purposes
 		}
 		
-		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash);
+		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}
