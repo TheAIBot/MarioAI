@@ -287,6 +287,19 @@ public class TestGrapher {
 		}
 	}
 
+	public void testJumpDownLedge(){		
+		World graph = totalFlatland(flatlandWorld(), marioNode);
+		Node[][] levelMatrix = graph.getLevelMatrix();
+		//For any given pillar, at any given height, he should be able to jump down from it:
+		for (int column = 0; column < EdgeCreator.GRID_WIDTH; column++) {
+			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
+				addWall(marioNode.y, column, marioNode.y, levelMatrix, marioNode);				
+				grapher.setMovementEdges(graph, marioNode);
+				
+			}
+		}
+	}
+	
 	@Test
 	public void testNoJumpsThroughCeiling() {
 		// TODO add edge-cases
