@@ -84,6 +84,8 @@ public  class EdgeCreator {
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode,nodeColoumn, listOfEdges) && foundAllEdges;	
 			foundAllEdges = getJumpStraightUpEdges(startingNode,nodeColoumn,listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
+			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS, listOfEdges);
 		}
 		
 		if (foundAllEdges) startingNode.setIsAllEdgesMade(true);
@@ -115,6 +117,49 @@ public  class EdgeCreator {
 		return true;
 	}
 
+	public boolean getFallingDownEdges(Node startingNode, int nodeColoumn, JumpDirection direction,	ArrayList<DirectedEdge> listOfEdges){
+		//TODO two cases, left and right.
+		int initialXPosition = nodeColoumn + direction.getHorizontalDirectionAsInt();
+		//If the column to the left/right haven't been seen yet, then no edges can be found,
+		//and therefore false is returned.
+		if (isOnLevelMatrix(initialXPosition, startingNode.y) && 
+			 isOnLevelMatrix(initialXPosition, startingNode.y - 1)) {
+			
+			//It is required that the two blocks to the right/left, are blocks that mario can pass trough,
+			//and the block below also can be passed trough:
+			if (isSolid(observationGraph[initialXPosition][startingNode.y ])  ||
+				 isSolid(observationGraph[initialXPosition][startingNode.y - 1]) ||
+				!isAir(initialXPosition, startingNode.y + 1)) {
+				//Can't fall down, so return = true, and no edges are added.
+				return true;			
+			}
+			
+		} else return false;
+		//First falling straight down:
+		for (int height = startingNode.y - 1; height >= 0; height--) {
+			if (isHittingWallOrGroundDownwards(initialXPosition, height)) {
+				listOfEdges.add(new FallEdge(startingNode, observationGraph[initialXPosition][height]));
+			}
+		}
+		
+		boolean foundAllEdges = true;
+		JumpingEdge polynomial = new JumpingEdge(null, null);
+		List<DirectedEdge> jumpDownEdges = new ArrayList<DirectedEdge>();
+		//Does not include falling straight down.
+		for (int fallRange = direction.getHorizontalDirectionAsInt(); fallRange <= MAX_JUMP_RANGE*direction.getHorizontalDirectionAsInt(); fallRange += direction.getHorizontalDirectionAsInt()) {
+			//it should start from initialXPosition, as Mario first needs to go of the ledge.
+			polynomial.setToFallPolynomil(startingNode, initialXPosition, fallRange); 
+			foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, direction, jumpDownEdges) && foundAllEdges;
+		}		
+		//The edges added by the method above, is polynomials. 
+		//They need to be converted to fallDownEdges:
+		for (DirectedEdge edge : jumpDownEdges) {
+			listOfEdges.add(new FallEdge(edge.source, edge.target));
+		}	
+		
+		return foundAllEdges;
+	}
+	
 	public boolean getRunningReachableEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		boolean foundAllEdges = true;
 
@@ -379,9 +424,8 @@ public  class EdgeCreator {
 		//TODO removed yPosition-1
 		if (isOnLevelMatrix(xPosition, yPosition)) {
 			final boolean isAtSolidNode = isSolid(observationGraph[xPosition][yPosition]);
-			final boolean isAtJumpthroughNode = isJumpThroughNode(observationGraph[xPosition][yPosition]);
-			
-			return isAtSolidNode || isAtJumpthroughNode;
+			final boolean isAtJumpThroughNode = isJumpThroughNode(observationGraph[xPosition][yPosition]);
+			return isAtSolidNode || isAtJumpThroughNode;
 		} else {
 			return false;
 		}
@@ -403,6 +447,7 @@ public  class EdgeCreator {
 			return isOnSolidGround(node.y, nodeXPosition) && observationGraph[nodeXPosition][node.y - 1] == null;	
 		}
 	}
+	
 	//TODO update this to use the height data.
 	private boolean canMarioStandThere(int coloumn,int row) {
 		return 0 < row && row < GRID_HEIGHT &&

@@ -102,8 +102,9 @@ public class TestAStar {
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
 	}
 	
-	//@Test
+	@Test
 	public void testTakeFastestJump() {
+		Assert.fail("Test runs forever");
 		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
 		setup("flatWithJump", false, false);
 		FastAndFurious fastAgent = (FastAndFurious) agent;

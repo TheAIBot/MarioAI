@@ -6,6 +6,7 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
@@ -171,9 +172,10 @@ public class MarioControls {
 		YMovementInformation jumpInfo;
 		if (edge instanceof RunningEdge) {
 			jumpInfo = getYMovement(0, 0, 0);
-		}
-		else {
+		} else if (edge instanceof JumpingEdge) {
 			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
+		} else {
+			return null;
 		}
 		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo);
 	}
@@ -394,5 +396,11 @@ public class MarioControls {
 
 	public float getXVelocity() {
 		return currentXSpeed;
+	}
+
+	public static boolean canMarioUseFallEdge(DirectedEdge ancestorEdge, float xPos) {
+		// Not currently
+		//TODO make method
+		return false;
 	}
 }
