@@ -14,11 +14,11 @@ import ch.idsia.mario.environments.Environment;
 
 
 public class FastAndFurious implements Agent {
-	private final World world = new World();
-	private final EdgeCreator grapher = new EdgeCreator();
-	private final AStar aStar = new AStar();
-	private final MarioControls marioController = new MarioControls();
-	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
+	public final World world = new World();
+	public final EdgeCreator grapher = new EdgeCreator();
+	public final AStar aStar = new AStar();
+	public final MarioControls marioController = new MarioControls();
+	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private ArrayList<DirectedEdge> newestPath = null;
 	private int tickCount = 0;
 	

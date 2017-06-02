@@ -3,7 +3,6 @@ package ch.idsia.scenarios;
 import MarioAI.FastAndFurious;
 import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;

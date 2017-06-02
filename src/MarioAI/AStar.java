@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import com.sun.istack.internal.FinalArrayList;
-
 import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
@@ -16,7 +14,6 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.environments.Environment;
-import sun.management.counter.Variability;
 
 
 public class AStar {
@@ -78,7 +75,7 @@ public class AStar {
 			
 			final Node goal = new Node((short) goalX, (short) 2, (byte) 3);
 
-			final float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
+			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 			goalSpeedNode = new SpeedNode(goal, 0, Long.MIN_VALUE);
 			
