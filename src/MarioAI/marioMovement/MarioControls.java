@@ -290,21 +290,19 @@ public class MarioControls {
 		totalTicks += ticksDrifting;
 		
 		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
-		distanceMoved = (xPositions.size() == 0)? 0:xPositions.get(xPositions.size() - 1);
+		distanceMoved = (xPositions.size() == 0)? 0 : xPositions.get(xPositions.size() - 1);
 		
-		if (neededXDistance != 0) {
-			//move the last tick
-			//which should be on ground
-			//this allows two jumping edges
-			//after each other.
-			////BLOCK 1 COPY////
-			speed = getNextTickSpeed(speed);
-			distanceMoved += speed;
-			xPositions.add(distanceMoved);
-			pressButton.add(true);
-			totalTicks++;
-			////BLOCK 1 COPY////			
-		}
+		//move the last tick
+		//which should be on ground
+		//this allows two jumping edges
+		//after each other.
+		////BLOCK 1 COPY////
+		speed = getNextTickSpeed(speed);
+		distanceMoved += speed;
+		xPositions.add(distanceMoved);
+		pressButton.add(true);
+		totalTicks++;
+		////BLOCK 1 COPY////			
 		
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction
