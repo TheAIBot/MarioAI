@@ -416,10 +416,18 @@ public class TestAStar {
 		setup("jumpLevels/jumpStraightUp", true, false);
 		TestTools.setMarioPosition(observation, 3, 12);
 		TestTools.runOneTick(observation);
-		TestTools.renderLevel(observation);
-		graph.update(observation);
-		
+
+		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+		DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
+		DebugDraw.drawEdges(observation, graph.getLevelMatrix());
+		DebugDraw.drawMarioReachableNodes(observation, graph);
+		DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
+		graph.update(observation);		
 		Node orignalMarioNode = graph.getMarioNode(observation);
+		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
+
+		TestTools.renderLevel(observation);
+		
 		Node[] originalGoalNodes = graph.getGoalNodes(0);
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
 		assertNotNull(path);
@@ -440,17 +448,18 @@ public class TestAStar {
 	 * @param originalGoalNodes
 	 */
 	private void verifyPath(AStar aStar, List<DirectedEdge> path, Node[] originalGoalNodes) {
-		Iterator<DirectedEdge> iter = path.iterator();
 		
 		for (int i = 0; i < path.size(); i++) {
 			Node nextNode = path.get(i).source;
 			List<DirectedEdge> newPath = aStar.runMultiNodeAStar(observation, nextNode, originalGoalNodes, path.get(i).getMoveInfo().getEndSpeed(), enemyPredictor, 2);
 			
+			assertEquals(path.size() - i, newPath.size());
 			// Go through edges and check they are same and verify the movement 
-			iter.next();
-			for (DirectedEdge edge : newPath) {
-				assertEquals(edge, iter.next());
-				verifyMoveAlongEdge(aStar, edge);
+			//iter.next();
+			
+			for (int j = 0; j < originalGoalNodes.length; j++) {
+				assertEquals(path.get(j + i), newPath.get(i));
+				verifyMoveAlongEdge(aStar, newPath.get(i));				
 			}
 		}
 	}
@@ -461,11 +470,13 @@ public class TestAStar {
 	 * @param edge
 	 */
 	private void verifyMoveAlongEdge(AStar aStar, DirectedEdge edge) {
-		final int maxTicksAllowedToRun = 1000;
+		final int maxTicksAllowedToRun = 50;
 		int c = 0;
 		while (graph.getMarioNode(observation) != edge.target) {
 			c++;
 			TestTools.runOneTick(observation);
+			TestTools.renderLevel(observation);
+			graph.update(observation);
 			if (c >= maxTicksAllowedToRun) Assert.fail("Hueston we have a problem. Never reaches destination."); 
 		}
 		

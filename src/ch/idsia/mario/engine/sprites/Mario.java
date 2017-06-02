@@ -709,7 +709,7 @@ public class Mario extends Sprite {
 	
 	public void setPosition(int x, int y) {
 		this.x = x * 16 - 8;
-		this.y = y * 16;
+		this.y = y * 16 - 1;
 	}
 	
 	public void setXPosition(int x) {
