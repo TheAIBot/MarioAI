@@ -16,15 +16,13 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import MarioAI.AStar;
 import MarioAI.FastAndFurious;
 import MarioAI.Hasher;
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.debugGraphics.DebugDraw;
-import MarioAI.enemy.EnemyPredictor;
-import MarioAI.enemy.EnemyType;
-import MarioAI.graph.CollisionDetection;
+import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.enemySimuation.EnemyType;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
@@ -33,8 +31,8 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import MarioAI.path.AStar;
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
@@ -46,7 +44,6 @@ public class TestAStar {
 	EdgeCreator edgeCreator;
 	Node marioNode;
 	EnemyPredictor enemyPredictor;
-	AStar aStar;
 	MarioControls marioControls;
 	
 	public void setup(String levelName) {
@@ -61,25 +58,22 @@ public class TestAStar {
 		world = agent.world;
 		edgeCreator = agent.grapher;
 		enemyPredictor = agent.enemyPredictor;
-		aStar = agent.aStar;
 		marioControls = agent.marioController;
 		marioNode = world.getMarioNode(observation);
 	}
-		
+	
 	public Agent setupUnitTestAgent(String levelName) {
 		Agent agent = new UnitTestAgent();
 		observation = TestTools.loadLevel(levelName + ".lvl", agent, false);
 		DebugDraw.resetGraphics(observation);
 		TestTools.runOneTick(observation);
 		world = new World();
-		CollisionDetection.setWorld(world);
 		edgeCreator = new EdgeCreator();
 		world.initialize(observation);
 		edgeCreator.setMovementEdges(world, world.getMarioNode(observation));
 		enemyPredictor = new EnemyPredictor();
 		marioNode = world.getMarioNode(observation);
 		marioControls = new MarioControls();
-		aStar = new AStar();
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		return agent;
 	}
@@ -90,21 +84,12 @@ public class TestAStar {
 	@Test
 	public void testAStarRunning() {
 		setup("flat");
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNotNull(path);
 		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
 			assertTrue(directedEdge instanceof RunningEdge);
-			//assertEquals(directedEdge.target.gScore, c, delta);
-			//assertEquals(directedEdge.target.fScore == 1000 - c, delta);
-//			assertTrue(directedEdge instanceof RunningEdge);
-//			try {
-//				Running test = (Running) directedEdge;
-//			} catch (ClassCastException e) {
-//				Assert.fail();
-//			}
-//			c++;
-//			assertTrue(directedEdge instanceof RunningEdge);
 		}
 		assertEquals(12, path.get(path.size() - 1).target.x); //Correct x end destination
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
@@ -150,7 +135,8 @@ public class TestAStar {
 	@Test
 	public void testAStarJumping() {
 		setup("TestAStarJump", false);
-		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 
 		//TestTools.runOneTick(observation);
 		assertTrue(path != null);
@@ -168,7 +154,7 @@ public class TestAStar {
 		for (int i = 4; i < path.size(); i++) { //Running
 			assertTrue(path.get(i) instanceof RunningEdge);
 			
-		}		
+		}
 		
 	}
 	
@@ -184,7 +170,8 @@ public class TestAStar {
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 			TestTools.runOneTick(observation);
 			unitTestAgent.action[Mario.KEY_RIGHT] = true;
-			aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
+			agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+			List<DirectedEdge> path = agent.pathCreator.getBestPath();
 			
 			for (SpeedNode speedNode : speedNodes.values()) {
 				if (!searchedNodes.contains(speedNode.hash)) {
@@ -222,7 +209,8 @@ public class TestAStar {
 		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 		TestTools.renderLevel(observation);
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertTrue(path != null);
 		
 		for (DirectedEdge edge : path) {
@@ -329,7 +317,8 @@ public class TestAStar {
 		// Should not find path in the given timespan
 		final int TIME_ALLOWED = 1;
 		Node[] goalNodesInBeginning = world.getGoalNodes(0);
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertTrue(path == null);
 		ArrayList<DirectedEdge> pathSegment = aStar.getCurrentBestSegmentPath();
 		
@@ -345,7 +334,8 @@ public class TestAStar {
 		// Let A* run many times - enough times to make it find a solution path 
 		int c = 0;
 		do {
-			path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+			agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+			path = agent.pathCreator.getBestPath();
 			c++;
 			if (c >= 1000) {
 				Assert.fail("AStar never finishes");
@@ -378,7 +368,8 @@ public class TestAStar {
 		
 		// This time limit should be short enough to not make A* able to finish in two runs, but still be able to make progress by extending path fragments
 		final int TIME_ALLOWED = 3;
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		
 		// The path should not be a complete solution but should include some nodes
 		assertNull(path);
@@ -386,12 +377,12 @@ public class TestAStar {
 		assertNotNull(pathSegment);
 		assertTrue(pathSegment.size() > 0);
 		
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
-		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		path = agent.pathCreator.getBestPath();
 		//assertTrue(path == null);
 		ArrayList<DirectedEdge> newPathSegment = aStar.getCurrentBestSegmentPath();
 		assertTrue(newPathSegment.size() > pathSegment.size());
@@ -415,7 +406,8 @@ public class TestAStar {
 		//TestTools.renderLevel(observation);
 		world.update(observation);
 		
-		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
+		agent.pathCreator.blokingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNull(path);
 	}
 	
@@ -493,7 +485,6 @@ public class TestAStar {
 		assertEquals(correspondingSpeedNode.xPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}
-	
 	
 }
 

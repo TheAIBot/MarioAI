@@ -10,73 +10,39 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	/**
-	 * Hash speednode based on veloctiy and the edge leading to this speedNode
-	 * @param vx
-	 * @param edge
-	 * @return
-	 */
-	public static long hashSpeedNode(float vx, DirectedEdge edge) {
-		//the hash of the speed needs to be fixed
-		//final long a = hashSpeed(vx) << 32;
-		//final int speedHash = hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES);
-		//final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES) << 32);
+	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {
+		final long a = ((long)hashSpeed(vx, hashGranularity) << 32);
 		final long edgeHash = edge.hashCode();
 		
 		return a | edgeHash;
 	}
 	
-	public static long hashSpeedNode(float vx, DirectedEdge edge, int factorNumberOfSpeedNodes) {
-		//the hash of the speed needs to be fixed
-		//final long a = hashSpeed(vx) << 32;
-		//final int speedHash = hashSpeed(vx, FACTOR_NUMBER_OF_SPEED_NODES);
-		//final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx, factorNumberOfSpeedNodes) << 32);
-		final long edgeHash = edge.hashCode();
-		
-		return a | edgeHash;
+	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
+		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx, hashGranularity);
 	}
 	
-	/**
-	 * Hash speednode based on x, y coords and velocity.
-	 * To be used for checking if we have seen this speedNode before.
-	 * Used in closed set.
-	 * @param sn
-	 * @return
-	 */
-	public static int hashEndSpeedNode(SpeedNode sn) {
-		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx);
-	}
-	
-	public static int hashEndSpeedNode(int x, int y, float vx) {
-		return hashEndSpeedNode(x, y, vx, FACTOR_NUMBER_OF_SPEED_NODES);
-	}
-	
-	public static int hashEndSpeedNode(int x, int y, float vx, int granularity) {
+	public static int hashEndSpeedNode(int x, int y, float vx, int speedGranularity) {
 		final int a = x & 0xffff;
 		final int b = (y & 0xff) << 16;
-		final int c = ((byte)hashSpeed(vx, granularity)) << 24;
-		final int d = hashSpeed(vx, granularity) & 0x80000000;
+		final int c = ((byte)hashSpeed(vx, speedGranularity)) << 24;
+		final int d = hashSpeed(vx, speedGranularity) & 0x80000000;
 		
 		return d | c | b | a;
 	}
 	
-	public static final int FACTOR_NUMBER_OF_SPEED_NODES = 40;
-	public static byte hashSpeed(float vx, int granularity) {
-		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (granularity * 2);
+	public static byte hashSpeed(float vx, int hashGranularity) {
+		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (hashGranularity * 2);
 		if (vx >= 0) {
-			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
+			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
 		} else {
-			int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * granularity));
-			if (hashWithOutSign == 0) return (byte) hashWithOutSign;
-			return (byte) (0x80 | hashWithOutSign);
+			final int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
+			if (hashWithOutSign == 0) {
+				return (byte) hashWithOutSign;
+			}
+			else {
+				return (byte) (0x80 | hashWithOutSign);	
+			}
 		}
-		/*
-		final int speedHash = hashSpeed(vx);
-		final long speedSign = (speedHash >= 0) ? 0 : Long.MIN_VALUE;
-		final long a = ((long)hashSpeed(vx) << 32) | speedSign;
-		*/
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

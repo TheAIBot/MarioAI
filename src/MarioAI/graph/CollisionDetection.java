@@ -16,7 +16,6 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.engine.sprites.Sparkle;
 
 public class CollisionDetection {
-	private static World world;
 	public static final float MARIO_WIDTH = 4; //TODO Change depending on mario
 	public static final float MARIO_HEIGHT = 24; //(*)TODO Change depending on mario
 	//Taken from Level class.
@@ -28,7 +27,7 @@ public class CollisionDetection {
    	//Test seed: 3261372
 	
 	
-	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -44,16 +43,12 @@ public class CollisionDetection {
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.
 		if (lastYValue == futureOffset.y) {
-			return !move(currentPosition, xa, 0);
+			return !move(currentPosition, xa, 0, world);
 		}
 		else {
-			return !move(currentPosition, xa, 0) || 
-					 !move(currentPosition, 0, ya);
+			return !move(currentPosition, xa, 0, world) || 
+					 !move(currentPosition, 0, ya, world);
 		}
-	}
-	
-	public static void setWorld(World newWorld){
-		world = newWorld;
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.
@@ -62,24 +57,24 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean move(Point2D.Float currentPosition, float xa, float ya) {
+	private static boolean move(Point2D.Float currentPosition, float xa, float ya, World world) {
 		while (xa > 8) {
-			if (!move(currentPosition, 8, 0))
+			if (!move(currentPosition, 8, 0, world))
 				return false;
 			xa -= 8;
 		}
 		while (xa < -8) {
-			if (!move(currentPosition, -8, 0))
+			if (!move(currentPosition, -8, 0, world))
 				return false;
 			xa += 8;
 		}
 		while (ya > 8) {
-			if (!move(currentPosition, 0, 8))
+			if (!move(currentPosition, 0, 8, world))
 				return false;
 			ya -= 8;
 		}
 		while (ya < -8) {
-			if (!move(currentPosition, 0, -8))
+			if (!move(currentPosition, 0, -8, world))
 				return false;
 			ya += 8;
 		}
@@ -88,28 +83,28 @@ public class CollisionDetection {
 
 		//We don't care if it is just one of the blocking that is true, or multiple, so they are joiuned together
 		if 			(ya > 0 && 
-						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world))) {
 			collide = true;
 		} 
 		if 	(ya < 0 && 
-				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) {
+				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) {
 			collide = true;
 		}
 		if 	(xa > 0 && 
-						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
 		if 	(xa < 0 &&
-						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
 
@@ -145,7 +140,7 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya) {
+	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
 		int x = (int) (newX / 16);
 		int y = (int) (newY / 16);
 		//TODO check why this is necessary.
