@@ -1,4 +1,4 @@
-package MarioAI.enemy.simulators;
+package MarioAI.enemySimuation.simulators;
 
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
@@ -162,4 +162,16 @@ public class ShellSimulator extends EnemySimulator
 
         return blocking;
     }
+
+	@Override
+	public EnemySimulator copy() {
+		ShellSimulator copy = new ShellSimulator(world, x, y, xa, ya);
+		copy.x = x;
+		copy.y = y;
+		copy.xa = xa;
+		copy.ya = ya;
+		copy.positionsIndexOffset = positionsIndexOffset;
+		
+		return copy;
+	}
 }

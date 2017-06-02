@@ -55,7 +55,7 @@ public  class EdgeCreator {
 				canMarioStandThere(connectingEdge.target, marioNode) && //The edge must not go into for example a wall.
 				connectingEdge.source != connectingEdge.target) { // No movement to the same node. Notice that no equals method are needed.
 				//TODO (*) Maybe allow above.
-				node.addEdge(connectingEdge); 
+				node.addEdge(connectingEdge);
 			}
 		}		
 	}

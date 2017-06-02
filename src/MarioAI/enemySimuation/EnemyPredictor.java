@@ -1,15 +1,18 @@
-package MarioAI.enemy;
+package MarioAI.enemySimuation;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
 
-import MarioAI.enemy.simulators.BulletBillSimulator;
-import MarioAI.enemy.simulators.EnemySimulator;
-import MarioAI.enemy.simulators.FlowerEnemy;
-import MarioAI.enemy.simulators.ShellSimulator;
-import MarioAI.enemy.simulators.WalkingEnemySimulator;
+import MarioAI.World;
+import MarioAI.enemySimuation.simulators.BulletBillSimulator;
+import MarioAI.enemySimuation.simulators.EnemySimulator;
+import MarioAI.enemySimuation.simulators.FlowerEnemy;
+import MarioAI.enemySimuation.simulators.ShellSimulator;
+import MarioAI.enemySimuation.simulators.WalkingEnemySimulator;
+import MarioAI.path.PathCreator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
@@ -47,7 +50,6 @@ public class EnemyPredictor {
 			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
 			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
-			
 			//check if the rectangle of mario intersects with the enemys rectangle
 			if (enemyX1 <= marioX2 && 
 				enemyX2 >= marioX1 &&
@@ -56,7 +58,7 @@ public class EnemyPredictor {
 				return true;
 			}
 		}
-		return false;
+		return false;	
 	}
 	
 	public void updateEnemies(final float[] enemyInfo) {
@@ -94,7 +96,7 @@ public class EnemyPredictor {
 	
 	private void updateSimulations() {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			enemySimulation.moveTime();
+			enemySimulation.moveTimeForward();
 		}
 	}
 	
@@ -140,7 +142,7 @@ public class EnemyPredictor {
 			}
 		}
 		
-		verifiedEnemySimulations = notDeletedSimulations;
+		verifiedEnemySimulations = notDeletedSimulations;	
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
@@ -169,7 +171,7 @@ public class EnemyPredictor {
 				
 				if (foundPoint != null) {
 					enemyPositions.remove(foundPoint);
-					verifiedEnemySimulations.add(enemySimulation);
+					verifiedEnemySimulations.add(enemySimulation);	
 					newEnemySpawned = true;
 				}
 			}
@@ -209,7 +211,7 @@ public class EnemyPredictor {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
 							//the xa and ya are 1 tick too old so they are updated here
 							potentialSimulation.moveEnemy();
-							potentialSimulation.moveTime();
+							potentialSimulation.moveTimeForward();
 							//but the position isn't too old so it's set here again
 							potentialSimulation.setX(x1);
 							potentialSimulation.setY(y1);
@@ -266,6 +268,27 @@ public class EnemyPredictor {
 			return Enemy.ENEMY_SPIKY;
 		}
 		throw new Error("Unkown kind: " + kind);
+	}
+	
+	public void moveIntoFuture(final int timeToMove) {
+		for (int i = 0; i < timeToMove; i++) {
+			updateSimulations();
+		}
+	}
+	
+	public void moveIntoPast(final int timeToMove) {
+		for (int i = 0; i < timeToMove; i++) {
+			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+				enemySimulation.moveTimeBackwards();
+			}
+		}
+	}
+	
+	public void syncFrom(EnemyPredictor correctPredictor) {
+		verifiedEnemySimulations = new ArrayList<EnemySimulator>();
+		for (EnemySimulator enemySimulator : correctPredictor.verifiedEnemySimulations) {
+			verifiedEnemySimulations.add(enemySimulator.copy());
+		}
 	}
 	
 	public ArrayList<EnemySimulator> getEnemies() {
