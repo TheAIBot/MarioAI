@@ -12,7 +12,6 @@ import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
