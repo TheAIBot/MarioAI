@@ -1,7 +1,5 @@
 package MarioAI.path;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -87,14 +85,6 @@ public class AStar {
 				for (DirectedEdge neighborEdge : current.node.getEdges()) {			
 					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
 					
-					if (!sn.isSpeedNodeUseable()) {
-						continue;
-					}
-					
-					if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-						continue;
-					}
-					
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
 					final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
@@ -109,9 +99,17 @@ public class AStar {
 					//then there is no need to add this edge as it's worse than the
 					//current one
 					if (openSetMap.containsKey(snEndHash) &&
-						tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+							tentativeGScore >= openSetMap.get(snEndHash).gScore) {
 						continue;
-					}  
+					}
+					
+					if (!sn.isSpeedNodeUseable()) {
+						continue;
+					}
+					
+					if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+						continue;
+					}
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.
