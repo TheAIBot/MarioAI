@@ -113,6 +113,7 @@ public class AStar {
 					
 					if (sn.ticksOfInvincibility == 0) {
 						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+							if (sn.lives == 1) continue; // if Mario would die if he hits an enemy
 							penalty = PENALTY_SCORE;
 						}
 					}

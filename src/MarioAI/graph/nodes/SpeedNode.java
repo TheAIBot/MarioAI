@@ -28,7 +28,8 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
 	
-	public int ticksOfInvincibility = 0;
+	public int ticksOfInvincibility = 32; // source: Mario.java line 596
+	public int lives = 3;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -105,12 +106,14 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
 		int i = parent.ticksOfInvincibility;
+		
 		if (i >= moveInfo.getPositions().length) {
 			this.ticksOfInvincibility -= moveInfo.getPositions().length;
 			return false;
 		} else {
 			this.ticksOfInvincibility = 0;
 		}
+		
 		boolean hasEnemyCollision = false;
 		for (; i < moveInfo.getPositions().length; i++) {
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
@@ -136,6 +139,8 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 //			
 //			currentTick++;
 //		}
+		
+		if (hasEnemyCollision) lives--;
 		
 		return hasEnemyCollision;
 	}
