@@ -406,10 +406,33 @@ public class TestAStar {
 //	}
 	
 	/**
-	 * Check that no path exists if in a narrow tunnel with an enemy
+	 * Check that no path exists if in a narrow tunnel with an enemy when life is 1
 	 */
 	@Test
-	public void testTunnelWithEnemy() {
+	public void testTunnelWithEnemyOneLife() {
+		setup("straightTunnel", false);
+		TestTools.setMarioPosition(observation, 2, 12);
+		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
+		TestTools.runOneTick(observation);
+		//TestTools.renderLevel(observation);
+		world.update(observation);
+		
+		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
+		//assertNull(path);
+		assertNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway eventhough the fscore is high.
+		
+//		boolean hasHitEnemy = false;
+//		for (DirectedEdge edge : path) {
+//			if (edge.getMoveInfo().hasCollisions(edge.source, world));
+//		}
+	}
+	
+	/**
+	 * Check that Mario can go through an enemy because there is no alternative path
+	 */
+	@Test
+	public void testTunnelWithEnemyHasToGo() {
 		setup("straightTunnel", false);
 		TestTools.setMarioPosition(observation, 2, 12);
 		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
