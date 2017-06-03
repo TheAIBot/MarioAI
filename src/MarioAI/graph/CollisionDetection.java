@@ -40,15 +40,23 @@ public class CollisionDetection {
 		//TODO find out why,
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16,
 															    (sourceNode.yPos - currentOffset.y) * 16 - 1);
+		//System.out.println();
 		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
+		//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.
 		if (lastYValue == futureOffset.y) {
-			return !move(currentPosition, xa, 0);
+			final boolean returnValue = !move(currentPosition, xa, 0);
+			//System.out.println("New position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
+			//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
+			return returnValue;
+			
 		}
 		else {
-			return !move(currentPosition, xa, 0) || 
-					 !move(currentPosition, 0, ya);
+			final boolean returnValue = !move(currentPosition, xa, 0) || !move(currentPosition, 0, ya);
+			//System.out.println("New position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
+			//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
+			return returnValue;
 		}
 	}
 	
@@ -155,11 +163,12 @@ public class CollisionDetection {
 			Node[] column = world.getColumn(x);
 			if (column != null && y >= 0 && y <= 15) { //TODO (*)Check correct null check
 				if (column[y] == null) {
-					return false;
+					return false; //Can't block if it is air.
 				}
-				boolean blocking = ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_ALL) > 0;
-				blocking |= (ya > 0) && ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_UPPER) > 0;
-				blocking |= (ya < 0) && ((TILE_BEHAVIORS[column[y].type & 0xff]) & BIT_BLOCK_LOWER) > 0;
+				byte block = column[y].type;
+				boolean blocking = ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_ALL) > 0;
+				blocking |= (ya > 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_UPPER) > 0;
+				blocking |= (ya < 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
 			} else {
 				return false;//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check

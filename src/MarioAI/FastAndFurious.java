@@ -7,6 +7,7 @@ import MarioAI.enemy.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
@@ -87,7 +88,6 @@ public class FastAndFurious implements Agent {
 				DebugDraw.drawPathMovement(observation, newestPath);
 				DebugDraw.drawAction(observation, action);
 				//TestTools.renderLevel(observation);
-				//System.out.println();
 			}
 		}
 		tickCount++;

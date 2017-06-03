@@ -3,12 +3,14 @@ package ch.idsia.scenarios;
 import MarioAI.FastAndFurious;
 import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
+import tests.UnitTestAgent;
 
 public class Play {
 
@@ -18,12 +20,13 @@ public class Play {
 		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
+			//Agent controller = new UnitTestAgent();
+			//((UnitTestAgent) controller).action[0] = true;
 			//Agent controller = new HumanKeyboardAgent();
-			// Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("jumpLevels/smallPillar.lvl", controller, true);
-			TestTools.setMarioPosition(observation, 6, 8);
+			Environment observation = TestTools.loadLevel("testForceRunIntoWall.lvl", controller, true);
+			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
@@ -73,7 +76,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(1);
+	        options.setLevelDifficulty(2);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

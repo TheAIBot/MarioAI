@@ -129,7 +129,7 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		final int jumpType = 1; //it is a jump edge type
 		//Its jump height. Max is 4 min is 0, giving 3 bits.
 		//3 plus 1 but for jump type 
-		final int jumpHeight = ((ceiledTopPointY - (int)source.y) & 0xf) << 2; 
+		final int jumpHeight = ((Math.round(topPointY) - (int)source.y) & 0xf) << 2; 
 		return jumpHeight | jumpType;
 	}
 	

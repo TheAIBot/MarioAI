@@ -166,8 +166,13 @@ public class MovementInformation{
 		}
 	}
 
+	public static int edgeCounter = 1;
+	
 	public boolean hasCollisions(SpeedNode sourceNode) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
+		//System.out.println("\n");
+		//System.out.println("Edge " + edgeCounter + ": \n");
+		edgeCounter++;
 		final float lastYValue = positions[positions.length -1].y;
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];

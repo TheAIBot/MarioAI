@@ -425,17 +425,6 @@ public class TestAStar {
 		TestTools.setMarioPosition(observation, 3, 12);
 		TestTools.runOneTick(observation);
 
-<<<<<<< HEAD
-		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-		DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-		DebugDraw.drawEdges(observation, graph.getLevelMatrix());
-		DebugDraw.drawMarioReachableNodes(observation, graph);
-		DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
-		graph.update(observation);		
-		Node orignalMarioNode = graph.getMarioNode(observation);
-		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
-		Node[][] level = graph.getLevelMatrix();
-=======
 		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 		DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
 		DebugDraw.drawEdges(observation, world.getLevelMatrix());
@@ -444,10 +433,9 @@ public class TestAStar {
 		world.update(observation);		
 		Node orignalMarioNode = world.getMarioNode(observation);
 		edgeCreator.setMovementEdges(world, orignalMarioNode);		
-
->>>>>>> tests
+		Node[][] level = world.getLevelMatrix();
 		TestTools.renderLevel(observation);
-		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
+		//edgeCreator.setMovementEdges(world, orignalMarioNode);		
 		
 		Node[] originalGoalNodes = world.getGoalNodes(0);
 		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
