@@ -73,7 +73,7 @@ public class Play {
 	        //options.setLevelRandSeed(860788790);
 	        //options.setLevelRandSeed(1145934057);
 	        //options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
-	        options.setLevelRandSeed(1585046168);
+	        //options.setLevelRandSeed(1585046168);
 	        //options.setLevelRandSeed(3261372);
 	        //options.setLevelRandSeed(41);
 	        //options.setLevelRandSeed(42);

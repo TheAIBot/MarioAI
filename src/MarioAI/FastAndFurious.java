@@ -97,27 +97,37 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				if (enemyPredictor.hasNewEnemySpawned()) {
 					System.out.println("Reason: New enemies");
 				}
+				if (marioController.canUpdatePath) {
+					System.out.println("Reason: Edge finished");
+				}
 				if (pathCreator.getBestPath() == null) {
 					System.out.println("Reason: No path");
 				}
 				
 				if (pathCreator.isRunning) {
+					final long startTime = System.currentTimeMillis();
 					pathCreator.stop();
 					pathCreator.updateBestPath();
+					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
 					System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning && 
 					 pathCreator.getBestPath() != null && 
 					 pathCreator.getBestPath().size() > 0) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					final long startTime = System.currentTimeMillis();
 					startFindingPathFromPreviousPath(observation);
 					System.out.println("Tick: " + tickCount + " Started\n");
+					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
 				}
 				if (!pathCreator.isRunning && 
 					(pathCreator.getBestPath() == null || 
 					 pathCreator.getBestPath().size() == 0)) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					final long startTime = System.currentTimeMillis();
 					findPath(observation);
+					System.out.println("Failed to find path. Restarting.");
+					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
 				}
 				
 				

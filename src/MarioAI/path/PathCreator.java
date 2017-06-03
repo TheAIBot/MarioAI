@@ -165,6 +165,7 @@ public class PathCreator {
 			if (paths[i].isBestPath) {
 				paths[i].usePath();
 				bestPath = paths[i];
+				System.out.println("Updated best path");
 				return;
 			}
 		}
@@ -174,11 +175,15 @@ public class PathCreator {
 			//with the highest granularity
 			paths[paths.length - 1].usePath();
 			bestPath = paths[paths.length - 1];	
+			System.out.println("Updated best path");
+		}
+		else {
+			bestPath.path.remove(0);
 		}
 	}
 	
 	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
-		if (newPotentialPath == null) {
+		if (newPotentialPath.path == null) {
 			return false;
 		}
 		if (!newPotentialPath.isBestPath && 

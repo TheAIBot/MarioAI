@@ -113,8 +113,8 @@ public class MarioControls {
 			}
 			
 			if (prevEdge == null ||
-				!next.getMoveInfo().equals(prevEdge.getMoveInfo()) ||
-				!next.equals(prevEdge)) {
+				!next.equals(prevEdge) ||
+				!next.getMoveInfo().equals(prevEdge.getMoveInfo())) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
 			}
