@@ -29,7 +29,7 @@ public class PathCreator {
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
-	private ArrayList<DirectedEdge> bestPath = null;
+	private AStarPath bestPath = null;
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private final CompletableFuture<Boolean>[] runningTasks;
@@ -141,9 +141,9 @@ public class PathCreator {
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
-		if (shouldUpdateToNewPath(path.path)) {
+		if (shouldUpdateToNewPath(path)) {
 			path.usePath();
-			bestPath = path.path;	
+			bestPath = path;	
 		}
 	}
 	
@@ -160,30 +160,34 @@ public class PathCreator {
 		for (int i = aStars.length - 1; i >= 0; i--) {
 			if (paths[i].isBestPath) {
 				paths[i].usePath();
-				bestPath = paths[i].path;
+				bestPath = paths[i];
 				return;
 			}
 		}
 		
-		if (shouldUpdateToNewPath(paths[paths.length - 1].path)) {
+		if (shouldUpdateToNewPath(paths[paths.length - 1])) {
 			//Otherwise chose the path from the astar
 			//with the highest granularity
 			paths[paths.length - 1].usePath();
-			bestPath = paths[paths.length - 1].path;	
+			bestPath = paths[paths.length - 1];	
 		}
 	}
 	
-	private boolean shouldUpdateToNewPath(ArrayList<DirectedEdge> newPotentialPath) {
+	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
 		if (newPotentialPath == null) {
 			return false;
 		}
-		else {
-			return true;
+		if (!newPotentialPath.isBestPath && 
+			bestPath.isBestPath &&
+			bestPath.path.size() > 1) {
+			return false;
 		}
+		
+		return true;
 	}
 	
 	public ArrayList<DirectedEdge> getBestPath() {
-		return bestPath;
+		return bestPath == null ? null : bestPath.path;
 	}
 	
 	public void syncWithRealWorld(World realWorld, EnemyPredictor realEnemyPredictor) {
