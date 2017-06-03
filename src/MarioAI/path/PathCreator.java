@@ -2,6 +2,7 @@ package MarioAI.path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorService;
@@ -198,4 +199,13 @@ public class PathCreator {
 		removeGoalFrame();
 		isRunning = false;
 	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return aStars[aStars.length-1].getSpeedNodes();
+	}
+	
+	public int getBlockingGranularity() {
+		return aStars[aStars.length-1].hashGranularity;
+	}
+	
 }

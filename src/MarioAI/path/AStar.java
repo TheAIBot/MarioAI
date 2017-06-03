@@ -8,6 +8,7 @@ import java.util.PriorityQueue;
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
@@ -23,12 +24,12 @@ public class AStar {
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 	
 	private SpeedNode currentBestPathEnd = null;
-	private final int hashGranularity;
+	public final int hashGranularity;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
 	
-	private static final int PENALTY_SCORE = 1000; // arbitrary high value;
+	private static final int PENALTY_SCORE = 9000; // arbitrary high value;
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
@@ -64,9 +65,8 @@ public class AStar {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);
 			
-			int penalty = 0;
-			
 			synchronized (lockBestSpeedNode) {
+				
 				final SpeedNode current = openSet.remove();
 				openSetMap.remove(current.hash);
 				
@@ -86,7 +86,7 @@ public class AStar {
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
 				// Explore each neighbor of current node
-				for (DirectedEdge neighborEdge : current.node.getEdges()) {			
+				for (DirectedEdge neighborEdge : current.node.getEdges()) {
 					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
 					
 					//If a similar enough node has already been run through
@@ -111,12 +111,21 @@ public class AStar {
 						continue;
 					}
 					
-					if (sn.ticksOfInvincibility == 0) {
-						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-							if (sn.lives == 1) continue; // if Mario would die if he hits an enemy
-							penalty = PENALTY_SCORE;
+					int penalty = 0;
+					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+							continue;
 						}
-					}
+						
+						if (sn.ticksOfInvincibility == 0) {
+							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+								if (sn.lives == 1) {
+									continue; // if Mario would die if he hits an enemy
+								}
+								penalty = PENALTY_SCORE;
+							}
+						}
+					}					
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.
@@ -126,8 +135,6 @@ public class AStar {
 					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(snEndHash, sn);
-					
-					penalty = 0;
 				}	
 			}
 		}
