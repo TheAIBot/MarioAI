@@ -78,7 +78,7 @@ public class TestMarioMovements {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
-		final Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
+		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());

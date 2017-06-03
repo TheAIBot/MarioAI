@@ -28,6 +28,10 @@ public class CollisionDetection {
 	
 	
 	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
+		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
+	}
+	
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -37,8 +41,8 @@ public class CollisionDetection {
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		//TODO find out why,
-		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16,
-															    (sourceNode.yPos - currentOffset.y) * 16 - 1);
+		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
+															     (startY - currentOffset.y) * 16 - 1);
 		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.

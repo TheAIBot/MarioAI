@@ -88,6 +88,7 @@ public class FastAndFurious implements Agent {
 				}
 				
 				
+				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
