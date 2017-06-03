@@ -114,7 +114,7 @@ public class TestTools {
 	public static Sprite spawnEnemy(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
-		final float y = mapY * 16;
+		final float y = mapY * 16 - 1;
 		
 		Sprite enemy = null;
 		
