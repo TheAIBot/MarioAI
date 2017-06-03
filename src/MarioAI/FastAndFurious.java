@@ -106,10 +106,18 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.updateBestPath();
 					System.out.println("Tick: " + tickCount + " Stopped");
 				}
-				if (!pathCreator.isRunning) {
+				if (!pathCreator.isRunning && 
+					 pathCreator.getBestPath() != null && 
+					 pathCreator.getBestPath().size() > 0) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					startFindingPathFromPreviousPath(observation);
 					System.out.println("Tick: " + tickCount + " Started\n");
+				}
+				if (!pathCreator.isRunning && 
+					(pathCreator.getBestPath() == null || 
+					 pathCreator.getBestPath().size() == 0)) {
+					pathCreator.syncWithRealWorld(world, enemyPredictor);
+					findPath(observation);
 				}
 				
 				
