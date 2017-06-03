@@ -20,8 +20,6 @@ import ch.idsia.mario.environments.Environment;
 
 public class TestMarioMovements {
 	
-	private int hashNumber = 0;
-	
 	@Test
 	public void testRightMovement() {
 		testRightSpeed(1);
@@ -38,7 +36,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, 0, 0, 10, world);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceToMove, 0, 0, 10, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -62,7 +60,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, -distanceToMove, 0, 0, 10, world);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, -distanceToMove, 0, 0, 10, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -100,7 +98,7 @@ public class TestMarioMovements {
 		}
 		
 		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
-		final ArrayList<DirectedEdge> path = createPath(startNode.x, startNode.y, moveVector, 0, 0, distanceToMove * REPEAT_COUNT, world);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startNode.x, startNode.y, moveVector, 0, 0, distanceToMove * REPEAT_COUNT, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -151,7 +149,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 1, world);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 1, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -175,7 +173,7 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, 0, pathLength, world);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, 0, pathLength, world);
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
@@ -186,7 +184,7 @@ public class TestMarioMovements {
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, i, 0, 0, j, world), createPath(0, 0, j, 0, 0, i, world));
+				comparePaths(PathHelper.createPath(0, 0, i, 0, 0, j, world), PathHelper.createPath(0, 0, j, 0, 0, i, world));
 			}
 		}	
 	}
@@ -197,7 +195,7 @@ public class TestMarioMovements {
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, -i, 0, 0, j, world), createPath(0, 0, -j, 0, 0, i, world));
+				comparePaths(PathHelper.createPath(0, 0, -i, 0, 0, j, world), PathHelper.createPath(0, 0, -j, 0, 0, i, world));
 			}
 		}	
 	}
@@ -221,58 +219,11 @@ public class TestMarioMovements {
 		
 		final int startY = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<DirectedEdge> path = createPath(3, startY, distanceX + 1, jumpHeight, 0, 40, world); 
+		ArrayList<DirectedEdge> path = PathHelper.createPath(3, startY, distanceX + 1, jumpHeight, 0, 40, world); 
 		
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 
-	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
-		int[] distanceXArray = new int[pathlength];
-		for (int i = 0; i < distanceXArray.length; i++) {
-			distanceXArray[i] = distanceX;
-		}
-		return createPath(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world);
-	}
-	
-	private ArrayList<DirectedEdge> createPath(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		
-		final Node startNode = new Node(startX, startY, (byte)0);
-		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX[0], heightDifference, jumpHeight, world);
-		path.add(speedNode.ancestorEdge);
-		
-		for (int i = 1; i < pathlength; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX[i], heightDifference, jumpHeight, world);
-			speedNode.use();
-			path.add(speedNode.ancestorEdge);
-		}
-		
-		return path;
-	}
-	
-	private SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight, World world) {
-		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
-		
-		DirectedEdge edge;
-		if (jumpHeight == 0) {
-			edge = new RunningEdge(startNode, endNode);
-		}
-		else {
-			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
-		}
-		
-		SpeedNode speedNode;
-		if (startSpeedNode != null) {
-			speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash(), world);
-		}
-		else {
-			speedNode = new SpeedNode(endNode, edge.source.x, 0, edge, getHash(), world);
-		}
-		speedNode.use();
-		
-		return speedNode;
-	}
-	
 	private void comparePaths(ArrayList<DirectedEdge> path1, ArrayList<DirectedEdge> path2) {
 		final ArrayList<Point2D.Float> positions1 = new ArrayList<Point2D.Float>();
 		final ArrayList<Boolean> xActions1 = new ArrayList<Boolean>();
@@ -413,9 +364,5 @@ public class TestMarioMovements {
 	
 	private boolean withinAcceptableError(float a, float b) {
 		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
-	}
-	
-	private int getHash() {
-		return hashNumber++;
 	}
 }
