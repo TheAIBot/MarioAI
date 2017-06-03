@@ -2,12 +2,18 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
@@ -187,10 +193,13 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	private void save(Environment observation) {
-		try(FileWriter writer = new FileWriter(saveStateFileName)){
-			final long seed = ((MarioComponent)observation).getLevelScene().getSeed();
-			writer.write(seed + " " + tickCount);
-		} catch (Exception e) {
+		final long seed = ((MarioComponent)observation).getLevelScene().getSeed();
+		String fileContent = seed + " " + tickCount;
+		
+		try {
+			Files.write(Paths.get(saveStateFileName), fileContent.getBytes(), StandardOpenOption.CREATE);
+			System.out.println("Saved game stat to file.");
+		} catch (IOException e) {
 			System.out.println("Failed to save game state.");
 		}
 	}
@@ -198,6 +207,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	private void delete() {
 		try {
 			Files.delete(Paths.get(saveStateFileName));
+			System.out.println("Deleted save state file.");
 		} catch (IOException e) {
 			System.out.println("Failed to delete save state.");
 		}
@@ -224,14 +234,17 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			synchronized (keyLock) {
 				unpauseForOneTick = pressed;	
 			}
+			break;
 		case KeyEvent.VK_I:
 			synchronized (keyLock) {
-				savePlace = true;	
+				savePlace = pressed;	
 			}
+			break;
 		case KeyEvent.VK_L:
 			synchronized (keyLock) {
-				deletePlace = true;
+				deletePlace = pressed;
 			}
+			break;
 		}
     }
     
