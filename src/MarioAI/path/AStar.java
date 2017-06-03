@@ -119,15 +119,19 @@ public class AStar {
 					// collision detection and invincibility handling 
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//							continue;
+//						}
+						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-								if (sn.lives == 1) {
+								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
 								penalty = PENALTY_SCORE;
 							}
 						}
-					}					
+					}
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.

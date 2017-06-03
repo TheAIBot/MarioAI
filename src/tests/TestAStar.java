@@ -62,21 +62,21 @@ public class TestAStar {
 		marioNode = world.getMarioNode(observation);
 	}
 	
-	public UnitTestAgent setupUnitTestAgent(String levelName) {
-		UnitTestAgent uagent = new UnitTestAgent();
-		observation = TestTools.loadLevel(levelName + ".lvl", uagent, false);
-		DebugDraw.resetGraphics(observation);
-		TestTools.runOneTick(observation);
-		world = new World();
-		edgeCreator = new EdgeCreator();
-		world.initialize(observation);
-		edgeCreator.setMovementEdges(world, world.getMarioNode(observation));
-		enemyPredictor = new EnemyPredictor();
-		marioNode = world.getMarioNode(observation);
-		marioControls = new MarioControls();
-		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-		return uagent;
-	}
+//	public UnitTestAgent setupUnitTestAgent(String levelName) {
+//		UnitTestAgent uagent = new UnitTestAgent();
+//		observation = TestTools.loadLevel(levelName + ".lvl", uagent, false);
+//		DebugDraw.resetGraphics(observation);
+//		TestTools.runOneTick(observation);
+//		world = new World();
+//		edgeCreator = new EdgeCreator();
+//		world.initialize(observation);
+//		edgeCreator.setMovementEdges(world, world.getMarioNode(observation));
+//		enemyPredictor = new EnemyPredictor();
+//		marioNode = world.getMarioNode(observation);
+//		marioControls = new MarioControls();
+//		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+//		return uagent;
+//	}
 	
 	/**
 	 * Test if A Star returns path with only Running Directed Edges on a flat level
@@ -180,7 +180,7 @@ public class TestAStar {
 			
 			for (SpeedNode speedNode : speedNodes.values()) {
 				if (!searchedNodes.contains(speedNode.hash)) {
-					int hashCode = speedNode.ancestorEdge.hashCode(); //speedNode.node.hashCode();
+					int hashCode = speedNode.ancestorEdge.hashCode(); // used to be: speedNode.node.hashCode();
 					if (numberOfNodesMap.containsKey(hashCode)) {
 						int number = numberOfNodesMap.get(hashCode);
 						numberOfNodesMap.put(hashCode, number+1);
@@ -410,9 +410,12 @@ public class TestAStar {
 	 */
 	@Test
 	public void testTunnelWithEnemyOneLife() {
-		setup("straightTunnel", false);
+		setup("straightTunnel", true);
+		
+		SpeedNode.MAX_MARIO_LIFE = 1; // make sure Mario will only have one life in this test (technically he will have more, but he will act as if he only had one)
+		
 		TestTools.setMarioPosition(observation, 2, 12);
-		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
+		TestTools.spawnEnemy(observation, 7, 12, -1, EnemyType.GREEN_KOOPA);
 		TestTools.runOneTick(observation);
 		//TestTools.renderLevel(observation);
 		world.update(observation);
@@ -421,18 +424,13 @@ public class TestAStar {
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		//assertNull(path);
 		assertNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway eventhough the fscore is high.
-		
-//		boolean hasHitEnemy = false;
-//		for (DirectedEdge edge : path) {
-//			if (edge.getMoveInfo().hasCollisions(edge.source, world));
-//		}
 	}
 	
 	/**
-	 * Check that Mario can go through an enemy because there is no alternative path
+	 * Check that Mario can go through an enemy because there is no alternative path assuming Mario has more than one life left
 	 */
 	@Test
-	public void testTunnelWithEnemyHasToGo() {
+	public void testTunnelWithEnemyMoreThanOneLife() {
 		setup("straightTunnel", false);
 		TestTools.setMarioPosition(observation, 2, 12);
 		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
@@ -443,18 +441,27 @@ public class TestAStar {
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		//assertNull(path);
-		assertNotNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway eventhough the fscore is high.
+		assertNotNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway, eventhough the fscore is high.
 		
-//		boolean hasHitEnemy = false;
-//		for (DirectedEdge edge : path) {
-//			if (edge.getMoveInfo().hasCollisions(edge.source, world));
-//		}
+		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		boolean hasHitEnemy = false;
+		for (DirectedEdge edge : path) {
+			SpeedNode sn = speedNodes.values().stream()
+											   .filter(x -> x.ancestorEdge.equals(edge))
+											   .findFirst().get();
+			if (edge.getMoveInfo().hasCollisions(sn, world)) hasHitEnemy = true;
+			else System.out.println("NOPE");
+		}
+		assertTrue(hasHitEnemy);
 	}
 	
 	@Test
 	public void testJumpStraightUp() {
 		setup("jumpLevels/jumpStraightUp", true);
-		TestTools.setMarioPosition(observation, 3, 12);
+		int marioBeginningXPos = 3;
+		int marioBeginningYPos = 12;
+		
+		TestTools.setMarioPosition(observation, marioBeginningXPos, marioBeginningYPos);
 		TestTools.runOneTick(observation);
 
 		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
@@ -473,10 +480,19 @@ public class TestAStar {
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNotNull(path);
 		
-		// Check the first elements in the path only consists of jumps
+		// --- Check the first elements in the path only consists of jumps
+		
 		assertTrue(path.get(0) instanceof JumpingEdge);
+		assertEquals(marioBeginningXPos, path.get(0).target.x);
+		assertEquals(marioBeginningYPos - 3, path.get(0).target.y);
+		
 		assertTrue(path.get(1) instanceof JumpingEdge);
+		assertEquals(marioBeginningXPos, path.get(1).target.x);
+		assertEquals(marioBeginningYPos - 2 * 3, path.get(1).target.y);
+		
 		assertTrue(path.get(2) instanceof JumpingEdge);
+		assertEquals(marioBeginningXPos, path.get(2).target.x);
+		assertEquals(marioBeginningYPos - 3 * 3, path.get(2).target.y);
 		
 		verifyPath(path, originalGoalNodes);
 	}

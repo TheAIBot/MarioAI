@@ -15,7 +15,7 @@ public class Play {
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new HumanKeyboardAgent();
@@ -42,7 +42,8 @@ public class Play {
 	        options.setNumberOfTrials(1);
 	        options.setMatlabFileName("");
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
-	        options.setLevelRandSeed(seed);
+	        //options.setLevelRandSeed(seed);
+	        options.setLevelRandSeed(1671739449);
 	        System.out.println("Seed = " + seed);
 	        
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
@@ -71,6 +72,7 @@ public class Play {
 1772112418
 232887628
 500432374 //Difficulty 2, fejl i collision engine
+1671739449 // gets stuck because cannot find path due to enemy (RED GOOMBA) 1/5th in
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.

@@ -30,8 +30,9 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	private final boolean isSpeedNodeUseable;
 	
 	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
+	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
-	public int lives = 3;
+	public int lives = MAX_MARIO_LIFE;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -114,9 +115,10 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		if (i >= moveInfo.getPositions().length) {
 			this.ticksOfInvincibility -= moveInfo.getPositions().length;
 			return false;
-		} else {
-			//this.ticksOfInvincibility = 0;
 		}
+//		else {
+//			//this.ticksOfInvincibility = 0;
+//		}
 		
 		currentTick += i;
 		boolean hasEnemyCollision = false;
@@ -148,11 +150,21 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 //			currentTick++;
 //		}
 		
-		if (hasEnemyCollision) lives--;
+		if (hasEnemyCollision) {
+			lives--;
+		}
 		
 		return hasEnemyCollision;
 	}
 	
+	/**
+	 * Old collision method. Momentarily only for ease of reference.
+	 * TODO remove this method
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return
+	 */
 	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
 		
