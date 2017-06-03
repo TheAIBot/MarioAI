@@ -73,8 +73,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
-		
-
 		//There are a lot of possible problems for a fall edge.
 		//TODO move below, when implemented
 		if (this.ancestorEdge instanceof FallEdge &&
