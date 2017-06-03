@@ -28,6 +28,8 @@ public class AStar {
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
 	
+	private static final int PENALTY_SCORE = 1000; // arbitrary high value;
+	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
 	}
@@ -61,6 +63,8 @@ public class AStar {
 		while (!openSet.isEmpty() && keepRunning) {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);
+			
+			int penalty = 0;
 			
 			synchronized (lockBestSpeedNode) {
 				final SpeedNode current = openSet.remove();
@@ -107,18 +111,23 @@ public class AStar {
 						continue;
 					}
 					
-					if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-						continue;
+					if (sn.ticksOfInvincibility == 0) {
+						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+							if (sn.lives == 1) continue; // if Mario would die if he hits an enemy
+							penalty = PENALTY_SCORE;
+						}
 					}
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.
 					openSet.remove(sn);
 					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
 					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(snEndHash, sn);
+					
+					penalty = 0;
 				}	
 			}
 		}

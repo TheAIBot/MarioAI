@@ -28,6 +28,9 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
 	
+	public int ticksOfInvincibility = 32; // source: Mario.java line 596
+	public int lives = 3;
+	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
@@ -43,17 +46,8 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	}
 	
 	public SpeedNode(Node node, float marioX, float vx, long hash) {
-		this.node = node;
-		this.moveInfo = null;
-		this.vx = vx;
-		this.parent = null;
-		this.parentXPos = node.x;
-		this.parentVx = 0;
-		this.ancestorEdge = null;
+		this(node, vx, hash);
 		this.xPos = marioX;
-		this.yPos = node.y;
-		this.isSpeedNodeUseable = true;
-		this.hash = hash;
 	}
 	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
@@ -111,18 +105,44 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
+		int i = parent.ticksOfInvincibility;
 		
-		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = parentXPos  + position.x;
-			final float y = parent.yPos - position.y;
+		if (i >= moveInfo.getPositions().length) {
+			this.ticksOfInvincibility -= moveInfo.getPositions().length;
+			return false;
+		} else {
+			this.ticksOfInvincibility = 0;
+		}
+		
+		boolean hasEnemyCollision = false;
+		for (; i < moveInfo.getPositions().length; i++) {
+			Point2D.Float currentPosition = moveInfo.getPositions()[i];
+			final float x = parentXPos  + currentPosition.x;
+			final float y = parent.yPos - currentPosition.y;
 			
 			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				return true;
+				ticksOfInvincibility = 10000;
+				hasEnemyCollision = true;
 			}
 			
 			currentTick++;
+			ticksOfInvincibility -= (ticksOfInvincibility > 0)? 1: 0;
 		}
-		return false;
+		
+//		for (Point2D.Float position : moveInfo.getPositions()) {
+//			final float x = parentXPos  + position.x;
+//			final float y = parent.yPos - position.y;
+//			
+//			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
+//				return true;
+//			}
+//			
+//			currentTick++;
+//		}
+		
+		if (hasEnemyCollision) lives--;
+		
+		return hasEnemyCollision;
 	}
 	
 	public MovementInformation getMoveInfo() {
