@@ -371,15 +371,29 @@ public class TestCollisionDetector {
 		world.initialize(observation);
 		
 		agent.action[Mario.KEY_LEFT] = true;
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 100; i++) {
 			TestTools.runOneTick(observation);
 		}
-		TestTools.runOneTick(observation);
 		
 		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world);
+		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
+		
+		
+		
+		
+		agent.action[Mario.KEY_LEFT] = false;
+		agent.action[Mario.KEY_RIGHT] = true;
+		for (int i = 0; i < 100; i++) {
+			TestTools.runOneTick(observation);
+		}
+		
+		marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world);
 		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 	}
 	
