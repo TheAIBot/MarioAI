@@ -1,5 +1,14 @@
 package MarioAI;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
@@ -11,21 +20,31 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 
-public class FastAndFurious implements Agent {
+public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	private final EdgeCreator grapher = new EdgeCreator();
 	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 1);
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	
 	public boolean DEBUG = true;
+	
+	private boolean pauseGame = false;
+	private boolean unpauseForOneTick = false;
+	private boolean savePlace = false;
+	private boolean deletePlace = false;
+	private boolean runToTick = false;
+	private int tickToRunTo = -1;
+	public static String saveStateFileName = "levelState.lvlst";
+	private Object keyLock = new Object();
 
 	public void reset() {
 		marioController.reset();
 	}
 	
 	public boolean[] getAction(Environment observation) {
+		executeKeyCommands(observation);
+		
 		boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
@@ -132,6 +151,94 @@ public class FastAndFurious implements Agent {
 		//long startTime = System.currentTimeMillis();
 		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioHeight);
 	}
+	
+	private void executeKeyCommands(Environment observation) {
+		synchronized (keyLock) {
+			unpauseForOneTick = false;
+			
+			if (savePlace) {
+				save(observation);
+				savePlace = false;
+			}
+			
+			if (deletePlace) {
+				delete();
+				deletePlace = false;
+			}
+		}
+		if (runToTick && tickToRunTo == tickCount) {
+			pauseGame = true;
+		}
+		while(pauseGame && !unpauseForOneTick) {
+			try {
+				Thread.sleep(10);
+				
+				if (savePlace) {
+					save(observation);
+					savePlace = false;
+				}
+				
+				if (deletePlace) {
+					delete();
+					deletePlace = false;
+				}
+			} catch (InterruptedException e) { }
+		}
+	}
+	
+	private void save(Environment observation) {
+		try(FileWriter writer = new FileWriter(saveStateFileName)){
+			final long seed = ((MarioComponent)observation).getLevelScene().getSeed();
+			writer.write(seed + " " + tickCount);
+		} catch (Exception e) {
+			System.out.println("Failed to save game state.");
+		}
+	}
+	
+	private void delete() {
+		try {
+			Files.delete(Paths.get(saveStateFileName));
+		} catch (IOException e) {
+			System.out.println("Failed to delete save state.");
+		}
+	}
+	
+    public void keyPressed(KeyEvent e)
+    {
+        toggleKey(e.getKeyCode(), true);
+    }
+
+    public void keyReleased(KeyEvent e)
+    {
+        toggleKey(e.getKeyCode(), false);
+    }
+    
+    private void toggleKey(int keyCode, boolean pressed) {
+    	switch (keyCode) {
+		case KeyEvent.VK_P:
+			if (pressed) {
+				pauseGame = !pauseGame;	
+			}
+			break;
+		case KeyEvent.VK_O:
+			synchronized (keyLock) {
+				unpauseForOneTick = pressed;	
+			}
+		case KeyEvent.VK_I:
+			synchronized (keyLock) {
+				savePlace = true;	
+			}
+		case KeyEvent.VK_L:
+			synchronized (keyLock) {
+				deletePlace = true;
+			}
+		}
+    }
+    
+    public void runToTick(int tick) {
+    	tickToRunTo = tick;
+    	runToTick = true;
+    }
 
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;

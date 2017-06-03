@@ -1153,4 +1153,8 @@ public class LevelScene extends Scene implements SpriteContext
 
     public int getTimeLeft() {        return timeLeft / 15;    }
 
+    public long getSeed() {
+    	return levelSeed;
+    }
+    
 }

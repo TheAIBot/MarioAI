@@ -1,5 +1,11 @@
 package ch.idsia.scenarios;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import MarioAI.FastAndFurious;
 import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
@@ -33,7 +39,7 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
-	        Agent controller = new FastAndFurious();
+			FastAndFurious controller = new FastAndFurious();
 	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
@@ -44,6 +50,21 @@ public class Play {
 	        options.setMatlabFileName("");
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
+	        if (new File(FastAndFurious.saveStateFileName).exists()) {
+	        	String fileContent = null;
+				try {
+					fileContent = Files.readAllLines(Paths.get(FastAndFurious.saveStateFileName)).get(0);
+					
+					final long loadedSeed = Long.parseLong(fileContent.split(" ")[0]);
+					final int tick = Integer.parseInt(fileContent.split(" ")[1]);
+					
+					controller.runToTick(tick);
+					options.setLevelRandSeed((int)loadedSeed);
+					options.setMaxFPS(true);
+				} catch (IOException e) {
+					System.out.println("Failed to load level state");
+				}
+			}
 	        System.out.println("Seed = " + seed);
 	        
 	        //options.setLevelRandSeed(898452612); //Difficulty 1

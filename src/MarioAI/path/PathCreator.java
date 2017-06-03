@@ -74,6 +74,10 @@ public class PathCreator {
 	}
 	
 	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+		if (isRunning) {
+			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
+		}
+		
 		isRunning = true;
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -196,6 +200,10 @@ public class PathCreator {
 	}
 	
 	public void stop() {
+		if (!isRunning) {
+			throw new Error("PathCreator wasn't running. Start PathCreator before stopping it again.");
+		}
+		
 		for (AStar aStar : aStars) {
 			aStar.stop();
 		}
