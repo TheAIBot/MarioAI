@@ -56,7 +56,8 @@ public class FastAndFurious implements Agent {
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned() ||
 				 pathCreator.getBestPath() == null) && 
-				marioController.canUpdatePath) 
+				marioController.canUpdatePath || 
+				!pathCreator.isRunning) 
 			{
 				/*
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
