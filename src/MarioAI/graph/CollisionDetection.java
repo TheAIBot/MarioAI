@@ -13,12 +13,12 @@ public class CollisionDetection {
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
-   public static final int BIT_BLOCK_LOWER = 1 << 2;   
+    public static final int BIT_BLOCK_LOWER = 1 << 2;   
 
-   public static byte[] TILE_BEHAVIORS = new byte[256];
+    public static final byte[] TILE_BEHAVIORS = new byte[256];
    	//Test seed: 3261372
-	public static byte[] TILE_CONVERTER 		 = new byte[]{16,21,34,  9,-74,11};
-	public static byte[] TILE_CONVERTER_MARKER = new byte[]{16,21,0 ,-10,-11,20};
+	public static final byte[] TILE_CONVERTER 	     = new byte[]{16,21,34,  9,-74,11};
+	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16,21, 0,-10,-11,20};
 	
 	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
 		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
