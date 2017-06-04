@@ -24,6 +24,7 @@ import ch.idsia.mario.engine.sprites.Shell;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
+import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.EvaluationOptions;
 
 public class TestTools {
@@ -36,6 +37,11 @@ public class TestTools {
 	
 	public static void runWholeLevel(Environment observation) {
 		((MarioComponent) observation).run1(0, 1);
+	}
+	
+	public static int runWholeLevelWillWin(Environment observation) {
+		EvaluationInfo ei = ((MarioComponent) observation).run1(0, 1);
+		return ei.marioStatus;
 	}
 	
 	public static byte[][] getLevelMap(Environment observation)
@@ -112,7 +118,7 @@ public class TestTools {
 	public static Sprite spawnEnemy(Environment observation, int mapX, int mapY, int direction, EnemyType enemyType) {
 		final LevelScene world = ((MarioComponent)observation).getLevelScene();
 		final float x = mapX * 16;
-		final float y = mapY * 16;
+		final float y = mapY * 16 - 1;
 		
 		Sprite enemy = null;
 		

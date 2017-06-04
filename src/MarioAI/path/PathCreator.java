@@ -2,6 +2,7 @@ package MarioAI.path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,7 +126,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blokingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -212,4 +213,13 @@ public class PathCreator {
 		removeGoalFrame();
 		isRunning = false;
 	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return aStars[aStars.length-1].getSpeedNodes();
+	}
+	
+	public int getBlockingGranularity() {
+		return aStars[aStars.length-1].hashGranularity;
+	}
+	
 }

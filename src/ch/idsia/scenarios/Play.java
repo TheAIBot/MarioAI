@@ -33,6 +33,9 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
+			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
@@ -69,7 +72,6 @@ public class Play {
 	        System.out.println("Seed = " + seed);
 	        options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
-	        		//hahahaha
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
 	        //options.setLevelRandSeed(860788790);
 	        //options.setLevelRandSeed(1145934057);
@@ -94,6 +96,7 @@ public class Play {
 1772112418
 232887628
 500432374 //Difficulty 2, fejl i collision engine
+1671739449 // gets stuck because cannot find path due to enemy (RED GOOMBA) 1/5th in
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
