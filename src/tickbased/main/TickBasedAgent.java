@@ -14,20 +14,20 @@ public class TickBasedAgent implements Agent {
 	
 	AStarTickBased aStar;
 	Problem problem;
+	final int MAX_ALLOWED_RUN_TIME = 42;
 	
 	List<Action> plan;
 	Iterator<Action> iter;
+	boolean finishedNewRun = true;
 	
 	public TickBasedAgent() {
 		reset();
 	}
 
 	public boolean[] getAction(Environment observation) {
-		byte[][] worldScene = observation.getLevelSceneObservationZ(0);
-    	float[] enemyPositions = observation.getEnemiesFloatPos();
-		float[] marioPos = observation.getMarioFloatPos();
+		long startTime = System.currentTimeMillis();
+		updateLevel(observation);
 		
-		boolean finishedNewRun = true;
 		if (finishedNewRun) {
 			iter = plan.iterator();
 			finishedNewRun = false;
@@ -41,11 +41,21 @@ public class TickBasedAgent implements Agent {
 	        return action;
 		}
 		
-		return ((MarioAction) (iter.next())).action;
+		int timeLeft = MAX_ALLOWED_RUN_TIME - (int)(System.currentTimeMillis() - startTime);
 		
 		//aStar.runAStar(problem);
+		
+		return ((MarioAction) (iter.next())).action;
 	}
 	
+	private void updateLevel(Environment observation) {
+		byte[][] worldScene = observation.getLevelSceneObservationZ(0);
+    	float[] enemyPositions = observation.getEnemiesFloatPos();
+		float[] marioPos = observation.getMarioFloatPos();
+		
+		
+	}
+
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;
 	}

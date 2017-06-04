@@ -27,7 +27,7 @@ public class AStarTickBased {
 		start.gScore = 0;
 		start.fScore = problem.heuristicFunction(start, goal);
 		
-		// Continue exploring as long as there are states in the state space, which have not been visited
+		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
 		while (!frontier.isEmpty()) {
 			SearchNode node = frontier.remove();
 			frontierMap.remove(node.hashCode());
@@ -36,7 +36,7 @@ public class AStarTickBased {
 			if (problem.goalTest(node.state)) {
 				return reconstructPath(node);
 			}
-
+			
 			// Current node has been explored
 			explored.add(node);
 			

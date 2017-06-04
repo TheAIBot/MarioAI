@@ -12,9 +12,12 @@ import tickbased.main.State;
 
 public class TickProblem extends Problem {
 
+	private static final float MAX_RIGHT = 200;
+
 	@Override
 	public List<Action> actions(State state) {
 		Node node = (Node) state;
+		
 		List<Action> actions = new ArrayList<Action>();
 
 		// move right
@@ -86,12 +89,12 @@ public class TickProblem extends Problem {
 	}
 
 	/**
-	 * Reached a location as far to the right as possible as seen so far
+	 * Reached a location as far to the right as possible
+	 * This will actually never occur, since there is not enough time nor information to complete this task
 	 */
 	@Override
-	public boolean goalTest(State goal) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean goalTest(State node) {
+		return ((Node) node).x > MAX_RIGHT;
 	}
 
 }

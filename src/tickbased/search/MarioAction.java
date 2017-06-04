@@ -7,8 +7,7 @@ public class MarioAction implements Action {
 	public final State parent;
 	public int hash;
 	
-	// action executed
-	public boolean[] action = new boolean[5];
+	public boolean[] action = new boolean[5]; // action executed
 	
 	public MarioAction(Node parent, boolean[] action) {
 		this.parent = parent;

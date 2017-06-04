@@ -1,32 +1,25 @@
 package tickbased.search;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import tickbased.game.world.LevelScene;
-import tickbased.main.Action;
 import tickbased.main.State;
 
 public class Node implements State {
 	
 	public LevelScene levelScene;
 
-	public float x, y; // coordinates for the current position in the graph
-	public List<Action> marioActions = new ArrayList<Action>(); //An arrayList (i.e. a dynamic array/table) is used rather than a linked list)
+	public float x, y; // coordinates for the position
+//	public List<Action> marioActions = new ArrayList<Action>();
 	public int hash;
-
-	public Node(float x, float y) {
-		this.x = x;
-		this.y = y;
-	}
 
 	public Node(LevelScene levelScene) {
 		this.levelScene = levelScene;
+		this.x = levelScene.mario.x;
+		this.y = levelScene.mario.y;
 	}
 
-	public void addEdge(MarioAction action) {
-		marioActions.add(action);
-	}
+//	public void addAction(MarioAction action) {
+//		marioActions.add(action);
+//	}
 	
 	public String toString() {
 		return "(" + x + "," + y + ")";
