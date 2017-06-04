@@ -12,6 +12,7 @@ import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
 public class SpeedNode implements Comparable<SpeedNode>, Function {
+
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
@@ -28,8 +29,10 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
 	
-	public int ticksOfInvincibility = 32; // source: Mario.java line 596
-	public int lives = 3;
+	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
+	public static int MAX_MARIO_LIFE = 3;
+	public int ticksOfInvincibility = 0;
+	public int lives = MAX_MARIO_LIFE;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -71,8 +74,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
-		
-
 		//There are a lot of possible problems for a fall edge.
 		//TODO move below, when implemented
 		if (this.ancestorEdge instanceof FallEdge &&
@@ -106,27 +107,36 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
 		int i = parent.ticksOfInvincibility;
+		this.ticksOfInvincibility = parent.ticksOfInvincibility;
+		parent.ticksOfInvincibility = 0;
 		
+		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
+		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
 		if (i >= moveInfo.getPositions().length) {
 			this.ticksOfInvincibility -= moveInfo.getPositions().length;
 			return false;
-		} else {
-			this.ticksOfInvincibility = 0;
 		}
+//		else {
+//			//this.ticksOfInvincibility = 0;
+//		}
 		
+		currentTick += i;
 		boolean hasEnemyCollision = false;
 		for (; i < moveInfo.getPositions().length; i++) {
+//			System.out.println(i + ", " + parent.ticksOfInvincibility);
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
 			
 			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				ticksOfInvincibility = 10000;
 				hasEnemyCollision = true;
+				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
 			}
 			
 			currentTick++;
-			ticksOfInvincibility -= (ticksOfInvincibility > 0)? 1: 0;
+			//ticksOfInvincibility -= (ticksOfInvincibility > 0) ? 1: 0;
+			
+//			System.out.println(ticksOfInvincibility);
 		}
 		
 //		for (Point2D.Float position : moveInfo.getPositions()) {
@@ -140,9 +150,35 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 //			currentTick++;
 //		}
 		
-		if (hasEnemyCollision) lives--;
+		if (hasEnemyCollision) {
+			lives--;
+		}
 		
 		return hasEnemyCollision;
+	}
+	
+	/**
+	 * Old collision method. Momentarily only for ease of reference.
+	 * TODO remove this method
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return
+	 */
+	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
+		int currentTick = startTime;
+		
+		for (Point2D.Float position : moveInfo.getPositions()) {
+			final float x = parentXPos  + position.x;
+			final float y = parent.yPos - position.y;
+			
+			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
+				return true;
+			}
+			
+			currentTick++;
+		}
+		return false;
 	}
 	
 	public MovementInformation getMoveInfo() {
