@@ -28,6 +28,9 @@ import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.engine.sprites.SpriteContext;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
+import MarioAI.debugGraphics.DebugDrawing;
+import MarioAI.debugGraphics.DebugLines;
+import MarioAI.debugGraphics.DebugPoints;
 
 public class LevelScene extends Scene implements SpriteContext {
 	private List<Sprite> sprites = new ArrayList<Sprite>();
@@ -1084,8 +1087,7 @@ public class LevelScene extends Scene implements SpriteContext {
 		return timeLeft / 15;
 	}
 
-	public long getSeed() {
-		return levelSeed;
-	}
-
+    public long getSeed() {
+    	return levelSeed;
+    }
 }

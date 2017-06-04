@@ -11,8 +11,6 @@ import org.junit.Assert;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyType;
-import MarioAI.enemySimuation.simulators.BulletBillSimulator;
-import MarioAI.enemySimuation.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;

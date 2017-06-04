@@ -74,7 +74,7 @@ public class TestGrapher {
 	public static World totalFlatland(World graph, Node marioNode) {
 		Node[][] level = graph.getLevelMatrix();
 		for (short i = 0; i < GRID_WIDTH; i++) {
-			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) 11); // TODO(*)
+			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) -11); // TODO(*)
 																// Error: try to set it to -11
 																//Check the same method in TestCollisonDetection.
 		}
@@ -208,7 +208,7 @@ public class TestGrapher {
 	public static void addWall(int height, int coloumn, int row, Node[][] levelMatrix, Node marioNode) {
 		for (short j = 1; j <= height; j++) {
 			levelMatrix[coloumn][row - j] = new Node(getXPositionFromColoumn(marioNode, coloumn),
-					(short) (row - j), (byte) 10);
+					(short) (row - j), (byte) -10);
 		}
 	}
 
@@ -289,6 +289,19 @@ public class TestGrapher {
 		}
 	}
 
+	public void testJumpDownLedge(){		
+		World graph = totalFlatland(flatlandWorld(), marioNode);
+		Node[][] levelMatrix = graph.getLevelMatrix();
+		//For any given pillar, at any given height, he should be able to jump down from it:
+		for (int column = 0; column < EdgeCreator.GRID_WIDTH; column++) {
+			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
+				addWall(marioNode.y, column, marioNode.y, levelMatrix, marioNode);				
+				grapher.setMovementEdges(graph, marioNode);
+				
+			}
+		}
+	}
+	
 	@Test
 	public void testNoJumpsThroughCeiling() {
 		// TODO add edge-cases

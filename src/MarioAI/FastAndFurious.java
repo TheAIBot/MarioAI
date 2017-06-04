@@ -2,16 +2,8 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -28,12 +20,12 @@ import ch.idsia.mario.environments.Environment;
 
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
-	private final EdgeCreator grapher = new EdgeCreator();
-	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 2);
-	private final MarioControls marioController = new MarioControls();
-	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
+	public final EdgeCreator grapher = new EdgeCreator();
+	public final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 2);
+	public final MarioControls marioController = new MarioControls();
+	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = true;
+	public boolean DEBUG = false;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -152,7 +144,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
 				DebugDraw.drawAction(observation, action);
 				//TestTools.renderLevel(observation);
-				//System.out.println();
 			}
 		}
 		tickCount++;

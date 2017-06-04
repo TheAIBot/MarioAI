@@ -9,11 +9,8 @@ import static org.junit.Assert.*;
 
 import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.environments.Environment;

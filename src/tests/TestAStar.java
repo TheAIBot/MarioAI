@@ -10,7 +10,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import MarioAI.Hasher;
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.JumpDirection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
@@ -37,40 +37,49 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
-//	Agent agent = new UnitTestAgent();
+//	FastAndFurious agent;
 //	Environment observation;
-//	World graph;
-//	EdgeCreator grapher;
+//	final float delta = MarioControls.ACCEPTED_DEVIATION; //0.05f;
+//	World world;
 //	EdgeCreator edgeCreator;
-//	final float delta = 0.05f;
 //	Node marioNode;
 //	EnemyPredictor enemyPredictor;
 //	AStar aStar;
 //	MarioControls marioControls;
 //	
 //	public void setup(String levelName) {
-//		setup(levelName, false, false);
+//		setup(levelName, false);
 //	}
 //	
-//	public void setup(String levelName, boolean showLevel, boolean withFastAndFurius) {
-//		if (withFastAndFurius) {
-//			agent = new FastAndFurious();
-//		} else agent = new UnitTestAgent();
-//		observation = TestTools.loadLevel("" + levelName + ".lvl", agent, showLevel);
+//	public void setup(String levelName, boolean showLevel) {
+//		agent = new FastAndFurious();
+//		observation = TestTools.loadLevel(levelName + ".lvl", agent, showLevel);
 //		DebugDraw.resetGraphics(observation);
 //		TestTools.runOneTick(observation);
-//		graph = new World();
+//		world = agent.world;
+//		edgeCreator = agent.grapher;
+//		enemyPredictor = agent.enemyPredictor;
+//		aStar = agent.aStar;
+//		marioControls = agent.marioController;
+//		marioNode = world.getMarioNode(observation);
+//	}
+//		
+//	public Agent setupUnitTestAgent(String levelName) {
+//		Agent agent = new UnitTestAgent();
+//		observation = TestTools.loadLevel(levelName + ".lvl", agent, false);
+//		DebugDraw.resetGraphics(observation);
+//		TestTools.runOneTick(observation);
+//		world = new World();
+//		CollisionDetection.setWorld(world);
 //		edgeCreator = new EdgeCreator();
-//		graph.initialize(observation);
-//		grapher = new EdgeCreator();
-//		grapher.setMovementEdges(graph, graph.getMarioNode(observation));
+//		world.initialize(observation);
+//		edgeCreator.setMovementEdges(world, world.getMarioNode(observation));
 //		enemyPredictor = new EnemyPredictor();
-//		marioNode = graph.getMarioNode(observation);
+//		marioNode = world.getMarioNode(observation);
 //		marioControls = new MarioControls();
 //		aStar = new AStar();
-//		new MarioControls();
 //		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-//		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
+//		return agent;
 //	}
 //	
 //	/**
@@ -79,7 +88,7 @@ public class TestAStar {
 //	@Test
 //	public void testAStarRunning() {
 //		setup("flat");
-//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
 //		assertNotNull(path);
 //		//He should run through the level:
 //		for (DirectedEdge directedEdge : path) {
@@ -95,25 +104,24 @@ public class TestAStar {
 //	public void testTakeFastestJump() {
 //		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
 //		//setup("flatWithJump", true, true);
-//		setup("flatWithJump", false, true);
-//		FastAndFurious fastAgent = (FastAndFurious) agent;
-//		List<DirectedEdge> path = fastAgent.getPath(observation);
+//		setup("flatWithJump", false);
+//		List<DirectedEdge> path = agent.getPath(observation);
 //		int numberOfActions = 1;
 //		int numberOfTicks = 0;
 //		DebugDraw.resetGraphics(observation);
-//		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+//		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 //		DebugDraw.drawPathMovement(observation, path);
 //		TestTools.renderLevel(observation);
 //		assertTrue(path != null);
 //		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
 //		Assert.fail("Test will run forever after this line, though it works as expected");
 //		while(numberOfActions <= 5){
-//			if (marioControls.canUpdatePath && graph.hasGoalNodesChanged() || 
+//			if (marioControls.canUpdatePath && world.hasGoalNodesChanged() || 
 //				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
 //				 numberOfActions++;
-//				 path = fastAgent.getPath(observation);
+//				 path = agent.getPath(observation);
 //				 DebugDraw.resetGraphics(observation);
-//				 DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+//				 DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 //				 DebugDraw.drawPathMovement(observation, path);
 //				 TestTools.renderLevel(observation);
 //				 assertTrue(path != null);
@@ -131,13 +139,13 @@ public class TestAStar {
 //	 */
 //	@Test
 //	public void testAStarJumping() {
-//		setup("TestAStarJump", false, false);
-//		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+//		setup("TestAStarJump", false);
+//		ArrayList<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
 //
 //		//TestTools.runOneTick(observation);
 //		assertTrue(path != null);
 //		
-//		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
+//		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 //		DebugDraw.drawPathMovement(observation, path);
 //		TestTools.renderLevel(observation);
 //		assertEquals(10, path.size());
@@ -156,18 +164,17 @@ public class TestAStar {
 //	
 //	@Test
 //	public void testNumberOfSpeedNodes() {
-//		setup("TestAStarJump", false, false);
+//		UnitTestAgent unitTestAgent = (UnitTestAgent) setupUnitTestAgent("TestAStarJump");
 //		
 //		Map<Long, SpeedNode> speedNodes = aStar.getSpeedNodes();
 //		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
 //		final int MAX_NUMBER_OF_SPEED_NODES = Hasher.FACTOR_NUMBER_OF_SPEED_NODES * 2 + 1;
 //		final int NUMBER_OF_TEST_TICKS = 100;
 //		final HashSet<Long>searchedNodes = new HashSet<Long>(); 
-//		UnitTestAgent unitTestAgent = (UnitTestAgent) agent;
 //		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 //			TestTools.runOneTick(observation);
 //			unitTestAgent.action[Mario.KEY_RIGHT] = true;
-//			aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+//			aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
 //			
 //			for (SpeedNode speedNode : speedNodes.values()) {
 //				if (!searchedNodes.contains(speedNode.hash)) {
@@ -191,11 +198,9 @@ public class TestAStar {
 //	
 //	@Test
 //	public void testJumpOverEnemy() {
-//		setup("testAStarEnemyJumpOver",false, false);
+//		setup("testAStarEnemyJumpOver",false);
 //		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
 //		
-//		EnemyPredictor enemyPredictor = new EnemyPredictor();
-//		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 //		TestTools.runOneTick(observation);
 //		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 //		TestTools.runOneTick(observation);
@@ -207,7 +212,7 @@ public class TestAStar {
 //		TestTools.runOneTick(observation);
 //		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 //		TestTools.renderLevel(observation);
-//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
 //		assertTrue(path != null);
 //		
 //		for (DirectedEdge edge : path) {
@@ -217,11 +222,9 @@ public class TestAStar {
 //
 //	@Test
 //	public void testCollideWithEnemy(){
-//		setup("testAStarEnemyJumpOver",false, false);
+//		setup("testAStarEnemyJumpOver",false);
 //		
 //		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
-//		EnemyPredictor enemyPredictor = new EnemyPredictor();
-//		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 //		TestTools.runOneTick(observation);
 //		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 //		TestTools.runOneTick(observation);
@@ -237,11 +240,11 @@ public class TestAStar {
 //		final int columnStart = 13;
 //		final int columnEnd = 15;
 //
-//		Node source = graph.getLevelMatrix()[columnStart][marioNode.y];
-//		Node target = graph.getLevelMatrix()[columnEnd][marioNode.y];
+//		Node source = world.getLevelMatrix()[columnStart][marioNode.y];
+//		Node target = world.getLevelMatrix()[columnEnd][marioNode.y];
 //		
 //		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
-//		marioNode = graph.getMarioNode(observation);
+//		marioNode = world.getMarioNode(observation);
 //		JumpingEdge polynomial = new JumpingEdge(null, null); 
 //		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
 //		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
@@ -263,11 +266,9 @@ public class TestAStar {
 //	
 //	@Test
 //	public void testNotCollideWithEnemy(){
-//		setup("testAStarEnemyJumpOver",true,false);
+//		setup("testAStarEnemyJumpOver",true);
 //		
 //		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
-//		EnemyPredictor enemyPredictor = new EnemyPredictor();
-//		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 //		TestTools.runOneTick(observation);
 //		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 //		TestTools.runOneTick(observation);
@@ -283,11 +284,11 @@ public class TestAStar {
 //		final int columnStart = 11;
 //		final int columnEnd = 13;
 //
-//		Node source = graph.getLevelMatrix()[columnStart][marioNode.y];
-//		Node target = graph.getLevelMatrix()[columnEnd][marioNode.y];
+//		Node source = world.getLevelMatrix()[columnStart][marioNode.y];
+//		Node target = world.getLevelMatrix()[columnEnd][marioNode.y];
 //		
 //		List<DirectedEdge> edges = new ArrayList<DirectedEdge>();
-//		marioNode = graph.getMarioNode(observation);
+//		marioNode = world.getMarioNode(observation);
 //		JumpingEdge polynomial = new JumpingEdge(null, null); 
 //		polynomial.setToJumpPolynomial(source, columnStart, 2, 4);
 //		edgeCreator.jumpAlongPolynomial(source, columnStart, polynomial, JumpDirection.RIGHT_UPWARDS, edges); 
@@ -313,12 +314,12 @@ public class TestAStar {
 //	 */
 //	@Test
 //	public void testAStarCanRunMoreThanOneTick() {
-//		setup("flat");
+//		setup("pit12345");
 //		
 //		// Should not find path in the given timespan
-//		final int TIME_ALLOWED = 5;
-//		Node[] goalNodesInBeginning = graph.getGoalNodes(0);
-//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+//		final int TIME_ALLOWED = 1;
+//		Node[] goalNodesInBeginning = world.getGoalNodes(0);
+//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
 //		assertTrue(path == null);
 //		ArrayList<DirectedEdge> pathSegment = aStar.getCurrentBestSegmentPath();
 //		
@@ -327,14 +328,14 @@ public class TestAStar {
 //		for (DirectedEdge directedEdge : pathSegment) {
 //			lastNode = directedEdge.target;
 //		}
-//		for (Node node : graph.getGoalNodes(0)) {
+//		for (Node node : world.getGoalNodes(0)) {
 //			assertNotEquals(lastNode, node);
 //		}
 //		
 //		// Let A* run many times - enough times to make it find a solution path 
 //		int c = 0;
 //		do {
-//			path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+//			path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
 //			c++;
 //			if (c >= 1000) {
 //				Assert.fail("AStar never finishes");
@@ -360,18 +361,27 @@ public class TestAStar {
 //	 */
 //	@Test
 //	public void testAStarRunMoreThanOneTickExtendPathSegment() {
-//		setup("flat");
+//		setup("miniMaze", true);
+//		TestTools.setMarioPosition(observation, 2, 12);
+//		TestTools.runOneTick(observation);
+//		world.update(observation);
 //		
 //		// This time limit should be short enough to not make A* able to finish in two runs, but still be able to make progress by extending path fragments
-//		final int TIME_ALLOWED = 1;
-//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
+//		final int TIME_ALLOWED = 3;
+//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, TIME_ALLOWED);
 //		
 //		// The path should not be a complete solution but should include some nodes
-//		assertTrue(path == null);
+//		assertNull(path);
 //		ArrayList<DirectedEdge> pathSegment = aStar.getCurrentBestSegmentPath();
+//		assertNotNull(pathSegment);
 //		assertTrue(pathSegment.size() > 0);
 //		
-//		path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
+//		path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, TIME_ALLOWED);
 //		//assertTrue(path == null);
 //		ArrayList<DirectedEdge> newPathSegment = aStar.getCurrentBestSegmentPath();
 //		assertTrue(newPathSegment.size() > pathSegment.size());
@@ -388,35 +398,36 @@ public class TestAStar {
 //	 */
 //	@Test
 //	public void testTunnelWithEnemy() {
-//		setup("straightTunnel", false, false);
+//		setup("straightTunnel", false);
 //		TestTools.setMarioPosition(observation, 2, 12);
 //		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
 //		TestTools.runOneTick(observation);
 //		//TestTools.renderLevel(observation);
-//		graph.update(observation);
+//		world.update(observation);
 //		
-//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, graph.getMarioNode(observation), graph.getGoalNodes(0), 0, enemyPredictor, 2);
+//		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2);
 //		assertNull(path);
 //	}
 //	
 //	@Test
 //	public void testJumpStraightUp() {
-//		setup("jumpLevels/jumpStraightUp", true, false);
+//		setup("jumpLevels/jumpStraightUp", true);
 //		TestTools.setMarioPosition(observation, 3, 12);
 //		TestTools.runOneTick(observation);
 //
-//		DebugDraw.drawGoalNodes(observation, graph.getGoalNodes(0));
-//		DebugDraw.drawBlockBeneathMarioNeighbors(observation, graph);
-//		DebugDraw.drawEdges(observation, graph.getLevelMatrix());
-//		DebugDraw.drawMarioReachableNodes(observation, graph);
-//		DebugDraw.drawNodeEdgeTypes(observation, graph.getLevelMatrix());
-//		graph.update(observation);		
-//		Node orignalMarioNode = graph.getMarioNode(observation);
-//		edgeCreator.setMovementEdges(graph, orignalMarioNode);		
-//
+//		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
+//		DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
+//		DebugDraw.drawEdges(observation, world.getLevelMatrix());
+//		DebugDraw.drawMarioReachableNodes(observation, world);
+//		DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
+//		world.update(observation);		
+//		Node orignalMarioNode = world.getMarioNode(observation);
+//		edgeCreator.setMovementEdges(world, orignalMarioNode);		
+//		Node[][] level = world.getLevelMatrix();
 //		TestTools.renderLevel(observation);
+//		//edgeCreator.setMovementEdges(world, orignalMarioNode);		
 //		
-//		Node[] originalGoalNodes = graph.getGoalNodes(0);
+//		Node[] originalGoalNodes = world.getGoalNodes(0);
 //		List<DirectedEdge> path = aStar.runMultiNodeAStar(observation, orignalMarioNode, originalGoalNodes, 0, enemyPredictor, 2);
 //		assertNotNull(path);
 //		
@@ -424,6 +435,13 @@ public class TestAStar {
 //		assertTrue(path.get(0) instanceof JumpingEdge);
 //		assertTrue(path.get(1) instanceof JumpingEdge);
 //		assertTrue(path.get(2) instanceof JumpingEdge);
+//		//Check if he jumps straight up:
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y]		, path.get(0).source);
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 3]	, path.get(0).target);
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 3]	, path.get(1).source);
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 6]	, path.get(1).target);
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 6]	, path.get(2).source);
+//		assertEquals(level[EdgeCreator.GRID_WIDTH/2][orignalMarioNode.y - 9]	, path.get(2).target);
 //		
 //		verifyPath(aStar, path, originalGoalNodes);
 //	}
@@ -460,11 +478,11 @@ public class TestAStar {
 //	private void verifyMoveAlongEdge(AStar aStar, DirectedEdge edge) {
 //		final int maxTicksAllowedToRun = 50;
 //		int c = 0;
-//		while (graph.getMarioNode(observation) != edge.target) {
+//		while (world.getMarioNode(observation) != edge.target) {
 //			c++;
 //			TestTools.runOneTick(observation);
 //			TestTools.renderLevel(observation);
-//			graph.update(observation);
+//			world.update(observation);
 //			if (c >= maxTicksAllowedToRun) Assert.fail("Hueston we have a problem. Never reaches destination."); 
 //		}
 //		
@@ -473,8 +491,6 @@ public class TestAStar {
 //		assertEquals(correspondingSpeedNode.xPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 //		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 //	}
-//	
-//	
 }
 
 
