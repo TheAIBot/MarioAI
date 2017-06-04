@@ -11,7 +11,7 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
-public class SpeedNode implements Comparable<SpeedNode>, Function {
+public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
@@ -175,10 +175,6 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
 	}
 
-	public float f(float x) {
-		return moveInfo.f(x);
-	}
-	
 	private boolean collissionDetector(){
 		boolean hasCollided = false;
 		return hasCollided;

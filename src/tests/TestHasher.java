@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.Hasher;
+import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
@@ -17,27 +18,70 @@ import MarioAI.marioMovement.MarioControls;
 
 public class TestHasher {
 	
+	private final int LIMIT_X = 32;
+	private final int LIMIT_Y = 15;
+	
 	@Test
-	public void testNoOverlapJumpHashingAndRunningHashing() {
+	public void testNoOverlapDifferentEdgeHashing() {
 		List<Integer> allJumpingEdgesList = getAllPossibleJumpingEdgeHashcodes();
 		List<Integer> allRunningEdges = getAllPossibleRunningEdgeHashcodes();
+		List<Integer> allFallEdges = getAllPossibleFallEdgeHashcodes();
 		HashSet<Integer> allEdgesHashed = new HashSet<Integer>();
 		allEdgesHashed.addAll(allJumpingEdgesList);
 		allEdgesHashed.addAll(allRunningEdges);
-		assertEquals(allJumpingEdgesList.size() + allRunningEdges.size(), allEdgesHashed.size());
+		allEdgesHashed.addAll(allFallEdges);
+		assertEquals(allJumpingEdgesList.size() + allRunningEdges.size() + allFallEdges.size(), allEdgesHashed.size());
 		
 	}
 
+	private List<Integer> getAllPossibleFallEdgeHashcodes() {
+		final int expectedHashes =  (int) ((LIMIT_Y+1)*(LIMIT_X+1))*((LIMIT_X+1)*(LIMIT_Y+1)) * 2;
+		ArrayList<Integer> allFallEdgesHashes = new ArrayList<Integer>(expectedHashes);
+		
+		for (short sourceY = 0; sourceY <= LIMIT_Y; sourceY++) {
+			for (short sourceX = 0; sourceX <= LIMIT_X; sourceX++) {			
+				for (short targetY = 0; targetY <= LIMIT_Y; targetY++) {
+					for (short targetX = 0; targetX <= LIMIT_X; targetX++) {		
+						//Type does not matter
+						final Node source = new Node(sourceX, sourceY, (byte)10);
+						final Node target = new Node(targetX, targetY, (byte)10);
+						final FallEdge fall1 = new FallEdge(source, target, false);
+						final FallEdge fall2 = new FallEdge(source, target, true);
+						allFallEdgesHashes.add(fall1.hashCode());
+						allFallEdgesHashes.add(fall2.hashCode());
+					}
+				}			
+			}
+		}
+		assertEquals(expectedHashes, allFallEdgesHashes.size());
+		return allFallEdgesHashes;
+	}
+
+
+	@Test
+	public void testProperFallEdgeHashing() {
+		final HashSet<Integer> allFallEdgesHashed = new HashSet<Integer>();
+		
+		//adding the edges twice should give the same size unlees some hashes are the same
+		for (int i = 0; i < 2; i++) {
+			//Because of the small state space, brute force over the statespace will be used to check its correctness.
+			final List<Integer> allFallEdgesHashcodes = getAllPossibleFallEdgeHashcodes();
+			allFallEdgesHashed.addAll(allFallEdgesHashcodes);
+			assertEquals(allFallEdgesHashcodes.size(), allFallEdgesHashed.size());
+		}
+	}
+	
+
 	@Test
 	public void testProperJumpEdgeHashing() {
-		final HashSet<Integer> allRuningEdgesHashed = new HashSet<Integer>();
+		final HashSet<Integer> allJumpEdgesHashed = new HashSet<Integer>();
 		
 		//adding the edges twice should give the same size unlees some hashes are the same
 		for (int i = 0; i < 2; i++) {
 			//Because of the small state space, brute force over the statespace will be used to check its correctness.
 			final List<Integer> allJumpingEdgesHashcodes = getAllPossibleJumpingEdgeHashcodes();
-			allRuningEdgesHashed.addAll(allJumpingEdgesHashcodes);
-			assertEquals(allJumpingEdgesHashcodes.size(), allRuningEdgesHashed.size());
+			allJumpEdgesHashed.addAll(allJumpingEdgesHashcodes);
+			assertEquals(allJumpingEdgesHashcodes.size(), allJumpEdgesHashed.size());
 		}
 	}
 	
@@ -46,39 +90,39 @@ public class TestHasher {
 		final int limitX = 32;
 		final int limitJumpHeight = 4;
 		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (limitJumpHeight + 1) * 2;
-		ArrayList<Integer> allRunningEdgesHashes = new ArrayList<Integer>(expectedHashes);
+		ArrayList<Integer> allJumpingEdgesHashes = new ArrayList<Integer>(expectedHashes);
 		
-		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
-			for (short sourceX = 0; sourceX <= limitX; sourceX++) {			
-				for (short targetY = 0; targetY <= limitY; targetY++) {
-					for (short targetX = 0; targetX <= limitX; targetX++) {		
+		for (short sourceY = 0; sourceY <= LIMIT_Y; sourceY++) {
+			for (short sourceX = 0; sourceX <= LIMIT_X; sourceX++) {			
+				for (short targetY = 0; targetY <= LIMIT_Y; targetY++) {
+					for (short targetX = 0; targetX <= LIMIT_X; targetX++) {		
 						for (int JumpHeight = 0; JumpHeight <= limitJumpHeight; JumpHeight++) {
 							//Type does not matter
 							final Node source = new Node(sourceX, sourceY, (byte)10);
 							final Node target = new Node(targetX, targetY, (byte)10);
 							final JumpingEdge newPolynomial1 = new JumpingEdge(source,target, sourceY + JumpHeight, false);
 							final JumpingEdge newPolynomial2 = new JumpingEdge(source,target, sourceY + JumpHeight, true);
-							allRunningEdgesHashes.add(newPolynomial1.hashCode());
-							allRunningEdgesHashes.add(newPolynomial2.hashCode());
+							allJumpingEdgesHashes.add(newPolynomial1.hashCode());
+							allJumpingEdgesHashes.add(newPolynomial2.hashCode());
 						}						
 					}
 				}			
 			}
 		}
-		assertEquals(expectedHashes, allRunningEdgesHashes.size());
-		return allRunningEdgesHashes;
+		assertEquals(expectedHashes, allJumpingEdgesHashes.size());
+		return allJumpingEdgesHashes;
 	}
 
 	@Test
 	public void testProperRunningEdgeHashing() {
-		final HashSet<Integer> allRuningEdgesHashed = new HashSet<Integer>();
+		final HashSet<Integer> allRunningEdgesHashed = new HashSet<Integer>();
 		
-		//adding the edges twice should give the same size unlees some hashes are the same
+		//adding the edges twice should give the same size, unless some hashes are the same
 		for (int i = 0; i < 2; i++) {
 			//Because of the small state space, brute force over the statespace will be used to check its correctness.
 			final List<Integer> allRunningEdgesList = getAllPossibleRunningEdgeHashcodes();
-			allRuningEdgesHashed.addAll(allRunningEdgesList);
-			assertEquals(allRunningEdgesList.size(), allRuningEdgesHashed.size());
+			allRunningEdgesHashed.addAll(allRunningEdgesList);
+			assertEquals(allRunningEdgesList.size(), allRunningEdgesHashed.size());
 		}
 	}
 

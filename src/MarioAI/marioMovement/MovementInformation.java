@@ -10,7 +10,7 @@ import MarioAI.graph.Function;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
-public class MovementInformation implements Function{
+public class MovementInformation{
 	//vertical information
 	private final int totalTicksJumped;
 	
@@ -129,11 +129,6 @@ public class MovementInformation implements Function{
 		return positions;
 	}
 
-	@Override
-	public float f(float x) {
-		return 0;
-	}
-
 	public boolean[] getPressXButton() {
 		return pressXButton;
 	}
@@ -192,7 +187,6 @@ public class MovementInformation implements Function{
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
 		final float lastYValue = positions[positions.length - 1].y;
-		
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
 			if (CollisionDetection.isColliding(currentPosition, previousPosition, startX, startY, lastYValue, world)) {

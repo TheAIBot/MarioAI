@@ -180,7 +180,7 @@ public class TestCollisionDetector {
 		for (int height = 3; height <= 5; height++) { //Tested for different height of the ceilings
 			//Makes the ceiling
 			for (int i = 0; i < level.length; i++) {
-				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) 11);
+				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) -10);
 			}
 			final int currentHeight = height;
 			SpeedNode startNode = new SpeedNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
@@ -272,7 +272,7 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
 				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition, world);
@@ -320,7 +320,7 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top	. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
 				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode, lastYPosition, world);
@@ -366,7 +366,8 @@ public class TestCollisionDetector {
 		final UnitTestAgent agent = new UnitTestAgent();
 		final Environment observation = TestTools.loadLevel("testCollisionDetector/collisionBox.lvl", agent, true);
 		TestTools.setMarioXPosition(observation, 4);
-		TestTools.renderLevel(observation);
+		//TestTools.renderLevel(observation);
+		CollisionDetection.loadTileBehaviors();
 		final World world = new World();
 		world.initialize(observation);
 		
@@ -374,7 +375,8 @@ public class TestCollisionDetector {
 		for (int i = 0; i < 100; i++) {
 			TestTools.runOneTick(observation);
 		}
-		
+		TestTools.runOneTick(observation);
+		world.update(observation);
 		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		

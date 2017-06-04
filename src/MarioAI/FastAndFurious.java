@@ -19,19 +19,21 @@ import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import tests.TestTools;
 
 
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
-	private final EdgeCreator grapher = new EdgeCreator();
-	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 2);
-	private final MarioControls marioController = new MarioControls();
-	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
+	public final EdgeCreator grapher = new EdgeCreator();
+	public final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 2);
+	public final MarioControls marioController = new MarioControls();
+	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
 	public boolean DEBUG = true;
 	
@@ -152,7 +154,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
 				DebugDraw.drawAction(observation, action);
 				//TestTools.renderLevel(observation);
-				//System.out.println();
 			}
 		}
 		tickCount++;
