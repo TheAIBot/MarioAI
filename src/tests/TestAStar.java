@@ -2,7 +2,6 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -31,9 +30,6 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import MarioAI.path.AStar;
-import ch.idsia.ai.agents.Agent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestAStar {
@@ -495,6 +491,28 @@ public class TestAStar {
 		assertEquals(marioBeginningYPos - 3 * 3, path.get(2).target.y);
 		
 		verifyPath(path, originalGoalNodes);
+	}
+	
+	/**
+	 * Tests if Mario is making many low jumps instead of longer jumps, given that the ceiling only allows the former.
+	 */
+	@Test
+	public void testLowJumpCourse() {
+		setup("jumpLevels/semiAdvancedJumpingCourse", true);
+		TestTools.runOneTick(observation);
+		//TestTools.runWholeLevel(observation);
+		
+		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
+		assertNotNull(path);
+		
+		final int marioInitialXPos = 2;
+		assertTrue(path.size() <= 4);
+		for (int i = 0; i < path.size(); i++) {
+			DirectedEdge edge = path.get(i);
+			assertTrue(edge instanceof JumpingEdge);
+			assertEquals(edge.source.x, marioInitialXPos + i * 2);
+		}
 	}
 
 	/**
