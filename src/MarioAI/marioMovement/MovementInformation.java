@@ -4,8 +4,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.CollisionDetection;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 

@@ -9,7 +9,6 @@ import java.nio.file.StandardOpenOption;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;

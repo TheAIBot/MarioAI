@@ -1,8 +1,8 @@
-package MarioAI.graph;
+package MarioAI;
 
 import java.awt.geom.Point2D;
 import java.io.DataInputStream;
-import MarioAI.World;
+
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;

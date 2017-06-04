@@ -12,9 +12,9 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import MarioAI.CollisionDetection;
 import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
