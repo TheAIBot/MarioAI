@@ -2,33 +2,29 @@ package MarioAI.graph;
 
 import java.awt.geom.Point2D;
 import java.io.DataInputStream;
-import java.io.IOException;
-
-import com.sun.javafx.scene.paint.GradientUtils.Point;
-import com.sun.javafx.scene.traversal.Direction;
-
 import MarioAI.World;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.LevelScene;
-import ch.idsia.mario.engine.level.Level;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Sparkle;
 
 public class CollisionDetection {
-	private static World world;
 	public static final float MARIO_WIDTH = 4; //TODO Change depending on mario
 	public static final float MARIO_HEIGHT = 24; //(*)TODO Change depending on mario
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
-    public static final int BIT_BLOCK_LOWER = 1 << 2;   
+   public static final int BIT_BLOCK_LOWER = 1 << 2;   
 
-    public static byte[] TILE_BEHAVIORS = new byte[256];
+   public static byte[] TILE_BEHAVIORS = new byte[256];
    	//Test seed: 3261372
+	public static byte[] TILE_CONVERTER 		 = new byte[]{16,21,34,  9,-74,11};
+	public static byte[] TILE_CONVERTER_MARKER = new byte[]{16,21,0 ,-10,-11,20};
 	
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
+		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
+	}
 	
-	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
+	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -38,30 +34,19 @@ public class CollisionDetection {
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		//TODO find out why,
-		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + sourceNode.xPos) * 16,
-															    (sourceNode.yPos - currentOffset.y) * 16 - 1);
-		//System.out.println();
+		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
+															     (startY - currentOffset.y) * 16 - 1);
 		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
 		//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.
 		if (lastYValue == futureOffset.y) {
-			final boolean returnValue = !move(currentPosition, xa, 0);
-			//System.out.println("New position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
-			//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
-			return returnValue;
-			
+			return !move(currentPosition, xa, 0, world);
 		}
 		else {
-			final boolean returnValue = !move(currentPosition, xa, 0) || !move(currentPosition, 0, ya);
-			//System.out.println("New position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
-			//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
-			return returnValue;
+			return !move(currentPosition, xa, 0, world) || 
+					 !move(currentPosition, 0, ya, world);
 		}
-	}
-	
-	public static void setWorld(World newWorld){
-		world = newWorld;
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.
@@ -70,24 +55,24 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean move(Point2D.Float currentPosition, float xa, float ya) {
+	private static boolean move(Point2D.Float currentPosition, float xa, float ya, World world) {
 		while (xa > 8) {
-			if (!move(currentPosition, 8, 0))
+			if (!move(currentPosition, 8, 0, world))
 				return false;
 			xa -= 8;
 		}
 		while (xa < -8) {
-			if (!move(currentPosition, -8, 0))
+			if (!move(currentPosition, -8, 0, world))
 				return false;
 			xa += 8;
 		}
 		while (ya > 8) {
-			if (!move(currentPosition, 0, 8))
+			if (!move(currentPosition, 0, 8, world))
 				return false;
 			ya -= 8;
 		}
 		while (ya < -8) {
-			if (!move(currentPosition, 0, -8))
+			if (!move(currentPosition, 0, -8, world))
 				return false;
 			ya += 8;
 		}
@@ -96,28 +81,28 @@ public class CollisionDetection {
 
 		//We don't care if it is just one of the blocking that is true, or multiple, so they are joiuned together
 		if 			(ya > 0 && 
-						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0) || 
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, 0, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, 0, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world))) {
 			collide = true;
 		} 
 		if 	(ya < 0 && 
-				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya)) {
+				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) {
 			collide = true;
 		}
 		if 	(xa > 0 && 
-						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) || 
-						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) || 
+						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
 		if 	(xa < 0 &&
-						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya) ||
-						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya))) {
+						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) ||
+						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
 
@@ -153,7 +138,7 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya) {
+	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
 		int x = (int) (newX / 16);
 		int y = (int) (newY / 16);
 		//TODO check why this is necessary.
@@ -165,7 +150,7 @@ public class CollisionDetection {
 				if (column[y] == null) {
 					return false; //Can't block if it is air.
 				}
-				byte block = column[y].type;
+				byte block = convertType(column[y].type);
 				boolean blocking = ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_ALL) > 0;
 				blocking |= (ya > 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_UPPER) > 0;
 				blocking |= (ya < 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_LOWER) > 0;
@@ -176,6 +161,14 @@ public class CollisionDetection {
 		}
 	}
 	
+	public static byte convertType(byte type){
+		for (int i = 0; i < TILE_CONVERTER.length; i++) {
+			if (TILE_CONVERTER_MARKER[i] == type) {
+				return TILE_CONVERTER[i];
+			}
+		}
+		throw new Error("Missing tile converter type, for type = " + type);
+	}
 	
 	public static void loadTileBehaviors()
 	{

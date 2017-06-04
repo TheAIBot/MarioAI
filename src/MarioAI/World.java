@@ -1,14 +1,13 @@
 package MarioAI;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
-/**
- * Previously called node creater
- * Manages the world state space
- */
+
 public class World {
 	public static final int LEVEL_HEIGHT = 15;
 	public static final int LEVEL_WIDTH = 22;
@@ -134,7 +133,6 @@ public class World {
 			byteColumn[i] = level[i - topObservationYPos][sightColumnIndex];
 		}
 		return byteColumn;
-		
 	}
 
 	private Node[] convertByteColumnToNodeColumn(final byte[] byteColumn, final int x) {
@@ -157,6 +155,25 @@ public class World {
 
 	public Node[] getColumn(final int x) {
 		return savedColumns.get(x);
+	}
+	
+	public void syncFrom(World world) {
+		//copy levelMatrix
+		for (int x = 0; x < levelMatrix.length; x++) {
+			for (int y = 0; y < levelMatrix[x].length; y++) {
+				levelMatrix[x][y] = world.levelMatrix[x][y];
+			}
+		}
+		
+		//copy savedColumn
+		savedColumns.clear();
+		for (Entry<Integer, Node[]> entry : world.savedColumns.entrySet()) {
+			Node[] columnCopy = new Node[entry.getValue().length];
+			for (int i = 0; i < columnCopy.length; i++) {
+				columnCopy[i] = entry.getValue()[i];
+			}
+			savedColumns.put(entry.getKey().intValue(), columnCopy);
+		}
 	}
 	
 	public boolean hasGoalNodesChanged() {

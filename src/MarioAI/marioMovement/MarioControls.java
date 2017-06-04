@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import MarioAI.MarioMethods;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
@@ -93,7 +94,7 @@ public class MarioControls {
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
-		if (path != null) {			
+		if (path != null && path.size() > 0) {			
 			DirectedEdge next = path.get(0);
 			int movementTime = next.getMoveInfo().getMoveTime();
 			if (prevEdge != null && 
@@ -172,10 +173,8 @@ public class MarioControls {
 		YMovementInformation jumpInfo;
 		if (edge instanceof RunningEdge) {
 			jumpInfo = getYMovement(0, 0, 0);
-		} else if (edge instanceof JumpingEdge) {
-			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
 		} else {
-			return null;
+			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
 		}
 		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo);
 	}
@@ -288,21 +287,19 @@ public class MarioControls {
 		totalTicks += ticksDrifting;
 		
 		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
-		distanceMoved = (xPositions.size() == 0)? 0:xPositions.get(xPositions.size() - 1);
+		distanceMoved = (xPositions.size() == 0)? 0 : xPositions.get(xPositions.size() - 1);
 		
-		if (neededXDistance != 0) {
-			//move the last tick
-			//which should be on ground
-			//this allows two jumping edges
-			//after each other.
-			////BLOCK 1 COPY////
-			speed = getNextTickSpeed(speed);
-			distanceMoved += speed;
-			xPositions.add(distanceMoved);
-			pressButton.add(true);
-			totalTicks++;
-			////BLOCK 1 COPY////			
-		}
+		//move the last tick
+		//which should be on ground
+		//this allows two jumping edges
+		//after each other.
+		////BLOCK 1 COPY////
+		speed = getNextTickSpeed(speed);
+		distanceMoved += speed;
+		xPositions.add(distanceMoved);
+		pressButton.add(true);
+		totalTicks++;
+		////BLOCK 1 COPY////			
 		
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction

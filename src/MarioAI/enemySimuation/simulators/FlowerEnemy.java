@@ -1,4 +1,4 @@
-package MarioAI.enemy.simulators;
+package MarioAI.enemySimuation.simulators;
 
 import java.util.ArrayList;
 
@@ -89,4 +89,18 @@ public class FlowerEnemy extends EnemySimulator
         ya*=0.9;
         ya+=0.1f;
     }
+
+	@Override
+	public EnemySimulator copy() {
+		FlowerEnemy copy = new FlowerEnemy(world, x, y, ya, true);
+		copy.x = x;
+		copy.y = y;
+		copy.xa = xa;
+		copy.ya = ya;
+		copy.positionsIndexOffset = positionsIndexOffset;
+		
+		copy.jumpTime = jumpTime;
+		
+		return copy;
+	}
 }

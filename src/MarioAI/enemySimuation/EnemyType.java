@@ -1,4 +1,4 @@
-package MarioAI.enemy;
+package MarioAI.enemySimuation;
 
 public enum EnemyType {
 	RED_KOOPA {

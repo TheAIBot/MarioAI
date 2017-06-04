@@ -2,7 +2,8 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
-import MarioAI.enemy.EnemyPredictor;
+import MarioAI.World;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
@@ -55,27 +56,39 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash) {
-		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash);
-	}
-	
-	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash) {
+	///Should only be used for testing purposes
+	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
-		if (!(ancestorEdge instanceof FallEdge)) {
-			this.vx = moveInfo.getEndSpeed();
-			this.xPos = parentXPos + moveInfo.getXMovementDistance();
-		} else this.vx = 0; //TODO change when implemented.
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.parentXPos = parentXPos;
+		this.parentVx = parentVx;
+		this.ancestorEdge = ancestorEdge;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+	}
+	
+	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
+		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
+	}
+	
+	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+		this.node = node;
+		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
 		this.yPos = node.y;
-		this.isSpeedNodeUseable = determineIfThisNodeIsUseable();
+		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
 	}
 	
-	private boolean determineIfThisNodeIsUseable() {
+	private boolean determineIfThisNodeIsUseable(World world) {
 		
 
 		//There are a lot of possible problems for a fall edge.
@@ -100,11 +113,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			return false;
 		}
 		
-		if (getMoveInfo().hasCollisions(parent)) {
+		//TODO remove this when changed moveinformation is implemented
+		if (getMoveInfo().hasCollisions(parent, world)) {
 			return false;
 		}
 		
-		//TODO: add check for whether this edge runs into any blocks
 		return true;
 	}
 	

@@ -72,7 +72,7 @@ public class TestGrapher {
 	public static World totalFlatland(World graph, Node marioNode) {
 		Node[][] level = graph.getLevelMatrix();
 		for (short i = 0; i < GRID_WIDTH; i++) {
-			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) 11); // TODO(*)
+			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) -11); // TODO(*)
 																// Error: try to set it to -11
 																//Check the same method in TestCollisonDetection.
 		}
@@ -206,7 +206,7 @@ public class TestGrapher {
 	public static void addWall(int height, int coloumn, int row, Node[][] levelMatrix, Node marioNode) {
 		for (short j = 1; j <= height; j++) {
 			levelMatrix[coloumn][row - j] = new Node(getXPositionFromColoumn(marioNode, coloumn),
-					(short) (row - j), (byte) 10);
+					(short) (row - j), (byte) -10);
 		}
 	}
 

@@ -12,6 +12,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.sun.istack.internal.FinalArrayList;
+
+import MarioAI.FastAndFurious;
+import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
@@ -20,8 +24,11 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
+import junit.framework.Assert;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCollisionDetector {
@@ -58,7 +65,6 @@ public class TestCollisionDetector {
 		world = TestGrapher.totalFlatland(world, marioNode);//Adds a wall later, to force it to run into the wall.
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Again, edge before the wall.
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		Node[][] level = world.getLevelMatrix();
 		//adding the walls:
@@ -96,9 +102,9 @@ public class TestCollisionDetector {
 					DirectedEdge currentLeftEdge 	= leftWalkingPath.get(j);
 					
 					final SpeedNode snRight = new SpeedNode(currentRightEdge.target, currentRight	,
-							                                  currentRightEdge, 0); //Don't care about the hash.
+							                                  currentRightEdge, 0, world); //Don't care about the hash.
 					final SpeedNode snLeft 	= new SpeedNode(currentLeftEdge.target	, currentLeft	,
-							                                  currentLeftEdge	, 0); //Don't care about the hash.
+							                                  currentLeftEdge	, 0, world); //Don't care about the hash.
 					if (!snRight.isSpeedNodeUseable() ||
 						 !snLeft .isSpeedNodeUseable()) {
 						fail();
@@ -139,18 +145,18 @@ public class TestCollisionDetector {
 					//If he should collide with the block
 					if (shouldHaveCollisionRight) {
 						//errorMessage += ". There are no collision.";
-						assertTrue(errorMessage, snRight.getMoveInfo().hasCollisions(currentRight));
+						assertTrue(errorMessage, snRight.getMoveInfo().hasCollisions(currentRight, world));
 					} else{
 						//errorMessage += ". There are a collision.";
-						assertFalse(errorMessage , snRight.getMoveInfo().hasCollisions(currentRight));
+						assertFalse(errorMessage , snRight.getMoveInfo().hasCollisions(currentRight, world));
 					}
 					
 					if (shouldHaveCollisionLeft) {
 						//errorMessage += ". There are no collision.";
-						assertTrue(errorMessage, snLeft.getMoveInfo().hasCollisions(currentLeft));
+						assertTrue(errorMessage, snLeft.getMoveInfo().hasCollisions(currentLeft, world));
 					} else{
 						//errorMessage += ". There are a collision.";
-						assertFalse(errorMessage, snLeft.getMoveInfo().hasCollisions(currentLeft));
+						assertFalse(errorMessage, snLeft.getMoveInfo().hasCollisions(currentLeft, world));
 					}
 					currentRight 	= snRight;
 					currentLeft 	= snLeft;					
@@ -168,25 +174,24 @@ public class TestCollisionDetector {
 		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Edges are made before the ceiling, to ensure that the movements are possible.
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		Node[][] level = world.getLevelMatrix();
 		
 		for (int height = 3; height <= 5; height++) { //Tested for different height of the ceilings
 			//Makes the ceiling
 			for (int i = 0; i < level.length; i++) {
-				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) 11);
+				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) -10);
 			}
 			final int currentHeight = height;
 			SpeedNode startNode = new SpeedNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0); //Don't care about the hash.
+				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable()) { //Does not take the ceiling into account
 					if (Arrays.asList(sn.getMoveInfo().getPositions()).stream().anyMatch(position -> position.y + 2 > currentHeight - 1)) { //If it collides with the ceiling
-						assertTrue(sn.getMoveInfo().hasCollisions(startNode));
+						assertTrue(sn.getMoveInfo().hasCollisions(startNode, world));
 					} else {
-						assertFalse(sn.getMoveInfo().hasCollisions(startNode));
+						assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));
 					}
 				} 
 			}
@@ -209,7 +214,6 @@ public class TestCollisionDetector {
 		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		
 		//For all movements, given an arbitrary starting speed, since he starts on a flat world,
@@ -217,10 +221,10 @@ public class TestCollisionDetector {
 		for (float speed = (float) -0.35; speed < 0.35; speed += 0.01) {
 			SpeedNode startNode = new SpeedNode(marioNode, speed, Long.MAX_VALUE);
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0); //Don't care about the hash.
+				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable()) {
-					assertFalse(sn.getMoveInfo().hasCollisions(startNode));
+					assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));
 				} 
 			}
 		}
@@ -253,7 +257,6 @@ public class TestCollisionDetector {
 		world = TestGrapher.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		Node[][] level = world.getLevelMatrix();
 		
@@ -269,10 +272,10 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
-				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition);
+				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition, world);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				//TODO discuss if this is fine, and the desired result. (*)
 				// 1.0/16 needs to be added, as this is subtracted in the method, and not added later.
@@ -282,7 +285,7 @@ public class TestCollisionDetector {
 					assertTrue(errorMessage, 	hasCollision);
 				} else{
 					if (hasCollision) {
-						hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition);
+						hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition, world);
 					}
 					assertFalse(errorMessage,	hasCollision);
 				}
@@ -303,7 +306,6 @@ public class TestCollisionDetector {
 		world = TestGrapher.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		Node[][] level = world.getLevelMatrix();
 		
@@ -318,10 +320,10 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top	. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
-				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode, lastYPosition);
+				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode, lastYPosition, world);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				
 				if (9  <= j) { //TODO check should it also hold true with j=9?
@@ -342,7 +344,6 @@ public class TestCollisionDetector {
 		world = TestGrapher.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
-		CollisionDetection.setWorld(world);
 		CollisionDetection.loadTileBehaviors();
 		Node[][] level = world.getLevelMatrix();
 		
@@ -358,6 +359,45 @@ public class TestCollisionDetector {
 	@Test
 	public void testCompareWithMariosCollisionEngine(){
 		fail("Make the test");
+	}
+	
+	@Test
+	public void testBox() {
+		final UnitTestAgent agent = new UnitTestAgent();
+		final Environment observation = TestTools.loadLevel("testCollisionDetector/collisionBox.lvl", agent, true);
+		TestTools.setMarioXPosition(observation, 4);
+		//TestTools.renderLevel(observation);
+		CollisionDetection.loadTileBehaviors();
+		final World world = new World();
+		world.initialize(observation);
+		
+		agent.action[Mario.KEY_LEFT] = true;
+		for (int i = 0; i < 100; i++) {
+			TestTools.runOneTick(observation);
+		}
+		TestTools.runOneTick(observation);
+		world.update(observation);
+		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world);
+		boolean hasCollisions = path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world);
+		assertTrue(hasCollisions);
+		
+		
+		
+		
+		agent.action[Mario.KEY_LEFT] = false;
+		agent.action[Mario.KEY_RIGHT] = true;
+		for (int i = 0; i < 100; i++) {
+			TestTools.runOneTick(observation);
+		}
+		
+		marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world);
+		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 	}
 	
 }

@@ -4,10 +4,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.World;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.Function;
-import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
@@ -166,17 +165,26 @@ public class MovementInformation{
 		}
 	}
 
-	public static int edgeCounter = 1;
-	
-	public boolean hasCollisions(SpeedNode sourceNode) { //The x position should however suffice, as edges only comes from the ground.
+	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		//System.out.println("\n");
-		//System.out.println("Edge " + edgeCounter + ": \n");
-		edgeCounter++;
-		final float lastYValue = positions[positions.length -1].y;
+		final float lastYValue = positions[positions.length - 1].y;
+		
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
-			if (CollisionDetection.isColliding(currentPosition, previousPosition, sourceNode, lastYValue)) {
+			if (CollisionDetection.isColliding(currentPosition, previousPosition, sourceNode, lastYValue, world)) {
+				return true;
+			}
+			previousPosition = currentPosition;
+		}	
+		return false;
+	}
+	
+	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
+		Point2D.Float previousPosition = new Point2D.Float(0, 0);
+		final float lastYValue = positions[positions.length - 1].y;
+		for (int i = 0; i < positions.length; i++) { 
+			final Point2D.Float currentPosition = positions[i];
+			if (CollisionDetection.isColliding(currentPosition, previousPosition, startX, startY, lastYValue, world)) {
 				return true;
 			}
 			previousPosition = currentPosition;

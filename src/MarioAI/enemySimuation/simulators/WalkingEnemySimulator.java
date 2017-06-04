@@ -1,4 +1,4 @@
-package MarioAI.enemy.simulators;
+package MarioAI.enemySimuation.simulators;
 
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
@@ -21,6 +21,7 @@ public class WalkingEnemySimulator extends EnemySimulator
     private final int height;
     private final boolean avoidCliffs;
     private final boolean winged;
+    private final int type;
     
     private int facing;
 
@@ -34,6 +35,7 @@ public class WalkingEnemySimulator extends EnemySimulator
         this.xa = xa;
         this.ya = ya;
         this.winged = winged;
+        this.type = type;
 
         avoidCliffs = (type == Enemy.ENEMY_RED_KOOPA);
         
@@ -177,4 +179,16 @@ public class WalkingEnemySimulator extends EnemySimulator
 
         return world.level.isBlocking(x, y, xa, ya);
     }
+
+	@Override
+	public EnemySimulator copy() {
+		WalkingEnemySimulator copy = new WalkingEnemySimulator(world, x, y, xa, ya, type, kind, winged);
+		copy.x = x;
+		copy.y = y;
+		copy.xa = xa;
+		copy.ya = ya;
+		copy.positionsIndexOffset = positionsIndexOffset;
+		
+		return copy;
+	}
 }
