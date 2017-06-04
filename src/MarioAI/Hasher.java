@@ -3,6 +3,7 @@ package MarioAI;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import sun.launcher.resources.launcher;
 
 public class Hasher {
 	
@@ -71,9 +72,11 @@ public class Hasher {
 		final int b4 = 	((int) edge.source.x & 0x1ff) << position4; //Same as above.
 		final int position5 = position4+9;
 		
+		final int b5 = edge.useSuperSpeed ? 0x8000 : 0x0000;
+		
 		//Unique edge information to add to the hash.
 		//Includes things like if it is an jump edge or running edge, and things like that.
-		final int b5 = extraHash << position5; 
-		return b1 | b2 | b3 | b4 | b5;
+		final int b6 = extraHash << position5; 
+		return b1 | b2 | b3 | b4 | b5 | b6;
 	}
 }

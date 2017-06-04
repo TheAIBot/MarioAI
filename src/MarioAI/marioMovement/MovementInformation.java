@@ -20,6 +20,7 @@ public class MovementInformation implements Function{
 	private final int totalTicksXMoved;
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
+	private final boolean useSuperSpeed;
 	
 	//position information
 	private final Point2D.Float[] positions;
@@ -28,6 +29,7 @@ public class MovementInformation implements Function{
 		this.xMovedDistance = xMoveInfo.xMovedDistance;
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
+		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
 		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
@@ -85,14 +87,17 @@ public class MovementInformation implements Function{
 		if (xMovedDistance > 0) {
 			actions[Mario.KEY_RIGHT] = pressXButton[tick];
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = useSuperSpeed;
 		}
 		else if (xMovedDistance < 0) {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = pressXButton[tick];
+			actions[Mario.KEY_SPEED] = useSuperSpeed;
 		}
 		else {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = false;
 		}
 		
 		actions[Mario.KEY_JUMP] = pressYButton[tick];

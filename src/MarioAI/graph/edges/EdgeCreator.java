@@ -110,7 +110,8 @@ public  class EdgeCreator {
 				break;
 			} else {
 				//Else will Mario be able to jump up to this height, to the current target:
-				listOfEdges.add(new JumpingEdge(startingNode, currentLandingPosition, startingNode.y + jumpHeight));
+				listOfEdges.add(new JumpingEdge(startingNode, currentLandingPosition, startingNode.y + jumpHeight, false));
+				listOfEdges.add(new JumpingEdge(startingNode, currentLandingPosition, startingNode.y + jumpHeight, true));
 			}
 		}
 		//TODO change so it depends on the situation.
@@ -138,7 +139,8 @@ public  class EdgeCreator {
 		//First falling straight down:
 		for (int height = startingNode.y - 1; height >= 0; height--) {
 			if (isHittingWallOrGroundDownwards(initialXPosition, height)) {
-				listOfEdges.add(new FallEdge(startingNode, observationGraph[initialXPosition][height]));
+				listOfEdges.add(new FallEdge(startingNode, observationGraph[initialXPosition][height], false));
+				listOfEdges.add(new FallEdge(startingNode, observationGraph[initialXPosition][height], true));
 			}
 		}
 		
@@ -154,7 +156,8 @@ public  class EdgeCreator {
 		//The edges added by the method above, is polynomials. 
 		//They need to be converted to fallDownEdges:
 		for (DirectedEdge edge : jumpDownEdges) {
-			listOfEdges.add(new FallEdge(edge.source, edge.target));
+			listOfEdges.add(new FallEdge(edge.source, edge.target, false));
+			listOfEdges.add(new FallEdge(edge.source, edge.target, true));
 		}	
 		
 		return foundAllEdges;
@@ -165,12 +168,14 @@ public  class EdgeCreator {
 
 		//Run to the right:
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y]));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], false));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], true));
 		} else foundAllEdges = false;
 		
 		//Run to the left:
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y]));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));
 		}	else foundAllEdges = false;
 		
 		return foundAllEdges;
@@ -309,7 +314,8 @@ public  class EdgeCreator {
 						  lowerFacingMarioCorner == Collision.HIT_GROUND) {
 				collisionDetection = Collision.HIT_GROUND;
 				if (addEdges) {
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial, false));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial, true));
 				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL    || 
@@ -362,11 +368,13 @@ public  class EdgeCreator {
 			     lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
 				collisionDetection = Collision.HIT_GROUND;
 				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	{
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial, false));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial, true));
 				}										 
 				else { //lands on the opposite corner.
 					final int groundXPos = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, false));
+					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, true));
 				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL || 

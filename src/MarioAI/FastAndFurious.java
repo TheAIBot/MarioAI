@@ -29,7 +29,7 @@ import ch.idsia.mario.environments.Environment;
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	private final EdgeCreator grapher = new EdgeCreator();
-	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 1);
+	private final PathCreator pathCreator = new PathCreator(Runtime.getRuntime().availableProcessors() - 2);
 	private final MarioControls marioController = new MarioControls();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
@@ -88,6 +88,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
 				*/
+				/*
 				if (world.hasGoalNodesChanged()) {
 					System.out.println("Reason: World");
 				}
@@ -103,31 +104,27 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				if (pathCreator.getBestPath() == null) {
 					System.out.println("Reason: No path");
 				}
+				*/
 				
 				if (pathCreator.isRunning) {
-					final long startTime = System.currentTimeMillis();
 					pathCreator.stop();
 					pathCreator.updateBestPath();
-					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
-					System.out.println("Tick: " + tickCount + " Stopped");
+					//System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning && 
 					 pathCreator.getBestPath() != null && 
 					 pathCreator.getBestPath().size() > 0) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
-					final long startTime = System.currentTimeMillis();
 					startFindingPathFromPreviousPath(observation);
-					System.out.println("Tick: " + tickCount + " Started\n");
-					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
+					//System.out.println("Tick: " + tickCount + " Started\n");
 				}
 				if (!pathCreator.isRunning && 
 					(pathCreator.getBestPath() == null || 
 					 pathCreator.getBestPath().size() == 0)) {
+					
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
-					final long startTime = System.currentTimeMillis();
 					findPath(observation);
-					System.out.println("Failed to find path. Restarting.");
-					System.out.println("Time: " + (System.currentTimeMillis() - startTime));
+					//System.out.println("Failed to find path. Restarting.");
 				}
 				
 				
@@ -137,7 +134,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			}
 			else if (marioController.canUpdatePath) {
 				pathCreator.stop();
-				System.out.println("Tick: " + tickCount + " Path ignored");
+				//System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			
 			action = marioController.getNextAction(observation, pathCreator.getBestPath());

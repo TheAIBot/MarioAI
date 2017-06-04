@@ -82,7 +82,7 @@ public class MarioControls {
 		float distanceMoved = 0;
 		speed = Math.abs(speed);
 		for (int i = 0; i < ticksJumping; i++) {
-			speed = getNextTickSpeed(speed);
+			speed = getNextTickSpeed(speed, edge.useSuperSpeed);
 			distanceMoved += speed;
 		}
 		
@@ -137,7 +137,7 @@ public class MarioControls {
 		float distanceMoved = 0;
 		int ticks = 0;
 		while (distanceMoved < neededXDistance) {
-			speed = getNextTickSpeed(speed);
+			speed = getNextTickSpeed(speed, true);
 			distanceMoved += speed;
 			ticks++;
 		}
@@ -176,11 +176,11 @@ public class MarioControls {
 		} else {
 			jumpInfo = getYMovement((int)Math.round(edge.getMaxY()), edge.source.y, edge.target.y);
 		}
-		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo);
+		return getMovementInformationFromEdge(startX, startY, endNode.x, speed, jumpInfo, edge.useSuperSpeed);
 	}
 	
-	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, YMovementInformation jumpInfo) {
-		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, jumpInfo.totalTicksJumped);
+	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, YMovementInformation jumpInfo, boolean useSuperSpeed) {
+		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, jumpInfo.totalTicksJumped, useSuperSpeed);
 		MovementInformation movementInformation = new MovementInformation(xMovementInfo, jumpInfo);
 		return movementInformation;
 	}
@@ -235,7 +235,7 @@ public class MarioControls {
 		return new YMovementInformation(0, new ArrayList<Float>(), new ArrayList<Boolean>());
 	}
 	
-	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime) {
+	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime, boolean useSuperSpeed) {
 		final ArrayList<Float> xPositions = new ArrayList<Float>();
 		final ArrayList<Boolean> pressButton = new ArrayList<Boolean>(); 
 		final boolean distanceIsNegative = neededXDistance < 0;
@@ -247,7 +247,7 @@ public class MarioControls {
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
 			
-			addOnDeaccelerationPositions(speed, xPositions, pressButton);
+			addOnDeaccelerationPositions(speed, xPositions, pressButton, useSuperSpeed);
 			
 			totalTicks = xPositions.size();
 			distanceMoved = xPositions.get(xPositions.size() - 1);		
@@ -256,7 +256,7 @@ public class MarioControls {
 			//deaccelerated his speed is now 0
 			speed = 0;
 		} else if (neededXDistance == 0) {
-			return new XMovementInformation(0, speed, 0, xPositions, pressButton);
+			return new XMovementInformation(0, speed, 0, xPositions, pressButton, useSuperSpeed);
 		}
 		
 		//The calculations are independent of the direction:
@@ -268,7 +268,7 @@ public class MarioControls {
 		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
 		while (distanceToTarget > ACCEPTED_DEVIATION) {
 			////BLOCK 1////
-			speed = getNextTickSpeed(speed);
+			speed = getNextTickSpeed(speed, useSuperSpeed);
 			distanceMoved += speed;
 			xPositions.add(distanceMoved);
 			pressButton.add(true);
@@ -294,7 +294,7 @@ public class MarioControls {
 		//this allows two jumping edges
 		//after each other.
 		////BLOCK 1 COPY////
-		speed = getNextTickSpeed(speed);
+		speed = getNextTickSpeed(speed, useSuperSpeed);
 		distanceMoved += speed;
 		xPositions.add(distanceMoved);
 		pressButton.add(true);
@@ -311,11 +311,11 @@ public class MarioControls {
 			}
 		}
 
-		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton);
+		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton, useSuperSpeed);
 	}
 	
-	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton) {
-		final ArrayList<Float> xDeaccelerationPositions = getDeaccelerationPositions(speed);
+	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton, final boolean useSuperSpees) {
+		final ArrayList<Float> xDeaccelerationPositions = getDeaccelerationPositions(speed, useSuperSpees);
 		
 		for (int i = 0; i < xDeaccelerationPositions.size(); i++) {
 			xPositions.add(-xDeaccelerationPositions.get(i));
@@ -323,16 +323,26 @@ public class MarioControls {
 		}	
 	}
 			
-	public static float getNextTickSpeed(final float speed) {
-		return speed * 0.89f + 0.0375f;
+	public static float getNextTickSpeed(final float speed, final boolean useSuperSpees) {
+		if (useSuperSpees) {
+			return speed * 0.89f + 0.075f;
+		}
+		else {
+			return speed * 0.89f + 0.0375f;	
+		}
 	}
 	
-	private static ArrayList<Float> getDeaccelerationPositions(float speed) {
+	private static ArrayList<Float> getDeaccelerationPositions(float speed, final boolean useSuperSpees) {
 		final ArrayList<Float> xPositions = new ArrayList<Float>(); 
 		float xMovement = 0;
 		do {
-			speed = speed * 0.89f - 0.0375f;
-			if (speed < MIN_MARIO_SPEED) {
+			if (useSuperSpees) {
+				speed = speed * 0.89f - 0.075f;
+			}
+			else {
+				speed = speed * 0.89f - 0.0375f;	
+			}
+			if (Math.abs(speed) < MIN_MARIO_SPEED) {
 				speed = 0;
 			}
 			xMovement += speed;

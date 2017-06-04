@@ -37,7 +37,7 @@ public class TestCollisionDetector {
 	EdgeCreator grapher = new EdgeCreator();
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
-	public DirectedEdge runningEdgeType = new RunningEdge(null, null);
+	public DirectedEdge runningEdgeType = new RunningEdge(null, null, false);
 	//TODO also add some step-by-step comparisons, of isBlocking and the likes.
 	//TODO might be an error with him running to the goal nodes, going out of the level.
 	//TODO test for different materials, floor and ceilings.
@@ -378,7 +378,7 @@ public class TestCollisionDetector {
 		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world);
+		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world, false);
 		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 		
 		
@@ -393,7 +393,7 @@ public class TestCollisionDetector {
 		marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world);
+		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world, false);
 		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 	}
 	

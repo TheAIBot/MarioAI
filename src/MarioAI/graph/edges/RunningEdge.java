@@ -5,8 +5,8 @@ import MarioAI.graph.nodes.Node;
 
 public class RunningEdge extends DirectedEdge{
 
-	public RunningEdge(Node source, Node target) {
-		super(source, target);
+	public RunningEdge(Node source, Node target, boolean useSuperSpeed) {
+		super(source, target, useSuperSpeed);
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 

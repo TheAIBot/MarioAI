@@ -5,7 +5,7 @@ import MarioAI.graph.nodes.Node;
 public class AStarHelperEdge extends RunningEdge {
 
 	public AStarHelperEdge(Node source, Node target) {
-		super(source, target);
+		super(source, target, true);
 	}
 	
 	@Override

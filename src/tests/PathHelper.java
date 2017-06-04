@@ -13,47 +13,47 @@ import MarioAI.graph.nodes.SpeedNode;
 public class PathHelper {
 	private static int hashNumber = 0;
 	
-	public static ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
+	public static ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world, boolean useSuperSpeed) {
 		int[] distanceXArray = new int[pathlength];
 		for (int i = 0; i < distanceXArray.length; i++) {
 			distanceXArray[i] = distanceX;
 		}
-		return createPath(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world);
+		return createPath(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world, useSuperSpeed);
 	}
 	
-	public static ArrayList<DirectedEdge> createPath(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
-		return reconstructPath(createPathEndSpeedNode(startX, startY, distanceX, jumpHeight, heightDifference, pathlength, world));
+	public static ArrayList<DirectedEdge> createPath(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world, boolean useSuperSpeed) {
+		return reconstructPath(createPathEndSpeedNode(startX, startY, distanceX, jumpHeight, heightDifference, pathlength, world, useSuperSpeed));
 	}
 	
-	public static SpeedNode createPathEndSpeedNode(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
+	public static SpeedNode createPathEndSpeedNode(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world, boolean useSuperSpeed) {
 		int[] distanceXArray = new int[pathlength];
 		for (int i = 0; i < distanceXArray.length; i++) {
 			distanceXArray[i] = distanceX;
 		}
-		return createPathEndSpeedNode(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world);
+		return createPathEndSpeedNode(startX, startY, distanceXArray, jumpHeight, heightDifference, pathlength, world, useSuperSpeed);
 	}
 	
-	public static SpeedNode createPathEndSpeedNode(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
+	public static SpeedNode createPathEndSpeedNode(int startX, int startY, int[] distanceX, int jumpHeight, int heightDifference, int pathlength, World world, boolean useSuperSpeed) {
 		
 		final Node startNode = new Node(startX, startY, (byte)0);
-		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX[0], heightDifference, jumpHeight, world);
+		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX[0], heightDifference, jumpHeight, world, useSuperSpeed);
 		
 		for (int i = 1; i < pathlength; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX[i], heightDifference, jumpHeight, world);
+			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX[i], heightDifference, jumpHeight, world, useSuperSpeed);
 		}
 		
 		return speedNode;
 	}
 	
-	private static SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight, World world) {
+	private static SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight, World world, boolean useSuperSpeed) {
 		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
 		
 		DirectedEdge edge;
 		if (jumpHeight == 0) {
-			edge = new RunningEdge(startNode, endNode);
+			edge = new RunningEdge(startNode, endNode, useSuperSpeed);
 		}
 		else {
-			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
+			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4), useSuperSpeed);
 		}
 		
 		SpeedNode speedNode;

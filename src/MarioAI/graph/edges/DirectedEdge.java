@@ -6,12 +6,14 @@ import MarioAI.marioMovement.MovementInformation;
 public abstract class DirectedEdge {
 	public final Node source; 
 	public final Node target;
+	public final boolean useSuperSpeed;
 	protected int hash;
 	private MovementInformation moveInfo;
 	
-	public DirectedEdge(Node source, Node target) {
+	public DirectedEdge(Node source, Node target, boolean useSuperSpeed) {
 		this.source = source;
 		this.target = target;
+		this.useSuperSpeed = useSuperSpeed;
 	}
 	
 	public abstract float getMaxY();
