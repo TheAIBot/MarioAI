@@ -11,8 +11,6 @@ import org.junit.Assert;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyType;
-import MarioAI.enemySimuation.simulators.BulletBillSimulator;
-import MarioAI.enemySimuation.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
@@ -26,6 +24,7 @@ import ch.idsia.mario.engine.sprites.Shell;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
+import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.EvaluationOptions;
 
 public class TestTools {
@@ -38,6 +37,11 @@ public class TestTools {
 	
 	public static void runWholeLevel(Environment observation) {
 		((MarioComponent) observation).run1(0, 1);
+	}
+	
+	public static int runWholeLevelWillWin(Environment observation) {
+		EvaluationInfo ei = ((MarioComponent) observation).run1(0, 1);
+		return ei.marioStatus;
 	}
 	
 	public static byte[][] getLevelMap(Environment observation)
