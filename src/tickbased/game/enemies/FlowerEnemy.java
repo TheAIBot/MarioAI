@@ -1,6 +1,6 @@
 package tickbased.game.enemies;
 
-import ch.idsia.mario.engine.LevelScene;
+import tickbased.game.world.LevelScene;
 
 public class FlowerEnemy extends Enemy
 {

@@ -1,11 +1,9 @@
 package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
-import ch.idsia.mario.engine.LevelScene;
+import tickbased.game.world.LevelScene;
 
-
-public class Mushroom extends Sprite
-{
+public class Mushroom extends Sprite {
     private static float GROUND_INERTIA = 0.89f;
     private static float AIR_INERTIA = 0.89f;
 

@@ -1,9 +1,8 @@
 package tickbased.game.world;
 
-import ch.idsia.mario.engine.LevelScene;
-import ch.idsia.mario.engine.sprites.Enemy;
-import ch.idsia.mario.engine.sprites.FlowerEnemy;
-import ch.idsia.mario.engine.sprites.Sprite;
+import tickbased.game.enemies.Enemy;
+import tickbased.game.enemies.FlowerEnemy;
+import tickbased.game.enemies.Sprite;
 
 public class SpriteTemplate
 {

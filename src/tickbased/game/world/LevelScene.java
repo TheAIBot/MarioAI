@@ -1,38 +1,32 @@
 package tickbased.game.world;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.BgRenderer;
 import ch.idsia.mario.engine.Generalizer;
 import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.LevelRenderer;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.level.BgLevelGenerator;
-import ch.idsia.mario.engine.level.Level;
 import ch.idsia.mario.engine.level.LevelGenerator;
-import ch.idsia.mario.engine.level.SpriteTemplate;
-import ch.idsia.mario.engine.sprites.BulletBill;
-import ch.idsia.mario.engine.sprites.CoinAnim;
-import ch.idsia.mario.engine.sprites.FireFlower;
-import ch.idsia.mario.engine.sprites.Fireball;
-import ch.idsia.mario.engine.sprites.Mario;
-import ch.idsia.mario.engine.sprites.Mushroom;
-import ch.idsia.mario.engine.sprites.Particle;
-import ch.idsia.mario.engine.sprites.Shell;
-import ch.idsia.mario.engine.sprites.Sparkle;
-import ch.idsia.mario.engine.sprites.Sprite;
-import ch.idsia.mario.engine.sprites.SpriteContext;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
+import tickbased.game.enemies.BulletBill;
+import tickbased.game.enemies.CoinAnim;
+import tickbased.game.enemies.FireFlower;
+import tickbased.game.enemies.Fireball;
+import tickbased.game.enemies.Mario;
+import tickbased.game.enemies.Mushroom;
+import tickbased.game.enemies.Particle;
+import tickbased.game.enemies.Shell;
+import tickbased.game.enemies.Sparkle;
+import tickbased.game.enemies.Sprite;
+import tickbased.game.enemies.SpriteContext;
+
 
 
 public class LevelScene implements SpriteContext
@@ -91,6 +85,25 @@ public class LevelScene implements SpriteContext
         this.levelType = type;
         this.levelLength = levelLength;
         this.setTotalTime(timeLimit);
+        killedCreaturesTotal = 0;
+        killedCreaturesByFireBall = 0;
+        killedCreaturesByStomp = 0;
+        killedCreaturesByShell = 0;
+    }
+    
+    
+    /**
+     * Copy constructor
+     * @param levelScene
+     */
+    public LevelScene(LevelScene levelScene) {
+        this.graphicsConfiguration = levelScene.graphicsConfiguration;
+        this.levelSeed = levelScene.levelSeed;
+        this.renderer = levelScene.renderer;
+        this.levelDifficulty = levelScene.levelDifficulty;
+        this.levelType = levelScene.levelType;
+        this.levelLength = levelScene.levelLength;
+        this.setTotalTime(levelScene.totalTime);
         killedCreaturesTotal = 0;
         killedCreaturesByFireBall = 0;
         killedCreaturesByStomp = 0;
@@ -611,53 +624,53 @@ public class LevelScene implements SpriteContext
         return ret;
     }
 
-    public void init()
-    {
-        try
-        {
-            Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            System.exit(0);
-        }
-        /*        if (replayer!=null)
-         {
-         level = LevelGenerator.createLevel(2048, 15, replayer.nextLong());
-         }
-         else
-         {*/
-//        level = LevelGenerator.createLevel(320, 15, levelSeed);
-        level = LevelGenerator.createLevel(levelLength, 15, levelSeed, levelDifficulty, levelType);
-        //        }
-
-        /*        if (recorder != null)
-         {
-         recorder.addLong(LevelGenerator.lastSeed);
-         }*/
-
-
-        paused = false;
-        Sprite.spriteContext = this;
-        sprites.clear();
-        layer = new LevelRenderer(level, graphicsConfiguration, 320, 240);
-        for (int i = 0; i < 2; i++)
-        {
-            int scrollSpeed = 4 >> i;
-            int w = ((level.width * 16) - 320) / scrollSpeed + 320;
-            int h = ((level.height * 16) - 240) / scrollSpeed + 240;
-            Level bgLevel = BgLevelGenerator.createLevel(w / 32 + 1, h / 32 + 1, i == 0, levelType);
-            bgLayer[i] = new BgRenderer(bgLevel, graphicsConfiguration, 320, 240, scrollSpeed);
-        }
-        mario = new Mario(this);
-        sprites.add(mario);
-        startTime = 1;
-
-        timeLeft = totalTime*15;
-
-        tick = 0;
-    }
+//    public void init()
+//    {
+//        try
+//        {
+//            Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
+//        }
+//        catch (IOException e)
+//        {
+//            e.printStackTrace();
+//            System.exit(0);
+//        }
+//        /*        if (replayer!=null)
+//         {
+//         level = LevelGenerator.createLevel(2048, 15, replayer.nextLong());
+//         }
+//         else
+//         {*/
+////        level = LevelGenerator.createLevel(320, 15, levelSeed);
+//        level = LevelGenerator.createLevel(levelLength, 15, levelSeed, levelDifficulty, levelType);
+//        //        }
+//
+//        /*        if (recorder != null)
+//         {
+//         recorder.addLong(LevelGenerator.lastSeed);
+//         }*/
+//
+//
+//        paused = false;
+//        Sprite.spriteContext = this;
+//        sprites.clear();
+//        layer = new LevelRenderer(level, graphicsConfiguration, 320, 240);
+//        for (int i = 0; i < 2; i++)
+//        {
+//            int scrollSpeed = 4 >> i;
+//            int w = ((level.width * 16) - 320) / scrollSpeed + 320;
+//            int h = ((level.height * 16) - 240) / scrollSpeed + 240;
+//            Level bgLevel = BgLevelGenerator.createLevel(w / 32 + 1, h / 32 + 1, i == 0, levelType);
+//            bgLayer[i] = new BgRenderer(bgLevel, graphicsConfiguration, 320, 240, scrollSpeed);
+//        }
+//        mario = new Mario(this);
+//        sprites.add(mario);
+//        startTime = 1;
+//
+//        timeLeft = totalTime*15;
+//
+//        tick = 0;
+//    }
 
     public int fireballsOnScreen = 0;
 

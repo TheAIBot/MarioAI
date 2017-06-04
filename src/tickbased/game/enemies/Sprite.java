@@ -1,10 +1,11 @@
 package tickbased.game.enemies;
 
+import java.awt.Graphics;
+import java.awt.Image;
+
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.level.SpriteTemplate;
-
-import java.awt.*;
+import tickbased.game.world.SpriteTemplate;
 
 public class Sprite
 {

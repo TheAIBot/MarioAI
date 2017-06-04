@@ -1,8 +1,7 @@
 package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
-import ch.idsia.mario.engine.LevelScene;
-
+import tickbased.game.world.LevelScene;
 
 public class BulletBill extends Sprite
 {

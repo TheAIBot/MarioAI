@@ -2,9 +2,9 @@ package tickbased.game.enemies;
 
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.GlobalOptions;
-import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.Scene;
-import ch.idsia.mario.engine.level.Level;
+import tickbased.game.world.Level;
+import tickbased.game.world.LevelScene;
 
 public class Mario extends Sprite {
 	public static boolean large = false;
@@ -684,6 +684,14 @@ public class Mario extends Sprite {
 			keys[i] = (mask & (1 << i)) > 0;
 		}
 	}
+	
+	/**
+	 * Custom method
+	 * @param k
+	 */
+	public void setKeys(boolean[] k) {
+    	for (int i = 0; i < 5; i++) keys[i] = k[i];
+    }
 
 	public static void get1Up() {
 		lives++;

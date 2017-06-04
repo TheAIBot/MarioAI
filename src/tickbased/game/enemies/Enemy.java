@@ -1,9 +1,9 @@
 package tickbased.game.enemies;
 
-import ch.idsia.mario.engine.Art;
-import ch.idsia.mario.engine.LevelScene;
+import java.awt.Graphics;
 
-import java.awt.*;
+import ch.idsia.mario.engine.Art;
+import tickbased.game.world.LevelScene;
 
 
 public class Enemy extends Sprite
