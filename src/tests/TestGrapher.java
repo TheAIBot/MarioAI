@@ -13,6 +13,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
@@ -558,7 +560,185 @@ public class TestGrapher {
 	
 	@Test
 	public void testMiddleCornerCollisionDetection(){
+		World world = flatlandWorld(); //Not total flatland.
+		Node[][] level = world.getLevelMatrix();
+		for (int i = 9; i < level.length; i++) {
+			if (level[i][9] != null) level[i][9] = new Node(level[i][9].x, level[i][9].y, (byte) -10);
+		}
+		grapher.setMovementEdges(world, marioNode);		
+		for (int xPos = 0; xPos < level.length; xPos++) { //This is the column position.
+			for (float yPos = 1; yPos < level[xPos].length; yPos += 0.005) {
+				String errorMessage = "Error at xPos = " + xPos + ", yPos = " + yPos;
+				//Rightwards:
+				Collision currentCollisionRight = grapher.middleFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_DOWNWARDS);
+				Collision mimicCurrentCollisionRight = grapher.middleFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS);
+				//It should not matter whether the motion is upwards or downwards.
+				assertEquals(errorMessage, currentCollisionRight, mimicCurrentCollisionRight); 			
+				//Leftwards. The same is true as before:
+				Collision currentCollisionLeft = grapher.middleFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_DOWNWARDS);
+				Collision mimicCurrentCollisionLeft = grapher.middleFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_UPWARDS);
+				//It should not matter whether the motion is upwards or downwards.
+				assertEquals(errorMessage, currentCollisionLeft, mimicCurrentCollisionLeft); 
+				
+				//Case rightwards:
+				if (xPos < 9) { //Beginning of the floor.
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRight);
+				} else {
+					//There might be a collision:
+					float middleYPos = yPos - EdgeCreator.MARIO_HEIGHT/2;
+					if (9 <= middleYPos && middleYPos <= 10) {
+						assertEquals(errorMessage, Collision.HIT_WALL, currentCollisionRight);
+					} else {
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRight);
+					}
+				}				
+				
+				//Case leftwards:
+				//Should count as though the x position is one to the left. Therefore
+				if (xPos < 9 + 1) { //Beginning of the floor.
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeft);
+				} else {
+					//There might be a collision:
+					float middleYPos = yPos - EdgeCreator.MARIO_HEIGHT/2;
+					if (9 <= middleYPos && middleYPos <= 10) {
+						assertEquals(errorMessage, Collision.HIT_WALL	, currentCollisionLeft);
+					} else {
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeft);
+					}
+				}
+				
+			}
+		}
+	}
+	
+	public void testCornersIgnoreJumpthroughtMaterial(){
 		fail("Make the test.");
 	}
+	
+	@Test
+	public void testUpperFacingCornerCollisionDetection(){
+		World world = flatlandWorld(); //Not total flatland.
+		Node[][] level = world.getLevelMatrix();
+		for (int i = 9; i < level.length; i++) {
+			if (level[i][9] != null) level[i][9] = new Node(level[i][9].x, level[i][9].y, (byte) -10);
+		}
+		
+		grapher.setMovementEdges(world, marioNode);		
+		
+		for (int xPos = 0; xPos < level.length; xPos++) { //This is the column position.
+			for (float yPos = 1; yPos < level[xPos].length; yPos += 0.01) {
+				String errorMessage = "Error at xPos = " + xPos + ", yPos = " + yPos;
+				//First with no Hitting wall, and formerYPos being different from the current:
+					//Four different possible directions:
+					Collision currentCollisionRightUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS	 , false, -1);
+					Collision currentCollisionRightDown = grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_DOWNWARDS , false, -1);
+					Collision currentCollisionLeftUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_UPWARDS	 , false, -1);
+					Collision currentCollisionLeftDown 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_DOWNWARDS  , false, -1);
+				//IsHittingWall:
+					//Four different possible directions:
+					Collision currentCollisionHittingWallRightUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS	 , true, -1);
+					Collision currentCollisionHittingWallRightDown 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_DOWNWARDS , true, -1);
+					Collision currentCollisionHittingWallLeftUp 		= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_UPWARDS	 , true, -1);
+					Collision currentCollisionHittingWallLeftDown 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_DOWNWARDS  , true, -1);
+				//formerYPos=yPos:
+					//Four different possible directions:
+					Collision currentCollisionSameYRightUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS	 , false, yPos);
+					Collision currentCollisionSameYRightDown 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_DOWNWARDS , false, yPos);
+					Collision currentCollisionSameYLeftUp 		= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_UPWARDS	 , false, yPos);
+					Collision currentCollisionSameYLeftDown 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.LEFT_DOWNWARDS  , false, yPos);
+				//They should be the same, when the y-value are within a certain margin:
+					
+				//Case right upwards:
+				if (xPos < 9) { //Beginning of the floor.
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRightUp);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallRightUp);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYRightUp);
+				} else {
+					//There might be a collision:
+					float upperYPos = yPos - EdgeCreator.MARIO_HEIGHT;
+					//The 0.01, is because of an addition by this in the code.
+					if (9 + 0.01 <= upperYPos && upperYPos <= 10 + 0.01) { //If there should be a collision:
+						currentCollisionRightUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS	 , false, -1);
+						assertEquals(errorMessage, Collision.HIT_CEILING, currentCollisionRightUp);
+						//Thinks it is a continuation of a wall it is currently hitting:
+						assertEquals(errorMessage, Collision.HIT_WALL	, currentCollisionHittingWallRightUp); 
+						//Should think it has just hit a wall:
+						assertEquals(errorMessage, Collision.HIT_WALL	, currentCollisionSameYRightUp); 
+					} else {
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRightUp);
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallRightUp);
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYRightUp);
+					}
+				}				
+				
+				//Case right downwards:
+				if (xPos < 9) { //Beginning of the floor.
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRightDown);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallRightDown);
+					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYRightDown);
+				} else {
+					//There might be a collision:
+					float upperYPos = yPos - EdgeCreator.MARIO_HEIGHT;
+					//The 0.01, is because of an addition by this in the code.
+					if (9 + 0.01 <= upperYPos && upperYPos <= 10 + 0.01) { //If there should be a collision:
+						currentCollisionRightUp 	= grapher.upperFacingCornerCollision(yPos, xPos, JumpDirection.RIGHT_UPWARDS	 , false, -1);
+						assertEquals(errorMessage, Collision.HIT_CEILING, currentCollisionRightDown);
+						//Thinks it is a continuation of a wall it is currently hitting:
+						assertEquals(errorMessage, Collision.HIT_WALL	, currentCollisionHittingWallRightDown); 
+						//Should think it has just hit a wall:
+						assertEquals(errorMessage, Collision.HIT_WALL	, currentCollisionSameYRightDown); 
+					} else {
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRightDown);
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallRightDown);
+						assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYRightDown);
+					}
+				}				
+
+				//Case Left upwards:
+				//fail("Make case");
+				
+				//Case Left downwards:
+				//fail("Make case");
+			}
+		}
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testLowerFacingCornerCollisionDetection(){
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testLowerOppositeCornerCollisionDetection(){
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testUpperOppositeCornerCollisionDetection(){
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testDownwardsCollisionDetection(){
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testUpwardsCollisionDetection(){
+		fail("Make the test.");
+	}
+	
+
+	@Test
+	public void testHittingStuffUpwards(){
+		fail("Make the test.");
+	}
+	
+	@Test
+	public void testHittingStuffDownwards(){
+		fail("Make the test.");
+	}
+	
 	
 }
