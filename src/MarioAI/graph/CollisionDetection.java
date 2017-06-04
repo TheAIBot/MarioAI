@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import MarioAI.World;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
 public class CollisionDetection {
@@ -53,7 +54,7 @@ public class CollisionDetection {
 		final float diffX = currentPosition.x - expectedPosition.x;
 		final float diffY = currentPosition.y - expectedPosition.y;
 		
-		return diffX > 0.005 || diffY > 0.005;
+		return diffX > MarioControls.ACCEPTED_DEVIATION || diffY > MarioControls.ACCEPTED_DEVIATION;
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.
