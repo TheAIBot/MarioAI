@@ -96,6 +96,8 @@ public class TestMarioMovements {
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
+		TestTools.setMarioXPosition(observation, 5);
+		TestTools.runOneTick(observation);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());

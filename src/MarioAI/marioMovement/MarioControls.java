@@ -247,21 +247,21 @@ public class MarioControls {
 			(neededXDistance > 0 && speed < 0)) {
 			speed = Math.abs(speed);
 			
-			addOnDeaccelerationPositions(speed, xPositions, pressButton, useSuperSpeed);
+			speed = addOnDeaccelerationPositions(speed, xPositions, pressButton, useSuperSpeed);
 			
 			totalTicks = xPositions.size();
 			distanceMoved = xPositions.get(xPositions.size() - 1);		
 			
 			//because mario has now completely 
 			//deaccelerated his speed is now 0
-			speed = 0;
+			//speed = 0;
 		} else if (neededXDistance == 0) {
 			return new XMovementInformation(0, speed, 0, xPositions, pressButton, useSuperSpeed);
 		}
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 2);
+		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 3);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
@@ -314,26 +314,19 @@ public class MarioControls {
 		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton, useSuperSpeed);
 	}
 	
-	private static void addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton, final boolean useSuperSpees) {
-		final ArrayList<Float> xDeaccelerationPositions = getDeaccelerationPositions(speed, useSuperSpees);
+	private static float addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton, final boolean useSuperSpees) {
+		final ArrayList<Float> xDeaccelerationPositions = new ArrayList<Float>();
+		final float endSpeed = getDeaccelerationPositions(speed, xDeaccelerationPositions, useSuperSpees);
 		
 		for (int i = 0; i < xDeaccelerationPositions.size(); i++) {
 			xPositions.add(-xDeaccelerationPositions.get(i));
 			pressButton.add(true);
 		}	
-	}
-			
-	public static float getNextTickSpeed(final float speed, final boolean useSuperSpees) {
-		if (useSuperSpees) {
-			return speed * 0.89f + 0.075f;
-		}
-		else {
-			return speed * 0.89f + 0.0375f;	
-		}
+		
+		return endSpeed;
 	}
 	
-	private static ArrayList<Float> getDeaccelerationPositions(float speed, final boolean useSuperSpees) {
-		final ArrayList<Float> xPositions = new ArrayList<Float>(); 
+	private static float getDeaccelerationPositions(float speed, final ArrayList<Float> xPositions, final boolean useSuperSpees) {
 		float xMovement = 0;
 		do {
 			if (useSuperSpees) {
@@ -348,7 +341,16 @@ public class MarioControls {
 			xMovement += speed;
 			xPositions.add(xMovement);
 		} while (speed >= MIN_MARIO_SPEED);
-		return xPositions;
+		return speed;
+	}
+	
+	public static float getNextTickSpeed(final float speed, final boolean useSuperSpees) {
+		if (useSuperSpees) {
+			return speed * 0.89f + 0.075f;
+		}
+		else {
+			return speed * 0.89f + 0.0375f;	
+		}
 	}
 	
 	private static float getDriftingDistance(final float speed, final int driftTime) {
