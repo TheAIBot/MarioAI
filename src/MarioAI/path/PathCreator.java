@@ -3,15 +3,8 @@ package MarioAI.path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.validator.PublicClassValidator;
-
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.jndi.rmi.registry.RegistryContext;
 
 import MarioAI.MarioMethods;
 import MarioAI.World;
@@ -20,7 +13,6 @@ import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 

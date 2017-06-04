@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import MarioAI.World;
 import MarioAI.graph.CollisionDetection;
-import MarioAI.graph.Function;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 

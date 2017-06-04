@@ -12,9 +12,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.sun.istack.internal.FinalArrayList;
-
-import MarioAI.FastAndFurious;
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.graph.CollisionDetection;
@@ -24,11 +21,9 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-import junit.framework.Assert;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCollisionDetector {

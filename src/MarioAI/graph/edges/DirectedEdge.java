@@ -1,6 +1,5 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MovementInformation;
 

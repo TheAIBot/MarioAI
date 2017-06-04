@@ -3,7 +3,6 @@ package MarioAI;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import sun.launcher.resources.launcher;
 
 public class Hasher {
 	

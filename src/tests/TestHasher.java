@@ -13,7 +13,6 @@ import MarioAI.Hasher;
 import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
 public class TestHasher {

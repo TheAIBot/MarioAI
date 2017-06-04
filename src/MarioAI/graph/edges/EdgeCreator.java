@@ -2,8 +2,6 @@ package MarioAI.graph.edges;
 
 import java.util.*;
 
-import com.sun.javafx.scene.traversal.Direction;
-
 import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;

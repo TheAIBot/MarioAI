@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;

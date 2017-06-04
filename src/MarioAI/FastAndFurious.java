@@ -2,16 +2,8 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -19,13 +11,11 @@ import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.EdgeCreator;
-import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
-import tests.TestTools;
 
 
 public class FastAndFurious extends KeyAdapter implements Agent {
