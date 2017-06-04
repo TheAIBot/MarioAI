@@ -23,6 +23,10 @@ public class TickBasedAgent implements Agent {
 	}
 
 	public boolean[] getAction(Environment observation) {
+		byte[][] worldScene = observation.getLevelSceneObservationZ(0);
+    	float[] enemyPositions = observation.getEnemiesFloatPos();
+		float[] marioPos = observation.getMarioFloatPos();
+		
 		boolean finishedNewRun = true;
 		if (finishedNewRun) {
 			iter = plan.iterator();
@@ -51,6 +55,7 @@ public class TickBasedAgent implements Agent {
 	}
 
 	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override

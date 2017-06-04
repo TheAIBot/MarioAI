@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.idsia.mario.engine.sprites.Mario;
+import tickbased.game.world.LevelScene;
 import tickbased.main.Action;
 import tickbased.main.Problem;
 import tickbased.main.SearchNode;
@@ -57,10 +58,20 @@ public class TickProblem extends Problem {
 	}
 
 	@Override
-	public SearchNode childNode(SearchNode node, Action action) {
-		// TODO Auto-generated method stub
+	public SearchNode childNode(SearchNode searchNode, Action action) {
+		Node node = (Node) searchNode.state;
+		MarioAction marioAction = (MarioAction) action;
 		
-		return null;
+		// Clone the levelScene and update it by executing the given action
+		LevelScene levelScene = new LevelScene(node.levelScene);
+		levelScene.mario.setKeys(marioAction.action);
+		levelScene.tick();
+		
+		State newNode = new Node(levelScene);
+		states.add(newNode);
+		
+		SearchNode sn = new SearchNode(newNode, action);
+		return sn;
 	}
 
 	@Override
@@ -69,11 +80,14 @@ public class TickProblem extends Problem {
 	}
 
 	@Override
-	public double heuristicFunction(SearchNode node, SearchNode goal) {
+	public double heuristicFunction(SearchNode searchNode, SearchNode goal) {
 		// TODO note: goal should be an auxiliary node far to the right
-		return Math.sqrt(Math.pow(((Node) goal.state).x, 2) + Math.pow(((Node) node.state).x, 2));
+		return Math.sqrt(Math.pow(((Node) goal.state).x, 2) + Math.pow(((Node) searchNode.state).x, 2));
 	}
 
+	/**
+	 * Reached a location as far to the right as possible as seen so far
+	 */
 	@Override
 	public boolean goalTest(State goal) {
 		// TODO Auto-generated method stub
