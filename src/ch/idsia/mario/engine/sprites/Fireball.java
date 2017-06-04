@@ -3,7 +3,6 @@ package ch.idsia.mario.engine.sprites;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.LevelScene;
 
-
 public class Fireball extends Sprite
 {
     private static float GROUND_INERTIA = 0.89f;
@@ -15,7 +14,7 @@ public class Fireball extends Sprite
     private int width = 4;
     int height = 24;
 
-    private tickbased.game.world.LevelScene world;
+    private LevelScene world;
     public int facing;
 
     public boolean avoidCliffs = false;
@@ -24,14 +23,14 @@ public class Fireball extends Sprite
     public boolean dead = false;
     private int deadTime = 0;
 
-    public Fireball(tickbased.game.world.LevelScene world2, float x, float y, int facing)
+    public Fireball(LevelScene world, float x, float y, int facing)
     {
         kind = KIND_FIREBALL;
         sheet = Art.particles;
 
         this.x = x;
         this.y = y;
-        this.world = world2;
+        this.world = world;
         xPicO = 4;
         yPicO = 4;
 

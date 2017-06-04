@@ -2,8 +2,6 @@ package tickbased.game.world;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +9,6 @@ import ch.idsia.mario.engine.BgRenderer;
 import ch.idsia.mario.engine.Generalizer;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
-import ch.idsia.mario.engine.level.BgLevelGenerator;
-import ch.idsia.mario.engine.level.LevelGenerator;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
 import tickbased.game.enemies.BulletBill;
@@ -26,8 +22,6 @@ import tickbased.game.enemies.Shell;
 import tickbased.game.enemies.Sparkle;
 import tickbased.game.enemies.Sprite;
 import tickbased.game.enemies.SpriteContext;
-
-
 
 public class LevelScene implements SpriteContext
 {

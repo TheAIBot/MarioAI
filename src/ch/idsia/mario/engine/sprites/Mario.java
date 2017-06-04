@@ -83,7 +83,7 @@ public class Mario extends Sprite {
 	int width = 4;
 	int height = 24;
 
-	public tickbased.game.world.LevelScene world;
+	public LevelScene world;
 	public int facing;
 	private int powerUpTime = 0; // exclude pause for rendering changes
 
@@ -96,7 +96,7 @@ public class Mario extends Sprite {
 	public Sprite carried = null;
 	private static Mario instance;
 
-	public Mario(tickbased.game.world.LevelScene levelScene) {
+	public Mario(LevelScene levelScene) {
 		kind = KIND_MARIO;
 		Mario.instance = this;
 		this.world = levelScene;
@@ -109,9 +109,6 @@ public class Mario extends Sprite {
 
 		facing = 1;
 		setLarge(Mario.large, Mario.fire);
-	}
-
-	public Mario(LevelScene levelScene) {
 	}
 
 	private boolean lastLarge;

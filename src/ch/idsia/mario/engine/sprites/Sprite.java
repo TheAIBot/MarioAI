@@ -48,7 +48,7 @@ public class Sprite
     
     public int layer = 1;
 
-    public tickbased.game.world.SpriteTemplate spriteTemplate;
+    public SpriteTemplate spriteTemplate;
 
     public void move()
     {
