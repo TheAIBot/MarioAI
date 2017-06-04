@@ -36,17 +36,24 @@ public class CollisionDetection {
 		//TODO find out why,
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
 															     (startY - currentOffset.y) * 16 - 1);
+		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
 		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
 		//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.
 		if (lastYValue == futureOffset.y) {
-			return !move(currentPosition, xa, 0, world);
+			move(currentPosition, xa, 0, world);
+			currentPosition.y += ya;
 		}
 		else {
-			return !move(currentPosition, xa, 0, world) || 
-					 !move(currentPosition, 0, ya, world);
+			move(currentPosition, xa, 0, world);
+			move(currentPosition, 0, ya, world);
 		}
+		
+		final float diffX = currentPosition.x - expectedPosition.x;
+		final float diffY = currentPosition.y - expectedPosition.y;
+		
+		return diffX > 0.005 || diffY > 0.005;
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.
