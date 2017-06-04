@@ -259,7 +259,7 @@ public class MarioControls {
 		
 		//The calculations are independent of the direction:
 		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance) - (MAX_X_VELOCITY / 3);
+		neededXDistance = Math.abs(neededXDistance);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.

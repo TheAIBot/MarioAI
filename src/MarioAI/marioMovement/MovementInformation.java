@@ -155,6 +155,9 @@ public class MovementInformation{
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
 				return false;
 			}
+			else if (bb.useSuperSpeed != useSuperSpeed) {
+				return false;
+			}
 			else if (!Arrays.equals(bb.pressXButton, pressXButton)) {
 				return false;
 			}

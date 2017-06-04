@@ -31,7 +31,7 @@ public class Play {
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
@@ -39,7 +39,7 @@ public class Play {
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
-			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
