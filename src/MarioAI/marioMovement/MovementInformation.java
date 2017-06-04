@@ -86,12 +86,12 @@ public class MovementInformation{
 		if (xMovedDistance > 0) {
 			actions[Mario.KEY_RIGHT] = pressXButton[tick];
 			actions[Mario.KEY_LEFT] = false;
-			actions[Mario.KEY_SPEED] = useSuperSpeed;
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else if (xMovedDistance < 0) {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = pressXButton[tick];
-			actions[Mario.KEY_SPEED] = useSuperSpeed;
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else {
 			actions[Mario.KEY_RIGHT] = false;

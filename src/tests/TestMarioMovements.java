@@ -18,12 +18,14 @@ import ch.idsia.mario.environments.Environment;
 public class TestMarioMovements {
 	
 	@Test
-	public void testRightMovement() {
+	public void testRightMovementSlow() {
 		testRightSpeed(1, false);
 		testRightSpeed(2, false);
 		testRightSpeed(3, false);
 		testRightSpeed(4, false);
-		
+	}
+	@Test
+	public void testRightMovementFast() {
 		testRightSpeed(1, true);
 		testRightSpeed(2, true);
 		testRightSpeed(3, true);
@@ -44,12 +46,14 @@ public class TestMarioMovements {
 	}
 	
 	@Test
-	public void testLeftMovement() {
+	public void testLeftMovementSlow() {
 		testLeftSpeed(1, false);
 		testLeftSpeed(2, false);
 		testLeftSpeed(3, false);
 		testLeftSpeed(4, false);
-		
+	}
+	@Test
+	public void testLeftMovementFast() {
 		testLeftSpeed(1, true);
 		testLeftSpeed(2, true);
 		testLeftSpeed(3, true);
@@ -73,14 +77,16 @@ public class TestMarioMovements {
 	}
 	
 	@Test
-	public void testDeaccelerating() {
+	public void testDeacceleratingSlow() {
 		testDeaccelerating(1, false);
 		testDeaccelerating(2, false);
 		testDeaccelerating(5, false);
 		testDeaccelerating(8, false);
 		testDeaccelerating(13, false);
 		testDeaccelerating(21, false);
-		
+	}
+	@Test
+	public void testDeacceleratingFast() {
 		testDeaccelerating(1, true);
 		testDeaccelerating(2, true);
 		testDeaccelerating(5, true);
@@ -120,7 +126,7 @@ public class TestMarioMovements {
 	}
 	
 	@Test
-	public void testJumps() {
+	public void testJumpsSlow() {
 		testJumpTime(1, 0, 0, false);
 		testJumpTime(2, 0, 0, false);
 		testJumpTime(3, 0, 0, false);
@@ -155,7 +161,9 @@ public class TestMarioMovements {
 		
 		testJumpTime(4, -4, 1, false);
 		testJumpTime(5, -4, 1, false);
-		
+	}
+	@Test
+	public void testJumpsFast() {		
 		testJumpTime(1, 0, 0, true);
 		testJumpTime(2, 0, 0, true);
 		testJumpTime(3, 0, 0, true);
@@ -206,11 +214,20 @@ public class TestMarioMovements {
 	}
 	
 	@Test
-	public void testConsecutiveJumps() {
+	public void testConsecutiveJumpsSlow() {
 		for (int pathLength = 1; pathLength < 10; pathLength++) {
 			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
 				for (int distanceX = 1; distanceX <= 4; distanceX++) {
 					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, false);
+				}
+			}
+		}
+	}
+	@Test
+	public void testConsecutiveJumpsFast() {
+		for (int pathLength = 1; pathLength < 10; pathLength++) {
+			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
+				for (int distanceX = 1; distanceX <= 4; distanceX++) {
 					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, true);
 				}
 			}
@@ -231,38 +248,58 @@ public class TestMarioMovements {
 	}
 	
 	@Test
-	public void testRunningRightPathEqualities() {
+	public void testRunningRightPathEqualitiesSlow() {
 		MarioControls.setupYMovements();
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				comparePaths(PathHelper.createPath(0, 0, i, 0, 0, j, world, false), PathHelper.createPath(0, 0, j, 0, 0, i, world, false));
+			}
+		}	
+	}
+	@Test
+	public void testRunningRightPathEqualitiesFast() {
+		MarioControls.setupYMovements();
+		final World world = new World();
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
 				comparePaths(PathHelper.createPath(0, 0, i, 0, 0, j, world, true ), PathHelper.createPath(0, 0, j, 0, 0, i, world, true ));
 			}
 		}	
 	}
 	
 	@Test
-	public void testRunningLeftPathEqualities() {
+	public void testRunningLeftPathEqualitiesSlow() {
 		MarioControls.setupYMovements();
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
 				comparePaths(PathHelper.createPath(0, 0, -i, 0, 0, j, world, false), PathHelper.createPath(0, 0, -j, 0, 0, i, world, false));
+			}
+		}	
+	}
+	@Test
+	public void testRunningLeftPathEqualitiesFast() {
+		MarioControls.setupYMovements();
+		final World world = new World();
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
 				comparePaths(PathHelper.createPath(0, 0, -i, 0, 0, j, world, true ), PathHelper.createPath(0, 0, -j, 0, 0, i, world, true ));
 			}
 		}	
 	}
 	
 	@Test
-	public void testXWidthJumpNoAstar() {
+	public void testXWidthJumpNoAstarSlow() {
 		testJumpNoAstar(1, 2, false);
 		testJumpNoAstar(1, 3, false);
 		testJumpNoAstar(1, 4, false);
 		
 		testJumpNoAstar(2, 3, false);
 		testJumpNoAstar(2, 4, false);
-		
+	}
+	@Test
+	public void testXWidthJumpNoAstarFast() {
 		testJumpNoAstar(1, 2, true);
 		testJumpNoAstar(1, 3, true);
 		testJumpNoAstar(1, 4, true);
