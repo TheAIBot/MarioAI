@@ -19,7 +19,6 @@ public  class EdgeCreator {
 	public static final boolean ALLOW_JUMPING = true;
 	
 	private Node[][] observationGraph = new Node[GRID_WIDTH][GRID_WIDTH];
-	private int testPrintCounter = 24; // Rand value
 
 	public void setMovementEdges(World world, Node marioNode) {
 		observationGraph = world.getLevelMatrix();
@@ -217,7 +216,6 @@ public  class EdgeCreator {
 		//Switches modes from ascending to descending, when the top point has been reached.
 		boolean hasAlreadyPassedTopPoint = false;
 		boolean isPastTopPointColumn = polynomial.isPastTopPoint(nodeColoumn,  currentXPosition + xPositionOffsetForJump);
-		
 		//TODO go stepwise through it and ensure that it works.
 		
 		while (isWithinView(currentXPosition + xPositionOffsetForJump)) {
@@ -225,11 +223,16 @@ public  class EdgeCreator {
 			float currentYPosition;
 			
 			if (isPastTopPointColumn && !hasAlreadyPassedTopPoint) {
-				if ((polynomial.getTopPointX() < currentXPosition && !direction.isLeftType())) { //rightwards!
+				if ((polynomial.getTopPointX() < currentXPosition + xPositionOffsetForJump && 
+					  !direction.isLeftType())
+					  && collisionDetection != Collision.HIT_WALL) { //rightwards!
 					currentXPosition--; //The toppoint was in the current block (and not ending there).
 					//Therefore the downward going part of that block needs to be checked.
 					//See more detailed explanation in the report.
-				} else if ((polynomial.getTopPointX() > currentXPosition && direction.isLeftType())) { //Leftwards
+					//It must not just have had a collision with a wall, as the x position has then already been decremented.
+				} else if ((polynomial.getTopPointX() > currentXPosition + xPositionOffsetForJump && 
+						      direction.isLeftType()) &&
+								collisionDetection != Collision.HIT_WALL) { //Leftwards
 					currentXPosition++;
 				}
 				currentJumpDirection = direction.getOppositeVerticalDirection();				
@@ -260,7 +263,7 @@ public  class EdgeCreator {
 			}
 			
 			if (collisionDetection == Collision.HIT_WALL) {
-				currentXPosition = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
+				currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
 				xPositionOffsetForJump = xPositionOffsetForJump + direction.getHorizontalDirectionAsInt();
 			} //TODO change back to both below returns true.
 			else if ( collisionDetection == Collision.HIT_GROUND) {
@@ -300,7 +303,7 @@ public  class EdgeCreator {
 				y = Math.max(bound, 0);
 			}
 			
-			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  	(y, currentXPosition, collisionDetection, direction);
+			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  	(y, currentXPosition, direction, collisionDetection);
 			final Collision upperFacingMarioCorner   = upperFacingCornerCollision  	(y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision upperOppositeMarioCorner = upperOppositeCornerCollision	(y, currentXPosition, direction);	
 			final Collision middleFacingMarioCorner  = middleFacingCornerCollision	(y, currentXPosition, direction);
@@ -355,9 +358,13 @@ public  class EdgeCreator {
 				y = Math.max(bound, 0);
 			}
 			
-			final Collision lowerFacingMarioCorner 	= lowerFacingCornerCollision  	(y, currentXPosition, collisionDetection, direction);
+			final Collision lowerFacingMarioCorner 	= lowerFacingCornerCollision  	(y, currentXPosition, direction, collisionDetection);
 			final Collision upperFacingMarioCorner 	= upperFacingCornerCollision  	(y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision	(y, currentXPosition, direction);	
+			if (lowerOppositeMarioCorner == Collision.HIT_WALL) {
+				throw new Error("Logic error");
+			}
+			
 			//As it is descending to the right, only worry about the two corners to the right, and the left lower one.
 			//TODO change this so that walls are prioritized correctly
 			//TODO discuss why it is HIT_NOTHING or HIT_WALL for upperFacingMarioCorner.
@@ -468,10 +475,12 @@ public  class EdgeCreator {
 
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
 			return 0 < yPosition && yPosition < GRID_HEIGHT &&
-				   isOnSolidGround((int) yPosition, coloumn) && observationGraph[coloumn][(int) (yPosition - 1)] == null;
+				   isOnSolidGround((int) (yPosition), coloumn) && 
+				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 1]) &&
+				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]);
+			//One could use Marios height, but this is techinacally not correct, 
+			//if one only wants to use information from one corner, namely this
 		}
-
-	
 	
 	private boolean isOnSolidGround(int row, int coloumn) {
 		return observationGraph[coloumn][row] != null; //TODO Fix in general.
@@ -484,16 +493,21 @@ public  class EdgeCreator {
 				 observationGraph[coloumn][row] == null;// TODO(*) Fix
 	}
 				
-	public Collision lowerFacingCornerCollision	(float y, int currentXPosition, Collision collisionDetection, JumpDirection direction) {
+	public Collision lowerFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, Collision collisionDetection) {
+		if (direction.isLeftType()) { 
+			//The x position denotes the placement of the right corner, 
+			//so if one wants the left, one must be subtracted.
+			currentXPosition += direction.getHorizontalDirectionAsInt();
+		}
 		if (direction.isUpwardsType()) { 
 			//In the case one is going upwards, one should not check for any other type of collisions, 
 			//than those originating from wall collisions.
 			//TODO check and discuss if ceiling the result is correct.
 			if (isHittingWallOrGroundUpwards(currentXPosition, y)) { //If it is hitting the ceiling, upperRight will notice.
 				return Collision.HIT_WALL;
-			} else {		//TODO check if needs Math.ceil
-				if (isAir(currentXPosition, (int) (y - MARIO_HEIGHT)) && 
-					collisionDetection == Collision.HIT_WALL) {
+			} else {	
+				if (//isAir(currentXPosition, (int) (y - MARIO_HEIGHT)) && //Is this needed?
+					 collisionDetection == Collision.HIT_WALL) {
 					return Collision.HIT_GROUND;
 				} else {
 					return Collision.HIT_NOTHING;			
@@ -502,10 +516,10 @@ public  class EdgeCreator {
 		} else {
 			//One must be going downwards, and there should be checked for collisions:
 			//TODO check and discuss if ceiling the result is correct.
-			if (isHittingWallOrGroundDownwards(currentXPosition, (int) Math.floor(y))) {
+			if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
 				//If this corner is hitting something, then there are two possibilities: either it is the ground or a wall.
 				//If it is the ground, then Mario can stand there, and if it is a wall, it is not possible.
-				if (canMarioStandThere(currentXPosition, (int) Math.floor(y))) {
+				if (canMarioStandThere(currentXPosition, y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall...
 					return Collision.HIT_GROUND;
 				} else {
 					return Collision.HIT_WALL;
@@ -516,7 +530,11 @@ public  class EdgeCreator {
 	}
 
 	public Collision upperFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, boolean isHittingWall, float formerLowerYPosition) {
-		//TODO likely error here with the direction.
+		if (direction.isLeftType()) { 
+			//The x position denotes the placement of the right corner, 
+			//so if one wants the left, one must be subtracted.
+			currentXPosition += direction.getHorizontalDirectionAsInt();
+		}
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
@@ -545,7 +563,10 @@ public  class EdgeCreator {
 	}
 	
 	public Collision upperOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
-		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
+		if (!direction.isLeftType()) {
+			//If it is moving to the right, x=x-1 for the opposite corner. Else x=x.
+			currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
+		}
 		
 		//If Mario is going upwards, and since this is the opposite corner of the way he is going, 
 		//one only needs to check for ceiling collisions.
@@ -558,12 +579,15 @@ public  class EdgeCreator {
 	}
 	
 	public Collision lowerOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
-		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
+		if (!direction.isLeftType()) {
+			//If it is moving to the right, x=x-1 for the opposite corner. Else x=x.
+			currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
+		}
 		
 		//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
 		//TODO check and discuss if ceiling the result is correct.
 		if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
-			if (canMarioStandThere(currentXPosition, y)) {
+			if (canMarioStandThere(currentXPosition,  y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall
 				return Collision.HIT_GROUND;
 			} else {  
 				throw new Error("Logic error on corner collision detection");
@@ -578,7 +602,7 @@ public  class EdgeCreator {
 	public Collision middleFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction){
 		if (direction.isLeftType()) { 
 			//The x position denotes the placement of the right corner, 
-			//so if one wants the left, one must be substracted.
+			//so if one wants the left, one must be subtracted.
 			currentXPosition += direction.getHorizontalDirectionAsInt();
 		}
 		//Mario must have height < 1, before this is relevant:

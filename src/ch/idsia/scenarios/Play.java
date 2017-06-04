@@ -66,7 +66,7 @@ public class Play {
 				}
 			}
 	        System.out.println("Seed = " + seed);
-	        
+	        options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        		//hahahaha
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
