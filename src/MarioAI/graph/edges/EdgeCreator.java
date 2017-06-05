@@ -15,6 +15,7 @@ public class EdgeCreator {
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
+	public static final boolean ALLOW_SPEED_KEY = false;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {
@@ -184,13 +185,17 @@ public class EdgeCreator {
 		//Run to the right:
 		if (nodeColoumn + 1 < GRID_WIDTH) { //Not at the rightmost block in the view.
 			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], false));
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], true));
+			if (ALLOW_SPEED_KEY) {
+				listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn + 1][startingNode.y], true));				
+			}
 		} else foundAllEdges = false;
 		
 		//Run to the left:
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
 			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));
+			if (ALLOW_SPEED_KEY) {
+				listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));				
+			}
 		}	else foundAllEdges = false;
 
 		return foundAllEdges;
@@ -378,7 +383,9 @@ public class EdgeCreator {
 				collisionDetection = Collision.HIT_GROUND;
 				if (addEdges) {
 					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial, false));
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial, true));
+					if (ALLOW_SPEED_KEY) {
+						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y], polynomial, true));						
+					}
 				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL
@@ -443,12 +450,16 @@ public class EdgeCreator {
 				collisionDetection = Collision.HIT_GROUND;
 				if(lowerFacingMarioCorner == Collision.HIT_GROUND)	{
 					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial, false));
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial, true));
+					if (ALLOW_SPEED_KEY) {
+						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[currentXPosition][(int) y],polynomial, true));						
+					}
 				}										 
 				else { //lands on the opposite corner.
 					final int groundXPos = currentXPosition + direction.getOppositeDirection().getHorizontalDirectionAsInt();
 					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, false));
-					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, true));
+					if (ALLOW_SPEED_KEY) {
+						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, true));						
+					}
 				}
 				break;
 			} else if (upperFacingMarioCorner == Collision.HIT_WALL

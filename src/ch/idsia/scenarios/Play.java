@@ -39,7 +39,7 @@ public class Play {
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
-			Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
@@ -70,6 +70,7 @@ public class Play {
 				}
 			}
 	        System.out.println("Seed = " + seed);
+	        options.setLevelRandSeed(136829693);
 	        //options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
@@ -100,7 +101,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(2);
+	        //options.setLevelDifficulty(2);
 	        options.setLevelDifficulty(-1);	 
 	        task.setOptions(options);
 	        
