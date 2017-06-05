@@ -3,7 +3,12 @@ package tickbased.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.environments.Environment;
+import tickbased.game.enemies.BulletBill;
+import tickbased.game.enemies.Enemy;
+import tickbased.game.enemies.FlowerEnemy;
+import tickbased.game.enemies.Mario;
+import tickbased.game.enemies.Sprite;
 import tickbased.game.world.LevelScene;
 import tickbased.main.Action;
 import tickbased.main.Problem;
@@ -13,8 +18,10 @@ import tickbased.main.State;
 public class TickProblem extends Problem {
 
 	private static final float MAX_RIGHT = 200;
-	private static final int SCREEN_WIDTH = 20; // TODO
+	private static final int SCREEN_WIDTH = 22, SCREEN_HEIGHT = 15; // TODO
 	public int maxRightSeenSoFar = 10; // TODO
+	public LevelScene levelScene;
+	public List<Sprite> sprites = new ArrayList<Sprite>();
 
 	@Override
 	public List<Action> actions(State state) {
@@ -24,21 +31,21 @@ public class TickProblem extends Problem {
 
 		// move right
 		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
-		actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
 		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
-		actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
 
 		// move left
 		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
-		actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
 		actions.add(new MarioAction(node, createAction(true, false, false, false, true)));
-		actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
 
 		// jump straight up
-		actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
 		
-		// stand still
-		actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
+		// stand still and jump
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
 		
 		return actions;
 	}
@@ -93,15 +100,6 @@ public class TickProblem extends Problem {
 		return distToRightSideOfScreen < 0 ? 0 : distToRightSideOfScreen;
 	}
 
-//	/**
-//	 * Reached a location as far to the right as possible
-//	 * This will actually never occur, since there is not enough time nor information to complete this task
-//	 */
-//	@Override
-//	public boolean goalTest(State node) {
-//		return ((Node) node).x > MAX_RIGHT;
-//	}
-	
 	@Override
 	public boolean goalTest(State node) {
 		float distToRightSideOfScreen = ((Node) node).x - maxRightSeenSoFar;
@@ -110,6 +108,68 @@ public class TickProblem extends Problem {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Updates the levelScene (world) from the latest observation by setting blocks and enemies (sprites)
+	 * @param observation
+	 */
+	public void updateLevel(Environment observation) {
+		byte[][] blockPositions = observation.getLevelSceneObservationZ(0);
+    	float[] enemyPositions = observation.getEnemiesFloatPos();
+		float[] marioPosition = observation.getMarioFloatPos();
+		
+		levelScene.mario.x = marioPosition[0];
+		levelScene.mario.y = marioPosition[1];
+		Mario mario = levelScene.mario;
+		
+		int marioXPos = (int) mario.x / 16;
+		int marioYPos = (int) mario.y / 16;
+
+		// Blocks
+        for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        	for (int x = marioXPos; x < marioXPos + SCREEN_WIDTH; x++) {
+        		levelScene.level.setBlock(x, y, blockPositions[x][y]);
+        	}
+        }
+        
+        // Enemies
+        float delta = 0.5f; // uncertainty of already seen enemy positions relative to observed now
+        Sprite sprite = null;
+        for (int i = 0; i < enemyPositions.length; i += 3) {
+        	int kind = (int) enemyPositions[i];
+        	float x = enemyPositions[i+1];
+        	float y = enemyPositions[i+2];
+        	
+        	boolean hasFoundEnemy = false;
+        	for (Sprite spr : sprites) {
+        		// check if enemy has been seen previously
+        		if (Math.abs(spr.x - x) < delta && Math.abs(spr.y - y) < delta && spr.kind == kind) {
+        			if (!spr.hasFacingBeenSet) { // if enemy.facing has not been set previously
+        				((Enemy) spr).facing = (spr.x - x > 0) ? 1 : -1;
+        			}
+        			hasFoundEnemy = true;
+        			break;
+        		}
+        	}
+        	
+			if (!hasFoundEnemy) {
+				if (kind == Enemy.ENEMY_FLOWER) {
+					int xBlockPos = (int) x / 16;
+					int yBlockPos = (int) y / 16;
+					sprite = new FlowerEnemy(levelScene, (int) x, (int) y, xBlockPos, yBlockPos);
+				} else if (kind == Sprite.KIND_BULLET_BILL) {
+					sprite = new BulletBill(levelScene, x, y, -1);
+				} else {
+					boolean winged = false; // TODO temporarily not taken care of
+					sprite = new Enemy(levelScene, (int) x, (int) y, -1, kind, winged, (int) x / 16, (int) y / 16);
+				}
+				sprites.add(sprite);
+        	}
+			if (sprite != null) levelScene.addSprite(sprite);
+        	
+        }
+
 	}
 
 }

@@ -13,10 +13,13 @@ import tickbased.search.Node;
 
 public class AStarTickBased {
 
+	public boolean finishedNewRun = false;
+
 	public List<Action> runAStar(Problem problem) {
 		long startTime = System.currentTimeMillis();
 		long time = System.currentTimeMillis();
 		problem.timeUsed = (int) (time - startTime);
+		finishedNewRun = false;
 		
 		SearchNode start = new SearchNode(problem.initialState);
 		SearchNode goal = new SearchNode(problem.goalState);
@@ -35,12 +38,13 @@ public class AStarTickBased {
 		start.fScore = problem.heuristicFunction(start, goal);
 		
 		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
-		while (!frontier.isEmpty() && problem.timeUsed < TickBasedAgent.MAX_ALLOWED_RUN_TIME) {
+		while (!frontier.isEmpty() && problem.timeUsed < problem.MAX_ALLOWED_RUN_TIME) {
 			SearchNode searchNode = frontier.remove();
 			frontierMap.remove(searchNode.hashCode());
 
 			// If goal is reached return solution path
 			if (problem.goalTest(searchNode.state)) {
+				finishedNewRun = true;
 				return reconstructPath(searchNode);
 			}
 			
@@ -70,6 +74,7 @@ public class AStarTickBased {
 		
 		// No solution exists or no solution was found in the given time.
 		// Return the best route found so far.
+		finishedNewRun = true;
 		return reconstructPath(currentBest);
 	}
 	

@@ -10,6 +10,7 @@ public abstract class Problem {
 	public State initialState;
 	public State goalState;
 	public int timeUsed = 0;
+	public final int MAX_ALLOWED_RUN_TIME = 42;
 	
 	public Problem() {
 	}

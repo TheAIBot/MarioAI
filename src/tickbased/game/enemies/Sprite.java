@@ -50,6 +50,8 @@ public class Sprite
     public int layer = 1;
 
     public SpriteTemplate spriteTemplate;
+    
+    public boolean hasFacingBeenSet = false; // Custom
 
     public void move()
     {
