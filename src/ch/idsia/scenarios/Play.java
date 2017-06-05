@@ -3,20 +3,20 @@ package ch.idsia.scenarios;
 import MarioAI.FastAndFurious;
 import MarioAI.graph.CollisionDetection;
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
+import tickbased.main.TickBasedAgent;
 
 public class Play {
 
 
 	public static void main(String[] args) {
 		CollisionDetection.loadTileBehaviors();
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new HumanKeyboardAgent();
@@ -31,7 +31,7 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
-	        Agent controller = new FastAndFurious();
+	        Agent controller = new TickBasedAgent();
 	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
 	        EvaluationOptions options = new CmdLineOptions(new String[0]);
 	        options.setAgent(controller);
@@ -61,7 +61,7 @@ public class Play {
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        options.setLevelDifficulty(2);
+	        options.setLevelDifficulty(0);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

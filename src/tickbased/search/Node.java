@@ -33,7 +33,7 @@ public class Node implements State {
 		return false;
 	}
 	
-	public int hashCode() {
-		return hash;
-	}
+//	public int hashCode() {
+//		return hash;
+//	}
 }

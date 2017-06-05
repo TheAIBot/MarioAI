@@ -13,7 +13,7 @@ import tickbased.search.Node;
 
 public class AStarTickBased {
 
-	public boolean finishedNewRun = false;
+	public boolean finishedNewRun = true;
 
 	public List<Action> runAStar(Problem problem) {
 		long startTime = System.currentTimeMillis();

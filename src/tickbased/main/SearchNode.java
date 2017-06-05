@@ -12,7 +12,7 @@ public class SearchNode implements Comparable<SearchNode> {
 	
 	public SearchNode(State state) {
 		this.state = state;
-		this.hash = state.hashCode();
+//		this.hash = state.hashCode();
 	}
 	
 	public SearchNode(State state, Action action) {
@@ -30,9 +30,9 @@ public class SearchNode implements Comparable<SearchNode> {
 		return false;
 	}
 
-	public int hashCode() {
-		return hash;
-	}
+//	public int hashCode() {
+//		return hash;
+//	}
 	
 	public String toString() {
 		return state.toString();

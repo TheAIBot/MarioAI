@@ -33,12 +33,4 @@ public abstract class Problem {
 	
 	public abstract boolean goalTest(State goal);
 	
-	public void setInitialState(State state) {
-		this.initialState = state;
-	}
-	
-	public void setGoalState(State state) {
-		this.goalState = state;
-	}
-	
 }

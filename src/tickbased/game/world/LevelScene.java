@@ -2,6 +2,8 @@ package tickbased.game.world;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,8 @@ import ch.idsia.mario.engine.BgRenderer;
 import ch.idsia.mario.engine.Generalizer;
 import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.level.BgLevelGenerator;
+import ch.idsia.mario.engine.level.LevelGenerator;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
 import tickbased.game.enemies.BulletBill;
@@ -91,6 +95,7 @@ public class LevelScene implements SpriteContext
      * @param levelScene
      */
     public LevelScene(LevelScene levelScene) {
+    	this();
         this.graphicsConfiguration = levelScene.graphicsConfiguration;
         this.levelSeed = levelScene.levelSeed;
         this.renderer = levelScene.renderer;
@@ -104,7 +109,44 @@ public class LevelScene implements SpriteContext
         killedCreaturesByShell = 0;
     }
 
-    private String mapElToStr(int el)
+    /**
+     * Custom
+     */
+    public LevelScene() {
+    	init();
+	}
+    
+	public void init() {
+//		try {
+//			Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			System.exit(0);
+//		}
+		
+		level = new Level(1000, 15);
+		
+		paused = false;
+		Sprite.spriteContext = this;
+		sprites.clear();
+		layer = new LevelRenderer(level, graphicsConfiguration, 320, 240);
+
+		mario = new Mario(this);
+		sprites.add(mario);
+		startTime = 1;
+
+		timeLeft = totalTime * 15;
+
+		tick = 0;
+	}
+    
+    private class CustomLayerClass {
+    	int width = 320;
+    	int height = 240;
+    	//from mario source code: layer = new LevelRenderer(level, graphicsConfiguration, 320, 240);
+    }
+
+	private String mapElToStr(int el)
     {
         String s = "";
         if  (el == 0 || el == 1)

@@ -5,7 +5,7 @@ import tickbased.main.State;
 
 public class MarioAction implements Action {
 	public final State parent;
-	public int hash;
+	//public int hash;
 	
 	public boolean[] action = new boolean[5]; // action executed
 	

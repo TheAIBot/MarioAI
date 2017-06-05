@@ -128,7 +128,9 @@ public class TickProblem extends Problem {
 
 		// Blocks
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        	for (int x = marioXPos; x < marioXPos + SCREEN_WIDTH; x++) {
+        	int xStart = (marioXPos - SCREEN_WIDTH > 0) ? marioXPos - SCREEN_WIDTH : 0;
+        	int xEnd = (marioXPos <= 15) ? 15 : marioXPos - SCREEN_WIDTH ; // in the beginning Mario cannot see very far for some reason. So take care of this.
+        	for (int x = xStart; x < xEnd; x++) {
         		levelScene.level.setBlock(x, y, blockPositions[x][y]);
         	}
         }
