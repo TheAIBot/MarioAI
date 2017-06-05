@@ -266,38 +266,43 @@ public class MarioControls {
 		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
 		while (distanceToTarget > ACCEPTED_DEVIATION) {
 			////BLOCK 1////
-			speed = getNextTickSpeed(speed, useSuperSpeed);
-			distanceMoved += speed;
+			final float futureSpeed = getNextTickSpeed(speed, useSuperSpeed);
+			final float futureDistanceMoved = distanceMoved + futureSpeed;
+			
+			final float oldDistanceToTarget = distanceToTarget;
+			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - totalTicks));
+			
+			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget)) {
+				break;
+			}
+			
+			speed = futureSpeed;
+			distanceMoved = futureDistanceMoved;
 			xPositions.add(distanceMoved);
 			pressButton.add(true);
 			totalTicks++;
 			////BLOCK 1////
 			
-			final float oldDistanceToTarget = distanceToTarget;
-			distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
-			
-			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget)) {
-				break;
-			}
 		}
-		
-		final int ticksDrifting = Math.max(0, airTime - totalTicks);
-		totalTicks += ticksDrifting;
-		
-		speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
-		distanceMoved = (xPositions.size() == 0)? 0 : xPositions.get(xPositions.size() - 1);
-		
-		//move the last tick
-		//which should be on ground
-		//this allows two jumping edges
-		//after each other.
-		////BLOCK 1 COPY////
-		speed = getNextTickSpeed(speed, useSuperSpeed);
-		distanceMoved += speed;
-		xPositions.add(distanceMoved);
-		pressButton.add(true);
-		totalTicks++;
-		////BLOCK 1 COPY////			
+		if (airTime > 0) {
+			final int ticksDrifting = Math.max(0, airTime - totalTicks);
+			totalTicks += ticksDrifting;
+			
+			speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
+			distanceMoved = (xPositions.size() == 0)? 0 : xPositions.get(xPositions.size() - 1);
+			
+			//move the last tick
+			//which should be on ground
+			//this allows two jumping edges
+			//after each other.
+			////BLOCK 1 COPY////
+			speed = getNextTickSpeed(speed, useSuperSpeed);
+			distanceMoved += speed;
+			xPositions.add(distanceMoved);
+			pressButton.add(true);
+			totalTicks++;
+			////BLOCK 1 COPY////		
+		}		
 		
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction
