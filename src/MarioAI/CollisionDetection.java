@@ -51,8 +51,8 @@ public class CollisionDetection {
 			move(currentPosition, 0, ya, world);
 		}
 		
-		final float diffX = currentPosition.x - expectedPosition.x;
-		final float diffY = currentPosition.y - expectedPosition.y;
+		final float diffX = Math.abs(currentPosition.x - expectedPosition.x);
+		final float diffY = Math.abs(currentPosition.y - expectedPosition.y);
 		
 		return diffX > MarioControls.ACCEPTED_DEVIATION || diffY > MarioControls.ACCEPTED_DEVIATION;
 	}
