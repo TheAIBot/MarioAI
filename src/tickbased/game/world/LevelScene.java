@@ -2,17 +2,12 @@ package tickbased.game.world;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.idsia.mario.engine.BgRenderer;
 import ch.idsia.mario.engine.Generalizer;
-import ch.idsia.mario.engine.GlobalOptions;
 import ch.idsia.mario.engine.MarioComponent;
-import ch.idsia.mario.engine.level.BgLevelGenerator;
-import ch.idsia.mario.engine.level.LevelGenerator;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
 import tickbased.game.enemies.BulletBill;
@@ -23,7 +18,6 @@ import tickbased.game.enemies.Mario;
 import tickbased.game.enemies.Mushroom;
 import tickbased.game.enemies.Particle;
 import tickbased.game.enemies.Shell;
-import tickbased.game.enemies.Sparkle;
 import tickbased.game.enemies.Sprite;
 import tickbased.game.enemies.SpriteContext;
 
@@ -42,7 +36,7 @@ public class LevelScene implements SpriteContext
     public static Image tmpImage;
     private int tick;
 
-    private LevelRenderer layer;
+    private CustomLayerClass layer;
     private BgRenderer[] bgLayer = new BgRenderer[2];
 
     private GraphicsConfiguration graphicsConfiguration;
@@ -74,21 +68,21 @@ public class LevelScene implements SpriteContext
                                            "Underground(1)",
                                            "Castle(2)"};
 
-    public LevelScene(GraphicsConfiguration graphicsConfiguration, MarioComponent renderer, long seed, int levelDifficulty, int type, int levelLength, int timeLimit)
-    {
-        this.graphicsConfiguration = graphicsConfiguration;
-        this.levelSeed = seed;
-        this.renderer = renderer;
-        this.levelDifficulty = levelDifficulty;
-        this.levelType = type;
-        this.levelLength = levelLength;
-        this.setTotalTime(timeLimit);
-        killedCreaturesTotal = 0;
-        killedCreaturesByFireBall = 0;
-        killedCreaturesByStomp = 0;
-        killedCreaturesByShell = 0;
-    }
-    
+//    public LevelScene(GraphicsConfiguration graphicsConfiguration, MarioComponent renderer, long seed, int levelDifficulty, int type, int levelLength, int timeLimit)
+//    {
+//        this.graphicsConfiguration = graphicsConfiguration;
+//        this.levelSeed = seed;
+//        this.renderer = renderer;
+//        this.levelDifficulty = levelDifficulty;
+//        this.levelType = type;
+//        this.levelLength = levelLength;
+//        this.setTotalTime(timeLimit);
+//        killedCreaturesTotal = 0;
+//        killedCreaturesByFireBall = 0;
+//        killedCreaturesByStomp = 0;
+//        killedCreaturesByShell = 0;
+//    }
+//    
     
     /**
      * Copy constructor
@@ -129,7 +123,7 @@ public class LevelScene implements SpriteContext
 		paused = false;
 		Sprite.spriteContext = this;
 		sprites.clear();
-		layer = new LevelRenderer(level, graphicsConfiguration, 320, 240);
+		layer = new CustomLayerClass();
 
 		mario = new Mario(this);
 		sprites.add(mario);
@@ -726,8 +720,7 @@ public class LevelScene implements SpriteContext
 
     public void tick()
     {
-        if (GlobalOptions.TimerOn)
-                timeLeft--;
+        timeLeft--;
         if (timeLeft==0)
         {
             mario.die();
@@ -746,16 +739,6 @@ public class LevelScene implements SpriteContext
 
         if (xCam < 0) xCam = 0;
         if (xCam > level.width * 16 - 320) xCam = level.width * 16 - 320;
-
-        /*      if (recorder != null)
-         {
-         recorder.addTick(mario.getKeyMask());
-         }
-         
-         if (replayer!=null)
-         {
-         mario.setKeys(replayer.nextTick());
-         }*/
 
         fireballsOnScreen = 0;
 
@@ -798,9 +781,6 @@ public class LevelScene implements SpriteContext
             tick++;
             level.tick();
 
-            boolean hasShotCannon = false;
-            int xCannon = 0;
-
             for (int x = (int) xCam / 16 - 1; x <= (int) (xCam + layer.width) / 16 + 1; x++)
                 for (int y = (int) yCam / 16 - 1; y <= (int) (yCam + layer.height) / 16 + 1; y++)
                 {
@@ -808,21 +788,6 @@ public class LevelScene implements SpriteContext
 
                     if (x * 16 + 8 > mario.x + 16) dir = -1;
                     if (x * 16 + 8 < mario.x - 16) dir = 1;
-
-                    SpriteTemplate st = level.getSpriteTemplate(x, y);
-
-                    if (st != null)
-                    {
-                        if (st.lastVisibleTick != tick - 1)
-                        {
-                            if (st.sprite == null || !sprites.contains(st.sprite))
-                            {
-                                st.spawn(this, x, y, dir);
-                            }
-                        }
-
-                        st.lastVisibleTick = tick;
-                    }
 
                     if (dir != 0)
                     {
@@ -833,13 +798,7 @@ public class LevelScene implements SpriteContext
                             {
                                 if ((tick - x * 2) % 100 == 0)
                                 {
-                                    xCannon = x;
-                                    for (int i = 0; i < 8; i++)
-                                    {
-                                        addSprite(new Sparkle(x * 16 + 8, y * 16 + (int) (Math.random() * 16), (float) Math.random() * dir, 0, 0, 1, 5));
-                                    }
                                     addSprite(new BulletBill(this, x * 16 + 8 + dir * 8, y * 16 + 15, dir));
-                                    hasShotCannon = true;
                                 }
                             }
                         }
