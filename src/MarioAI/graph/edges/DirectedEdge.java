@@ -20,7 +20,7 @@ public abstract class DirectedEdge {
 	
 	public abstract float getWeight();
 	
-	protected abstract int getExtraEdgeHashcode();
+	protected abstract byte getExtraEdgeHashcode();
 		
 	@Override
 	public boolean equals(Object b) {

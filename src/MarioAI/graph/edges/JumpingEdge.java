@@ -121,7 +121,7 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	
 	@Override
 	public float getMaxY() {
-		return topPointY - (int)source.y;
+		return topPointY - source.y;
 	}
 
 	public float getWeight() {
@@ -129,12 +129,12 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	}
 	
 	@Override
-	protected int getExtraEdgeHashcode() {
-		final int jumpType = 1; //it is a jump edge type
+	protected byte getExtraEdgeHashcode() {
+		final byte jumpType = 0b0001_0000;
 		//Its jump height. Max is 4 min is 0, giving 3 bits.
 		//3 plus 1 but for jump type 
-		final int jumpHeight = ((Math.round(topPointY) - (int)source.y) & 0xf) << 2; 
-		return jumpHeight | jumpType;
+		final byte jumpHeight = (byte)Math.round(getMaxY()); 
+		return (byte) (jumpHeight | jumpType);
 	}
 	
 	public FallEdge getCorrespondingFallEdge(){

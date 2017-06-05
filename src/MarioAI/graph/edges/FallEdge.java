@@ -21,11 +21,10 @@ public class FallEdge extends DirectedEdge {
 	}
 
 	@Override
-	protected int getExtraEdgeHashcode() {
-		final int fallType = 2; //it is a fall edge type
+	protected byte getExtraEdgeHashcode() {
 		//Its fall length does not matter, only its targets position.
 		//Therefore it is not included
-		return fallType;
+		return 0b0000_0010;
 	}
 
 }

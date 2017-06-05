@@ -9,7 +9,7 @@ public class AStarHelperEdge extends RunningEdge {
 	}
 	
 	@Override
-	protected int getExtraEdgeHashcode() {
-		return 3;
+	protected byte getExtraEdgeHashcode() {
+		return 0b0000_0001;
 	}
 }
