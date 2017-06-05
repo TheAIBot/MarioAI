@@ -13,8 +13,8 @@ public class TickBasedAgent implements Agent {
 	protected String name = "TickBasedAgent";
 	
 	AStarTickBased aStar;
-	Problem problem;
-	final int MAX_ALLOWED_RUN_TIME = 42;
+	TickProblem problem;
+	public final static int MAX_ALLOWED_RUN_TIME = 42;
 	
 	List<Action> plan;
 	Iterator<Action> iter;
@@ -41,9 +41,10 @@ public class TickBasedAgent implements Agent {
 	        return action;
 		}
 		
-		int timeLeft = MAX_ALLOWED_RUN_TIME - (int)(System.currentTimeMillis() - startTime);
+		aStar.runAStar(problem);
 		
-		//aStar.runAStar(problem);
+		//problem.timeLeft = MAX_ALLOWED_RUN_TIME - (int)(System.currentTimeMillis() - startTime);
+		
 		
 		return ((MarioAction) (iter.next())).action;
 	}

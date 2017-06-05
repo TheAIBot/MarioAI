@@ -13,6 +13,8 @@ import tickbased.main.State;
 public class TickProblem extends Problem {
 
 	private static final float MAX_RIGHT = 200;
+	private static final int SCREEN_WIDTH = 20; // TODO
+	public int maxRightSeenSoFar = 10; // TODO
 
 	@Override
 	public List<Action> actions(State state) {
@@ -82,19 +84,32 @@ public class TickProblem extends Problem {
 		return 1;
 	}
 
-	@Override
-	public double heuristicFunction(SearchNode searchNode, SearchNode goal) {
-		// TODO note: goal should be an auxiliary node far to the right
-		return Math.sqrt(Math.pow(((Node) goal.state).x, 2) + Math.pow(((Node) searchNode.state).x, 2));
-	}
-
 	/**
-	 * Reached a location as far to the right as possible
-	 * This will actually never occur, since there is not enough time nor information to complete this task
+	 * Heuristic is the distance to the right side of the screen
 	 */
 	@Override
+	public double heuristicFunction(SearchNode searchNode, SearchNode goal) {
+		float distToRightSideOfScreen = ((Node) goal.state).x - ((Node) searchNode.state).x;
+		return distToRightSideOfScreen < 0 ? 0 : distToRightSideOfScreen;
+	}
+
+//	/**
+//	 * Reached a location as far to the right as possible
+//	 * This will actually never occur, since there is not enough time nor information to complete this task
+//	 */
+//	@Override
+//	public boolean goalTest(State node) {
+//		return ((Node) node).x > MAX_RIGHT;
+//	}
+	
+	@Override
 	public boolean goalTest(State node) {
-		return ((Node) node).x > MAX_RIGHT;
+		float distToRightSideOfScreen = ((Node) node).x - maxRightSeenSoFar;
+		if (distToRightSideOfScreen >= 0) {
+			maxRightSeenSoFar += ((Node) node).levelScene.mario.x += SCREEN_WIDTH / 2;
+			return true;
+		}
+		return false;
 	}
 
 }

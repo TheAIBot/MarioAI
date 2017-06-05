@@ -9,11 +9,18 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import tickbased.search.Node;
+
 public class AStarTickBased {
 
-	public static List<Action> runAStar(Problem problem) {
+	public List<Action> runAStar(Problem problem) {
+		long startTime = System.currentTimeMillis();
+		long time = System.currentTimeMillis();
+		problem.timeUsed = (int) (time - startTime);
+		
 		SearchNode start = new SearchNode(problem.initialState);
 		SearchNode goal = new SearchNode(problem.goalState);
+		SearchNode currentBest = start;
 		
 		// Set of nodes already explored
 		Set<SearchNode> explored = new HashSet<SearchNode>();
@@ -28,38 +35,42 @@ public class AStarTickBased {
 		start.fScore = problem.heuristicFunction(start, goal);
 		
 		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
-		while (!frontier.isEmpty()) {
-			SearchNode node = frontier.remove();
-			frontierMap.remove(node.hashCode());
+		while (!frontier.isEmpty() && problem.timeUsed < TickBasedAgent.MAX_ALLOWED_RUN_TIME) {
+			SearchNode searchNode = frontier.remove();
+			frontierMap.remove(searchNode.hashCode());
 
 			// If goal is reached return solution path
-			if (problem.goalTest(node.state)) {
-				return reconstructPath(node);
+			if (problem.goalTest(searchNode.state)) {
+				return reconstructPath(searchNode);
 			}
 			
 			// Current node has been explored
-			explored.add(node);
+			explored.add(searchNode);
 			
 			// Explore each neighbor of current node
-			for (Action action : problem.actions(node.state)) {
-				SearchNode child = problem.childNode(node, action);
+			for (Action action : problem.actions(searchNode.state)) {
+				SearchNode child = problem.childNode(searchNode, action);
+				
+				// If child node has a higher x value than the previous ones then this will be the new currentBest
+				if (((Node) child.state).x > ((Node) currentBest.state).x) currentBest = child;
 				
 				// Cost of reaching child node
-				double tentativeGScore = node.gScore + problem.pathCost(node, child);
+				double tentativeGScore = searchNode.gScore + problem.pathCost(searchNode, child);
 				
 				if (!explored.contains(child) && !frontierMap.containsKey(child.hashCode())) {
-					insertChildNode(child, node, tentativeGScore, problem, goal, frontier, frontierMap);
+					insertChildNode(child, searchNode, tentativeGScore, problem, goal, frontier, frontierMap);
 				} else if (frontierMap.containsKey(child.hashCode()) && frontierMap.get(child.hashCode()).gScore > tentativeGScore) {
 					// the path the child node gives rise to is better than the original node (and corresponding path) so add child node instead
 					frontier.remove(child);
 					frontierMap.remove(child.hashCode());
-					insertChildNode(child, node, tentativeGScore, problem, goal, frontier, frontierMap);
+					insertChildNode(child, searchNode, tentativeGScore, problem, goal, frontier, frontierMap);
 				}
 			}
 		}
 		
-		// No solution was found
-		return null;
+		// No solution exists or no solution was found in the given time.
+		// Return the best route found so far.
+		return reconstructPath(currentBest);
 	}
 	
 	/**
@@ -72,7 +83,7 @@ public class AStarTickBased {
 	 * @param frontier
 	 * @param frontierMap
 	 */
-	private static void insertChildNode(SearchNode child, SearchNode node, double tentativeGScore, Problem problem,
+	private void insertChildNode(SearchNode child, SearchNode node, double tentativeGScore, Problem problem,
 										SearchNode goal, PriorityQueue<SearchNode> frontier, Map<Integer, SearchNode> frontierMap) {
 		child.parent = node;
 		child.gScore = tentativeGScore;
@@ -86,7 +97,7 @@ public class AStarTickBased {
 	 * @param current
 	 * @return solution path
 	 */
-	private static List<Action> reconstructPath(SearchNode current) {
+	private List<Action> reconstructPath(SearchNode current) {
 		List<Action> path = new ArrayList<Action>();
 		while (current.parent != null) {
 			path.add(current.action);

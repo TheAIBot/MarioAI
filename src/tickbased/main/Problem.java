@@ -9,6 +9,7 @@ public abstract class Problem {
 	public Set<State> states = new HashSet<State>();
 	public State initialState;
 	public State goalState;
+	public int timeUsed = 0;
 	
 	public Problem() {
 	}
