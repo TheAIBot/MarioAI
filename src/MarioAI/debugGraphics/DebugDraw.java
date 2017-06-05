@@ -190,13 +190,15 @@ public class DebugDraw {
 				new Point2D.Float((marioXPos - 10), 14),
 				new Point2D.Float((marioXPos -  9), 14),
 				new Point2D.Float((marioXPos -  8), 14),
-				new Point2D.Float((marioXPos -  9), 13)
+				new Point2D.Float((marioXPos -  9), 13),
+				new Point2D.Float((marioXPos -  8), 13)
 		};
 		final int[] keys = new int[] {
 				Mario.KEY_LEFT,
 				Mario.KEY_DOWN,
 				Mario.KEY_RIGHT,
-				Mario.KEY_JUMP
+				Mario.KEY_JUMP,
+				Mario.KEY_SPEED
 		};
 		
 		final Point size = new Point((int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER), (int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER));
