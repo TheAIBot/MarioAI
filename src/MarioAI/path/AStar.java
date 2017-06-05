@@ -117,7 +117,7 @@ public class AStar {
 					
 					// collision detection and invincibility handling 
 					int penalty = 0;
-					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+					/*if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 //						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 //							continue;
 //						}
@@ -131,6 +131,7 @@ public class AStar {
 							}
 						}
 					}
+					*/
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.

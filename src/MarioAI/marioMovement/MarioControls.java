@@ -88,7 +88,7 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
-		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY;
+		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY / 2;
 	}
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {

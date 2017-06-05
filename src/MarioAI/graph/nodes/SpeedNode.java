@@ -229,9 +229,4 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public String toString() {
 		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
 	}
-
-	private boolean collissionDetector(){
-		boolean hasCollided = false;
-		return hasCollided;
-	}
 }

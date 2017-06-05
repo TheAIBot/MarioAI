@@ -1,5 +1,6 @@
 package MarioAI.path;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
@@ -28,6 +30,7 @@ public class PathCreator {
 	private final CompletableFuture<Boolean>[] runningTasks;
 	private final AStarHelperEdge[] addedEdges = new AStarHelperEdge[World.LEVEL_HEIGHT];
 	private final Node[] nodesWithAddedEdges = new Node[World.LEVEL_HEIGHT];
+	private Point2D.Float marioFuturePosition;
 	public boolean isRunning = false;
 	
 	@SuppressWarnings("unchecked")
@@ -59,7 +62,14 @@ public class PathCreator {
 		enemyPredictor.moveIntoFuture(timeForward);
 		
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-		final float futureMarioXPos = marioXPos + currentEdge.getMoveInfo().getXMovementDistance();
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		final Point2D.Float edgeEndDistance = currentEdge.getMoveInfo().getPositions()[currentEdge.getMoveInfo().getPositions().length - 1];
+		
+		final float futureMarioXPos = marioXPos + edgeEndDistance.x;
+		final float futureMarioYPos = marioYPos - edgeEndDistance.y;
+		
+		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
 		
 		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();
 		
@@ -175,6 +185,10 @@ public class PathCreator {
 		}
 	}
 	
+	public void discardFoundPath() {
+		//bestPath.path.remove(0);
+	}
+	
 	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
 		if (newPotentialPath.path == null) {
 			return false;
@@ -186,6 +200,21 @@ public class PathCreator {
 		}
 		
 		return true;
+	}
+	
+	public boolean isMarioAtExpectedPosition(Environment observation) {
+		if (marioFuturePosition == null) {
+			throw new Error("marioFuturePosition wasn't set.");
+		}
+		
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		final float diffX = Math.abs(marioFuturePosition.x - marioXPos);
+		final float diffY = Math.abs(marioFuturePosition.y - marioYPos);
+		
+		return diffX < MarioControls.ACCEPTED_DEVIATION && 
+			   diffY < MarioControls.ACCEPTED_DEVIATION;
 	}
 	
 	public ArrayList<DirectedEdge> getBestPath() {

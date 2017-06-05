@@ -25,13 +25,13 @@ public class Play {
 		CollisionDetection.loadTileBehaviors();
 		boolean loadLevel = false;
 		if (loadLevel) {
-			Agent controller = new FastAndFurious();
+			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
 			//((UnitTestAgent) controller).action[0] = true;
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			//Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
@@ -39,8 +39,18 @@ public class Play {
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
-			Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
+	        if (new File(FastAndFurious.saveStateFileName).exists()) {
+	        	String fileContent = null;
+				try {
+					fileContent = Files.readAllLines(Paths.get(FastAndFurious.saveStateFileName)).get(0);
+					final int tick = Integer.parseInt(fileContent.split(" ")[1]);
+					controller.runToTick(tick);
+				} catch (IOException e) {
+					System.out.println("Failed to load level state");
+				}
+			}
 			TestTools.runWholeLevel(observation);
 		} else {
 			FastAndFurious controller = new FastAndFurious();
