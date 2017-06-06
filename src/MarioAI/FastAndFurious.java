@@ -142,7 +142,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				//DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
