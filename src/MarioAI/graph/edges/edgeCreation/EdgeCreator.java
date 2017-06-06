@@ -1,10 +1,12 @@
-package MarioAI.graph.edges;
+package MarioAI.graph.edges.edgeCreation;
 
 import java.util.*;
 
 import MarioAI.World;
-import MarioAI.graph.Collision;
-import MarioAI.graph.JumpDirection;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.FallEdge;
+import MarioAI.graph.edges.JumpingEdge;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {

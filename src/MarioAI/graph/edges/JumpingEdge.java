@@ -1,7 +1,7 @@
 package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
-import MarioAI.graph.JumpDirection;
+import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
 
 public class JumpingEdge extends DirectedEdge {

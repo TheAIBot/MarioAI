@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.edgeCreation.EdgeCreator;
+import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
@@ -70,8 +73,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned() ||
 				 pathCreator.getBestPath() == null) && 
-				marioController.canUpdatePath || 
-				!pathCreator.isRunning) 
+				marioController.canUpdatePath) 
 			{
 				/*
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
@@ -99,7 +101,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
 						//save(observation);
-						//throw new Error();
+						throw new Error();
 					}
 					pathCreator.updateBestPath();
 					System.out.println("Tick: " + tickCount + " Stopped");
@@ -163,7 +165,9 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public void startFindingPathFromPreviousPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioHeight);
+		final ArrayList<DirectedEdge> path =  pathCreator.getBestPath();
+		final Node[] goalNodes = world.getGoalNodes(0);
+		pathCreator.start(observation, path, goalNodes, marioHeight);
 	}
 	
 	private void executeKeyCommands(Environment observation) {

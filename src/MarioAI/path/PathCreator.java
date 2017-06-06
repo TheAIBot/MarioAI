@@ -71,7 +71,7 @@ public class PathCreator {
 		
 		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
 		
-		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();
+		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
 		
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
@@ -181,7 +181,7 @@ public class PathCreator {
 			//System.out.println("Updated best path");
 		}
 		else {
-			bestPath.path.remove(0);
+			//bestPath.path.remove(0);
 		}
 	}
 	
