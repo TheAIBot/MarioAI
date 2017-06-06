@@ -9,27 +9,52 @@ import static org.junit.Assert.*;
 
 import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.environments.Environment;
 
 public class TestMarioMovements {
 	
-	private int hashNumber = 0;
-	
 	@Test
-	public void testRightMovement() {
-		testRightSpeed(1);
-		testRightSpeed(2);
-		testRightSpeed(3);
-		testRightSpeed(4);
+	public void testRightMovementSlow() {
+		testRightSpeed(1, false, false);
+		testRightSpeed(2, false, false);
+		testRightSpeed(3, false, false);
+		testRightSpeed(4, false, false);
 	}
-	private void testRightSpeed(int distanceToMove) {
+	@Test
+	public void testRightMovementFast() {
+		testRightSpeed(1, true, false);
+		testRightSpeed(2, true, false);
+		testRightSpeed(3, true, false);
+		testRightSpeed(4, true, false);
+	}
+	@Test
+	public void testRightMovementMixed() {
+		testRightSpeed(1, false, true);
+		testRightSpeed(2, false, true);
+		testRightSpeed(3, false, true);
+		testRightSpeed(4, false, true);
+		testRightSpeed(1, true , true);
+		testRightSpeed(2, true , true);
+		testRightSpeed(3, true , true);
+		testRightSpeed(4, true , true);
+	}
+	private void testRightSpeed(int distanceToMove, boolean useSuperSpeed, boolean mixed) {
+		final int pathLength = 10;
+		final boolean[] useSuperSpeeds = new boolean[pathLength];
+		for (int i = 0; i < useSuperSpeeds.length; i++) {
+			if (mixed) {
+				useSuperSpeed = !useSuperSpeed;
+			}
+			useSuperSpeeds[i] = useSuperSpeed;
+		}
+		
+		testRightSpeed(distanceToMove, pathLength, useSuperSpeeds);
+	}
+	private void testRightSpeed(int distanceToMove, int pathLength, boolean[] useSuperSpeeds) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
@@ -38,19 +63,49 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, 0, 0, 10, world);
-		
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceToMove, 0, 0, 10, world, useSuperSpeeds);
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
-	public void testLeftMovement() {
-		testLeftSpeed(1);
-		testLeftSpeed(2);
-		testLeftSpeed(3);
-		testLeftSpeed(4);
+	public void testLeftMovementSlow() {
+		testLeftSpeed(1, false, false);
+		testLeftSpeed(2, false, false);
+		testLeftSpeed(3, false, false);
+		testLeftSpeed(4, false, false);
 	}
-	private void testLeftSpeed(int distanceToMove) {
+	@Test
+	public void testLeftMovementFast() {
+		testLeftSpeed(1, true, false);
+		testLeftSpeed(2, true, false);
+		testLeftSpeed(3, true, false);
+		testLeftSpeed(4, true, false);
+	}
+	@Test
+	public void testLeftMovementMixed() {
+		testLeftSpeed(1, false, true);
+		testLeftSpeed(2, false, true);
+		testLeftSpeed(3, false, true);
+		testLeftSpeed(4, false, true);
+		testLeftSpeed(1, true , true);
+		testLeftSpeed(2, true , true);
+		testLeftSpeed(3, true , true);
+		testLeftSpeed(4, true , true);
+	}
+	private void testLeftSpeed(int distanceToMove, boolean useSuperSpeed, boolean mixed) {
+		final int pathLength = 10;
+		final boolean[] useSuperSpeeds = new boolean[pathLength];
+		for (int i = 0; i < useSuperSpeeds.length; i++) {
+			if (mixed) {
+				useSuperSpeed = !useSuperSpeed;
+			}
+			useSuperSpeeds[i] = useSuperSpeed;
+		}
+		
+		testLeftSpeed(distanceToMove, pathLength, useSuperSpeeds);
+	}
+	private void testLeftSpeed(int distanceToMove, int pathLength, boolean[] useSuperSpeeds) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
@@ -62,90 +117,152 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, -distanceToMove, 0, 0, 10, world);
-		
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, -distanceToMove, 0, 0, pathLength, world, useSuperSpeeds);
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
-	public void testDeaccelerating() {
-		testDeaccelerating(1);
-		testDeaccelerating(2);
-		testDeaccelerating(5);
-		testDeaccelerating(8);
-		testDeaccelerating(13);
-		testDeaccelerating(21);
+	public void testDeacceleratingSlow() {
+		testDeaccelerating(1 , false, false);
+		testDeaccelerating(2 , false, false);
+		testDeaccelerating(5 , false, false);
+		testDeaccelerating(8 , false, false);
+		testDeaccelerating(13, false, false);
+		testDeaccelerating(21, false, false);
 	}
-	private void testDeaccelerating(int distanceToMove) {
+	@Test
+	public void testDeacceleratingFast() {
+		testDeaccelerating(1 , true, false);
+		testDeaccelerating(2 , true, false);
+		testDeaccelerating(5 , true, false);
+		testDeaccelerating(8 , true, false);
+		testDeaccelerating(13, true, false);
+		testDeaccelerating(21, true, false);
+	}
+	@Test
+	public void testDeacceleratingMixed() {
+		testDeaccelerating(1 , false, true);
+		testDeaccelerating(2 , false, true);
+		testDeaccelerating(5 , false, true);
+		testDeaccelerating(8 , false, true);
+		testDeaccelerating(13, false, true);
+		testDeaccelerating(21, false, true);
+		testDeaccelerating(1 , true , true);
+		testDeaccelerating(2 , true , true);
+		testDeaccelerating(5 , true , true);
+		testDeaccelerating(8 , true , true);
+		testDeaccelerating(13, true , true);
+		testDeaccelerating(21, true , true);
+	}
+	private void testDeaccelerating(int distanceToMove, boolean useSuperSpeed, boolean mixed) {
+		final int pathLength = 10;
+		final boolean[] useSuperSpeeds = new boolean[distanceToMove * pathLength * 2];
+		for (int i = 0; i < useSuperSpeeds.length; i++) {
+			if (mixed) {
+				useSuperSpeed = !useSuperSpeed;
+			}
+			useSuperSpeeds[i] = useSuperSpeed;
+		}
+		
+		testDeaccelerating(distanceToMove, pathLength, useSuperSpeeds);
+	}
+	private void testDeaccelerating(int distanceToMove, int pathLength, boolean[] useSuperSpeeds) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
 		final Environment observation = TestTools.loadLevel("flat.lvl", agent, false);
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
+		TestTools.setMarioXPosition(observation, 5);
+		TestTools.runOneTick(observation);
 		
 		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
-		final Node endNode = new Node((short)(startMarioXPos + distanceToMove), (short)startMarioYPos,(byte)0);
-		final DirectedEdge edge1 = new RunningEdge(startNode, endNode);
-		final SpeedNode speedNode1 = new SpeedNode(endNode, null, startMarioXPos, 0, edge1, 0, world);
-		speedNode1.use();
-		path.add(edge1);
-		
-		SpeedNode prevSpeedNode = speedNode1;
-		
-		for (int i = 0; i < 10; i++) {
-			SpeedNode speedNode2 = createEdgeWithSpeedNode(endNode, prevSpeedNode, -distanceToMove, 0, 0, world);
-			path.add(speedNode2.ancestorEdge);
-			
-			SpeedNode speedNode3 = createEdgeWithSpeedNode(startNode, speedNode2, distanceToMove, 0, 0, world);
-			path.add(speedNode3.ancestorEdge);
-			
-			prevSpeedNode = speedNode3;
+		int[] moveVector = new int[distanceToMove * pathLength * 2];
+		int index = 0;
+		for (int i = 0; i < pathLength; i++) {
+			for (int x = 0; x < distanceToMove; x++) {
+				moveVector[index] = 1;
+				index++;
+			}
+			for (int x = 0; x < distanceToMove; x++) {
+				moveVector[index] = -1;
+				index++;
+			}
 		}
 		
+		final Node startNode = new Node((int)startMarioXPos, (int)startMarioYPos,(byte)0);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startNode.x, startNode.y, moveVector, 0, 0, distanceToMove * pathLength, world, useSuperSpeeds);
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
-	public void testJumps() {
-		testJumpTime(1, 0, 0);
-		testJumpTime(2, 0, 0);
-		testJumpTime(3, 0, 0);
-		testJumpTime(4, 0, 0);
-		
+	public void testJumpsSlow() {
+		testJumpTime(1, 0, 0, false);
+		testJumpTime(2, 0, 0, false);
+		testJumpTime(3, 0, 0, false);
+		testJumpTime(4, 0, 0, false);
 		for (int jumpHeight = 6; jumpHeight >= 0; jumpHeight--) {
 			for (int jumpDistance = 2; jumpDistance < 4; jumpDistance++) {
-				testJumpTime(1, jumpHeight, jumpDistance);
-				testJumpTime(2, jumpHeight, jumpDistance);
-				testJumpTime(3, jumpHeight, jumpDistance);
-				testJumpTime(4, jumpHeight, jumpDistance);
-				testJumpTime(5, jumpHeight, jumpDistance);	
+				testJumpTime(1, jumpHeight, jumpDistance, false);
+				testJumpTime(2, jumpHeight, jumpDistance, false);
+				testJumpTime(3, jumpHeight, jumpDistance, false);
+				testJumpTime(4, jumpHeight, jumpDistance, false);
+				testJumpTime(5, jumpHeight, jumpDistance, false);	
 			}
 		}
-		
-		testJumpTime(2, -1, 1);
-		testJumpTime(3, -1, 1);
-		testJumpTime(4, -1, 1);
-		testJumpTime(2, -1, 2);
-		testJumpTime(3, -1, 2);
-		testJumpTime(4, -1, 2);
-		
-		testJumpTime(3, -2, 1);
-		testJumpTime(4, -2, 1);
-		testJumpTime(3, -2, 2);
-		testJumpTime(4, -2, 2);
-		
-		testJumpTime(4, -3, 1);
-		testJumpTime(5, -3, 1);
-		testJumpTime(4, -3, 2);
-		testJumpTime(5, -3, 2);
-		
-		testJumpTime(4, -4, 1);
-		testJumpTime(5, -4, 1);
+		testJumpTime(2, -1, 1, false);
+		testJumpTime(3, -1, 1, false);
+		testJumpTime(4, -1, 1, false);
+		testJumpTime(2, -1, 2, false);
+		testJumpTime(3, -1, 2, false);
+		testJumpTime(4, -1, 2, false);
+		testJumpTime(3, -2, 1, false);
+		testJumpTime(4, -2, 1, false);
+		testJumpTime(3, -2, 2, false);
+		testJumpTime(4, -2, 2, false);
+		testJumpTime(4, -3, 1, false);
+		testJumpTime(5, -3, 1, false);
+		testJumpTime(4, -3, 2, false);
+		testJumpTime(5, -3, 2, false);
+		testJumpTime(4, -4, 1, false);
+		testJumpTime(5, -4, 1, false);
 	}
-	private void testJumpTime(int jumpHeight, int heightDifference, int distanceToMove) {
+	@Test
+	public void testJumpsFast() {		
+		testJumpTime(1, 0, 0, true);
+		testJumpTime(2, 0, 0, true);
+		testJumpTime(3, 0, 0, true);
+		testJumpTime(4, 0, 0, true);
+		for (int jumpHeight = 6; jumpHeight >= 0; jumpHeight--) {
+			for (int jumpDistance = 2; jumpDistance < 4; jumpDistance++) {
+				testJumpTime(1, jumpHeight, jumpDistance, true);
+				testJumpTime(2, jumpHeight, jumpDistance, true);
+				testJumpTime(3, jumpHeight, jumpDistance, true);
+				testJumpTime(4, jumpHeight, jumpDistance, true);
+				testJumpTime(5, jumpHeight, jumpDistance, true);	
+			}
+		}
+		testJumpTime(2, -1, 1, true);
+		testJumpTime(3, -1, 1, true);
+		testJumpTime(4, -1, 1, true);
+		testJumpTime(2, -1, 2, true);
+		testJumpTime(3, -1, 2, true);
+		testJumpTime(4, -1, 2, true);
+		testJumpTime(3, -2, 1, true);
+		testJumpTime(4, -2, 1, true);
+		testJumpTime(3, -2, 2, true);
+		testJumpTime(4, -2, 2, true);
+		testJumpTime(4, -3, 1, true);
+		testJumpTime(5, -3, 1, true);
+		testJumpTime(4, -3, 2, true);
+		testJumpTime(5, -3, 2, true);
+		//Can't do these two as mario hits the corner of a block first
+		//testJumpTime(4, -4, 1, true);
+		//testJumpTime(5, -4, 1, true);
+	}
+	private void testJumpTime(int jumpHeight, int heightDifference, int distanceToMove, boolean useSuperSpeed) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
@@ -154,22 +271,54 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 0, world);
-		
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceToMove, jumpHeight, heightDifference, 1, world, useSuperSpeed);
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
-	public void testConsecutiveJumps() {
+	public void testConsecutiveJumpsSlow() {
 		for (int pathLength = 1; pathLength < 10; pathLength++) {
 			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
 				for (int distanceX = 1; distanceX <= 4; distanceX++) {
-					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength);
+					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, false, false);
 				}
 			}
 		}
 	}
-	private void testConsecutiveJumpMovement(int distanceX, int jumpHeight, int pathLength) {
+	@Test
+	public void testConsecutiveJumpsFast() {
+		for (int pathLength = 1; pathLength < 10; pathLength++) {
+			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
+				for (int distanceX = 1; distanceX <= 4; distanceX++) {
+					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, true, false);
+				}
+			}
+		}
+	}
+	@Test
+	public void testConsecutiveJumpsMixed() {
+		for (int pathLength = 1; pathLength < 10; pathLength++) {
+			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
+				for (int distanceX = 1; distanceX <= 4; distanceX++) {
+					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, false, true);
+					testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, true , true);
+				}
+			}
+		}
+	}
+	private void testConsecutiveJumpMovement(int distanceX, int jumpHeight, int pathLength, boolean useSuperSpeed, boolean mixed) {
+		final boolean[] useSuperSpeeds = new boolean[pathLength];
+		for (int i = 0; i < useSuperSpeeds.length; i++) {
+			if (mixed) {
+				useSuperSpeed = !useSuperSpeed;
+			}
+			useSuperSpeeds[i] = useSuperSpeed;
+		}
+		
+		testConsecutiveJumpMovement(distanceX, jumpHeight, pathLength, useSuperSpeeds);
+	}
+	private void testConsecutiveJumpMovement(int distanceX, int jumpHeight, int pathLength, boolean[] useSuperSpeeds) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
@@ -178,43 +327,111 @@ public class TestMarioMovements {
 		final int startMarioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int startMarioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		final ArrayList<DirectedEdge> path = createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, 0, pathLength, world);
-		
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(startMarioXPos, startMarioYPos, distanceX, jumpHeight, 0, pathLength, world, useSuperSpeeds);
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 	
 	@Test
-	public void testRunningRightPathEqualities() {
+	public void testRunningRightPathEqualitiesSlow() {
 		MarioControls.setupYMovements();
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, i, 0, 0, j, world), createPath(0, 0, j, 0, 0, i, world));
+				final ArrayList<DirectedEdge> a = PathHelper.createPath(0, 0, i, 0, 0, j, world, false);
+				final ArrayList<DirectedEdge> b = PathHelper.createPath(0, 0, j, 0, 0, i, world, false);
+				verifyIntegrityOfPath(a);
+				verifyIntegrityOfPath(b);
+				comparePaths(a, b);
+			}
+		}	
+	}
+	@Test
+	public void testRunningRightPathEqualitiesFast() {
+		MarioControls.setupYMovements();
+		final World world = new World();
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
+				final ArrayList<DirectedEdge> a = PathHelper.createPath(0, 0, i, 0, 0, j, world, true);
+				final ArrayList<DirectedEdge> b = PathHelper.createPath(0, 0, j, 0, 0, i, world, true);
+				verifyIntegrityOfPath(a);
+				verifyIntegrityOfPath(b);
+				comparePaths(a, b);
 			}
 		}	
 	}
 	
 	@Test
-	public void testRunningLeftPathEqualities() {
+	public void testRunningLeftPathEqualitiesSlow() {
 		MarioControls.setupYMovements();
 		final World world = new World();
 		for (int i = 1; i <= 5; i++) {
 			for (int j = 1; j <= 5; j++) {
-				comparePaths(createPath(0, 0, -i, 0, 0, j, world), createPath(0, 0, -j, 0, 0, i, world));
+				final ArrayList<DirectedEdge> a = PathHelper.createPath(0, 0, -i, 0, 0, j, world, false);
+				final ArrayList<DirectedEdge> b = PathHelper.createPath(0, 0, -j, 0, 0, i, world, false);
+				verifyIntegrityOfPath(a);
+				verifyIntegrityOfPath(b);
+				comparePaths(a, b);
+			}
+		}	
+	}
+	@Test
+	public void testRunningLeftPathEqualitiesFast() {
+		MarioControls.setupYMovements();
+		final World world = new World();
+		for (int i = 1; i <= 5; i++) {
+			for (int j = 1; j <= 5; j++) {
+				final ArrayList<DirectedEdge> a = PathHelper.createPath(0, 0, -i, 0, 0, j, world, true);
+				final ArrayList<DirectedEdge> b = PathHelper.createPath(0, 0, -j, 0, 0, i, world, true);
+				verifyIntegrityOfPath(a);
+				verifyIntegrityOfPath(b);
+				comparePaths(a, b);
 			}
 		}	
 	}
 	
 	@Test
-	public void testXWidthJumpNoAstar() {
-		testJumpNoAstar(1, 2);
-		testJumpNoAstar(1, 3);
-		testJumpNoAstar(1, 4);
+	public void testXWidthJumpNoAstarSlow() {
+		testJumpNoAstar(1, 2, false, false);
+		testJumpNoAstar(1, 3, false, false);
+		testJumpNoAstar(1, 4, false, false);
+		testJumpNoAstar(2, 3, false, false);
+		testJumpNoAstar(2, 4, false, false);
+	}
+	@Test
+	public void testXWidthJumpNoAstarFast() {
+		testJumpNoAstar(1, 2, true, false);
+		testJumpNoAstar(1, 3, true, false);
+		testJumpNoAstar(1, 4, true, false);
+		testJumpNoAstar(2, 3, true, false);
+		testJumpNoAstar(2, 4, true, false);
+	}
+	@Test
+	public void testXWidthJumpNoAstarMixed() {
+		testJumpNoAstar(1, 2, false, true);
+		testJumpNoAstar(1, 3, false, true);
+		testJumpNoAstar(1, 4, false, true);
+		testJumpNoAstar(2, 3, false, true);
+		testJumpNoAstar(2, 4, false, true);
+		testJumpNoAstar(1, 2, true , true);
+		testJumpNoAstar(1, 3, true , true);
+		testJumpNoAstar(1, 4, true , true);
+		testJumpNoAstar(2, 3, true , true);
+		testJumpNoAstar(2, 4, true , true);
+	}
+	private void testJumpNoAstar(int distanceX, int jumpHeight, boolean useSuperSpeed, boolean mixed) {
+		final int pathLength = 30;
+		final boolean[] useSuperSpeeds = new boolean[pathLength];
+		for (int i = 0; i < useSuperSpeeds.length; i++) {
+			if (mixed) {
+				useSuperSpeed = !useSuperSpeed;
+			}
+			useSuperSpeeds[i] = useSuperSpeed;
+		}
 		
-		testJumpNoAstar(2, 3);
-		testJumpNoAstar(2, 4);
+		testJumpNoAstar(distanceX, jumpHeight, pathLength, useSuperSpeeds);
 	}
-	private void testJumpNoAstar(int distanceX, int jumpHeight) {
+	private void testJumpNoAstar(int distanceX, int jumpHeight, int pathLength, boolean[] useSuperSpeeds) {
 		final UnitTestAgent agent = new UnitTestAgent();	
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
@@ -224,50 +441,11 @@ public class TestMarioMovements {
 		
 		final int startY = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<DirectedEdge> path = createPath(3, startY, distanceX + 1, jumpHeight, 0, 40, world); 
-		
+		ArrayList<DirectedEdge> path = PathHelper.createPath(3, startY, distanceX + 1, jumpHeight, 0, pathLength, world, useSuperSpeeds); 
+		verifyIntegrityOfPath(path);
 		testEdgeMovement(observation, path, agent, marioControls);
 	}
 
-	private ArrayList<DirectedEdge> createPath(int startX, int startY, int distanceX, int jumpHeight, int heightDifference, int pathlength, World world) {
-		final ArrayList<DirectedEdge> path = new ArrayList<DirectedEdge>();
-		
-		final Node startNode = new Node(startX, startY, (byte)0);
-		SpeedNode speedNode = createEdgeWithSpeedNode(startNode, null, distanceX, heightDifference, jumpHeight, world);
-		path.add(speedNode.ancestorEdge);
-		
-		for (int i = 0; i < pathlength - 1; i++) {
-			speedNode = createEdgeWithSpeedNode(speedNode.ancestorEdge.target, speedNode, distanceX, heightDifference, jumpHeight, world);
-			speedNode.use();
-			path.add(speedNode.ancestorEdge);
-		}
-		
-		return path;
-	}
-	
-	private SpeedNode createEdgeWithSpeedNode(Node startNode, SpeedNode startSpeedNode, int xMove, int yMove, int jumpHeight, World world) {
-		final Node endNode = new Node(startNode.x + xMove, startNode.y + yMove, (byte)0);
-		
-		DirectedEdge edge;
-		if (jumpHeight == 0) {
-			edge = new RunningEdge(startNode, endNode);
-		}
-		else {
-			edge = new JumpingEdge(startNode, endNode, startNode.y + Math.min(jumpHeight, 4));
-		}
-		
-		SpeedNode speedNode;
-		if (startSpeedNode != null) {
-			speedNode = new SpeedNode(endNode, startSpeedNode, edge, getHash(), world);
-		}
-		else {
-			speedNode = new SpeedNode(endNode, null, edge.source.x, 0, edge, getHash(), world);
-		}
-		speedNode.use();
-		
-		return speedNode;
-	}
-	
 	private void comparePaths(ArrayList<DirectedEdge> path1, ArrayList<DirectedEdge> path2) {
 		final ArrayList<Point2D.Float> positions1 = new ArrayList<Point2D.Float>();
 		final ArrayList<Boolean> xActions1 = new ArrayList<Boolean>();
@@ -373,7 +551,7 @@ public class TestMarioMovements {
 				if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos)) {
 					final int distanceXMoved = edge.target.x - edge.source.x;
 					final int distanceYMoved = edge.target.y - edge.source.y;
-					Assert.fail("Mario Wasn't close enough to the expected position" + 
+					Assert.fail("Mario Wasn't close enough to the expected position." + 
 								"\nxdistance: " + distanceXMoved + 
 								"\nydistance: " + distanceYMoved + 
 								"\njump height: " + edge.getMaxY() + 
@@ -401,6 +579,21 @@ public class TestMarioMovements {
 		}
 	}
 	
+	private void verifyIntegrityOfPath(ArrayList<DirectedEdge> path) {
+		final float startX = path.get(0).source.x;
+		float posX = 0;
+		for (DirectedEdge edge : path) {
+			posX += edge.getMoveInfo().getXMovementDistance();
+			
+			final float diffX = Math.abs(posX - (edge.target.x - startX));
+			if (diffX > MarioControls.MAX_X_VELOCITY) {
+				Assert.fail("MovementInformation wasn't close enough to the target node position." + 
+							"\npathEndX: " + posX + 
+							"\ntargetNodeX: " + (edge.target.x - startX));
+			}
+		}
+	}
+	
 	private boolean withinAcceptableError(float a1, float b1, float a2, float b2) {
 		return 	withinAcceptableError(a1, b1) && 
 				withinAcceptableError(a2, b2);
@@ -408,9 +601,5 @@ public class TestMarioMovements {
 	
 	private boolean withinAcceptableError(float a, float b) {
 		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
-	}
-	
-	private int getHash() {
-		return hashNumber++;
 	}
 }

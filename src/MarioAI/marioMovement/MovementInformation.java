@@ -4,13 +4,12 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.CollisionDetection;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
-import MarioAI.graph.Function;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
-public class MovementInformation implements Function{
+public class MovementInformation{
 	//vertical information
 	private final int totalTicksJumped;
 	
@@ -20,6 +19,7 @@ public class MovementInformation implements Function{
 	private final int totalTicksXMoved;
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
+	private final boolean useSuperSpeed;
 	
 	//position information
 	private final Point2D.Float[] positions;
@@ -28,6 +28,7 @@ public class MovementInformation implements Function{
 		this.xMovedDistance = xMoveInfo.xMovedDistance;
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
+		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
 		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
@@ -85,14 +86,17 @@ public class MovementInformation implements Function{
 		if (xMovedDistance > 0) {
 			actions[Mario.KEY_RIGHT] = pressXButton[tick];
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else if (xMovedDistance < 0) {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = pressXButton[tick];
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = false;
 		}
 		
 		actions[Mario.KEY_JUMP] = pressYButton[tick];
@@ -124,11 +128,6 @@ public class MovementInformation implements Function{
 		return positions;
 	}
 
-	@Override
-	public float f(float x) {
-		return 0;
-	}
-
 	public boolean[] getPressXButton() {
 		return pressXButton;
 	}
@@ -156,6 +155,9 @@ public class MovementInformation implements Function{
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
 				return false;
 			}
+			else if (bb.useSuperSpeed != useSuperSpeed) {
+				return false;
+			}
 			else if (!Arrays.equals(bb.pressXButton, pressXButton)) {
 				return false;
 			}
@@ -177,6 +179,19 @@ public class MovementInformation implements Function{
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
 			if (CollisionDetection.isColliding(currentPosition, previousPosition, sourceNode, lastYValue, world)) {
+				return true;
+			}
+			previousPosition = currentPosition;
+		}	
+		return false;
+	}
+	
+	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
+		Point2D.Float previousPosition = new Point2D.Float(0, 0);
+		final float lastYValue = positions[positions.length - 1].y;
+		for (int i = 0; i < positions.length; i++) { 
+			final Point2D.Float currentPosition = positions[i];
+			if (CollisionDetection.isColliding(currentPosition, previousPosition, startX, startY, lastYValue, world)) {
 				return true;
 			}
 			previousPosition = currentPosition;

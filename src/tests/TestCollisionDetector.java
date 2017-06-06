@@ -12,8 +12,9 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import MarioAI.CollisionDetection;
+import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
@@ -21,6 +22,7 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -30,7 +32,7 @@ public class TestCollisionDetector {
 	EdgeCreator grapher = new EdgeCreator();
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
-	public DirectedEdge runningEdgeType = new RunningEdge(null, null);
+	public DirectedEdge runningEdgeType = new RunningEdge(null, null, false);
 	//TODO also add some step-by-step comparisons, of isBlocking and the likes.
 	//TODO might be an error with him running to the goal nodes, going out of the level.
 	//TODO test for different materials, floor and ceilings.
@@ -173,7 +175,7 @@ public class TestCollisionDetector {
 		for (int height = 3; height <= 5; height++) { //Tested for different height of the ceilings
 			//Makes the ceiling
 			for (int i = 0; i < level.length; i++) {
-				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) 11);
+				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) -10);
 			}
 			final int currentHeight = height;
 			SpeedNode startNode = new SpeedNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
@@ -265,7 +267,7 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
 				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode,lastYPosition, world);
@@ -313,7 +315,7 @@ public class TestCollisionDetector {
 				
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top	. 
-				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) 12);
+				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
 				boolean hasCollision = CollisionDetection.isColliding(futureOffset, currentOffset, startNode, lastYPosition, world);
@@ -352,6 +354,44 @@ public class TestCollisionDetector {
 	@Test
 	public void testCompareWithMariosCollisionEngine(){
 		fail("Make the test");
+	}
+	
+	@Test
+	public void testBox() {
+		final UnitTestAgent agent = new UnitTestAgent();
+		final Environment observation = TestTools.loadLevel("testCollisionDetector/collisionBox.lvl", agent, true);
+		TestTools.setMarioXPosition(observation, 4);
+		//TestTools.renderLevel(observation);
+		CollisionDetection.loadTileBehaviors();
+		final World world = new World();
+		world.initialize(observation);
+		
+		agent.action[Mario.KEY_LEFT] = true;
+		for (int i = 0; i < 100; i++) {
+			TestTools.runOneTick(observation);
+		}
+		TestTools.runOneTick(observation);
+		world.update(observation);
+		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world, false);
+		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
+		
+		
+		
+		
+		agent.action[Mario.KEY_LEFT] = false;
+		agent.action[Mario.KEY_RIGHT] = true;
+		for (int i = 0; i < 100; i++) {
+			TestTools.runOneTick(observation);
+		}
+		
+		marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world, false);
+		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 	}
 	
 }

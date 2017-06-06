@@ -10,28 +10,62 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {
-		final long a = ((long)hashSpeed(vx, hashGranularity) << 32);
+	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {	
 		final long edgeHash = edge.hashCode();
+		final long speedHash = hashSpeed(vx, hashGranularity);
+				
+		final long b1Mask = 0b0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111_1111_1111_1111_1111L;
+		final long b2Mask = 0b0000_0000_0000_0000_0000_0000_1111_1111_0000_0000_0000_0000_0000_0000_0000_0000L;
 		
-		return a | edgeHash;
+		final long b1Place = 0;
+		final long b2Place = 32;
+		
+		final long b1 = (edgeHash  << b1Place) & b1Mask;
+		final long b2 = (speedHash << b2Place) & b2Mask;
+		
+		return b1 | b2;
 	}
 	
 	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
 		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx, hashGranularity);
 	}
 	
-	public static int hashEndSpeedNode(int x, int y, float vx, int speedGranularity) {
-		final int a = x & 0xffff;
-		final int b = (y & 0xff) << 16;
-		final int c = ((byte)hashSpeed(vx, speedGranularity)) << 24;
-		final int d = hashSpeed(vx, speedGranularity) & 0x80000000;
+	public static int hashEndSpeedNode(int x, int y, float vx, int hashGranularity) {
+		final int speedHash = hashSpeed(vx, hashGranularity);
 		
-		return d | c | b | a;
+		final int b1Mask = 0b0000_0000_0000_0000_1111_1111_1111_1111;
+		final int b2Mask = 0b0000_0000_1111_1111_0000_0000_0000_0000;
+		final int b3Mask = 0b1111_1111_0000_0000_0000_0000_0000_0000;
+		
+		final int b1Place = 0;
+		final int b2Place = 16;
+		final int b3Place = 24;
+		
+		final int b1 = (x         << b1Place) & b1Mask;
+		final int b2 = (y         << b2Place) & b2Mask;
+		final int b3 = (speedHash << b3Place) & b3Mask;
+		
+		return b1 | b2 | b3;
 	}
 	
 	public static byte hashSpeed(float vx, int hashGranularity) {
 		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (hashGranularity * 2);
+		
+		final int hashWithOutSign = (byte) ((((Math.abs(vx) + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
+		int hashSign = ((vx >= 0) ? 0 : 1);
+		hashSign = (hashWithOutSign == 0) ? 0 : hashSign;
+		
+		final int b1Mask = 0b0111_1111;
+		final int b2Mask = 0b1000_0000;
+		
+		final int b1Place = 0;
+		final int b2Place = 7;
+		
+		final int b1 = (hashWithOutSign << b1Place) & b1Mask;
+		final int b2 = (hashSign        << b2Place) & b2Mask;
+		
+		return (byte) (b1 | b2);
+		/*
 		if (vx >= 0) {
 			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
 		} else {
@@ -43,37 +77,37 @@ public class Hasher {
 				return (byte) (0x80 | hashWithOutSign);	
 			}
 		}
+		*/
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {
-		//TODO It does not handle wall jumps properly. Look at later.
-
-		//TODO remember using isJumpEdge
-		//General hash for all kings of edges:
-		if (edge.target == null) { //setMovementEdges will delete it later:
+		if (edge.target == null) {
 			//This will mean a running edge from x,y=0,0 to 0,0, will not be unique: 
 			//no worries, as they will be discarded.
 			return 0; 
 		}
 		
-		//The y positions:
-		final int position1 = 0;		
-		final int b1 =  ((int) edge.target.y &  0xf) << position1; //Max height = 15, including 0, giving 4 bits.
-		final int position2 = position1+4;
+		final int b1Mask = 0b0000_0000_0000_0000_0000_0000_0000_1111;
+		final int b2Mask = 0b0000_0000_0000_0000_0000_0000_1111_0000;
+		final int b3Mask = 0b0000_0000_0000_0001_1111_1111_0000_0000;
+		final int b4Mask = 0b0000_0011_1111_1110_0000_0000_0000_0000;
+		final int b5Mask = 0b0000_0100_0000_0000_0000_0000_0000_0000;
+		final int b6Mask = 0b1111_1000_0000_0000_0000_0000_0000_0000;
 		
-		final int b2 = 	((int) edge.source.y &  0xf) << position2;//Same as above.
-		final int position3 = position2+4;
+		final int b1Place = 0;
+		final int b2Place = 4;
+		final int b3Place = 8;
+		final int b4Place = 17;
+		final int b5Place = 26;
+		final int b6Place = 27;
 		
-		//The x positions:
-		final int b3 = 	((int) edge.target.x & 0x1ff) << position3; //X position is max 300 ish and min 0, requiring 9 bits.
-		final int position4 = position3+9;
+		final int b1 = ( edge.target.y               << b1Place) & b1Mask;
+		final int b2 = ( edge.source.y               << b2Place) & b2Mask;
+		final int b3 = ( edge.target.x               << b3Place) & b3Mask;
+		final int b4 = ( edge.source.x               << b4Place) & b4Mask;
+		final int b5 = ((edge.useSuperSpeed ? 1 : 0) << b5Place) & b5Mask;
+		final int b6 = ( extraHash                   << b6Place) & b6Mask;
 		
-		final int b4 = 	((int) edge.source.x & 0x1ff) << position4; //Same as above.
-		final int position5 = position4+9;
-		
-		//Unique edge information to add to the hash.
-		//Includes things like if it is an jump edge or running edge, and things like that.
-		final int b5 = extraHash << position5; 
-		return b1 | b2 | b3 | b4 | b5;
+		return b1 | b2 | b3 | b4 | b5 | b6;
 	}
 }

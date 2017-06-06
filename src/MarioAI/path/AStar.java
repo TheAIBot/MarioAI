@@ -21,9 +21,8 @@ public class AStar {
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
-	
+	final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
-	public final int hashGranularity; // number of different speed values a speednode can have
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
@@ -118,7 +117,7 @@ public class AStar {
 					
 					// collision detection and invincibility handling 
 					int penalty = 0;
-					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+					/*if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 //						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 //							continue;
 //						}
@@ -132,6 +131,7 @@ public class AStar {
 							}
 						}
 					}
+					*/
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.
@@ -160,7 +160,7 @@ public class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
-			return speedNode; //TODO temp for testing purposes
+			return speedNode;
 		}
 		
 		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);

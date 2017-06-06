@@ -11,8 +11,7 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
-public class SpeedNode implements Comparable<SpeedNode>, Function {
-
+public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
@@ -53,6 +52,20 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 		this.xPos = marioX;
 	}
 	
+	///Should only be used for testing purposes
+	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+		this.node = node;
+		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.parentXPos = parentXPos;
+		this.parentVx = parentVx;
+		this.ancestorEdge = ancestorEdge;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+	}
+	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
 		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
 	}
@@ -60,10 +73,8 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
-		if (!(ancestorEdge instanceof FallEdge)) {
-			this.vx = moveInfo.getEndSpeed();
-			this.xPos = parentXPos + moveInfo.getXMovementDistance();
-		} else this.vx = 0; //TODO change when implemented.
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parentXPos + moveInfo.getXMovementDistance();
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
@@ -217,14 +228,5 @@ public class SpeedNode implements Comparable<SpeedNode>, Function {
 	@Override
 	public String toString() {
 		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
-	}
-
-	public float f(float x) {
-		return moveInfo.f(x);
-	}
-	
-	private boolean collissionDetector(){
-		boolean hasCollided = false;
-		return hasCollided;
 	}
 }
