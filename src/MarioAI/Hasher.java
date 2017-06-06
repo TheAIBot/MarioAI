@@ -10,18 +10,29 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {
-		final long a = ((long)hashSpeed(vx, hashGranularity) << 32);
+	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {	
 		final long edgeHash = edge.hashCode();
+		final long speedHash = hashSpeed(vx, hashGranularity);
+				
+		final long b1Mask = 0b0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111_1111_1111_1111_1111L;
+		final long b2Mask = 0b0000_0000_0000_0000_0000_0000_1111_1111_0000_0000_0000_0000_0000_0000_0000_0000L;
 		
-		return a | edgeHash;
+		final long b1Place = 0;
+		final long b2Place = 32;
+		
+		final long b1 = (edgeHash  << b1Place) & b1Mask;
+		final long b2 = (speedHash << b2Place) & b2Mask;
+		
+		return b1 | b2;
 	}
 	
 	public static int hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
 		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx, hashGranularity);
 	}
 	
-	public static int hashEndSpeedNode(int x, int y, float vx, int speedGranularity) {
+	public static int hashEndSpeedNode(int x, int y, float vx, int hashGranularity) {
+		final int speedHash = hashSpeed(vx, hashGranularity);
+		
 		final int b1Mask = 0b0000_0000_0000_0000_1111_1111_1111_1111;
 		final int b2Mask = 0b0000_0000_1111_1111_0000_0000_0000_0000;
 		final int b3Mask = 0b1111_1111_0000_0000_0000_0000_0000_0000;
@@ -30,15 +41,31 @@ public class Hasher {
 		final int b2Place = 16;
 		final int b3Place = 24;
 		
-		final int b1 = (x                               << b1Place) & b1Mask;
-		final int b2 = (y                               << b2Place) & b2Mask;
-		final int b3 = (hashSpeed(vx, speedGranularity) << b3Place) & b3Mask;
+		final int b1 = (x         << b1Place) & b1Mask;
+		final int b2 = (y         << b2Place) & b2Mask;
+		final int b3 = (speedHash << b3Place) & b3Mask;
 		
 		return b1 | b2 | b3;
 	}
 	
 	public static byte hashSpeed(float vx, int hashGranularity) {
 		final float ADD_FOR_ROUND = MarioControls.MAX_X_VELOCITY / (hashGranularity * 2);
+		
+		final int hashWithOutSign = (byte) ((((Math.abs(vx) + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
+		int hashSign = ((vx >= 0) ? 0 : 1);
+		hashSign = (hashWithOutSign == 0) ? 0 : hashSign;
+		
+		final int b1Mask = 0b0111_1111;
+		final int b2Mask = 0b1000_0000;
+		
+		final int b1Place = 0;
+		final int b2Place = 7;
+		
+		final int b1 = (hashWithOutSign << b1Place) & b1Mask;
+		final int b2 = (hashSign        << b2Place) & b2Mask;
+		
+		return (byte) (b1 | b2);
+		/*
 		if (vx >= 0) {
 			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
 		} else {
@@ -50,6 +77,7 @@ public class Hasher {
 				return (byte) (0x80 | hashWithOutSign);	
 			}
 		}
+		*/
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {
