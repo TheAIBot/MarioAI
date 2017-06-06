@@ -23,11 +23,13 @@ public class AStar {
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
 	final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
+	private SpeedNode currentBestPathEndNotPassingThroughEnemy = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
 	
-	private static final int PENALTY_SCORE = 9000; // arbitrary high value;
+	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
+	private static final int MAX_TIME_ALLOWED_BEFORE_PROPER_PATH_NEEDS_TO_BE_RETURNED = 40; // TODO: find a good value for this
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
@@ -92,7 +94,7 @@ public class AStar {
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : current.node.getEdges()) {
 					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
-					
+
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
 					final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
@@ -117,7 +119,7 @@ public class AStar {
 					
 					// collision detection and invincibility handling 
 					int penalty = 0;
-					/*if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 //						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 //							continue;
 //						}
@@ -131,21 +133,34 @@ public class AStar {
 							}
 						}
 					}
-					*/
 					
-					//Update the edges position in the priority queue
-					//by updating the scores and taking it in and out of the queue.
+					// The current best speednode is the one furthest to the right
+					// (disregarding if it passes through an enemy or not).
+					if (currentBestPathEnd == null || sn.xPos > currentBestPathEnd.xPos) {
+						currentBestPathEnd = sn;
+					}
+					// The current best speednode not passing through an enemy is the 
+					// as with the current best speednode set above, but taking into concern
+					// if an enemy is passed through.
+					if (sn.fScore < penaltyThreshold &&
+						(currentBestPathEndNotPassingThroughEnemy == null ||
+						sn.xPos > currentBestPathEndNotPassingThroughEnemy.xPos)) {
+						currentBestPathEndNotPassingThroughEnemy = sn;
+					}
+					
+					// Update the edges position in the priority queue
+					// by updating the scores and taking it in and out of the queue.
 					if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
 					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(snEndHash, sn);
-				}	
+				}
 			}
 		}
 		
-		currentBestPathEnd = null;
+		//currentBestPathEnd = null;
 		foundBestPath = false;
 	}
 	
@@ -181,12 +196,16 @@ public class AStar {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
-			if (foundBestPath) {
-				return new AStarPath(currentBestPathEnd, true, hashGranularity);
+			// If the time limit for how long it can be accepted to get a path, which does not nessecarily
+			// make good progress towards the goal then return the best path not going through an enemy
+			if (timePassed < MAX_TIME_ALLOWED_BEFORE_PROPER_PATH_NEEDS_TO_BE_RETURNED) {
+				return new AStarPath(currentBestPathEndNotPassingThroughEnemy, true, hashGranularity); 
 			}
-			else {
-				return new AStarPath(openSet.peek(), false, hashGranularity);
-			}
+			
+			// If time limit is up return the best possible path with regards to the 
+			// If enough time has passed and A* has not given a good solution, then accept a path
+			// which potentially goes through an enemy. This functions as a guard against Mario getting stuck.
+			return new AStarPath(currentBestPathEnd, true, hashGranularity);
 		}
 	}
 	
