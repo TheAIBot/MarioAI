@@ -9,8 +9,8 @@ import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
 public class CollisionDetection {
-	public static final float MARIO_WIDTH = 4; //TODO Change depending on mario
-	public static final float MARIO_HEIGHT = 24; //(*)TODO Change depending on mario
+	public static final float MARIO_WIDTH = 4;
+	public static final float MARIO_HEIGHT = 24;
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
@@ -21,11 +21,15 @@ public class CollisionDetection {
 	public static final byte[] TILE_CONVERTER 	     = new byte[]{16,21,34,  9,-74,11};
 	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16,21, 0,-10,-11,20};
 	
-	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
+	public CollisionDetection() {
+		loadTileBehaviors();
+	}
+	
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
 		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
 	}
 	
-	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue, World world){
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -63,7 +67,7 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean move(Point2D.Float currentPosition, float xa, float ya, World world) {
+	private boolean move(Point2D.Float currentPosition, float xa, float ya, World world) {
 		while (xa > 8) {
 			if (!move(currentPosition, 8, 0, world))
 				return false;
@@ -146,7 +150,7 @@ public class CollisionDetection {
 	 * @param ya
 	 * @return
 	 */
-	private static boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
+	private boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
 		int x = (int) (newX / 16);
 		int y = (int) (newY / 16);
 		//TODO check why this is necessary.
@@ -169,7 +173,7 @@ public class CollisionDetection {
 		}
 	}
 	
-	public static byte convertType(byte type){
+	private byte convertType(byte type){
 		for (int i = 0; i < TILE_CONVERTER.length; i++) {
 			if (TILE_CONVERTER_MARKER[i] == type) {
 				return TILE_CONVERTER[i];
@@ -178,7 +182,7 @@ public class CollisionDetection {
 		throw new Error("Missing tile converter type, for type = " + type);
 	}
 	
-	public static void loadTileBehaviors()
+	private void loadTileBehaviors()
 	{
 		//TODO check done correctly
 		try 

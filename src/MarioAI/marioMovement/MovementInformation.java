@@ -178,7 +178,7 @@ public class MovementInformation{
 		
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
-			if (CollisionDetection.isColliding(currentPosition, previousPosition, sourceNode, lastYValue, world)) {
+			if (world.isColliding(currentPosition, previousPosition, sourceNode, lastYValue)) {
 				return true;
 			}
 			previousPosition = currentPosition;
@@ -191,7 +191,7 @@ public class MovementInformation{
 		final float lastYValue = positions[positions.length - 1].y;
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
-			if (CollisionDetection.isColliding(currentPosition, previousPosition, startX, startY, lastYValue, world)) {
+			if (world.isColliding(currentPosition, previousPosition, startX, startY, lastYValue)) {
 				return true;
 			}
 			previousPosition = currentPosition;

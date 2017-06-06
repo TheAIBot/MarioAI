@@ -49,8 +49,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			world.initialize(observation);
 			grapher.setMovementEdges(world, world.getMarioNode(observation));
 			
-			CollisionDetection.loadTileBehaviors();
-			
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
 			

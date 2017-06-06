@@ -1,9 +1,13 @@
 package MarioAI;
 
+import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.omg.CORBA.COMM_FAILURE;
+
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.environments.Environment;
 
 
@@ -14,6 +18,7 @@ public class World {
 	public static final int SIGHT_HEIGHT = 22;
 	private static final int MARIO_START_X_POS = 2;
 
+	private final CollisionDetection collisionDetection = new CollisionDetection();
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
@@ -173,6 +178,14 @@ public class World {
 			}
 			savedColumns.put(entry.getKey().intValue(), columnCopy);
 		}
+	}
+	
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
+		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, this);
+	}
+	
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue){
+		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, lastYValue, this);
 	}
 	
 	public boolean hasGoalNodesChanged() {
