@@ -1,5 +1,6 @@
 package MarioAI.marioMovement;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,22 +94,8 @@ public class MarioControls {
 		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
-			DirectedEdge next = path.get(0);
-			int movementTime = next.getMoveInfo().getMoveTime();
-			if (prevEdge != null && 
-				next.equals(prevEdge) &&
-				next.getMoveInfo().equals(prevEdge.getMoveInfo()) &&
-				movementTime == ticksOnThisEdge + 1) 
-			{
-				path.remove(0);
-				if (path.size() == 0) {
-					canUpdatePath = true;
-					Arrays.fill(actions, false);
-					return actions;
-				}
-				next = path.get(0);
-				movementTime = next.getMoveInfo().getMoveTime();
-			}
+			final DirectedEdge next = path.get(0);
+			final int movementTime = next.getMoveInfo().getMoveTime();
 			
 			if (prevEdge == null ||
 				!next.equals(prevEdge) ||
@@ -123,6 +110,17 @@ public class MarioControls {
 			canUpdatePath = movementTime == ticksOnThisEdge + 1;
 
 			next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
+			
+			if (canUpdatePath) {
+				path.remove(0);
+				final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+				final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+				System.out.println("Mario: " + marioX + ", " + marioY);
+				
+				for (Point2D.Float point : path.get(0).getMoveInfo().getPositions()) {
+					System.out.println(point.toString());
+				}
+			}
 		}
 		else {
 			canUpdatePath = true;

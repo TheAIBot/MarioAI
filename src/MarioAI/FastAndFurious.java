@@ -2,6 +2,7 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -120,16 +121,15 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
-				}
-				
+				}				
 				
 				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			else if (marioController.canUpdatePath) {
+			else if (marioController.canUpdatePath && 
+					 pathCreator.isRunning) {
 				pathCreator.stop();
-				pathCreator.discardFoundPath();
 				System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			

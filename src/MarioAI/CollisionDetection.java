@@ -18,8 +18,8 @@ public class CollisionDetection {
 
     public static final byte[] TILE_BEHAVIORS = new byte[256];
    	//Test seed: 3261372
-	public static final byte[] TILE_CONVERTER 	     = new byte[]{16,21,34,  9,-74,11};
-	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16,21, 0,-10,-11,20};
+	public static final byte[] TILE_CONVERTER 	     = new byte[]{16, 21, 34,   9, -74, 11};
+	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16, 21,  0, -10, -11, 20};
 	
 	public CollisionDetection() {
 		loadTileBehaviors();

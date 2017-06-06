@@ -17,6 +17,7 @@ import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.edgeCreation.Collision;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
