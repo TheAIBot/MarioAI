@@ -23,8 +23,8 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	public int ceiledTopPointX; //TODO change to private after tests.
 	public int ceiledTopPointY; // Ceiled coordinates of the toppunkt
 	
-	public JumpingEdge(Node source, Node target, JumpingEdge polynomial) {
-		super(source, target);
+	public JumpingEdge(Node source, Node target, JumpingEdge polynomial, boolean useSuperSpeed) {
+		super(source, target, useSuperSpeed);
 		this.a = polynomial.a;
 		this.b = polynomial.b;
 		this.c = polynomial.c;
@@ -37,7 +37,11 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	}
 
 	public JumpingEdge(Node source, Node target) {
-		super(source, target);
+		this(source, target, false);
+	}
+	
+	public JumpingEdge(Node source, Node target, boolean useSuperSpeed) {
+		super(source, target, useSuperSpeed);
 		this.a = 0;
 		this.b = 0;
 		this.c = 0;
@@ -45,8 +49,8 @@ public class JumpingEdge extends DirectedEdge implements Function{
 		//hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 	
-	public JumpingEdge(Node source, Node target, int ceiledTopPointY) {
-		this(source, target);
+	public JumpingEdge(Node source, Node target, int ceiledTopPointY, boolean useSuperSpeed) {
+		this(source, target, useSuperSpeed);
 		this.ceiledTopPointY = ceiledTopPointY + source.y;
 		this.topPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
@@ -134,7 +138,7 @@ public class JumpingEdge extends DirectedEdge implements Function{
 	}
 	
 	public FallEdge getCorrespondingFallEdge(){
-		return new FallEdge(this.source, this.target);
+		return new FallEdge(this.source, this.target, useSuperSpeed);
 	}
 	
 	public float getParameterA(){

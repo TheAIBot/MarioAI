@@ -1,18 +1,19 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MovementInformation;
 
 public abstract class DirectedEdge {
 	public final Node source; 
 	public final Node target;
+	public final boolean useSuperSpeed;
 	protected int hash;
 	private MovementInformation moveInfo;
 	
-	public DirectedEdge(Node source, Node target) {
+	public DirectedEdge(Node source, Node target, boolean useSuperSpeed) {
 		this.source = source;
 		this.target = target;
+		this.useSuperSpeed = useSuperSpeed;
 	}
 	
 	public abstract float getMaxY();
@@ -52,6 +53,7 @@ public abstract class DirectedEdge {
 		return "[" + source.x + " : " + source.y + "]" + 
 				   " --> " + 
 	          "[" + target.x + " : " + target.y + "]" +
-				 " H: " + Math.round(getMaxY()) + "\n";
+				 " H: " + Math.round(getMaxY()) + 
+				 " S: " + ((useSuperSpeed)? "t": "f") + "\n";
 	}
 }

@@ -95,7 +95,7 @@ public class Node {
 	public void setIsAllEdgesMade(boolean value) {
 		allEdgesMade = value;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return hash;

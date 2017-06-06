@@ -13,7 +13,6 @@ import MarioAI.Hasher;
 import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
 public class TestHasher {
@@ -35,7 +34,7 @@ public class TestHasher {
 	}
 
 	private List<Integer> getAllPossibleFallEdgeHashcodes() {
-		final int expectedHashes =  (int) ((LIMIT_Y+1)*(LIMIT_X+1))*((LIMIT_X+1)*(LIMIT_Y+1));
+		final int expectedHashes =  (int) ((LIMIT_Y+1)*(LIMIT_X+1))*((LIMIT_X+1)*(LIMIT_Y+1)) * 2;
 		ArrayList<Integer> allFallEdgesHashes = new ArrayList<Integer>(expectedHashes);
 		
 		for (short sourceY = 0; sourceY <= LIMIT_Y; sourceY++) {
@@ -45,8 +44,10 @@ public class TestHasher {
 						//Type does not matter
 						final Node source = new Node(sourceX, sourceY, (byte)10);
 						final Node target = new Node(targetX, targetY, (byte)10);
-						final FallEdge fall = new FallEdge(source, target);
-						allFallEdgesHashes.add(fall.hashCode());						
+						final FallEdge fall1 = new FallEdge(source, target, false);
+						final FallEdge fall2 = new FallEdge(source, target, true);
+						allFallEdgesHashes.add(fall1.hashCode());
+						allFallEdgesHashes.add(fall2.hashCode());
 					}
 				}			
 			}
@@ -84,8 +85,10 @@ public class TestHasher {
 	}
 	
 	private List<Integer> getAllPossibleJumpingEdgeHashcodes() {
+		final int limitY = 15;
+		final int limitX = 32;
 		final int limitJumpHeight = 4;
-		final int expectedHashes = (int)Math.pow((LIMIT_Y + 1), 2) * (int)Math.pow((LIMIT_X + 1), 2) * (limitJumpHeight + 1);
+		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (limitJumpHeight + 1) * 2;
 		ArrayList<Integer> allJumpingEdgesHashes = new ArrayList<Integer>(expectedHashes);
 		
 		for (short sourceY = 0; sourceY <= LIMIT_Y; sourceY++) {
@@ -96,8 +99,10 @@ public class TestHasher {
 							//Type does not matter
 							final Node source = new Node(sourceX, sourceY, (byte)10);
 							final Node target = new Node(targetX, targetY, (byte)10);
-							final JumpingEdge newPolynomial = new JumpingEdge(source, target, sourceY + JumpHeight);
-							allJumpingEdgesHashes.add(newPolynomial.hashCode());
+							final JumpingEdge newPolynomial1 = new JumpingEdge(source,target, sourceY + JumpHeight, false);
+							final JumpingEdge newPolynomial2 = new JumpingEdge(source,target, sourceY + JumpHeight, true);
+							allJumpingEdgesHashes.add(newPolynomial1.hashCode());
+							allJumpingEdgesHashes.add(newPolynomial2.hashCode());
 						}						
 					}
 				}			
@@ -121,17 +126,19 @@ public class TestHasher {
 	}
 
 	private ArrayList<Integer> getAllPossibleRunningEdgeHashcodes() {
-		final int expectedHashes = (int)Math.pow((LIMIT_Y + 1), 2) * (int)Math.pow((LIMIT_X + 1), 2);
+		final int limitY = 15;
+		final int limitX = 32;
+		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * 2;
 		ArrayList<Integer> allRunningEdgesHashcodes = new ArrayList<Integer>();
 		
-		for (short sourceY = 0; sourceY <= LIMIT_Y; sourceY++) {
-			for (short sourceX = 0; sourceX <= LIMIT_X; sourceX++) {						
-				for (short targetY = 0; targetY <= LIMIT_Y; targetY++) {
-					for (short targetX = 0; targetX <= LIMIT_X; targetX++) {
-						final RunningEdge run = new RunningEdge(new Node(sourceX, sourceY, (byte)10), 
-		                        				  		          new Node(targetX, targetY, (byte)10));
-						allRunningEdgesHashcodes.add(run.hashCode());
-						
+		for (short sourceY = 0; sourceY <= limitY; sourceY++) {
+			for (short sourceX = 0; sourceX <= limitX; sourceX++) {						
+				for (short targetY = 0; targetY <= limitY; targetY++) {
+					for (short targetX = 0; targetX <= limitX; targetX++) {
+						final RunningEdge run1 = new RunningEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), false);
+						final RunningEdge run2 = new RunningEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), true);
+						allRunningEdgesHashcodes.add(run1.hashCode());
+						allRunningEdgesHashcodes.add(run2.hashCode());
 					}
 				}
 			}
@@ -229,8 +236,8 @@ public class TestHasher {
 		final int limitY = 10;
 		final int limitX = 20;
 		final float speedLimit = MarioControls.MAX_X_VELOCITY;
-		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1) * 3;
-		ArrayList<Long> allRunningEdgesHashcodes = new ArrayList<Long>();
+		final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1) * 3 * 2;
+		ArrayList<Long> allSpeedNodeHashcodes = new ArrayList<Long>();
 		
 		final float speedIncrements = speedLimit / speedGranularity;
 		
@@ -238,20 +245,27 @@ public class TestHasher {
 			for (short sourceX = 0; sourceX <= limitX; sourceX++) {						
 				for (short targetY = 0; targetY <= limitY; targetY++) {
 					for (short targetX = 0; targetX <= limitX; targetX++) {
-						final RunningEdge edge = new RunningEdge(new Node(sourceX, sourceY, (byte)10), 
-								new Node(targetX, targetY, (byte)10));
+						final RunningEdge edge1 = new RunningEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), false);
 						for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 							//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-							allRunningEdgesHashcodes.add(Hasher.hashSpeedNode(v, edge, speedGranularity));
-							allRunningEdgesHashcodes.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge, speedGranularity));
-							allRunningEdgesHashcodes.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v, edge1, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge1, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge1, speedGranularity));
+						}
+						
+						final RunningEdge edge2 = new RunningEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), true);
+						for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
+							//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v, edge2, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge2, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge2, speedGranularity));
 						}
 					}
 				}
 			}
 		}
-		assertEquals(expectedHashes, allRunningEdgesHashcodes.size());
-		return allRunningEdgesHashcodes;
+		assertEquals(expectedHashes, allSpeedNodeHashcodes.size());
+		return allSpeedNodeHashcodes;
 	}
 	
 	@Test
@@ -266,10 +280,10 @@ public class TestHasher {
 				final int limitX = 20;
 				final int heightLimit = 4;
 				final float speedLimit = MarioControls.MAX_X_VELOCITY;
-				final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1) * heightLimit;
-				ArrayList<Long> allRunningEdgesHashcodes1 = new ArrayList<Long>();
-				ArrayList<Long> allRunningEdgesHashcodes2 = new ArrayList<Long>();
-				ArrayList<Long> allRunningEdgesHashcodes3 = new ArrayList<Long>();
+				final int expectedHashes = (int)Math.pow((limitY + 1), 2) * (int)Math.pow((limitX + 1), 2) * (speedGranularity * 2 + 1) * heightLimit * 2;
+				ArrayList<Long> allSpeedNodeHashcodes1 = new ArrayList<Long>();
+				ArrayList<Long> allSpeedNodeHashcodes2 = new ArrayList<Long>();
+				ArrayList<Long> allSpeedNodeHashcodes3 = new ArrayList<Long>();
 				
 				final float speedIncrements = speedLimit / speedGranularity;
 				
@@ -278,28 +292,34 @@ public class TestHasher {
 						for (short targetY = 0; targetY <= limitY; targetY++) {
 							for (short targetX = 0; targetX <= limitX; targetX++) {
 								for (int h = 1; h <= heightLimit; h++) {
-									final JumpingEdge edge = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), 
-											new Node(targetX, targetY, (byte)10),
-											h);
+									final JumpingEdge edge1 = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), false);
 									for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 										//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-										allRunningEdgesHashcodes1.add(Hasher.hashSpeedNode(v, edge, speedGranularity));
-										allRunningEdgesHashcodes2.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge, speedGranularity));
-										allRunningEdgesHashcodes3.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge, speedGranularity));
+										allSpeedNodeHashcodes1.add(Hasher.hashSpeedNode(v, edge1, speedGranularity));
+										allSpeedNodeHashcodes2.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge1, speedGranularity));
+										allSpeedNodeHashcodes3.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge1, speedGranularity));
+									}
+									
+									final JumpingEdge edge2 = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), true);
+									for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
+										//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
+										allSpeedNodeHashcodes1.add(Hasher.hashSpeedNode(v, edge2, speedGranularity));
+										allSpeedNodeHashcodes2.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge2, speedGranularity));
+										allSpeedNodeHashcodes3.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge2, speedGranularity));
 									}
 								}
 							}
 						}
 					}
 				}
-				assertEquals(expectedHashes, allRunningEdgesHashcodes1.size());
-				assertEquals(expectedHashes, allRunningEdgesHashcodes2.size());
-				assertEquals(expectedHashes, allRunningEdgesHashcodes3.size());
+				assertEquals(expectedHashes, allSpeedNodeHashcodes1.size());
+				assertEquals(expectedHashes, allSpeedNodeHashcodes2.size());
+				assertEquals(expectedHashes, allSpeedNodeHashcodes3.size());
 
-				allSpeedNodesHashed.addAll(allRunningEdgesHashcodes1);
-				allSpeedNodesHashed.addAll(allRunningEdgesHashcodes2);
-				allSpeedNodesHashed.addAll(allRunningEdgesHashcodes3);
-				assertEquals(allRunningEdgesHashcodes1.size(), allSpeedNodesHashed.size());
+				allSpeedNodesHashed.addAll(allSpeedNodeHashcodes1);
+				allSpeedNodesHashed.addAll(allSpeedNodeHashcodes2);
+				allSpeedNodesHashed.addAll(allSpeedNodeHashcodes3);
+				assertEquals(allSpeedNodeHashcodes1.size(), allSpeedNodesHashed.size());
 			}
 		}
 	}

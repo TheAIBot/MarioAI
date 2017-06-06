@@ -12,23 +12,18 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.sun.istack.internal.FinalArrayList;
-
-import MarioAI.FastAndFurious;
+import MarioAI.CollisionDetection;
 import MarioAI.MarioMethods;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-import junit.framework.Assert;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCollisionDetector {
@@ -37,7 +32,7 @@ public class TestCollisionDetector {
 	EdgeCreator grapher = new EdgeCreator();
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
-	public DirectedEdge runningEdgeType = new RunningEdge(null, null);
+	public DirectedEdge runningEdgeType = new RunningEdge(null, null, false);
 	//TODO also add some step-by-step comparisons, of isBlocking and the likes.
 	//TODO might be an error with him running to the goal nodes, going out of the level.
 	//TODO test for different materials, floor and ceilings.
@@ -380,9 +375,8 @@ public class TestCollisionDetector {
 		float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world);
-		boolean hasCollisions = path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world);
-		assertTrue(hasCollisions);
+		ArrayList<DirectedEdge> path = PathHelper.createPath((int)marioX, (int)marioY, -1, 0, 0, 1, world, false);
+		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 		
 		
 		
@@ -396,7 +390,7 @@ public class TestCollisionDetector {
 		marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world);
+		path = PathHelper.createPath((int)marioX, (int)marioY, 1, 0, 0, 1, world, false);
 		assertTrue(path.get(0).getMoveInfo().hasCollisions(marioX, marioY, world));
 	}
 	

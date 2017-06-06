@@ -2,16 +2,10 @@ package MarioAI.path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.validator.PublicClassValidator;
-
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.jndi.rmi.registry.RegistryContext;
 
 import MarioAI.MarioMethods;
 import MarioAI.World;
@@ -20,7 +14,6 @@ import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
@@ -74,6 +67,10 @@ public class PathCreator {
 	}
 	
 	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+		if (isRunning) {
+			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
+		}
+		
 		isRunning = true;
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -129,7 +126,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blokingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -161,6 +158,7 @@ public class PathCreator {
 			if (paths[i].isBestPath) {
 				paths[i].usePath();
 				bestPath = paths[i];
+				//System.out.println("Updated best path");
 				return;
 			}
 		}
@@ -170,11 +168,15 @@ public class PathCreator {
 			//with the highest granularity
 			paths[paths.length - 1].usePath();
 			bestPath = paths[paths.length - 1];	
+			//System.out.println("Updated best path");
+		}
+		else {
+			bestPath.path.remove(0);
 		}
 	}
 	
 	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
-		if (newPotentialPath == null) {
+		if (newPotentialPath.path == null) {
 			return false;
 		}
 		if (!newPotentialPath.isBestPath && 
@@ -196,6 +198,10 @@ public class PathCreator {
 	}
 	
 	public void stop() {
+		if (!isRunning) {
+			throw new Error("PathCreator wasn't running. Start PathCreator before stopping it again.");
+		}
+		
 		for (AStar aStar : aStars) {
 			aStar.stop();
 		}
@@ -207,4 +213,13 @@ public class PathCreator {
 		removeGoalFrame();
 		isRunning = false;
 	}
+	
+	public HashMap<Long, SpeedNode> getSpeedNodes() {
+		return aStars[aStars.length-1].getSpeedNodes();
+	}
+	
+	public int getBlockingGranularity() {
+		return aStars[aStars.length-1].hashGranularity;
+	}
+	
 }

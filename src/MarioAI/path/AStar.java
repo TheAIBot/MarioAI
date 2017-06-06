@@ -1,7 +1,5 @@
 package MarioAI.path;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,10 +8,10 @@ import java.util.PriorityQueue;
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-
 
 public class AStar {
 	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
@@ -23,17 +21,25 @@ public class AStar {
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
-	
+	final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
-	private final int hashGranularity;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
+	
+	private static final int PENALTY_SCORE = 9000; // arbitrary high value;
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
 	}
 	
+	/**
+	 * @param start
+	 * @param goal
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @param world
+	 */
 	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
 		closedSet.clear();
 		openSet.clear();
@@ -53,8 +59,7 @@ public class AStar {
 	}
 
 	/**
-	 * Basic A* search algorithm
-	 * 
+	 * Main part of the A* search algorithm. Adapted to fit project and problem specification.
 	 * @param start
 	 * @param goal
 	 * @return
@@ -65,6 +70,7 @@ public class AStar {
 			//System.out.println(openSet);
 			
 			synchronized (lockBestSpeedNode) {
+				
 				final SpeedNode current = openSet.remove();
 				openSetMap.remove(current.hash);
 				
@@ -84,16 +90,8 @@ public class AStar {
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
 				// Explore each neighbor of current node
-				for (DirectedEdge neighborEdge : current.node.getEdges()) {			
+				for (DirectedEdge neighborEdge : current.node.getEdges()) {
 					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
-					
-					if (!sn.isSpeedNodeUseable()) {
-						continue;
-					}
-					
-					if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-						continue;
-					}
 					
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
@@ -109,25 +107,53 @@ public class AStar {
 					//then there is no need to add this edge as it's worse than the
 					//current one
 					if (openSetMap.containsKey(snEndHash) &&
-						tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+							tentativeGScore >= openSetMap.get(snEndHash).gScore) {
 						continue;
-					}  
+					}
+					
+					if (!sn.isSpeedNodeUseable()) {
+						continue;
+					}
+					
+					// collision detection and invincibility handling 
+					int penalty = 0;
+					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//							continue;
+//						}
+						
+						if (sn.ticksOfInvincibility == 0) {
+							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+								if (sn.lives <= 1) {
+									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
+								}
+								penalty = PENALTY_SCORE;
+							}
+						}
+					}
 					
 					//Update the edges position in the priority queue
 					//by updating the scores and taking it in and out of the queue.
-					openSet.remove(sn);
+					if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight();
+					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
 					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(snEndHash, sn);
 				}	
 			}
 		}
+		
 		currentBestPathEnd = null;
 		foundBestPath = false;
 	}
 	
+	/**
+	 * @param neighborEdge
+	 * @param current
+	 * @param world
+	 * @return speedNode
+	 */
 	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, hashGranularity);
 		
@@ -144,7 +170,7 @@ public class AStar {
 	/**
 	 * @param current
 	 * @param goal
-	 * @return
+	 * @return an estimate of the ticks away from the goal
 	 */
 	private int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
 		return MarioControls.getTicksToTarget(goal.node.x - current.xPos, current.vx);

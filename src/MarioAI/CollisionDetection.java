@@ -1,10 +1,11 @@
-package MarioAI.graph;
+package MarioAI;
 
 import java.awt.geom.Point2D;
 import java.io.DataInputStream;
-import MarioAI.World;
+
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
 public class CollisionDetection {
@@ -13,12 +14,12 @@ public class CollisionDetection {
 	//Taken from Level class.
 	public static final int BIT_BLOCK_UPPER = 1 << 0;
 	public static final int BIT_BLOCK_ALL = 1 << 1;
-   public static final int BIT_BLOCK_LOWER = 1 << 2;   
+    public static final int BIT_BLOCK_LOWER = 1 << 2;   
 
-   public static byte[] TILE_BEHAVIORS = new byte[256];
+    public static final byte[] TILE_BEHAVIORS = new byte[256];
    	//Test seed: 3261372
-	public static byte[] TILE_CONVERTER 		 = new byte[]{16,21,34,  9,-74,11};
-	public static byte[] TILE_CONVERTER_MARKER = new byte[]{16,21,0 ,-10,-11,20};
+	public static final byte[] TILE_CONVERTER 	     = new byte[]{16,21,34,  9,-74,11};
+	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16,21, 0,-10,-11,20};
 	
 	public static boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
 		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
@@ -36,17 +37,24 @@ public class CollisionDetection {
 		//TODO find out why,
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
 															     (startY - currentOffset.y) * 16 - 1);
+		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
 		//System.out.println("Current position: x = " + currentPosition.x/16 + ", y = " + currentPosition.y/16);
 		//System.out.println("Or: x = " + currentPosition.x + ", y = " + currentPosition.y);
 		//TODO change -2 back to -1
 		//TODO (*) Why -2 to the y position?. Should it be +2? test.
 		if (lastYValue == futureOffset.y) {
-			return !move(currentPosition, xa, 0, world);
+			move(currentPosition, xa, 0, world);
+			currentPosition.y += ya;
 		}
 		else {
-			return !move(currentPosition, xa, 0, world) || 
-					 !move(currentPosition, 0, ya, world);
+			move(currentPosition, xa, 0, world);
+			move(currentPosition, 0, ya, world);
 		}
+		
+		final float diffX = currentPosition.x - expectedPosition.x;
+		final float diffY = currentPosition.y - expectedPosition.y;
+		
+		return diffX > MarioControls.ACCEPTED_DEVIATION || diffY > MarioControls.ACCEPTED_DEVIATION;
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.

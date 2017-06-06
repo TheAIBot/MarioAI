@@ -4,9 +4,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import MarioAI.CollisionDetection;
 import MarioAI.World;
-import MarioAI.graph.CollisionDetection;
-import MarioAI.graph.Function;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
@@ -20,6 +19,7 @@ public class MovementInformation{
 	private final int totalTicksXMoved;
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
+	private final boolean useSuperSpeed;
 	
 	//position information
 	private final Point2D.Float[] positions;
@@ -28,6 +28,7 @@ public class MovementInformation{
 		this.xMovedDistance = xMoveInfo.xMovedDistance;
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
+		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
 		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
@@ -85,14 +86,17 @@ public class MovementInformation{
 		if (xMovedDistance > 0) {
 			actions[Mario.KEY_RIGHT] = pressXButton[tick];
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else if (xMovedDistance < 0) {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = pressXButton[tick];
+			actions[Mario.KEY_SPEED] = useSuperSpeed;//pressXButton[tick];
 		}
 		else {
 			actions[Mario.KEY_RIGHT] = false;
 			actions[Mario.KEY_LEFT] = false;
+			actions[Mario.KEY_SPEED] = false;
 		}
 		
 		actions[Mario.KEY_JUMP] = pressYButton[tick];
@@ -149,6 +153,9 @@ public class MovementInformation{
 				return false;
 			}
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
+				return false;
+			}
+			else if (bb.useSuperSpeed != useSuperSpeed) {
 				return false;
 			}
 			else if (!Arrays.equals(bb.pressXButton, pressXButton)) {

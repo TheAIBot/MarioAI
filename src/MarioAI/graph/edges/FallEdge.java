@@ -5,8 +5,8 @@ import MarioAI.graph.nodes.Node;
 
 public class FallEdge extends DirectedEdge {
 
-	public FallEdge(Node source, Node target) {
-		super(source, target);
+	public FallEdge(Node source, Node target, boolean useSuperSpeed) {
+		super(source, target, useSuperSpeed);
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 

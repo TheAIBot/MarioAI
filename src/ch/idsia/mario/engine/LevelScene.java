@@ -1,20 +1,33 @@
 package ch.idsia.mario.engine;
 
-import ch.idsia.mario.engine.level.BgLevelGenerator;
-import ch.idsia.mario.engine.level.Level;
-import ch.idsia.mario.engine.level.LevelGenerator;
-import ch.idsia.mario.engine.level.SpriteTemplate;
-import ch.idsia.mario.engine.sprites.*;
-import ch.idsia.mario.environments.Environment;
-import ch.idsia.utils.MathX;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import MarioAI.debugGraphics.DebugDrawing;
+import ch.idsia.mario.engine.level.BgLevelGenerator;
+import ch.idsia.mario.engine.level.Level;
+import ch.idsia.mario.engine.level.LevelGenerator;
+import ch.idsia.mario.engine.level.SpriteTemplate;
+import ch.idsia.mario.engine.sprites.BulletBill;
+import ch.idsia.mario.engine.sprites.CoinAnim;
+import ch.idsia.mario.engine.sprites.FireFlower;
+import ch.idsia.mario.engine.sprites.Fireball;
+import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.engine.sprites.Mushroom;
+import ch.idsia.mario.engine.sprites.Particle;
+import ch.idsia.mario.engine.sprites.Shell;
+import ch.idsia.mario.engine.sprites.Sparkle;
+import ch.idsia.mario.engine.sprites.Sprite;
+import ch.idsia.mario.engine.sprites.SpriteContext;
+import ch.idsia.mario.environments.Environment;
+import ch.idsia.utils.MathX;
 import MarioAI.debugGraphics.DebugDrawing;
 import MarioAI.debugGraphics.DebugLines;
 import MarioAI.debugGraphics.DebugPoints;
@@ -1074,4 +1087,7 @@ public class LevelScene extends Scene implements SpriteContext {
 		return timeLeft / 15;
 	}
 
+    public long getSeed() {
+    	return levelSeed;
+    }
 }

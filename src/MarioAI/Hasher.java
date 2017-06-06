@@ -71,9 +71,21 @@ public class Hasher {
 		final int b4 = 	((int) edge.source.x & 0x1ff) << position4; //Same as above.
 		final int position5 = position4+9;
 		
+		final int b5 = edge.useSuperSpeed ? 0x80000000 : 0x00000000; //The last bit.
+
 		//Unique edge information to add to the hash.
 		//Includes things like if it is an jump edge or running edge, and things like that.
-		final int b5 = extraHash << position5; 
-		return b1 | b2 | b3 | b4 | b5;
+		final int b6 = extraHash << position5; 
+		
+		/*
+		System.out.println("b1 = " + "                          " + Integer.toBinaryString(b1));
+		System.out.println("b2 = " + "                      " + Integer.toBinaryString(b2));
+		System.out.println("b3 = " + "             " + Integer.toBinaryString(b3));
+		System.out.println("b4 = " + "    " + Integer.toBinaryString(b4));
+		System.out.println("b5 = " + Integer.toBinaryString(b5));
+		System.out.println("b6 = " + Integer.toBinaryString(b6));
+		System.out.println("Everything = " + Integer.toBinaryString(b1 | b2 | b3 | b4 | b5 | b6));
+		*/
+		return b1 | b2 | b3 | b4 | b5 | b6;
 	}
 }
