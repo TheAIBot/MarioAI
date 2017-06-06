@@ -13,15 +13,13 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.sun.javafx.geom.Edge;
-
 import MarioAI.World;
-import MarioAI.graph.JumpDirection;
-import MarioAI.graph.edges.Collision;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
+import MarioAI.graph.edges.edgeCreation.Collision;
+import MarioAI.graph.edges.edgeCreation.EdgeCreator;
+import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;

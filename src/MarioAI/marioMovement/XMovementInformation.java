@@ -2,7 +2,7 @@ package MarioAI.marioMovement;
 
 import java.util.ArrayList;
 
-public class XMovementInformation {
+class XMovementInformation {
 	public final float xMovedDistance;
 	public final float endSpeed;
 	public final int totalTicksXMoved;

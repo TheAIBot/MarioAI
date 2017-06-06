@@ -1,5 +1,6 @@
 package MarioAI.marioMovement;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,7 @@ public class MarioControls {
 	private float oldX = MARIO_START_X_POS;
 	private DirectedEdge prevEdge = null;
 	private float currentXSpeed = 0;
-	private boolean[] actions = new boolean[Environment.numberOfButtons];
+	private final boolean[] actions = new boolean[Environment.numberOfButtons];
 	
 	public boolean canUpdatePath = false;
 	
@@ -91,30 +92,20 @@ public class MarioControls {
 		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY / 2;
 	}
 		
+	float oldMarioX = 0;
+	float oldMarioY = 0;
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
-			DirectedEdge next = path.get(0);
-			int movementTime = next.getMoveInfo().getMoveTime();
-			if (prevEdge != null && 
-				next.equals(prevEdge) &&
-				next.getMoveInfo().equals(prevEdge.getMoveInfo()) &&
-				movementTime == ticksOnThisEdge + 1) 
-			{
-				path.remove(0);
-				if (path.size() == 0) {
-					canUpdatePath = true;
-					Arrays.fill(actions, false);
-					return actions;
-				}
-				next = path.get(0);
-				movementTime = next.getMoveInfo().getMoveTime();
-			}
+			final DirectedEdge next = path.get(0);
+			final int movementTime = next.getMoveInfo().getMoveTime();
 			
 			if (prevEdge == null ||
 				!next.equals(prevEdge) ||
 				!next.getMoveInfo().equals(prevEdge.getMoveInfo())) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
+				oldMarioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+				oldMarioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			}
 			else {
 				ticksOnThisEdge++;
@@ -123,6 +114,16 @@ public class MarioControls {
 			canUpdatePath = movementTime == ticksOnThisEdge + 1;
 
 			next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
+			
+			final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			
+			System.out.println("Mario: " + marioX + ", " + marioY);
+			System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
+			
+			if (canUpdatePath) {
+				path.remove(0);
+			}
 		}
 		else {
 			canUpdatePath = true;
@@ -416,5 +417,9 @@ public class MarioControls {
 		// Not currently
 		//TODO make method
 		return false;
+	}
+	
+	public boolean[] getActions() {
+		return actions;
 	}
 }

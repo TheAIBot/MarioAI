@@ -20,7 +20,7 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {2, 480, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
@@ -71,7 +71,7 @@ public class PathCreator {
 		
 		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
 		
-		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();
+		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
 		
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
@@ -180,13 +180,6 @@ public class PathCreator {
 			bestPath = paths[paths.length - 1];	
 			//System.out.println("Updated best path");
 		}
-		else {
-			bestPath.path.remove(0);
-		}
-	}
-	
-	public void discardFoundPath() {
-		//bestPath.path.remove(0);
 	}
 	
 	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {

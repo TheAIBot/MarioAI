@@ -2,7 +2,7 @@ package MarioAI.marioMovement;
 
 import java.util.ArrayList;
 
-public class YMovementInformation {
+class YMovementInformation {
 	public final int totalTicksJumped;
 	public final ArrayList<Float> yPositions;
 	public final ArrayList<Boolean> pressYButton;

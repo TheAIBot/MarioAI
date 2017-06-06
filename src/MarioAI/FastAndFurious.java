@@ -2,14 +2,18 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.edgeCreation.EdgeCreator;
+import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
@@ -41,15 +45,11 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	
 	public boolean[] getAction(Environment observation) {
 		executeKeyCommands(observation);
-		
-		boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
 			//Create the initial world and all its edges
 			world.initialize(observation);
 			grapher.setMovementEdges(world, world.getMarioNode(observation));
-			
-			CollisionDetection.loadTileBehaviors();
 			
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 			
@@ -72,8 +72,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned() ||
 				 pathCreator.getBestPath() == null) && 
-				marioController.canUpdatePath || 
-				!pathCreator.isRunning) 
+				marioController.canUpdatePath) 
 			{
 				/*
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
@@ -101,7 +100,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
 						//save(observation);
-						//throw new Error();
+						throw new Error();
 					}
 					pathCreator.updateBestPath();
 					System.out.println("Tick: " + tickCount + " Stopped");
@@ -120,20 +119,18 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
-				}
-				
-				
+				}				
 				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			else if (marioController.canUpdatePath) {
+			else if (marioController.canUpdatePath && 
+					 pathCreator.isRunning) {
 				pathCreator.stop();
-				pathCreator.discardFoundPath();
 				System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			
-			action = marioController.getNextAction(observation, pathCreator.getBestPath());
+			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
@@ -146,13 +143,13 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
-				DebugDraw.drawAction(observation, action);
+				DebugDraw.drawAction(observation, marioController.getActions());
 				//TestTools.renderLevel(observation);
 			}
 		}
 		tickCount++;
 		
-		return action;
+		return marioController.getActions();
 	}
 	
 	public void findPath(Environment observation) {
@@ -165,7 +162,9 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public void startFindingPathFromPreviousPath(Environment observation) {
 		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.start(observation, pathCreator.getBestPath(), world.getGoalNodes(0), marioHeight);
+		final ArrayList<DirectedEdge> path =  pathCreator.getBestPath();
+		final Node[] goalNodes = world.getGoalNodes(0);
+		pathCreator.start(observation, path, goalNodes, marioHeight);
 	}
 	
 	private void executeKeyCommands(Environment observation) {
