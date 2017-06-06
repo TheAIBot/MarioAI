@@ -118,7 +118,7 @@ public class MarioControls {
 				System.out.println("Mario: " + marioX + ", " + marioY);
 				
 				for (Point2D.Float point : path.get(0).getMoveInfo().getPositions()) {
-					System.out.println(point.toString());
+					System.out.println("(" + (marioX + point.x) + ", " + (marioY + point.y) + ")");
 				}
 			}
 		}
