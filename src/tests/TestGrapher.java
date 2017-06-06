@@ -13,8 +13,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.sun.javafx.geom.Edge;
-
 import MarioAI.World;
 import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;

@@ -1,8 +1,5 @@
 package MarioAI.graph.edges;
 
-
-import com.sun.javafx.scene.traversal.Direction;
-
 import MarioAI.Hasher;
 import MarioAI.graph.Function;
 import MarioAI.graph.JumpDirection;
