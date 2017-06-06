@@ -16,8 +16,8 @@ import org.junit.runners.MethodSorters;
 import com.sun.javafx.geom.Edge;
 
 import MarioAI.World;
-import MarioAI.graph.Collision;
 import MarioAI.graph.JumpDirection;
+import MarioAI.graph.edges.Collision;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.JumpingEdge;
