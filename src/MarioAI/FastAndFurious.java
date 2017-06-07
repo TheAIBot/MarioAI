@@ -28,7 +28,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = false;
+	public boolean DEBUG = true;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -103,14 +103,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 						//throw new Error();
 					}
 					pathCreator.updateBestPath();
-					System.out.println("Tick: " + tickCount + " Stopped");
+//					System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning && 
 					 pathCreator.getBestPath() != null && 
 					 pathCreator.getBestPath().size() > 0) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					startFindingPathFromPreviousPath(observation);
-					System.out.println("Tick: " + tickCount + " Started\n");
+//					System.out.println("Tick: " + tickCount + " Started\n");
 				}
 				if (!pathCreator.isRunning && 
 					(pathCreator.getBestPath() == null || 
@@ -127,7 +127,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			else if (marioController.canUpdatePath && 
 					 pathCreator.isRunning) {
 				pathCreator.stop();
-				System.out.println("Tick: " + tickCount + " Path ignored");
+//				System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
@@ -139,7 +139,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				DebugDraw.drawEnemies(observation, enemyPredictor);
+				//DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());

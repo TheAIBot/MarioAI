@@ -111,11 +111,13 @@ public class Play {
 500432374 //Difficulty 2, fejl i collision engine
 1671739449 // gets stuck because cannot find path due to enemy (RED GOOMBA) 1/5th in
 916101382 // stuck in beginning because of drop down + gap
+
+1036439644 // seed hvor det faktisk gaar ret godt
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(4);	 
+	        options.setLevelDifficulty(1);	 
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

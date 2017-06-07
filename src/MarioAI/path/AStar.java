@@ -90,11 +90,6 @@ class AStar {
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
 				
-				// The current best speednode is the one furthest to the right
-				// (disregarding if it passes through an enemy or not).
-				if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
-					currentBestPathEnd = current;
-				}
 				
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : current.node.getEdges()) {
@@ -127,6 +122,10 @@ class AStar {
 							continue;
 						}
 						
+//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//							continue;
+//						}
+						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 								if (sn.lives <= 1) {
@@ -136,6 +135,13 @@ class AStar {
 							}
 						}
 					}
+					// The current best speednode is the one furthest to the right
+					// (disregarding if it passes through an enemy or not).
+					if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
+						currentBestPathEnd = current;
+					}
+					//currentBestPathEnd = openSet.peek();
+					
 					
 					// Update the edges position in the priority queue
 					// by updating the scores and taking it in and out of the queue.
@@ -164,7 +170,7 @@ class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
-			return speedNode;
+			//return speedNode;
 		}
 		
 		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);
@@ -185,6 +191,7 @@ class AStar {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
+			if (!foundBestPath) System.out.println("Taking the best found so far");
 			return new AStarPath(currentBestPathEnd, true, hashGranularity);
 		}
 	}

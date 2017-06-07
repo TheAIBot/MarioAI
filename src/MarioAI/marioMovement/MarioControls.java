@@ -118,8 +118,8 @@ public class MarioControls {
 			final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			
-			System.out.println("Mario: " + marioX + ", " + marioY);
-			System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
+//			System.out.println("Mario: " + marioX + ", " + marioY);
+//			System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
 			
 			if (canUpdatePath) {
 				path.remove(0);
