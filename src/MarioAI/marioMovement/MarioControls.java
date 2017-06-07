@@ -285,8 +285,10 @@ public class MarioControls {
 			////BLOCK 1////
 			
 		}
+		final int ticksDrifting = Math.max(0, airTime - totalTicks);
+		//final int ticksAccelerating = totalTicks;
+		//totalTicks += ticksDrifting;
 		if (airTime > 0) {
-			final int ticksDrifting = Math.max(0, airTime - totalTicks);
 			totalTicks += ticksDrifting;
 			
 			speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions, pressButton);
@@ -319,11 +321,10 @@ public class MarioControls {
 	}
 	
 	private static float addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton, final boolean useSuperSpees) {
-		final ArrayList<Float> xDeaccelerationPositions = new ArrayList<Float>();
-		final float endSpeed = getDeaccelerationPositions(speed, xDeaccelerationPositions, useSuperSpees);
+		final float endSpeed = getDeaccelerationPositions(speed, xPositions, useSuperSpees);
 		
-		for (int i = 0; i < xDeaccelerationPositions.size(); i++) {
-			xPositions.add(-xDeaccelerationPositions.get(i));
+		for (int i = 0; i < xPositions.size(); i++) {
+			//xPositions.add(-xDeaccelerationPositions.get(i));
 			pressButton.add(true);
 		}	
 		
@@ -343,7 +344,7 @@ public class MarioControls {
 				speed = 0;
 			}
 			xMovement += speed;
-			xPositions.add(xMovement);
+			xPositions.add(-xMovement);
 		} while (speed >= MIN_MARIO_SPEED);
 		return speed;
 	}
@@ -366,22 +367,22 @@ public class MarioControls {
 	}
 	
 	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, ArrayList<Float> xPositions, final ArrayList<Boolean> pressButton) {
-		final ArrayList<Float> driftPositions = getDriftingPositions(speed, driftTime);
+		final float[] driftPositions = getDriftingPositions(speed, driftTime);
 		final float startXPosition = distanceMoved;
 		
-		for (int i = 0; i < driftPositions.size(); i++) {
-			xPositions.add(startXPosition + driftPositions.get(i));
+		for (int i = 0; i < driftPositions.length; i++) {
+			xPositions.add(startXPosition + driftPositions[i]);
 			pressButton.add(false);
 		}
 		return getLastSpeedDrifting(speed, distanceMoved, driftPositions);
 	}
 	
-	private static ArrayList<Float> getDriftingPositions(final float speed, final int driftTime) {
-		final ArrayList<Float> driftPositions = new ArrayList<Float>(); 
+	private static float[] getDriftingPositions(final float speed, final int driftTime) {
+		final float[]driftPositions = new float[driftTime]; 
 		float xMoved = 0;
 		for (int i = 0; i < driftTime; i++) {	
 			xMoved += getNextDriftingDistance(speed, i);
-			driftPositions.add(xMoved);
+			driftPositions[i] = xMoved;
 		}
 		return driftPositions;
 	}
@@ -395,16 +396,16 @@ public class MarioControls {
 		return (currentSpeed <= MIN_MARIO_SPEED) ? 0 : currentSpeed;
 	}
 	
-	private static float getLastSpeedDrifting(float speed, float distanceMoved, ArrayList<Float> driftPositions) {
-		if (driftPositions.size() == 0) {
+	private static float getLastSpeedDrifting(float speed, float distanceMoved, float[] driftPositions) {
+		if (driftPositions.length == 0) {
 			return speed;
 		}
-		else if (driftPositions.size() == 1) {
-			return driftPositions.get(0);
+		else if (driftPositions.length == 1) {
+			return driftPositions[0];
 		}
 		else {
-			final float last = driftPositions.get(driftPositions.size() - 1);
-			final float secondLast = driftPositions.get(driftPositions.size() - 2);
+			final float last = driftPositions[driftPositions.length - 1];
+			final float secondLast = driftPositions[driftPositions.length - 2];
 			return last - secondLast;
 		}
 	}
