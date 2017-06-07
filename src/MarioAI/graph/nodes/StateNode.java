@@ -123,20 +123,11 @@ public class StateNode implements Comparable<StateNode> {
 	
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight, EnemyCollision firstCollision) {
 		int currentTick = startTime;
-		int i = parent.ticksOfInvincibility;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
 		parent.ticksOfInvincibility = 0;
-		
-		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
-		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
-		if (i >= moveInfo.getPositions().length) {
-			this.ticksOfInvincibility -= moveInfo.getPositions().length;
-			return false;
-		}
-		
-		currentTick += i;
+				
 		boolean hasEnemyCollision = false;
-		for (; i < moveInfo.getPositions().length; i++) {
+		for (int i = 0; i < moveInfo.getPositions().length; i++) {
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
@@ -158,13 +149,19 @@ public class StateNode implements Comparable<StateNode> {
 			if (enemyPredictor.hasEnemy(x, y, 0.5f, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision)) {
 				if(firstCollision.isStompType){ //Stomp type collision
 					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
+					//Notice that if has more ticks of invincibility than 1, this is overwritten.
+					//This is how it is done in the game code.
 					//TODO check correct.
 					return true; //Stops the collision here, as the path taken must be changed.
-				} else{ //Normal collision, where Mario is damaged
+				} else if(ticksOfInvincibility == 0){ //Normal collision, where Mario is damaged
 					hasEnemyCollision = true;
 					lives--;
 					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+				} else {
+					ticksOfInvincibility--;
 				}
+			} else {
+				ticksOfInvincibility--;
 			}
 			
 			currentTick++;

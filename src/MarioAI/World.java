@@ -19,7 +19,7 @@ public class World {
 	private static final int MARIO_START_X_POS = 2;
 
 	private final CollisionDetection collisionDetection = new CollisionDetection();
-	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
+	private final Node[][] levelMatrix = new Node[LEVEL_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
@@ -224,5 +224,28 @@ public class World {
 	
 	public void resetHasWorldChanged() {
 		hasWorldChanged = false;
+	}
+
+	public Node[][] getLevelMatrixAt(int x) {
+		int xCenter = x; //Center of the new level matrix
+		
+		//We don't want there to be any columns in the right part of the level matrix,
+		//that we haven't seen. This will not work as intended with EdgeCreator.
+		if (xCenter > maxMarioXPos - LEVEL_WIDTH/2 - 1) {
+			xCenter = maxMarioXPos - LEVEL_WIDTH/2 - 1;
+			//TODO check if it is set to the correct value.
+		}
+		Node[][] newLevelMatrix = new Node[LEVEL_WIDTH][LEVEL_HEIGHT];
+		for (int i = 0; i < newLevelMatrix.length; i++) {
+			int relativeXPosition = (xCenter - LEVEL_WIDTH/2 + i);
+			Node[] column = getColumn(relativeXPosition);
+			//Must not be to much to the left: out of the level. 
+			//We want to express this as empty space. Luckily, this is already done.
+			if (!(column == null)) { 
+				newLevelMatrix[i] = column;
+			}
+		}
+		
+		return newLevelMatrix;		
 	}
 }

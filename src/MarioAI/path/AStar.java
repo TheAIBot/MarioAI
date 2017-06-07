@@ -129,54 +129,53 @@ class AStar {
 //							continue;
 //						}
 						
-						if (sn.ticksOfInvincibility == 0) {
-							EnemyCollision firstCollision = null;
-							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight, firstCollision)) {
-								if (firstCollision.isStompType) {
-									//Must change path
-									//Temp test to try to ensure that he lands on enemies:
-									penalty = -PENALTY_SCORE; 
-									System.out.println("Temp target enemy");
-									//Changing the path:
-									//TODO: Discuss: what to do with the speed node? create a copy? Mario won't land on an enemy every time.
-									Point2D.Float enemyPosition = firstCollision.enemy.getPositionAtTime(firstCollision.tickForCollision);
-									int enemyX = (int) enemyPosition.x;
-									int enemyY = (int) enemyPosition.y;
-									if (world.getColumn(enemyX)[enemyY] != null) {
-										throw new Error("Logic error");					
-										//TODO remove, not needed, after tests
+						EnemyCollision firstCollision = null;
+						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight, firstCollision)) {
+							if (firstCollision.isStompType) {
+								//Must change path
+								//Temp test to try to ensure that he lands on enemies:
+								penalty = -PENALTY_SCORE; 
+								System.out.println("Temp target enemy");
+								//Changing the path:
+								//TODO: Discuss: what to do with the speed node? create a copy? Mario won't land on an enemy every time.
+								Point2D.Float enemyPosition = firstCollision.enemy.getPositionAtTime(firstCollision.tickForCollision);
+								int enemyX = (int) enemyPosition.x;
+								int enemyY = (int) enemyPosition.y;
+								Node[] enemyColumn = world.getColumn(enemyX);
+								if (enemyColumn != null && enemyColumn[enemyY] != null) { //Ie. the enemy is placed in a block!
+									throw new Error("Logic error");	
+									//Might not be a total logic error, if the enemy is at a permeable block.   
+									//TODO remove, not needed, after tests
+								} else {
+									int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
+									//Make a modified speed node to the top of this position,
+									//from the former position data.
+									Node targetNode;
+									if (world.hasEnemyCollisionNode(enemyNodeHash)) {
+										targetNode = world.getEnemyCollisionNode(enemyX,enemyY);
+										//Add the target to this speed node
 									} else {
-										int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
-										//Make a modified speed node to the top of this position,
-										//from the former position data.
-										Node targetNode;
-										if (world.hasEnemyCollisionNode(enemyNodeHash)) {
-											targetNode = world.getEnemyCollisionNode(enemyX,enemyY);
-											//Add the target to this speed node
-										} else {
-											//No collisions for this placement has been added. This is now done:
-											targetNode = new Node(enemyX, enemyY, (byte)42);  //42 is arbitrary
-											//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
-											grapher.connectLoneNode(targetNode, world);
-											world.addEnemyCollisionNode(targetNode);											
-										}
-										//Make the target equal to targetNode, and finish the creation of the speed node.
-										EnemyPredictor.hitEnemy(firstCollision, sn);
-										//Do it from the living enemies described above.
-										
+										//No collisions for this placement has been added. This is now done:
+										targetNode = new Node(enemyX, enemyY, (byte)42);  //42 is arbitrary
+										//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
+										grapher.connectLoneNode(targetNode, world);
+										world.addEnemyCollisionNode(targetNode);											
 									}
+									//Make the target equal to targetNode, and finish the creation of the speed node.
+									EnemyPredictor.hitEnemy(firstCollision, sn);
+									//Do it from the living enemies described above.
 									
-
-									throw new Error("Make this.");
-								} else {//He has lost life and gets a penalty:
-									if (sn.lives <= 1) {
-										continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
-									}
-									int livesLost = (current.lives - sn.lives);
-									penalty = livesLost*PENALTY_SCORE;
+								}					
+								throw new Error("Make this.");
+							} else {//He has lost life and gets a penalty:
+								if (sn.lives <= 1) {
+									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
+								int livesLost = (current.lives - sn.lives);
+								penalty = livesLost*PENALTY_SCORE;
 							}
 						}
+					}
 					}
 					
 					
