@@ -6,7 +6,7 @@ import java.awt.Point;
 
 import ch.idsia.mario.engine.Art;
 
-public class DebugSquare extends DebugDrawing {
+class DebugSquare extends DebugDrawing {
 	private final Color color;
 	private final Point startPoint; 
 	private final Point size; 

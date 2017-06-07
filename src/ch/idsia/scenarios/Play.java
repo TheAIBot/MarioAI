@@ -22,7 +22,6 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		CollisionDetection.loadTileBehaviors();
 		boolean loadLevel = true;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();

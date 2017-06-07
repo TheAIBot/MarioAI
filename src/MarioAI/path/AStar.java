@@ -13,7 +13,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
-public class AStar {
+class AStar {
 	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
 	
 	// Set of nodes already explored

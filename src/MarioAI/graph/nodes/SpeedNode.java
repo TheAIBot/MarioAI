@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.graph.Function;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;

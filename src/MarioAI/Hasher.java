@@ -65,19 +65,6 @@ public class Hasher {
 		final int b2 = (hashSign        << b2Place) & b2Mask;
 		
 		return (byte) (b1 | b2);
-		/*
-		if (vx >= 0) {
-			return (byte) ((((vx + ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
-		} else {
-			final int hashWithOutSign = (int) ((((vx - ADD_FOR_ROUND) / MarioControls.MAX_X_VELOCITY) * hashGranularity));
-			if (hashWithOutSign == 0) {
-				return (byte) hashWithOutSign;
-			}
-			else {
-				return (byte) (0x80 | hashWithOutSign);	
-			}
-		}
-		*/
 	}
 
 	public static int hashEdge(DirectedEdge edge, int extraHash) {

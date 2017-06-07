@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 import MarioAI.World;
-import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
 

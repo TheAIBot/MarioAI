@@ -144,7 +144,7 @@ public class TestEnemyPredictor {
 		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 16, 80, enemyType.name());
 		enemies.clear();
 	}
-		
+	
 	private void testNoRemovalOfEnemyAndPrediction(Environment observation, EnemyPredictor enemyPredictor, ArrayList<Sprite> enemies, int enemyCount, int testTime, String enemyName) {
 		for (int i = 0; i < 3; i++) {
 			TestTools.runOneTick(observation);

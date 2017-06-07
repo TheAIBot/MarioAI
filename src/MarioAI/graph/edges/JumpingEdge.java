@@ -1,11 +1,10 @@
 package MarioAI.graph.edges;
 
 import MarioAI.Hasher;
-import MarioAI.graph.Function;
-import MarioAI.graph.JumpDirection;
+import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
 
-public class JumpingEdge extends DirectedEdge implements Function{
+public class JumpingEdge extends DirectedEdge {
 	private float a;
 	private float b;
 	private float c; // Parameters of the polynomial.

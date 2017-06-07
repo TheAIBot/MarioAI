@@ -1,10 +1,12 @@
-package MarioAI.graph.edges;
+package MarioAI.graph.edges.edgeCreation;
 
 import java.util.*;
 
 import MarioAI.World;
-import MarioAI.graph.Collision;
-import MarioAI.graph.JumpDirection;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.FallEdge;
+import MarioAI.graph.edges.JumpingEdge;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
@@ -15,7 +17,7 @@ public class EdgeCreator {
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
-	public static final boolean ALLOW_SPEED_KEY = true;
+	public static final boolean ALLOW_SPEED_KEY = false;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {

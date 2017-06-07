@@ -1,4 +1,4 @@
-package MarioAI.graph;
+package MarioAI.graph.edges;
 
 public enum Collision{
 	HIT_NOTHING, 

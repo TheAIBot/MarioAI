@@ -29,9 +29,6 @@ import ch.idsia.mario.engine.sprites.SpriteContext;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.utils.MathX;
 import MarioAI.debugGraphics.DebugDrawing;
-import MarioAI.debugGraphics.DebugLines;
-import MarioAI.debugGraphics.DebugPoints;
-
 public class LevelScene extends Scene implements SpriteContext {
 	private List<Sprite> sprites = new ArrayList<Sprite>();
 	private List<Sprite> spritesToAdd = new ArrayList<Sprite>();

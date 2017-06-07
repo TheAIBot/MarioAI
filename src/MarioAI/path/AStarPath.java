@@ -6,7 +6,7 @@ import java.util.Collections;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 
-public class AStarPath {
+class AStarPath {
 	public final SpeedNode pathEnd;
 	public final ArrayList<DirectedEdge> path;
 	public final boolean isBestPath;
