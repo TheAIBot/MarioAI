@@ -158,6 +158,7 @@ class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
+			//System.out.println("DiffX: " + (speedNode.creationXPos - (current.currentXPos + speedNode.getMoveInfo().getXMovementDistance())));
 			return speedNode;
 		}
 		
