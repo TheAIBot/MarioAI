@@ -55,6 +55,14 @@ public class EdgeCreator {
 			}
 		}
 	}
+	/**Used for creating connection from a node, not placed on the level matrix.
+	 * 
+	 */
+	public void connectLoneNode(Node loneNode, World world) {
+		Node[][] loneObservationGraph = world.getLevelMatrixAt(loneNode.x);
+		observationGraph = loneObservationGraph;
+		connectNode(loneNode, GRID_WIDTH/2, loneNode); //Simply takes the lone node as the mario node.
+	}
 
 	private boolean isOnLevelMatrix(Node position, Node marioNode) {
 		return isOnLevelMatrix(getColoumnRelativeToMario(position, marioNode), position.y);

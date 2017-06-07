@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import MarioAI.CollisionDetection;
 import MarioAI.World;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
 public class MovementInformation{
@@ -172,7 +172,7 @@ public class MovementInformation{
 		}
 	}
 
-	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
+	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
 		final float lastYValue = positions[positions.length - 1].y;
 		

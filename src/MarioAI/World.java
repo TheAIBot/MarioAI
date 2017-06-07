@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import org.omg.CORBA.COMM_FAILURE;
 
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import ch.idsia.mario.environments.Environment;
 
 
@@ -27,6 +27,8 @@ public class World {
 	private Node marioNode;
 	private boolean goalNodesChanged = false;
 	private boolean hasWorldChanged = false; //Has the world been changed, with the new update.
+	
+	private final HashMap<Integer, Node> enemyCollisionNodes = new HashMap<Integer, Node>();
 	
 	public void printMatrix(final Environment observation)
 	{
@@ -180,7 +182,23 @@ public class World {
 		}
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
+	public boolean hasEnemyCollisionNode(int hash){
+		return enemyCollisionNodes.containsKey(hash);
+	}
+	
+	public Node getEnemyCollisionNode(int hash){
+		return enemyCollisionNodes.get(hash);
+	}
+	
+	public Node getEnemyCollisionNode(int x, int y){
+		return getEnemyCollisionNode(Hasher.hashNode(x, y));
+	}
+	
+	public void addEnemyCollisionNode(Node node){
+		enemyCollisionNodes.put(Hasher.hashNode(node.x, node.y), node);
+	}
+	
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, StateNode sourceNode, float lastYValue){
 		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, this);
 	}
 	

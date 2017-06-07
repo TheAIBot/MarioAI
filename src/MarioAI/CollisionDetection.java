@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.io.DataInputStream;
 
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
@@ -25,7 +25,7 @@ public class CollisionDetection {
 		loadTileBehaviors();
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue, World world){
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, StateNode sourceNode, float lastYValue, World world){
 		return isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, world);
 	}
 	

@@ -37,12 +37,14 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(final float marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
+	public boolean hasEnemy(final float marioX2, final float marioY2, 	 final float marioWidth, 	  final float marioHeight, 
+									final int time, 		boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison) {
 		//b
 		final float marioX1 = marioX2 - marioWidth;
 		final float marioY1 = marioY2 - marioHeight;
 		
-		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+		for (int i = 0; i < verifiedEnemySimulations.size(); i++) {
+			EnemySimulator enemySimulation = verifiedEnemySimulations.get(i);
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a
 			final float enemyX2 = enemyPosition.x / BLOCK_PIXEL_SIZE;
@@ -50,11 +52,16 @@ public class EnemyPredictor {
 			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
 			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
 			
-			//check if the rectangle of mario intersects with the enemys rectangle
+			//check if the rectangle of mario intersects with the enemy's rectangle
 			if (enemyX1 <= marioX2 && 
 				enemyX2 >= marioX1 &&
 				enemyY1 <= marioY2 &&
 				enemyY2 >= marioY1) {
+				firstCollison = new EnemyCollision(enemySimulation,time);
+				if(enemySimulation.stomp(time, marioHeight, marioX2 - marioWidth/2,
+						                   marioY1, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
+					firstCollison.isStompType = true;
+				}
 				return true;
 			}
 		}

@@ -14,7 +14,7 @@ import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
@@ -53,7 +53,7 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
 	{
 		final DirectedEdge currentEdge = path.get(0);
 		
@@ -76,15 +76,15 @@ public class PathCreator {
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
 	
-	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
 		if (isRunning) {
 			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
 		}
 		
 		isRunning = true;
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
-		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
 			final int q = i;
@@ -96,7 +96,7 @@ public class PathCreator {
 		}
 	}
 	
-	private SpeedNode createGoalSpeedNode(final Node[] rightmostNodes) {
+	private StateNode createGoalSpeedNode(final Node[] rightmostNodes) {
 		// Add singleton goal node far to the right. This will ensure each
 		// vertical distance is minimal and all nodes in rightmost column will be
 		// pretty good goal positions to end up in after A* search 
@@ -124,7 +124,7 @@ public class PathCreator {
 			nodesWithAddedEdges[i] = node;
 		}
 		
-		return new SpeedNode(goal, 0, Long.MIN_VALUE);
+		return new StateNode(goal, 0, Long.MIN_VALUE);
 	}
 	
 	private void removeGoalFrame() {
@@ -136,11 +136,11 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
-		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
 		aStars[aStars.length - 1].stop();
@@ -236,7 +236,7 @@ public class PathCreator {
 		isRunning = false;
 	}
 	
-	public HashMap<Long, SpeedNode> getSpeedNodes() {
+	public HashMap<Long, StateNode> getSpeedNodes() {
 		return aStars[aStars.length-1].getSpeedNodes();
 	}
 	

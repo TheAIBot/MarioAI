@@ -3,19 +3,23 @@ package MarioAI.graph.nodes;
 import java.awt.geom.Point2D;
 
 import MarioAI.World;
+import MarioAI.enemySimuation.EnemyCollision;
 import MarioAI.enemySimuation.EnemyPredictor;
+import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
+import MarioAI.graph.edges.RunningEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
+import javafx.util.Pair;
 
-public class SpeedNode implements Comparable<SpeedNode> {
+public class StateNode implements Comparable<StateNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
 	public final float vx;
-	public SpeedNode parent;
+	public StateNode parent;
 	public final float parentXPos;
 	public final float parentVx;
 	public final long hash;
@@ -26,13 +30,16 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public float fScore = 0;
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
+	//Bit string, representing the enemies living. 
+	//Must not be reused.
+	public long livingEnemies = Long.MIN_VALUE; 
 	
 	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
 	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
 	public int lives = MAX_MARIO_LIFE;
 	
-	public SpeedNode(Node node, float vx, long hash) {
+	public StateNode(Node node, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -46,13 +53,13 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, float marioX, float vx, long hash) {
+	public StateNode(Node node, float marioX, float vx, long hash) {
 		this(node, vx, hash);
 		this.xPos = marioX;
 	}
 	
 	///Should only be used for testing purposes
-	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -65,11 +72,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, World world) {
 		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -114,7 +121,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight, EnemyCollision firstCollision) {
 		int currentTick = startTime;
 		int i = parent.ticksOfInvincibility;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
@@ -126,71 +133,46 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			this.ticksOfInvincibility -= moveInfo.getPositions().length;
 			return false;
 		}
-//		else {
-//			//this.ticksOfInvincibility = 0;
-//		}
 		
 		currentTick += i;
 		boolean hasEnemyCollision = false;
 		for (; i < moveInfo.getPositions().length; i++) {
-//			System.out.println(i + ", " + parent.ticksOfInvincibility);
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
 			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				hasEnemyCollision = true;
-				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+			
+			//In the beginning of a movement, Mario will always be on the ground, thus not accelerating downwards.
+			//Necessary to stomp the enemies.
+			boolean movingDownwards = (i == 0)? false: (moveInfo.getPositions()[i-1].y > moveInfo.getPositions()[i].y);
+			//He must also land on the enemy, ie, not be on the ground, or not have been on the ground the tick before:
+			boolean wasOnGround 	= (i == 0)? true: (moveInfo.getPositions()[i-1].y != moveInfo.getPositions()[i].y);
+			//He is on the ground, if and only if he is a running edge,
+			//or he is at the last two positions on any other type of edge
+			//( the last, curtesy of mario always landing before coming to the end of a block):
+			boolean isOnGround	= (this.ancestorEdge instanceof RunningEdge || moveInfo.getPositions().length - 2 <= i);
+			boolean isOrWasNotOnGround = !wasOnGround || !isOnGround;
+			
+			//I will take the first actual collision, 
+			//as though that is the one that determines the type of collision with enemies.
+			if (enemyPredictor.hasEnemy(x, y, 0.5f, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision)) {
+				if(firstCollision.isStompType){ //Stomp type collision
+					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
+					//TODO check correct.
+					return true; //Stops the collision here, as the path taken must be changed.
+				} else{ //Normal collision, where Mario is damaged
+					hasEnemyCollision = true;
+					lives--;
+					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+				}
 			}
 			
 			currentTick++;
-			//ticksOfInvincibility -= (ticksOfInvincibility > 0) ? 1: 0;
-			
-//			System.out.println(ticksOfInvincibility);
-		}
-		
-//		for (Point2D.Float position : moveInfo.getPositions()) {
-//			final float x = parentXPos  + position.x;
-//			final float y = parent.yPos - position.y;
-//			
-//			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-//				return true;
-//			}
-//			
-//			currentTick++;
-//		}
-		
-		if (hasEnemyCollision) {
-			lives--;
 		}
 		
 		return hasEnemyCollision;
 	}
-	
-	/**
-	 * Old collision method. Momentarily only for ease of reference.
-	 * TODO remove this method
-	 * @param startTime
-	 * @param enemyPredictor
-	 * @param marioHeight
-	 * @return
-	 */
-	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
-		int currentTick = startTime;
 		
-		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = parentXPos  + position.x;
-			final float y = parent.yPos - position.y;
-			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				return true;
-			}
-			
-			currentTick++;
-		}
-		return false;
-	}
-	
 	public MovementInformation getMoveInfo() {
 		return moveInfo;
 	}
@@ -212,15 +194,15 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		if (b == null) {
 			return false;
 		}
-		if (b instanceof SpeedNode) {
-			SpeedNode bb = (SpeedNode) b;
+		if (b instanceof StateNode) {
+			StateNode bb = (StateNode) b;
 			return bb.hash == hash;
 		} else {
 			return false;
 		}
 	}
 	
-	public int compareTo(SpeedNode o) {
+	public int compareTo(StateNode o) {
 		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
 	}
 	
