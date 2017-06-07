@@ -111,16 +111,14 @@ class AStar {
 						continue;
 					}
 					
-					if (!sn.isSpeedNodeUseable()) {
-						continue;
-					}
-					
 					// collision detection and invincibility handling 
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
-//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-//							continue;
-//						}
+						sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
+						
+						if (!sn.isSpeedNodeUseable(world)) {
+							continue;
+						}
 						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
@@ -156,7 +154,7 @@ class AStar {
 	 * @return speedNode
 	 */
 	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, hashGranularity);
+		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 120);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
@@ -174,7 +172,7 @@ class AStar {
 	 * @return an estimate of the ticks away from the goal
 	 */
 	private int heuristicFunction(final SpeedNode current, final SpeedNode goal) {
-		return MarioControls.getTicksToTarget(goal.node.x - current.xPos, current.vx);
+		return MarioControls.getTicksToTarget(goal.node.x - current.currentXPos, current.vx);
 	}
 	
 	public AStarPath getCurrentBestPath() {

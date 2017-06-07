@@ -22,7 +22,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -111,6 +111,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
+	        options.setLevelRandSeed(768188036);
 	        options.setLevelDifficulty(-1);	 
 	        task.setOptions(options);
 	        

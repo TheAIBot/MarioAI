@@ -60,9 +60,9 @@ public class World {
 	private void updateWholeMatrix(final Environment observation) {
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-
+		byte[][] scene = observation.getLevelSceneObservation();
 		for (int i = 0; i < levelMatrix.length; i++) {
-			final byte[] byteColumn = getByteColumnFromLevel(observation.getLevelSceneObservation(), marioYPos, i);
+			final byte[] byteColumn = getByteColumnFromLevel(scene, marioYPos, i);
 			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, columnIndex);
 			levelMatrix[i] = columnToInsert;
@@ -180,12 +180,12 @@ public class World {
 		}
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastYValue){
-		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.xPos, sourceNode.yPos, lastYValue, this);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode){
+		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, this);
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastYValue){
-		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, lastYValue, this);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY){
+		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, this);
 	}
 	
 	public boolean hasGoalNodesChanged() {

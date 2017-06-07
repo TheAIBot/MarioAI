@@ -30,7 +30,7 @@ public class MarioControls {
 	private float oldX = MARIO_START_X_POS;
 	private DirectedEdge prevEdge = null;
 	private float currentXSpeed = 0;
-	private boolean[] actions = new boolean[Environment.numberOfButtons];
+	private final boolean[] actions = new boolean[Environment.numberOfButtons];
 	
 	public boolean canUpdatePath = false;
 	
@@ -92,6 +92,8 @@ public class MarioControls {
 		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY / 2;
 	}
 		
+	float oldMarioX = 0;
+	float oldMarioY = 0;
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
 			final DirectedEdge next = path.get(0);
@@ -102,6 +104,8 @@ public class MarioControls {
 				!next.getMoveInfo().equals(prevEdge.getMoveInfo())) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
+				oldMarioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+				oldMarioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			}
 			else {
 				ticksOnThisEdge++;
@@ -111,15 +115,14 @@ public class MarioControls {
 
 			next.getMoveInfo().getActionsFromTick(ticksOnThisEdge, actions);
 			
+			final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			
+			//System.out.println("Mario: " + marioX + ", " + marioY);
+			//System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
+			
 			if (canUpdatePath) {
 				path.remove(0);
-				final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-				final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-				System.out.println("Mario: " + marioX + ", " + marioY);
-				
-				for (Point2D.Float point : path.get(0).getMoveInfo().getPositions()) {
-					System.out.println("(" + (marioX + point.x) + ", " + (marioY + point.y) + ")");
-				}
 			}
 		}
 		else {
@@ -414,5 +417,9 @@ public class MarioControls {
 		// Not currently
 		//TODO make method
 		return false;
+	}
+	
+	public boolean[] getActions() {
+		return actions;
 	}
 }

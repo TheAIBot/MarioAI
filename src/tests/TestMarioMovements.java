@@ -525,18 +525,15 @@ public class TestMarioMovements {
 		float actualMarioSpeed = 0;
 		float xOffset = 0;
 		float yOffset = 0;
+		agent.action = marioControls.getActions();
+		TestTools.runOneTick(observation);
 		for (int z = 0; z < path.size(); z++) {	
-			DirectedEdge edge = path.get(0);
-			MovementInformation moveInfo = edge.getMoveInfo();
+			final DirectedEdge edge = path.get(0);
+			final MovementInformation moveInfo = edge.getMoveInfo();
 			for (int i = 0; i < moveInfo.getPositions().length; i++) {				
-				final boolean[] newActions = marioControls.getNextAction(observation, path);
-				for (int j = 0; j < newActions.length; j++) {
-					agent.action[j] = newActions[j];
-				}
+				marioControls.getNextAction(observation, path);
 				TestTools.runOneTick(observation);
 				
-				edge = path.get(0);
-				moveInfo = edge.getMoveInfo();
 				final Point2D.Float position = moveInfo.getPositions()[i];
 				
 				final float expectedMarioXPos = startMarioXPos + position.x + xOffset;

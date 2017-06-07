@@ -46,8 +46,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	
 	public boolean[] getAction(Environment observation) {
 		executeKeyCommands(observation);
-		
-		boolean[] action = new boolean[Environment.numberOfButtons];
 
 		if (tickCount == 30) {
 			//Create the initial world and all its edges
@@ -103,7 +101,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
 						//save(observation);
-						throw new Error();
+						//throw new Error();
 					}
 					pathCreator.updateBestPath();
 					System.out.println("Tick: " + tickCount + " Stopped");
@@ -124,7 +122,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					System.out.println("Failed to find path. Restarting.");
 				}				
 				
-				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
@@ -134,26 +131,26 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				System.out.println("Tick: " + tickCount + " Path ignored");
 			}
 			
-			action = marioController.getNextAction(observation, pathCreator.getBestPath());
+			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
-				DebugDraw.drawEdges(observation, world.getLevelMatrix());
-				DebugDraw.drawMarioReachableNodes(observation, world);
-				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				DebugDraw.drawEnemies(observation, enemyPredictor);
-				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
+				//DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
+				//DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
+				//DebugDraw.drawEdges(observation, world.getLevelMatrix());
+				//DebugDraw.drawMarioReachableNodes(observation, world);
+				//DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
+				//DebugDraw.drawEnemies(observation, enemyPredictor);
+				//DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+				//DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
-				DebugDraw.drawAction(observation, action);
+				//DebugDraw.drawAction(observation, marioController.getActions());
 				//TestTools.renderLevel(observation);
 			}
 		}
 		tickCount++;
 		
-		return action;
+		return marioController.getActions();
 	}
 	
 	public void findPath(Environment observation) {

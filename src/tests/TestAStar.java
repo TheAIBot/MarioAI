@@ -245,7 +245,7 @@ public class TestAStar {
 		SpeedNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
 													.findFirst().get();
 				
-		assertTrue(end.isSpeedNodeUseable());
+		assertTrue(end.isSpeedNodeUseable(world));
 		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
 	
@@ -406,7 +406,7 @@ public class TestAStar {
 		
 		long hashCode = Hasher.hashSpeedNode(edge.getMoveInfo().getEndSpeed(), edge, agent.pathCreator.getBlockingGranularity());
 		SpeedNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
-		assertEquals(correspondingSpeedNode.xPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
+		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}
 }
