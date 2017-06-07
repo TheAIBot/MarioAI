@@ -28,7 +28,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = true;
+	public boolean DEBUG = false;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
