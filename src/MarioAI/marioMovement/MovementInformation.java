@@ -32,10 +32,8 @@ public class MovementInformation{
 		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
-		this.pressXButton = new boolean[getMoveTime()];
-		for (int i = 0; i < xMoveInfo.pressXButton.size(); i++) {
-			pressXButton[i] = xMoveInfo.pressXButton.get(i);
-		}
+		this.pressXButton = xMoveInfo.pressXButton;
+		
 		this.pressYButton = new boolean[getMoveTime()];
 		for (int i = 0; i < yMoveInfo.pressYButton.size(); i++) {
 			pressYButton[i] = yMoveInfo.pressYButton.get(i);
