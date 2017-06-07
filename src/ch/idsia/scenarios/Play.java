@@ -22,7 +22,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();

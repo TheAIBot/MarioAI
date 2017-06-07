@@ -99,8 +99,8 @@ public class TestCollisionDetector {
 							                                  currentRightEdge, 0, world); //Don't care about the hash.
 					final SpeedNode snLeft 	= new SpeedNode(currentLeftEdge.target	, currentLeft	,
 							                                  currentLeftEdge	, 0, world); //Don't care about the hash.
-					if (!snRight.isSpeedNodeUseable() ||
-						 !snLeft .isSpeedNodeUseable()) {
+					if (!snRight.isSpeedNodeUseable(world) ||
+						!snLeft .isSpeedNodeUseable(world)) {
 						fail();
 					}	
 					String errorMessage = "Size = " + size + ", i = " + i + ", j =" + j;
@@ -180,7 +180,7 @@ public class TestCollisionDetector {
 			for (DirectedEdge edge : marioNode.getEdges()) {
 				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
-				if (sn.isSpeedNodeUseable()) { //Does not take the ceiling into account
+				if (sn.isSpeedNodeUseable(world)) { //Does not take the ceiling into account
 					if (Arrays.asList(sn.getMoveInfo().getPositions()).stream().anyMatch(position -> position.y + 2 > currentHeight - 1)) { //If it collides with the ceiling
 						assertTrue(sn.getMoveInfo().hasCollisions(startNode, world));
 					} else {
@@ -215,7 +215,7 @@ public class TestCollisionDetector {
 			for (DirectedEdge edge : marioNode.getEdges()) {
 				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
-				if (sn.isSpeedNodeUseable()) {
+				if (sn.isSpeedNodeUseable(world)) {
 					assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));
 				} 
 			}
@@ -266,7 +266,7 @@ public class TestCollisionDetector {
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
-				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode,lastYPosition);
+				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				//TODO discuss if this is fine, and the desired result. (*)
 				// 1.0/16 needs to be added, as this is subtracted in the method, and not added later.
@@ -276,7 +276,7 @@ public class TestCollisionDetector {
 					assertTrue(errorMessage, 	hasCollision);
 				} else{
 					if (hasCollision) {
-						hasCollision = world.isColliding(futureOffset, currentOffset, startNode,lastYPosition);
+						hasCollision = world.isColliding(futureOffset, currentOffset, startNode);
 					}
 					assertFalse(errorMessage,	hasCollision);
 				}
@@ -313,7 +313,7 @@ public class TestCollisionDetector {
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
-				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode, lastYPosition);
+				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				
 				if (9  <= j) { //TODO check should it also hold true with j=9?

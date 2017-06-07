@@ -100,7 +100,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
 						//save(observation);
-						throw new Error();
+						//throw new Error();
 					}
 					pathCreator.updateBestPath();
 					System.out.println("Tick: " + tickCount + " Stopped");

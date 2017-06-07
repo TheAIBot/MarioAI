@@ -20,7 +20,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public final float parentVx;
 	public final long hash;
 	public final DirectedEdge ancestorEdge;
-	public float xPos;
+	public final float creationXPos;
+	public float currentXPos;
 	public final int yPos;
 	public int gScore = 0;
 	public float fScore = 0;
@@ -40,15 +41,27 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.parentXPos = node.x;
 		this.parentVx = 0;
 		this.ancestorEdge = null;
-		this.xPos = node.x;
+		this.creationXPos = node.x;
+		this.currentXPos = this.creationXPos;
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
 	}
 	
 	public SpeedNode(Node node, float marioX, float vx, long hash) {
-		this(node, vx, hash);
-		this.xPos = marioX;
+		this.node = node;
+		this.moveInfo = null;
+		this.vx = vx;
+		this.parent = null;
+		this.parentXPos = node.x;
+		this.parentVx = 0;
+		this.ancestorEdge = null;
+		this.creationXPos = marioX;
+		this.currentXPos = this.creationXPos;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+		
 	}
 	
 	///Should only be used for testing purposes
@@ -56,7 +69,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
-		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.creationXPos = parentXPos + moveInfo.getXMovementDistance();
+		this.currentXPos = this.creationXPos;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
@@ -66,14 +80,15 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
-		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
+		this(node, parent, parent.creationXPos, parent.vx, ancestorEdge, hash, world);
 	}
 	
 	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
-		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.creationXPos = parentXPos + moveInfo.getXMovementDistance();
+		this.currentXPos = this.creationXPos;
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
@@ -84,13 +99,16 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
-		//There are a lot of possible problems for a fall edge.
-		//TODO move below, when implemented
 		if (this.ancestorEdge instanceof FallEdge &&
-			 !MarioControls.canMarioUseFallEdge(ancestorEdge, xPos)) {
+			 !MarioControls.canMarioUseFallEdge(ancestorEdge, currentXPos)) {
 			return false;
 		}
 		
+		if (this.ancestorEdge instanceof JumpingEdge && 
+			!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
+			return false;
+		}
+			
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
@@ -98,15 +116,6 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			return false;
 		}
 		
-		//In a jump it's possible to jump too far
-		//and there is nothing that mario can do about it
-		//TODO this should maybe be removed in the future
-		if (this.ancestorEdge instanceof JumpingEdge && 
-			!MarioControls.canMarioUseJumpEdge(ancestorEdge, xPos)) {
-			return false;
-		}
-		
-		//TODO remove this when changed moveinformation is implemented
 		if (getMoveInfo().hasCollisions(parent, world)) {
 			return false;
 		}
@@ -114,9 +123,40 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
+	public boolean isSpeedNodeUseable(World world) {
+		final float diffX = Math.abs(creationXPos - currentXPos);
+		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
+			//In a jump it's possible to jump too far
+			//and there is nothing that mario can do about it
+			//TODO this should maybe be removed in the future
+			
+			if (this.ancestorEdge instanceof JumpingEdge && 
+				!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
+				return false;
+			}
+			
+			//Make sure the edge is possible to use
+			//all Running edges are possible
+			//not all jumps are possible
+			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped())) {
+				return false;
+			}
+			
+			if (getMoveInfo().hasCollisions(parent, world)) {
+				return false;
+			}	
+			
+			return true;
+		}
+		else {
+			return isSpeedNodeUseable;
+		}
+	}
+	
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
 		int i = parent.ticksOfInvincibility;
+		this.lives = parent.lives;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
 		parent.ticksOfInvincibility = 0;
 		
@@ -126,14 +166,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			this.ticksOfInvincibility -= moveInfo.getPositions().length;
 			return false;
 		}
-//		else {
-//			//this.ticksOfInvincibility = 0;
-//		}
 		
 		currentTick += i;
 		boolean hasEnemyCollision = false;
 		for (; i < moveInfo.getPositions().length; i++) {
-//			System.out.println(i + ", " + parent.ticksOfInvincibility);
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
@@ -144,21 +180,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			}
 			
 			currentTick++;
-			//ticksOfInvincibility -= (ticksOfInvincibility > 0) ? 1: 0;
-			
-//			System.out.println(ticksOfInvincibility);
 		}
-		
-//		for (Point2D.Float position : moveInfo.getPositions()) {
-//			final float x = parentXPos  + position.x;
-//			final float y = parent.yPos - position.y;
-//			
-//			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-//				return true;
-//			}
-//			
-//			currentTick++;
-//		}
 		
 		if (hasEnemyCollision) {
 			lives--;
@@ -201,10 +223,6 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public int getMoveTime() {
 		return moveInfo.getMoveTime();
-	}
-	
-	public boolean isSpeedNodeUseable() {
-		return isSpeedNodeUseable;
 	}
 	
 	@Override

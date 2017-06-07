@@ -20,7 +20,7 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 480, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
