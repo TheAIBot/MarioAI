@@ -17,10 +17,10 @@ class AStar {
 	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
 	
 	// Set of nodes already explored
-	private final HashSet<Integer> closedSet = new HashSet<Integer>();
+	private final HashSet<Long> closedSet = new HashSet<Long>();
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
-	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+	private final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
 	final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
@@ -51,7 +51,7 @@ class AStar {
 		
 		// Initialization
 		openSet.add(start);
-		openSetMap.put(Integer.MAX_VALUE, start);
+		openSetMap.put(Long.MAX_VALUE, start);
 		start.gScore = 0;
 		start.fScore = heuristicFunction(start, goal);
 		
@@ -85,7 +85,7 @@ class AStar {
 				//System.out.println("Current node edges:");
 				//System.out.println(current.node.edges + "\n");
 				// Current node has been explored.
-				final int endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
+				final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 				closedSet.add(endHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
@@ -95,7 +95,7 @@ class AStar {
 					
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
-					final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
+					final long snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
 					if (closedSet.contains(snEndHash)) {
 						continue;
 					}
@@ -154,7 +154,7 @@ class AStar {
 	 * @return speedNode
 	 */
 	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 120);
+		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 5000);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {

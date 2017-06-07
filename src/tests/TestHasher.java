@@ -145,23 +145,23 @@ public class TestHasher {
 	@Test
 	public void testSpeedNodeHashCodes() {
 		for (int g = 1; g < 20; g += 3) {
-			final HashSet<Integer> allSpeedNodesHashed = new HashSet<Integer>();
+			final HashSet<Long> allSpeedNodesHashed = new HashSet<Long>();
 			
 			//adding the edges twice should give the same size unlees some hashes are the same
 			for (int i = 0; i < 2; i++) {
 				//Because of the small state space, brute force over the statespace will be used to check its correctness.
-				final List<Integer> allSpeedNodesList = getAllPossibleSpeedNodeHashcodes(g);
+				final List<Long> allSpeedNodesList = getAllPossibleSpeedNodeHashcodes(g);
 				allSpeedNodesHashed.addAll(allSpeedNodesList);
 				assertEquals(allSpeedNodesList.size() / 3, allSpeedNodesHashed.size());
 			}
 		}
 	}
-	private ArrayList<Integer> getAllPossibleSpeedNodeHashcodes(int speedGranularity) {
+	private ArrayList<Long> getAllPossibleSpeedNodeHashcodes(int speedGranularity) {
 		final int limitY = 15;
 		final int limitX = 32;
 		final float speedLimit = MarioControls.MAX_X_VELOCITY;
 		final int expectedHashes = limitY * limitX * (speedGranularity * 2 + 1) * 3;
-		ArrayList<Integer> allSpeedNodeHashcodes = new ArrayList<Integer>();
+		ArrayList<Long> allSpeedNodeHashcodes = new ArrayList<Long>();
 		
 		final float speedIncrements = speedLimit / speedGranularity;
 		
@@ -182,21 +182,21 @@ public class TestHasher {
 	@Test
 	public void testSpeedHashing() {
 		for (int g = 1; g < 64; g += 3) {
-			final HashSet<Byte> allSpeedHashed = new HashSet<Byte>();
+			final HashSet<Short> allSpeedHashed = new HashSet<Short>();
 			
 			//adding the edges twice should give the same size unlees some hashes are the same
 			for (int i = 0; i < 2; i++) {
 				//Because of the small state space, brute force over the statespace will be used to check its correctness.
-				final ArrayList<Byte> allSpeedList = getAllPossibleSpeedHashcodes(g);
+				final ArrayList<Short> allSpeedList = getAllPossibleSpeedHashcodes(g);
 				allSpeedHashed.addAll(allSpeedList);
 				assertEquals(allSpeedList.size() / 3, allSpeedHashed.size());
 			}
 		}
 	}
-	private ArrayList<Byte> getAllPossibleSpeedHashcodes(int speedGranularity) {
+	private ArrayList<Short> getAllPossibleSpeedHashcodes(int speedGranularity) {
 		final float speedLimit = MarioControls.MAX_X_VELOCITY;
 		final int expectedHashes = (speedGranularity * 2 + 1) * 3;
-		ArrayList<Byte> allSpeedHashcodes = new ArrayList<Byte>();
+		ArrayList<Short> allSpeedHashcodes = new ArrayList<Short>();
 		
 		final float speedIncrements = speedLimit / speedGranularity;
 		
