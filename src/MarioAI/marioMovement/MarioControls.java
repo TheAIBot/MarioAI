@@ -118,8 +118,8 @@ public class MarioControls {
 			final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			
-			System.out.println("Mario: " + marioX + ", " + marioY);
-			System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
+			//System.out.println("Mario: " + marioX + ", " + marioY);
+			//System.out.println("Expec: " + (oldMarioX + next.getMoveInfo().getPositions()[ticksOnThisEdge].x) + ", " + (oldMarioY + next.getMoveInfo().getPositions()[ticksOnThisEdge].y));
 			
 			if (canUpdatePath) {
 				path.remove(0);
@@ -229,9 +229,19 @@ public class MarioControls {
 				yPositions.add(currentJumpHeight);
 			}
 			
-			return new YMovementInformation(totalTicksJumped, yPositions, pressJumpButton);
+			final boolean[] pressJump = new boolean[pressJumpButton.size()];
+			for (int i = 0; i < pressJump.length; i++) {
+				pressJump[i] = pressJumpButton.get(i);
+			}
+			
+			final float[] yPos = new float[yPositions.size()];
+			for (int i = 0; i < yPos.length; i++) {
+				yPos[i] = yPositions.get(i);
+			}
+			
+			return new YMovementInformation(totalTicksJumped, yPos, pressJump);
 		}
-		return new YMovementInformation(0, new ArrayList<Float>(), new ArrayList<Boolean>());
+		return new YMovementInformation(0, new float[0], new boolean[0]);
 	}
 	
 	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime, boolean useSuperSpeed) {

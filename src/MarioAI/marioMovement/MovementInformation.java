@@ -33,19 +33,15 @@ public class MovementInformation{
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
 		this.pressXButton = xMoveInfo.pressXButton;
-		
-		this.pressYButton = new boolean[getMoveTime()];
-		for (int i = 0; i < yMoveInfo.pressYButton.size(); i++) {
-			pressYButton[i] = yMoveInfo.pressYButton.get(i);
-		}
+		this.pressYButton = yMoveInfo.pressYButton;
 		
 		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
 	}
 	
-	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, ArrayList<Float> y, int moveTime) {
+	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, float[] y, int moveTime) {
 		final Point2D.Float[] combinedPositions = new Point2D.Float[moveTime];
 		
-		for (int i = 0; i < Math.max(x.size(), y.size()); i++) {
+		for (int i = 0; i < Math.max(x.size(), y.length); i++) {
 			float xPos;
 			float yPos;
 			
@@ -60,14 +56,14 @@ public class MovementInformation{
 				xPos = x.get(i);
 			}
 			
-			if (y.size() == 0) {
+			if (y.length == 0) {
 				yPos = 0;
 			}
-			else if (y.size() <= i) {
-				yPos = y.get(y.size() - 1);
+			else if (y.length <= i) {
+				yPos = y[y.length - 1];
 			}
 			else {
-				yPos = y.get(i);
+				yPos = y[i];
 			}
 			
 			combinedPositions[i] = new Point2D.Float(xPos, yPos);
@@ -97,7 +93,12 @@ public class MovementInformation{
 			actions[Mario.KEY_SPEED] = false;
 		}
 		
-		actions[Mario.KEY_JUMP] = pressYButton[tick];
+		if (pressYButton.length > tick) {
+			actions[Mario.KEY_JUMP] = pressYButton[tick];	
+		}
+		else {
+			actions[Mario.KEY_JUMP] = false;
+		}
 		
 		return actions;
 	}
