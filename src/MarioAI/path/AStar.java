@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import com.sun.corba.se.spi.orbutil.fsm.State;
+
 import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyCollision;
@@ -125,46 +127,13 @@ class AStar {
 					// collision detection and invincibility handling 
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
-												
+						
 						EnemyCollision firstCollision = new EnemyCollision();
+						
 						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight, firstCollision)) {
 							if (firstCollision.isStompType) {
-								//Must change path
-								//Temp test to try to ensure that he lands on enemies:
-								penalty = -PENALTY_SCORE; 
-								System.out.println("Temp target enemy");
-								//Changing the path:
-								//TODO: Discuss: what to do with the speed node? create a copy? Mario won't land on an enemy every time.
-								Point2D.Float enemyPosition = firstCollision.enemy.getPositionAtTime(firstCollision.tickForCollision);
-								int enemyX = (int) enemyPosition.x;
-								int enemyY = (int) enemyPosition.y;
-								Node[] enemyColumn = world.getColumn(enemyX);
-								if (enemyColumn != null && enemyColumn[enemyY] != null) { //Ie. the enemy is placed in a block!
-									throw new Error("Logic error");	
-									//Might not be a total logic error, if the enemy is at a permeable block.   
-									//TODO remove, not needed, after tests
-								} else {
-									int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
-									//Make a modified speed node to the top of this position,
-									//from the former position data.
-									Node targetNode;
-									if (world.hasEnemyCollisionNode(enemyNodeHash)) {
-										targetNode = world.getEnemyCollisionNode(enemyX,enemyY);
-										//Add the target to this speed node
-									} else {
-										//No collisions for this placement has been added. This is now done:
-										targetNode = new Node(enemyX, enemyY, (byte)42);  //42 is arbitrary
-										//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
-										//TODO little mistake: might think it is able to run, after the stomp
-										grapher.connectLoneNode(targetNode, world);
-										world.addEnemyCollisionNode(targetNode);											
-									}
-									//Make the target equal to targetNode, and finish the creation of the speed node.
-									EnemyPredictor.hitEnemy(firstCollision, sn);
-									//Do it from the living enemies described above.
-									
-								}					
-								throw new Error("Make this.");
+								addStompState(firstCollision, world, current, goal);	
+								continue; //The rest is handled in the method above.
 							} else {//He has lost life and gets a penalty:
 								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
@@ -176,15 +145,7 @@ class AStar {
 					}
 					
 					
-					
-					//Update the edges position in the priority queue
-					//by updating the scores and taking it in and out of the queue.
-					if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
-					sn.gScore = tentativeGScore;
-					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
-					sn.parent = current;
-					openSet.add(sn);
-					openSetMap.put(snEndHash, sn);
+					updateOpenSet(sn, tentativeGScore, goal, penalty, current, snEndHash);
 				}	
 			}
 		}
@@ -192,6 +153,72 @@ class AStar {
 		currentBestPathEnd = null;
 		foundBestPath = false;
 	}
+	
+	private void addStompState(EnemyCollision firstCollision, World world, StateNode current, StateNode goal) {
+		//TODO when done, go through a discuss.
+		//Temp test to try to ensure that he lands on enemies:
+		int penalty = -PENALTY_SCORE; 
+		System.out.println("Temp target enemy");
+		//Changing the path:
+		Point2D.Float enemyPosition = firstCollision.enemy.getPositionAtTime(firstCollision.tickForCollision);
+		int enemyX = (int) enemyPosition.x;
+		int enemyY = (int) enemyPosition.y;
+		Node[] enemyColumn = world.getColumn(enemyX);
+		Node targetNode;
+		
+		if (enemyColumn != null && enemyColumn[enemyY] != null) { //Ie. the enemy is placed in a block!
+			throw new Error("Logic error");	
+			//Might not be a total logic error, if the enemy is at a permeable block.   
+			//TODO remove, not needed, after tests
+		} else {
+			int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
+			//Make a modified speed node to the top of this position,
+	 		//from the former position data.
+			if (world.hasEnemyCollisionNode(enemyNodeHash)) {
+				targetNode = world.getEnemyCollisionNode(enemyX,enemyY);
+				//Add the target to this speed node
+			} else {
+				//No collisions for this placement has been added. This is now done:
+				targetNode = new Node(enemyX, enemyY, (byte)42);  //42 is arbitrary
+				//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
+				//TODO little mistake: might think it is able to run, after the stomp
+				grapher.connectLoneNode(targetNode, world);
+				world.addEnemyCollisionNode(targetNode);											
+			}
+		}	
+		//TODO change hashGranularity to the one desired
+		
+		StateNode stompState = new StateNode(targetNode, current, current.livingEnemies);
+		//Make the target equal to targetNode, and finish the creation of the speed node.
+		EnemyPredictor.hitEnemy(firstCollision, stompState);
+		//Do it from the living enemies described above.
+		stompNodeHash = 
+		//TODO change tentativeGScore.
+		updateOpenSet(stompState, tentativeGScore, goal, penalty, current, stompNodeHash);
+		throw new Error("Make this.");
+		continue;
+		
+		/*
+		closedSet.add(snEndHash); //Ensures
+		//There should be some small finesses? that means that this is needed. 
+		//Ie. because we need to change the target of the speed node, to another node.
+		 */
+		
+	}
+
+	public void updateOpenSet(StateNode sn, final int tentativeGScore, final StateNode goal, 
+									  final int penalty, final StateNode current, final int snEndHash){
+
+		//Update the edges position in the priority queue
+		//by updating the scores and taking it in and out of the queue.
+		if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
+		sn.gScore = tentativeGScore;
+		sn.fScore = sn.gScore + heuristicFunction(sn, goal)  + penalty;
+		sn.parent = current;
+		openSet.add(sn);
+		openSetMap.put(snEndHash, sn);
+	}
+	
 	
 	/**
 	 * @param neighborEdge
@@ -207,7 +234,7 @@ class AStar {
 			return speedNode;
 		}
 		
-		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, world);
+		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, current.livingEnemies, hash, world);
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}

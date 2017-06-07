@@ -1,7 +1,9 @@
 package MarioAI;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.omg.CORBA.COMM_FAILURE;
@@ -29,9 +31,9 @@ public class World {
 	private boolean hasWorldChanged = false; //Has the world been changed, with the new update.
 	
 	private final HashMap<Integer, Node> enemyCollisionNodes = new HashMap<Integer, Node>();
+	public List<Node> unfinishedEnemyCollisionNodes = new ArrayList<Node>();
 	
-	public void printMatrix(final Environment observation)
-	{
+	public void printMatrix(final Environment observation){
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
 		for (int x = 0; x < LEVEL_HEIGHT; x++) {
 			for (int y = 0; y < LEVEL_WIDTH; y++) {
@@ -196,6 +198,7 @@ public class World {
 	
 	public void addEnemyCollisionNode(Node node){
 		enemyCollisionNodes.put(Hasher.hashNode(node.x, node.y), node);
+		unfinishedEnemyCollisionNodes.add(node);
 	}
 	
 	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, StateNode sourceNode, float lastYValue){

@@ -82,8 +82,8 @@ public class PathCreator {
 		}
 		
 		isRunning = true;
-		
-		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		long livingEnemiesAtStart = enemyPredictor.currentLivingEnemies();
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, livingEnemiesAtStart);
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {

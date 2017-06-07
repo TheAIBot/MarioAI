@@ -32,14 +32,14 @@ public class StateNode implements Comparable<StateNode> {
 	private final boolean isSpeedNodeUseable;
 	//Bit string, representing the enemies living. 
 	//Must not be reused.
-	public long livingEnemies = Long.MIN_VALUE; 
+	public long livingEnemies; 
 	
 	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
 	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
 	public int lives = MAX_MARIO_LIFE;
 	
-	public StateNode(Node node, float vx, long hash) {
+	public StateNode(Node node, float vx, long hash, long livingEnemies) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -51,15 +51,16 @@ public class StateNode implements Comparable<StateNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.livingEnemies = livingEnemies;
 	}
 	
-	public StateNode(Node node, float marioX, float vx, long hash) {
-		this(node, vx, hash);
+	public StateNode(Node node, float marioX, float vx, long hash, long livingEnemies) {
+		this(node, vx, hash, livingEnemies);
 		this.xPos = marioX;
 	}
 	
 	///Should only be used for testing purposes
-	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -70,13 +71,14 @@ public class StateNode implements Comparable<StateNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.livingEnemies = livingEnemies;
 	}
 	
-	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, World world) {
-		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, world);
+	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
+		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, livingEnemies, world);
 	}
 	
-	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -88,6 +90,7 @@ public class StateNode implements Comparable<StateNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
+		this.livingEnemies = livingEnemies;
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
@@ -127,6 +130,7 @@ public class StateNode implements Comparable<StateNode> {
 		parent.ticksOfInvincibility = 0;
 				
 		boolean hasEnemyCollision = false;
+		
 		for (int i = 0; i < moveInfo.getPositions().length; i++) {
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;

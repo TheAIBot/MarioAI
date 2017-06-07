@@ -327,7 +327,7 @@ public class EnemyPredictor {
 		
 	}
 
-	public static long currentLivingEnemies() {
+	public long currentLivingEnemies() {
 		return -1;
 	}
 }

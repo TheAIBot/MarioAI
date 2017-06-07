@@ -17,9 +17,7 @@ public abstract class DirectedEdge {
 	}
 	
 	public abstract float getMaxY();
-	
-	public abstract float getWeight();
-	
+		
 	protected abstract byte getExtraEdgeHashcode();
 		
 	@Override
