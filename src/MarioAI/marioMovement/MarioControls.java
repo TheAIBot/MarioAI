@@ -372,23 +372,18 @@ public class MarioControls {
 	}
 	
 	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, ArrayList<Float> xPositions) {
-		final float[] driftPositions = getDriftingPositions(speed, driftTime);
-		final float startXPosition = distanceMoved;
+		final int startSize = xPositions.size();
+		getDriftingPositions(speed, driftTime, distanceMoved, xPositions);
 		
-		for (int i = 0; i < driftPositions.length; i++) {
-			xPositions.add(startXPosition + driftPositions[i]);
-		}
-		return getLastSpeedDrifting(speed, distanceMoved, driftPositions);
+		return getLastSpeedDrifting(speed, distanceMoved, xPositions,  startSize);
 	}
 	
-	private static float[] getDriftingPositions(final float speed, final int driftTime) {
-		final float[] driftPositions = new float[driftTime]; 
+	private static void getDriftingPositions(final float speed, final int driftTime, final float startXPosition, final ArrayList<Float>xPositions) {
 		float xMoved = 0;
 		for (int i = 0; i < driftTime; i++) {	
 			xMoved += getNextDriftingDistance(speed, i);
-			driftPositions[i] = xMoved;
+			xPositions.add(startXPosition + xMoved);
 		}
-		return driftPositions;
 	}
 	
 	private static float getNextDriftingDistance(float speed, float ticksDrifting) {
@@ -400,16 +395,16 @@ public class MarioControls {
 		return (currentSpeed <= MIN_MARIO_SPEED) ? 0 : currentSpeed;
 	}
 	
-	private static float getLastSpeedDrifting(float speed, float distanceMoved, float[] driftPositions) {
-		if (driftPositions.length == 0) {
+	private static float getLastSpeedDrifting(float speed, float distanceMoved, ArrayList<Float> driftPositions, int initialSize) {
+		if (driftPositions.size() - initialSize == 0) {
 			return speed;
 		}
-		else if (driftPositions.length == 1) {
-			return driftPositions[0];
+		else if (driftPositions.size() - initialSize == 1) {
+			return driftPositions.get(initialSize) - distanceMoved;
 		}
 		else {
-			final float last = driftPositions[driftPositions.length - 1];
-			final float secondLast = driftPositions[driftPositions.length - 2];
+			final float last = driftPositions.get(driftPositions.size() - 1);
+			final float secondLast = driftPositions.get(driftPositions.size() - 2);
 			return last - secondLast;
 		}
 	}

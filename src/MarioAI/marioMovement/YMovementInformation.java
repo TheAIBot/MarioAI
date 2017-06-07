@@ -1,7 +1,5 @@
 package MarioAI.marioMovement;
 
-import java.util.ArrayList;
-
 class YMovementInformation {
 	public final int totalTicksJumped;
 	public final float[] yPositions;
