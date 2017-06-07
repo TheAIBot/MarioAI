@@ -132,7 +132,6 @@ public class StateNode implements Comparable<StateNode> {
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
 			
-			
 			//In the beginning of a movement, Mario will always be on the ground, thus not accelerating downwards.
 			//Necessary to stomp the enemies.
 			boolean movingDownwards = (i == 0)? false: (moveInfo.getPositions()[i-1].y > moveInfo.getPositions()[i].y);
@@ -146,7 +145,7 @@ public class StateNode implements Comparable<StateNode> {
 			
 			//I will take the first actual collision, 
 			//as though that is the one that determines the type of collision with enemies.
-			if (enemyPredictor.hasEnemy(x, y, 0.5f, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision)) {
+			if (enemyPredictor.hasEnemy(x, y, 0.5f, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {
 				if(firstCollision.isStompType){ //Stomp type collision
 					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
 					//Notice that if has more ticks of invincibility than 1, this is overwritten.

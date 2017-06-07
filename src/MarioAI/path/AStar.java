@@ -125,11 +125,8 @@ class AStar {
 					// collision detection and invincibility handling 
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
-//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-//							continue;
-//						}
-						
-						EnemyCollision firstCollision = null;
+												
+						EnemyCollision firstCollision = new EnemyCollision();
 						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight, firstCollision)) {
 							if (firstCollision.isStompType) {
 								//Must change path
@@ -158,6 +155,7 @@ class AStar {
 										//No collisions for this placement has been added. This is now done:
 										targetNode = new Node(enemyX, enemyY, (byte)42);  //42 is arbitrary
 										//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
+										//TODO little mistake: might think it is able to run, after the stomp
 										grapher.connectLoneNode(targetNode, world);
 										world.addEnemyCollisionNode(targetNode);											
 									}
@@ -176,7 +174,7 @@ class AStar {
 							}
 						}
 					}
-					}
+					
 					
 					
 					//Update the edges position in the priority queue

@@ -12,6 +12,7 @@ import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.enemySimuation.simulators.FlowerEnemy;
 import MarioAI.enemySimuation.simulators.ShellSimulator;
 import MarioAI.enemySimuation.simulators.WalkingEnemySimulator;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.path.PathCreator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
@@ -38,12 +39,16 @@ public class EnemyPredictor {
 	}
 	
 	public boolean hasEnemy(final float marioX2, final float marioY2, 	 final float marioWidth, 	  final float marioHeight, 
-									final int time, 		boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison) {
+									final int time, 		boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison,
+									long livingEnemies) {
 		//b
 		final float marioX1 = marioX2 - marioWidth;
 		final float marioY1 = marioY2 - marioHeight;
 		
 		for (int i = 0; i < verifiedEnemySimulations.size(); i++) {
+			if (!isEnemyAlive(livingEnemies, i)) {
+				continue;
+			}
 			EnemySimulator enemySimulation = verifiedEnemySimulations.get(i);
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a
@@ -57,7 +62,9 @@ public class EnemyPredictor {
 				enemyX2 >= marioX1 &&
 				enemyY1 <= marioY2 &&
 				enemyY2 >= marioY1) {
-				firstCollison = new EnemyCollision(enemySimulation,time);
+				firstCollison.enemy = enemySimulation;
+				firstCollison.tickForCollision = time;
+				firstCollison.indexEnemy = i;
 				if(enemySimulation.stomp(time, marioHeight, marioX2 - marioWidth/2,
 						                   marioY1, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
 					firstCollison.isStompType = true;
@@ -308,5 +315,19 @@ public class EnemyPredictor {
 
 	public void resetNewEnemySpawned() {
 		newEnemySpawned = false;
+	}
+
+	public boolean isEnemyAlive(long livingEnemies, int enemyIndex) {
+		return ((livingEnemies >> enemyIndex) & 1) == 1;
+	}
+	
+	public static void hitEnemy(EnemyCollision firstCollision, StateNode state) {
+		// TODO Temporarily just kills the enemy.
+		state.livingEnemies &= ~(1 << firstCollision.indexEnemy);
+		
+	}
+
+	public static long currentLivingEnemies() {
+		return -1;
 	}
 }
