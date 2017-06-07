@@ -245,7 +245,7 @@ public class MarioControls {
 	}
 	
 	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime, boolean useSuperSpeed) {
-		final ArrayList<Float> xPositions = new ArrayList<Float>();
+		final ArrayList<Float> xPositions = new ArrayList<Float>(8);
 		final boolean distanceIsNegative = neededXDistance < 0;
 		float distanceMoved = 0;
 		int totalTicks = 0;
