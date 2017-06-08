@@ -97,7 +97,7 @@ public class FlowerEnemy extends EnemySimulator
 		copy.y = y;
 		copy.xa = xa;
 		copy.ya = ya;
-		copy.positionsIndexOffset = positionsIndexOffset;
+		//copy.positionsIndexOffset = positionsIndexOffset;
 		
 		copy.jumpTime = jumpTime;
 		

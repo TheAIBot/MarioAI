@@ -4,7 +4,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import MarioAI.CollisionDetection;
 import MarioAI.World;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -32,22 +31,16 @@ public class MovementInformation{
 		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
 		
-		this.pressXButton = new boolean[getMoveTime()];
-		for (int i = 0; i < xMoveInfo.pressXButton.size(); i++) {
-			pressXButton[i] = xMoveInfo.pressXButton.get(i);
-		}
-		this.pressYButton = new boolean[getMoveTime()];
-		for (int i = 0; i < yMoveInfo.pressYButton.size(); i++) {
-			pressYButton[i] = yMoveInfo.pressYButton.get(i);
-		}
+		this.pressXButton = xMoveInfo.pressXButton;
+		this.pressYButton = yMoveInfo.pressYButton;
 		
 		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
 	}
 	
-	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, ArrayList<Float> y, int moveTime) {
+	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, float[] y, int moveTime) {
 		final Point2D.Float[] combinedPositions = new Point2D.Float[moveTime];
 		
-		for (int i = 0; i < Math.max(x.size(), y.size()); i++) {
+		for (int i = 0; i < Math.max(x.size(), y.length); i++) {
 			float xPos;
 			float yPos;
 			
@@ -62,14 +55,14 @@ public class MovementInformation{
 				xPos = x.get(i);
 			}
 			
-			if (y.size() == 0) {
+			if (y.length == 0) {
 				yPos = 0;
 			}
-			else if (y.size() <= i) {
-				yPos = y.get(y.size() - 1);
+			else if (y.length <= i) {
+				yPos = y[y.length - 1];
 			}
 			else {
-				yPos = y.get(i);
+				yPos = y[i];
 			}
 			
 			combinedPositions[i] = new Point2D.Float(xPos, yPos);
@@ -99,7 +92,12 @@ public class MovementInformation{
 			actions[Mario.KEY_SPEED] = false;
 		}
 		
-		actions[Mario.KEY_JUMP] = pressYButton[tick];
+		if (pressYButton.length > tick) {
+			actions[Mario.KEY_JUMP] = pressYButton[tick];	
+		}
+		else {
+			actions[Mario.KEY_JUMP] = false;
+		}
 		
 		return actions;
 	}
@@ -174,10 +172,10 @@ public class MovementInformation{
 
 	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		
+		final float lastY = positions[positions.length - 1].y;
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
-			if (world.isColliding(currentPosition, previousPosition, sourceNode)) {
+			if (world.isColliding(currentPosition, previousPosition, sourceNode, lastY)) {
 				return true;
 			}
 			previousPosition = currentPosition;
@@ -187,9 +185,10 @@ public class MovementInformation{
 	
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
+		final float lastY = positions[positions.length - 1].y;
 		for (int i = 0; i < positions.length; i++) { 
 			final Point2D.Float currentPosition = positions[i];
-			if (world.isColliding(currentPosition, previousPosition, startX, startY)) {
+			if (world.isColliding(currentPosition, previousPosition, startX, startY, lastY)) {
 				return true;
 			}
 			previousPosition = currentPosition;

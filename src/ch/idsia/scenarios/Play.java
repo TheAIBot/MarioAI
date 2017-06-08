@@ -3,22 +3,16 @@ package ch.idsia.scenarios;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import MarioAI.CollisionDetection;
 import MarioAI.FastAndFurious;
 import MarioAI.enemySimuation.EnemyType;
-import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
-import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.tools.EvaluationOptions;
 import tests.TestTools;
-import tests.UnitTestAgent;
 
 public class Play {
 
@@ -32,7 +26,7 @@ public class Play {
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("pit12345678.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/semiAdvancedJumpingCourse.lvl", controller, true);
 			//TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);

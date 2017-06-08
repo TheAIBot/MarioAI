@@ -17,10 +17,10 @@ class AStar {
 	private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
 	
 	// Set of nodes already explored
-	private final HashSet<Integer> closedSet = new HashSet<Integer>();
+	private final HashSet<Long> closedSet = new HashSet<Long>();
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
-	private final Map<Integer, SpeedNode> openSetMap = new HashMap<Integer, SpeedNode>();
+	private final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
 	final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
@@ -51,7 +51,7 @@ class AStar {
 		
 		// Initialization
 		openSet.add(start);
-		openSetMap.put(Integer.MAX_VALUE, start);
+		openSetMap.put(Long.MAX_VALUE, start);
 		start.gScore = 0;
 		start.fScore = heuristicFunction(start, goal);
 		
@@ -86,7 +86,7 @@ class AStar {
 				//System.out.println("Current node edges:");
 				//System.out.println(current.node.edges + "\n");
 				// Current node has been explored.
-				final int endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
+				final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 				closedSet.add(endHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
@@ -104,7 +104,7 @@ class AStar {
 
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
-					final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
+					final long snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
 					if (closedSet.contains(snEndHash)) {
 						continue;
 					}
@@ -124,6 +124,7 @@ class AStar {
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 						sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
+						sn.parentXPos = current.currentXPos;
 						
 						if (!sn.isSpeedNodeUseable(world)) {
 							continue;
@@ -135,10 +136,13 @@ class AStar {
 						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+								continue;
+								/*
 								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
 								penalty = PENALTY_SCORE;
+								*/
 							}
 						}
 					}
@@ -166,11 +170,11 @@ class AStar {
 	 * @return speedNode
 	 */
 	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 120);
+		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 5000);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
-			//return speedNode;
+			return speedNode;
 		}
 		
 		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);
@@ -191,7 +195,6 @@ class AStar {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
-			if (!foundBestPath) System.out.println("Taking the best found so far");
 			return new AStarPath(currentBestPathEnd, true, hashGranularity);
 		}
 	}

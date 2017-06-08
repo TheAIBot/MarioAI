@@ -16,7 +16,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public final Node node;
 	public final float vx;
 	public SpeedNode parent;
-	public final float parentXPos;
+	public float parentXPos;
 	public final float parentVx;
 	public final long hash;
 	public final DirectedEdge ancestorEdge;

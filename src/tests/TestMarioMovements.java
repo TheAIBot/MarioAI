@@ -469,7 +469,8 @@ public class TestMarioMovements {
 			assertEquals(positions1.get(i).y, positions2.get(i).y, MarioControls.ACCEPTED_DEVIATION);
 			
 			assertEquals(xActions1.get(i), xActions2.get(i));
-			
+		}
+		for (int i = 0; i < yActions1.size(); i++) {
 			assertEquals(yActions1.get(i), yActions2.get(i));
 		}
 		for (int i = 0; i < speed1.size(); i++) {
@@ -498,7 +499,9 @@ public class TestMarioMovements {
 				positions.add(new Point2D.Float(x, y));
 				
 				xActions.add(moveInfo.getPressXButton()[z]);
-				yActions.add(moveInfo.getPressYButton()[z]);
+				if (moveInfo.getPressYButton().length > z) {
+					yActions.add(moveInfo.getPressYButton()[z]);	
+				}
 				
 				final Point2D.Float currentSpeed = new Point2D.Float(x - oldPos.x, y - oldPos.y);
 				speed.add(currentSpeed);

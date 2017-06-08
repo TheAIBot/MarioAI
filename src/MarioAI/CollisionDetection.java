@@ -25,23 +25,25 @@ public class CollisionDetection {
 		loadTileBehaviors();
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, World world){
-		return isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, world);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastY, World world){
+		return isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, lastY, world);
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, World world){
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastY, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
 		final float xa =  (futureOffset.x - currentOffset.x) * 16;
-		final float ya = -(futureOffset.y - currentOffset.y) * 16; //yes, it is the correct placement.
+		float ya = -(futureOffset.y - currentOffset.y) * 16; //yes, it is the correct placement.
 		//Change below to just use current position, if one want to get the actual position after the collision.
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
 															     (startY - currentOffset.y) * 16 - 1);
 		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
-		
+		if (lastY == futureOffset.y) {
+			ya += 1;
+		}
 		move(currentPosition, xa, 0, world);
 		move(currentPosition, 0, ya, world);
 		
@@ -91,8 +93,8 @@ public class CollisionDetection {
 		} 
 		if 	(ya < 0 && 
 				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) ||
-				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world)) {
+				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
+				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world))) {
 			collide = true;
 		}
 		if 	(xa > 0 && 
@@ -149,13 +151,14 @@ public class CollisionDetection {
 		else {
 			Node[] column = world.getColumn(x);
 			if (column != null && y >= 0 && y <= 15) { //TODO (*)Check correct null check
-				if (column[y] == null) {
+				Node block = column[y];
+				if (block == null) {
 					return false; //Can't block if it is air.
 				}
-				byte block = convertType(column[y].type);
-				boolean blocking = ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_ALL) > 0;
-				blocking |= (ya > 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_UPPER) > 0;
-				blocking |= (ya < 0) && ((TILE_BEHAVIORS[block & 0xff]) & BIT_BLOCK_LOWER) > 0;
+				byte blockType = convertType(block.type);
+				boolean blocking = ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_ALL) > 0;
+				blocking |= (ya > 0) && ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_UPPER) > 0;
+				blocking |= (ya < 0) && ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
 			} else {
 				return false;//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check

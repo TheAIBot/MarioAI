@@ -719,4 +719,19 @@ public class Mario extends Sprite {
 	public void setXPosition(int x) {
 		this.x = x * 16 - 8;
 	}
+	
+	public void setPixelPosition(int x, int y) {
+		this.x = x - 8;
+		this.y = y - 1;
+	}
+	
+	public void setXPixelPosition(int x) {
+		this.x = x - 8;
+	}
+	
+	public void resetSpeed() {
+		this.xa = 0;
+		this.ya = 0;
+		this.jumpTime = 0;
+	}
 }
