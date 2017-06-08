@@ -80,6 +80,7 @@ class AStar {
 					foundBestPath = true;
 					return;
 				}
+				
 				//System.out.println("Current node:");
 				//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
 				//System.out.println("Current node edges:");
@@ -89,6 +90,12 @@ class AStar {
 				closedSet.add(endHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
+				// The current best speednode is the one furthest to the right
+				// (disregarding if it passes through an enemy or not).
+				if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
+					currentBestPathEnd = current;
+				}
+				//currentBestPathEnd = current; //openSet.peek();
 				
 				
 				// Explore each neighbor of current node
@@ -135,13 +142,6 @@ class AStar {
 							}
 						}
 					}
-					// The current best speednode is the one furthest to the right
-					// (disregarding if it passes through an enemy or not).
-					if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
-						currentBestPathEnd = current;
-					}
-					//currentBestPathEnd = openSet.peek();
-					
 					
 					// Update the edges position in the priority queue
 					// by updating the scores and taking it in and out of the queue.
