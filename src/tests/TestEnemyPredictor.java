@@ -78,13 +78,15 @@ public class TestEnemyPredictor {
 	}
 	
 	private void testEnemy(EnemyType enemyType) {
-		testEnemyOnLevel("plainboxV3.lvl", enemyType);
+		testEnemyOnLevel("plainbox.lvl", enemyType);
+		//testEnemyOnLevel("plainboxV2.lvl", enemyType);
+		//testEnemyOnLevel("plainboxV3.lvl", enemyType);
 		//testEnemyOnLevel("bumpybox.lvl", enemyType);
 	}
 	
 	private void testEnemyOnLevel(String levelPath, EnemyType enemyType) {
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		Environment observation = TestTools.loadLevel(levelPath, new UnitTestAgent(), true);
+		Environment observation = TestTools.loadLevel(levelPath, new UnitTestAgent(), false);
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 		TestTools.setMarioInvulnerability(observation, true);
 		TestTools.setMarioXPosition(observation, 11);
@@ -102,11 +104,11 @@ public class TestEnemyPredictor {
 //		enemies.add(TestTools.spawnEnemy(observation, 20, 2, -1, enemyType));
 //		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 1, 80, enemyType.name());
 //		enemies.clear();
-
-		enemies.add(TestTools.spawnEnemy(observation, 4, 4, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 8, 5, 1, enemyType));
-		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 2, 80, enemyType.name());
-		enemies.clear();
+//
+//		enemies.add(TestTools.spawnEnemy(observation, 4, 4, 1, enemyType));
+//		enemies.add(TestTools.spawnEnemy(observation, 8, 5, 1, enemyType));
+//		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 2, 80, enemyType.name());
+//		enemies.clear();
 		
 		enemies.add(TestTools.spawnEnemy(observation, 2, 2, 1, enemyType));
 		enemies.add(TestTools.spawnEnemy(observation, 3, 3, 1, enemyType));
