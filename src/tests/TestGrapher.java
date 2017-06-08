@@ -350,6 +350,7 @@ public class TestGrapher {
 	public void testJumpStraightDownLedge(){		
 		World world = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] levelMatrix = world.getLevelMatrix();
+		grapher.setMovementEdges(world, marioNode);
 		//For any given pillar, at any given height, he should be able to jump down from it:
 		for (int column = 1; column < EdgeCreator.GRID_WIDTH - 1; column++) { //TODO set back to 0
 			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
