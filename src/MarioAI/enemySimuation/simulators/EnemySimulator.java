@@ -15,7 +15,6 @@ public abstract class EnemySimulator {
     protected final int kind;
     private final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
     protected int positionsIndexOffset = 0;
-    private final Object createPositionsLock = new Object();
 	
     public EnemySimulator(int kind, int widthInPixels, int heightInPixels) {
     	this.kind = kind;
@@ -33,6 +32,7 @@ public abstract class EnemySimulator {
 
     public void moveTimeForward() {
     	positionsIndexOffset++;
+    	moveEnemy();
     }
     
     public void moveTimeBackwards() {

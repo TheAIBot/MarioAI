@@ -187,7 +187,8 @@ public class WalkingEnemySimulator extends EnemySimulator
 		copy.y = y;
 		copy.xa = xa;
 		copy.ya = ya;
-		copy.positionsIndexOffset = positionsIndexOffset;
+		copy.onGround = onGround;
+		//copy.positionsIndexOffset = positionsIndexOffset;
 		
 		return copy;
 	}

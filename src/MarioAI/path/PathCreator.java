@@ -216,6 +216,9 @@ public class PathCreator {
 	
 	public void syncWithRealWorld(World realWorld, EnemyPredictor realEnemyPredictor) {
 		world.syncFrom(realWorld);
+		if (realEnemyPredictor.getEnemies().size() > 0) {
+			System.out.println();
+		}
 		enemyPredictor.syncFrom(realEnemyPredictor);
 	}
 	
