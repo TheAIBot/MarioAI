@@ -10,6 +10,7 @@ import MarioAI.graph.nodes.Node;
 public class EdgeCreator {
 	public static final float MAX_JUMP_HEIGHT = 4;
 	public static final float MAX_JUMP_RANGE = 5;
+	public static final float MAX_FALL_RANGE = 2;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
@@ -158,7 +159,7 @@ public class EdgeCreator {
 		JumpingEdge polynomial = new JumpingEdge(null, null);
 		List<DirectedEdge> jumpDownEdges = new ArrayList<DirectedEdge>();
 		// Does not include falling straight down.
-		for (int fallRange = 1; fallRange <= MAX_JUMP_RANGE / 2; fallRange++) {
+		for (int fallRange = 1; fallRange <= MAX_FALL_RANGE; fallRange++) {
 			// it should start from initialXPosition, as Mario first needs to go of the ledge.
 			int currentFallRange = fallRange * direction.getHorizontalDirectionAsInt();
 			polynomial.setToFallPolynomial(startingNode, initialXPosition+((direction.isLeftType())? 1:0), currentFallRange);
@@ -503,7 +504,9 @@ public class EdgeCreator {
 	
 	private boolean isHittingWallOrGroundUpwards(int xPosition, float yPosition) {
 		//Being out of the level matrix does not constitute as hitting something
-		
+		if (!isWithinView(xPosition)) {
+			throw new Error("Logic error: this should never be checked out of the level matrix");
+		}
 		//Floors the y position, as we are interested in the block Mario is currently in.
 		//Needs yPosition-0.01, as else one will get an immediate collision with the ground, as mario starts on it.
 		//Ie. takes it as though mario howers a little above the ground (which he actually does in the code.)
@@ -519,6 +522,9 @@ public class EdgeCreator {
 		//Floors the y position, as we are interested in the block Mario is currently in.
 		//Uses yPosition + 0.01, so when mario is close to the ground, it will be taken as a collision, without floating point errors.
 		//Not strictly neccessary.
+		if (!isWithinView(xPosition)) {
+			throw new Error("Logic error: this should never be checked out of the level matrix");
+		}
 		if (isOnLevelMatrix(xPosition, (int) (yPosition + 0.01))) {
 			final boolean isAtSolidNode = isSolid(observationGraph[xPosition][(int) (yPosition + 0.01)]);
 			final boolean isAtJumpThroughNode = isJumpThroughNode(observationGraph[xPosition][(int) (yPosition + 0.01)]);
@@ -529,7 +535,7 @@ public class EdgeCreator {
 	}
 
 	private boolean isWithinView(int xPosition) {
-		return xPosition < GRID_WIDTH && xPosition >= 0;
+		return xPosition < GRID_WIDTH && xPosition >= 1;
 	}
 
 	private boolean canMarioStandThere(Node node, Node marioNode) {
