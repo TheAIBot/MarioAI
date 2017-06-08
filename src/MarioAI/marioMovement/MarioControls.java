@@ -116,8 +116,8 @@ public class MarioControls {
 				final float marioX = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float marioY = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 				System.out.println("Mario: " + marioX + ", " + marioY);
-				
-				for (Point2D.Float point : path.get(0).getMoveInfo().getPositions()) {
+				for (int i = 0; i < path.get(0).getMoveTime(); i++) {
+					Point2D.Float point = path.get(0).getMoveInfo().getPositions()[i];
 					System.out.println("(" + (marioX + point.x) + ", " + (marioY + point.y) + ")");
 				}
 			}

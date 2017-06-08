@@ -7,6 +7,7 @@ public abstract class DirectedEdge {
 	public final Node source; 
 	public final Node target;
 	public final boolean useSuperSpeed;
+	private int movementTime;
 	protected int hash;
 	private MovementInformation moveInfo;
 	
@@ -37,6 +38,7 @@ public abstract class DirectedEdge {
 		
 	public void setMoveInfo(MovementInformation moveInfo) {
 		this.moveInfo = moveInfo;
+		this.movementTime = moveInfo.;
 	}
 	
 	public MovementInformation getMoveInfo() {
@@ -57,4 +59,8 @@ public abstract class DirectedEdge {
 	}
 
 	public abstract DirectedEdge getStompVersion(Node targetNode);
+
+	public int getMoveTime() {
+		return movementTime;
+	}
 }

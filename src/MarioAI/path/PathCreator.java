@@ -64,7 +64,7 @@ public class PathCreator {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		final Point2D.Float edgeEndDistance = currentEdge.getMoveInfo().getPositions()[currentEdge.getMoveInfo().getPositions().length - 1];
+		final Point2D.Float edgeEndDistance = currentEdge.getMoveInfo().getPositions()[currentEdge.getMoveTime() - 1];
 		
 		final float futureMarioXPos = marioXPos + edgeEndDistance.x;
 		final float futureMarioYPos = marioYPos - edgeEndDistance.y;
@@ -124,7 +124,7 @@ public class PathCreator {
 			nodesWithAddedEdges[i] = node;
 		}
 		
-		return new StateNode(goal, 0, Long.MIN_VALUE);
+		return new StateNode(goal, 0, Long.MIN_VALUE, 0); //current living enemies is just set to 0;
 	}
 	
 	private void removeGoalFrame() {
@@ -139,7 +139,7 @@ public class PathCreator {
 	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE,enemyPredictor.currentLivingEnemies());
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);

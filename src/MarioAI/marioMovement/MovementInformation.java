@@ -20,9 +20,8 @@ public class MovementInformation{
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
 	private final boolean useSuperSpeed;
-	private final int originalTicksForMovement;
-	private int ticksForMovement; //Necessary for stomp to work.
-	boolean hasStomp = false;
+	private final int originalTicksOfMovement;
+	private int ticksOfMovement; //Necessary for stomp to work.
 	//position information
 	private final Point2D.Float[] positions;
 	
@@ -32,8 +31,8 @@ public class MovementInformation{
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
 		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
-		this.originalTicksForMovement = Math.max(totalTicksXMoved, totalTicksJumped); ;
-		this.ticksForMovement = originalTicksForMovement;
+		this.originalTicksOfMovement = Math.max(totalTicksXMoved, totalTicksJumped); ;
+		this.ticksOfMovement = originalTicksOfMovement;
 		
 		this.pressXButton = new boolean[getMoveTime()];
 		for (int i = 0; i < xMoveInfo.pressXButton.size(); i++) {
@@ -108,23 +107,29 @@ public class MovementInformation{
 	}
 	
 	public float getXMovementDistance() {
-		return xMovedDistance;
+		if (ticksOfMovement == originalTicksOfMovement) {
+			return xMovedDistance;
+		} else return positions[ticksOfMovement-1].x;
 	}
 	
 	public float getEndSpeed() {
-		if (ticksForMovement != originalTicksForMovement) {
-			
+		if (ticksOfMovement != originalTicksOfMovement) {
+			if (ticksOfMovement == 1) {
+				return positions[0].x;
+			} else {
+				return positions[ticksOfMovement-1].x - positions[ticksOfMovement-2].x;
+			}
 		} else return endSpeed;
 	}
 	
 	public int getTotalTicksJumped() {
-		if (ticksForMovement != originalTicksForMovement) {
-			return Math.min(ticksForMovement, totalTicksJumped);
+		if (ticksOfMovement != originalTicksOfMovement) {
+			return Math.min(ticksOfMovement, totalTicksJumped);
 		} else return totalTicksJumped;
 	}
 	
 	public int getMoveTime() {
-		return ticksForMovement;
+		return ticksOfMovement;
 	}
 	
 	public Point2D.Float[] getPositions() {
@@ -158,7 +163,7 @@ public class MovementInformation{
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
 				return false;
 			} 
-			else if (bb.ticksForMovement != ticksForMovement){
+			else if (bb.ticksOfMovement != ticksOfMovement){
 				return false;
 			}
 			else if (bb.useSuperSpeed != useSuperSpeed) {
@@ -180,9 +185,9 @@ public class MovementInformation{
 
 	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastYValue = positions[ticksForMovement - 1].y;
+		final float lastYValue = positions[ticksOfMovement - 1].y;
 		
-		for (int i = 0; i < ticksForMovement; i++) { //Up to the end of the movement. 
+		for (int i = 0; i < ticksOfMovement; i++) { //Up to the end of the movement. 
 			final Point2D.Float currentPosition = positions[i];
 			if (world.isColliding(currentPosition, previousPosition, sourceNode, lastYValue)) {
 				return true;
@@ -194,8 +199,8 @@ public class MovementInformation{
 	
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastYValue = positions[ticksForMovement - 1].y;
-		for (int i = 0; i < ticksForMovement; i++) { 
+		final float lastYValue = positions[ticksOfMovement - 1].y;
+		for (int i = 0; i < ticksOfMovement; i++) { 
 			final Point2D.Float currentPosition = positions[i];
 			if (world.isColliding(currentPosition, previousPosition, startX, startY, lastYValue)) {
 				return true;
@@ -204,9 +209,12 @@ public class MovementInformation{
 		}	
 		return false;
 	}
+	
+	public int getTicksOfMovement(){
+		return ticksOfMovement;
+	}
 
 	public void setStopTime(int tickForCollision) {
-		totalTicksJumped = tickForCollision;
-		return
+		ticksOfMovement = tickForCollision;
 	}
 }
