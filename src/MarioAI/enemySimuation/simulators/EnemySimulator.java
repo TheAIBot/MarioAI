@@ -59,13 +59,13 @@ public abstract class EnemySimulator {
     	return getPositionAtTime(0);
     }
     
-    public Point2D.Float getPositionAtTime(int time) {
+    public synchronized Point2D.Float getPositionAtTime(int time) {
     	if (positionAtTime.size() - positionsIndexOffset <= time) {
-			synchronized (createPositionsLock) {
+			//synchronized (createPositionsLock) {
 		    	while (positionAtTime.size() - positionsIndexOffset <= time) {
 		    		moveEnemy();
 				}
-			}
+			//}
 		}
     	return positionAtTime.get(time + positionsIndexOffset);
     }
