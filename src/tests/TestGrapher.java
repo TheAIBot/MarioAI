@@ -108,7 +108,7 @@ public class TestGrapher {
 		// Edge node that should only point to right, as there is
 		// nothing to the left:
 		Node currentNode = world[9][marioNode.y];
-		assertEquals(1, currentNode.getNumberOfEdgesOfType(runningEdgeType));
+		assertEquals(2, currentNode.getNumberOfEdgesOfType(runningEdgeType));
 		assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x + 1, currentNode.y,
 				runningEdgeType));
 		// The other nodes to the left are null, and thus a running edge
@@ -155,9 +155,7 @@ public class TestGrapher {
 		World graph = totalFlatland(flatlandWorld(), marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(graph, marioNode);
-		boolean[] possibleJumpLenghts = new boolean[5];// 5 for the five
-								// different
-								// jump lengths
+		boolean[] possibleJumpLenghts = new boolean[(int) EdgeCreator.MAX_JUMP_RANGE];
 		for (DirectedEdge edge : marioNode.getEdges()) {
 			if (edge instanceof JumpingEdge) {
 				JumpingEdge polynomialEdge = (JumpingEdge) edge;
@@ -352,10 +350,9 @@ public class TestGrapher {
 	public void testJumpStraightDownLedge(){		
 		World world = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] levelMatrix = world.getLevelMatrix();
-		grapher.setMovementEdges(world, marioNode);
 		//For any given pillar, at any given height, he should be able to jump down from it:
-		for (int column = 1; column < EdgeCreator.GRID_WIDTH; column++) { //TODO set back to 0
-			for (int pillarHeight = 4; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
+		for (int column = 1; column < EdgeCreator.GRID_WIDTH - 1; column++) { //TODO set back to 0
+			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
 				addWall(pillarHeight, column, marioNode.y, levelMatrix, marioNode);
 				Node currentNode = levelMatrix[column][marioNode.y - pillarHeight];
 				//Pillars to the currents pillars sides, to the height of the pillar
@@ -370,11 +367,14 @@ public class TestGrapher {
 					//The extra edges to the right, is because mario lands on his left/right corner, on the pillar, when falling down:
 					int supposedNumberOfEdges = 2;
 					switch (pillarHeight - sidePillarHeight) {
+						case 4:
+							supposedNumberOfEdges += 2;
+							break;	
 						case 3:
 							supposedNumberOfEdges += 2;
 							break;
 						case 2:
-							supposedNumberOfEdges += 4;
+							supposedNumberOfEdges += 2;
 							break;
 						case 1:
 							supposedNumberOfEdges += 4;
@@ -382,24 +382,48 @@ public class TestGrapher {
 						default:
 							break;
 					}
+					int rightSupposedEdges = (column < EdgeCreator.GRID_WIDTH - 2)? supposedNumberOfEdges: 2;
+					int leftSupposedEdges = supposedNumberOfEdges; //(column > 1)? supposedNumberOfEdges: 2;
+					//The right case is needed, because it will go out of the level matrix, which won't happen in the left case.
 					//TODO check if it works as intended, with the number above.
 					grapher.clearAllEdges();
 					grapher.resetFoundAllEdges();
 					grapher.setMovementEdges(world, currentNode);
-					ArrayList<DirectedEdge> fallingDownEdges = new ArrayList<DirectedEdge>();
+					ArrayList<DirectedEdge> rightFallingDownEdges = new ArrayList<DirectedEdge>();
+					ArrayList<DirectedEdge> leftFallingDownEdges = new ArrayList<DirectedEdge>();
 					//Right direction:
-					grapher.getFallingDownEdges(currentNode, column, JumpDirection.RIGHT_DOWNWARDS, fallingDownEdges);
+					grapher.getFallingDownEdges(currentNode, column, JumpDirection.RIGHT_DOWNWARDS, rightFallingDownEdges);
+					grapher.getFallingDownEdges(currentNode, column, JumpDirection.LEFT_DOWNWARDS ,  leftFallingDownEdges);
 					//There is an edge, unless the pillars have the same size:
-					if (sidePillarHeight < pillarHeight && column > 0) {
-						//Only whant those going straight down:
-						final int currentColumn = column + 1;
+					if (sidePillarHeight < pillarHeight) {
 						final int currentHeight = marioNode.y - sidePillarHeight;
-						List<DirectedEdge> fallingStraightDownEdges = fallingDownEdges.stream().filter(edge -> edge.target == levelMatrix[currentColumn][currentHeight])
-																													  .collect(Collectors.toList());
 						
-						assertEquals(errorMessage, supposedNumberOfEdges, fallingStraightDownEdges.size());	
-						DirectedEdge currentEdge1 = fallingStraightDownEdges.get(0);	
-						DirectedEdge currentEdge2 = fallingStraightDownEdges.get(0);
+						//Right direction:
+						
+						//Only want those going straight down:
+						final int rightColumn = column + 1;
+						List<DirectedEdge> rightFallingStraightDownEdges = rightFallingDownEdges.stream().filter(edge -> edge.target == levelMatrix[rightColumn][currentHeight])
+																													  		 .collect(Collectors.toList());
+						
+						assertEquals(errorMessage, rightSupposedEdges, rightFallingStraightDownEdges.size());	
+						DirectedEdge currentEdge1 = rightFallingStraightDownEdges.get(0);	
+						DirectedEdge currentEdge2 = rightFallingStraightDownEdges.get(0);
+						assertTrue(errorMessage, currentEdge1 instanceof FallEdge);
+						assertTrue(errorMessage, currentEdge2 instanceof FallEdge);
+						//Correct source:
+						assertEquals(errorMessage, currentNode, currentEdge1.source);
+						assertEquals(errorMessage, currentNode, currentEdge2.source);
+						
+						
+						//Left direction
+						//Only want those going straight down:
+						final int leftColumn = column - 1;
+						List<DirectedEdge> leftFallingStraightDownEdges = leftFallingDownEdges.stream().filter(edge -> edge.target == levelMatrix[leftColumn][currentHeight])
+																													  		 .collect(Collectors.toList());
+						
+						assertEquals(errorMessage, leftSupposedEdges, leftFallingStraightDownEdges.size());	
+						currentEdge1 = leftFallingStraightDownEdges.get(0);	
+						currentEdge2 = leftFallingStraightDownEdges.get(0);
 						assertTrue(errorMessage, currentEdge1 instanceof FallEdge);
 						assertTrue(errorMessage, currentEdge2 instanceof FallEdge);
 						//Correct source:
@@ -407,19 +431,13 @@ public class TestGrapher {
 						assertEquals(errorMessage, currentNode, currentEdge2.source);
 					} 
 					
-					
-					if (column > 0) {
-						removeWall(sidePillarHeight, column-1, marioNode.y, levelMatrix);					
-					}
-					if (column < EdgeCreator.GRID_WIDTH) {
-						removeWall(sidePillarHeight, column+1, marioNode.y, levelMatrix);
-					}
+					removeWall(sidePillarHeight, column-1, marioNode.y, levelMatrix);	
+					removeWall(sidePillarHeight, column+1, marioNode.y, levelMatrix);
 				}
 
 				removeWall(pillarHeight, column, marioNode.y, levelMatrix);
 			}
 		}
-		fail("Make the test. Also do it for normal connecting edges.");
 	}
 	
 	@Test

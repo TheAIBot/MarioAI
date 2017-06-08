@@ -77,10 +77,10 @@ public class EdgeCreator {
 			foundAllEdges = getRunningReachableEdges(startingNode, nodeColoumn, listOfEdges)	&& foundAllEdges;
 		}
 		if (ALLOW_JUMPING) {
-			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
+			//foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
 
 		if (foundAllEdges)
@@ -159,13 +159,16 @@ public class EdgeCreator {
 		List<DirectedEdge> jumpDownEdges = new ArrayList<DirectedEdge>();
 		// Does not include falling straight down.
 		for (int fallRange = 1; fallRange <= MAX_JUMP_RANGE / 2; fallRange++) {
-			// it should start from initialXPosition, as Mario first
-			// needs to go of the ledge.
+			// it should start from initialXPosition, as Mario first needs to go of the ledge.
 			int currentFallRange = fallRange * direction.getHorizontalDirectionAsInt();
-			polynomial.setToFallPolynomial(startingNode, initialXPosition, currentFallRange);
+			polynomial.setToFallPolynomial(startingNode, initialXPosition+((direction.isLeftType())? 1:0), currentFallRange);
+			
 			// The opposite vertical direction is used, as it is inverted in the method.
 			// Plus direction.getHorizontalDirectionAsInt(), as it moved one back later.
-			foundAllEdges = jumpAlongPolynomial(startingNode, initialXPosition + direction.getHorizontalDirectionAsInt(), polynomial,
+			//Only to the right side, as the x difference between the right and the left=1
+			//and the later code will then handle the rest.
+			int jumpStartPosition = (direction.isLeftType())? initialXPosition:  initialXPosition + direction.getHorizontalDirectionAsInt();
+			foundAllEdges = jumpAlongPolynomial(startingNode, jumpStartPosition, polynomial,
 															direction.getOppositeVerticalDirection(), jumpDownEdges) && foundAllEdges;
 		}
 		// The edges added by the method above, is polynomials.
@@ -280,13 +283,10 @@ public class EdgeCreator {
 				// Because of the cursed limited precision:
 				currentYPosition = roundWithingMargin(currentYPosition, (float) 0.02);
 			}
-			// The bound is the bounded value for the next y
-			// position -> rounded down.
-			// This converts the next y value from (high value =
-			// higher up on the level) to (high value = lower on the
-			// level)
+			// The bound is the bounded value for the next y position -> rounded down.
+			// This converts the next y value from (high value = higher up on the level) to 
+			//(high value = lower on the level)
 			// TODO error in bound, because of rounding errors.
-			// Check for similar things other places.
 			final float bound = getBounds(startingNode, currentYPosition);
 
 			if (!isPastTopPointColumn) {

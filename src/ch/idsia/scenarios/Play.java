@@ -21,7 +21,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			Agent controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -37,7 +37,7 @@ public class Play {
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
-			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/truePillar.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
