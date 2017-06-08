@@ -124,8 +124,10 @@ public class Enemy extends Sprite
                             spriteContext.addSprite(new Shell(world, x, y, 1));
                         }
 //                        System.out.println("collideCheck and stomp");
-                        ++LevelScene.killedCreaturesTotal;
-                        ++LevelScene.killedCreaturesByStomp;
+//                        ++LevelScene.killedCreaturesTotal;
+//                        ++LevelScene.killedCreaturesByStomp;
+                        ++world.killedCreaturesTotal;
+                        ++world.killedCreaturesByFireBall;
                     }
                 }
                 else
@@ -347,8 +349,10 @@ public class Enemy extends Sprite
                 hPic = -hPic;
                 yPicO = -yPicO + 16;
 //                System.out.println("shellCollideCheck");
-                ++LevelScene.killedCreaturesTotal;
-                ++LevelScene.killedCreaturesByShell;
+//                ++LevelScene.killedCreaturesTotal;
+//                ++LevelScene.killedCreaturesByShell;
+                ++world.killedCreaturesTotal;
+                ++world.killedCreaturesByShell;
                 return true;
             }
         }
@@ -377,8 +381,10 @@ public class Enemy extends Sprite
                 hPic = -hPic;
                 yPicO = -yPicO + 16;
 //                System.out.println("fireballCollideCheck");
-                ++LevelScene.killedCreaturesTotal;
-                ++LevelScene.killedCreaturesByFireBall;
+//                ++LevelScene.killedCreaturesTotal;
+//                ++LevelScene.killedCreaturesByFireBall;
+                ++world.killedCreaturesTotal;
+                ++world.killedCreaturesByFireBall;
                 return true;
             }
         }
