@@ -2,6 +2,7 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
@@ -174,7 +175,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
 			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
+			if (enemyPredictor.hasEnemy(x, y, MarioMethods.MARIO_WIDTH, marioHeight, currentTick)) {
 				hasEnemyCollision = true;
 				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
 			}

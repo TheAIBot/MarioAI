@@ -37,18 +37,21 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(final float marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
+	public boolean hasEnemy(float marioX2, final float marioY2, final float marioWidth, final int marioHeight, final int time) {
+		//a
+		marioX2 += marioWidth;
+		
 		//b
-		final float marioX1 = marioX2 - marioWidth;
+		final float marioX1 = marioX2 - marioWidth * 2;
 		final float marioY1 = marioY2 - marioHeight;
 		
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
 			//a
-			final float enemyX2 = enemyPosition.x / BLOCK_PIXEL_SIZE;
+			final float enemyX2 = (enemyPosition.x / BLOCK_PIXEL_SIZE) + (enemySimulation.getWidth() / BLOCK_PIXEL_SIZE);
 			final float enemyY2 = enemyPosition.y / BLOCK_PIXEL_SIZE;
-			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
-			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
+			final float enemyX1 = (enemyPosition.x / BLOCK_PIXEL_SIZE) - (enemySimulation.getWidth() / BLOCK_PIXEL_SIZE);
+			final float enemyY1 = enemyY2 - (enemySimulation.getHeight() / BLOCK_PIXEL_SIZE);
 			
 			//check if the rectangle of mario intersects with the enemys rectangle
 			if (enemyX1 <= marioX2 && 

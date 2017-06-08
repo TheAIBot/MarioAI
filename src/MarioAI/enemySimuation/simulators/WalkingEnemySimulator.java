@@ -1,5 +1,7 @@
 package MarioAI.enemySimuation.simulators;
 
+import java.awt.geom.Point2D;
+
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 
@@ -17,8 +19,6 @@ public class WalkingEnemySimulator extends EnemySimulator
     private boolean onGround = false;
 
     protected final LevelScene world;
-    private final int width = 4;
-    private final int height;
     private final boolean avoidCliffs;
     private final boolean winged;
     private final int type;
@@ -27,7 +27,7 @@ public class WalkingEnemySimulator extends EnemySimulator
 
     public WalkingEnemySimulator(LevelScene world, float x, float y, float xa, float ya, int type, int kind, boolean winged)
     {
-    	super(kind, 16, (type > 1) ? 16 : 27);
+    	super(kind, 4, (type > 1) ? 12 : 24);
         
         this.world = world;
         this.x = x;
@@ -39,7 +39,6 @@ public class WalkingEnemySimulator extends EnemySimulator
 
         avoidCliffs = (type == Enemy.ENEMY_RED_KOOPA);
         
-        this.height = (type > 1) ? 12 : 24;
         this.facing = (xa >= 0) ? 1 : -1;
     }
     
@@ -189,6 +188,8 @@ public class WalkingEnemySimulator extends EnemySimulator
 		copy.ya = ya;
 		copy.onGround = onGround;
 		//copy.positionsIndexOffset = positionsIndexOffset;
+		Point2D.Float currentPosition = getCurrentPosition();
+		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		return copy;
 	}

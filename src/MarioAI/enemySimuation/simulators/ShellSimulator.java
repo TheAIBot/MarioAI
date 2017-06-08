@@ -1,5 +1,7 @@
 package MarioAI.enemySimuation.simulators;
 
+import java.awt.geom.Point2D;
+
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
 
@@ -10,9 +12,6 @@ public class ShellSimulator extends EnemySimulator
 
     private boolean onGround = false;
 
-    private final int width = 4;
-    private final int height = 12;
-
     private final LevelScene world;
     private int facing = 0;
 
@@ -20,7 +19,7 @@ public class ShellSimulator extends EnemySimulator
 
     public ShellSimulator(LevelScene world, float x, float y, float xa, float ya)
     {
-    	super(Sprite.KIND_SHELL, 16, 16);
+    	super(Sprite.KIND_SHELL, 4, 12);
 
     	this.world = world;
         this.x = x;
@@ -171,6 +170,8 @@ public class ShellSimulator extends EnemySimulator
 		copy.xa = xa;
 		copy.ya = ya;
 		//copy.positionsIndexOffset = positionsIndexOffset;
+		Point2D.Float currentPosition = getCurrentPosition();
+		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		return copy;
 	}

@@ -10,16 +10,16 @@ public abstract class EnemySimulator {
     protected float y;
     protected float xa;
     protected float ya;
-    protected final int widthInPixels;
-    protected final int heightInPixels;
+    protected final int width;
+    protected final int height;
     protected final int kind;
     private final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
     protected int positionsIndexOffset = 0;
 	
-    public EnemySimulator(int kind, int widthInPixels, int heightInPixels) {
+    public EnemySimulator(int kind, int width, int height) {
     	this.kind = kind;
-    	this.widthInPixels = widthInPixels;
-    	this.heightInPixels = heightInPixels;
+    	this.width = width;
+    	this.height = height;
     }
     
     protected abstract void move();
@@ -32,7 +32,6 @@ public abstract class EnemySimulator {
 
     public void moveTimeForward() {
     	positionsIndexOffset++;
-    	moveEnemy();
     }
     
     public void moveTimeBackwards() {
@@ -70,11 +69,15 @@ public abstract class EnemySimulator {
     	return positionAtTime.get(time + positionsIndexOffset);
     }
     
-    public int getWidthInPixels() {
-    	return widthInPixels;
+    public float getWidth() {
+    	return width;
     }
     
-    public int getHeightInPixels() {
-    	return heightInPixels;
+    public float getHeight() {
+    	return height;
+    }
+    
+    public void insertPosition(float x, float y) {
+    	positionAtTime.add(new Point2D.Float(x, y));
     }
 }

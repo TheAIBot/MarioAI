@@ -35,6 +35,10 @@ public class MovementInformation{
 		this.pressYButton = yMoveInfo.pressYButton;
 		
 		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
+		
+		if (positions.length == 0) {
+			throw new Error("movementinformation with length 0");
+		}
 	}
 	
 	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, float[] y, int moveTime) {

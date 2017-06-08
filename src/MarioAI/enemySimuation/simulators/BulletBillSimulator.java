@@ -1,5 +1,6 @@
 package MarioAI.enemySimuation.simulators;
 
+import java.awt.geom.Point2D;
 
 public class BulletBillSimulator extends EnemySimulator
 {
@@ -7,7 +8,7 @@ public class BulletBillSimulator extends EnemySimulator
 
     public BulletBillSimulator(float x, float y, int dir, int kind)
     {
-    	super(kind, 16, 14);
+    	super(kind, 4, 12);
         this.x = x;
         this.y = y;
         
@@ -31,6 +32,8 @@ public class BulletBillSimulator extends EnemySimulator
 		copy.xa = xa;
 		copy.ya = ya;
 		//copy.positionsIndexOffset = positionsIndexOffset;
+		Point2D.Float currentPosition = getCurrentPosition();
+		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		return copy;
 	}

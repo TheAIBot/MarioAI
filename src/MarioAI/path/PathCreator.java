@@ -37,7 +37,7 @@ public class PathCreator {
 	public PathCreator(int threadCount) {
 		//There can't be more threads than granularities as two threads
 		//would then have to share the same granularity.
-		threadCount = Math.min(threadCount, HASH_GRANULARITY.length);
+		threadCount = Math.min(threadCount, MAX_THREAD_COUNT);
 		threadPool = Executors.newFixedThreadPool(threadCount);
 		runningTasks = new CompletableFuture[threadCount];
 		
@@ -191,6 +191,7 @@ public class PathCreator {
 			bestPath.path.size() > 1) {
 			return false;
 		}
+		
 		
 		return true;
 	}

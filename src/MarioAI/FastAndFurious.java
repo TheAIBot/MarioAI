@@ -99,8 +99,8 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				if (pathCreator.isRunning) {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
-						//save(observation);
-						//throw new Error();
+						save(observation);
+						throw new Error("Mario didn't follow the path correctly.");
 					}
 					pathCreator.updateBestPath();
 //					System.out.println("Tick: " + tickCount + " Stopped");
@@ -139,7 +139,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				//DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
