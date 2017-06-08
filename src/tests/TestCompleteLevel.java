@@ -8,11 +8,12 @@ import MarioAI.FastAndFurious;
 import MarioAI.World;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestCompleteLevel {
-	final int MARIO_WON = 1;
-	final int MARIO_LOST = 0;
+	final int MARIO_WON = Mario.STATUS_WIN; // 1
+	final int MARIO_LOST = Mario.STATUS_DEAD; // 0
 	
 	Agent agent;
 	Environment observation;

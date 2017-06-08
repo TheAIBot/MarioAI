@@ -28,7 +28,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	private final MovementInformation moveInfo;
 	private final boolean isSpeedNodeUseable;
 	
-	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
+	public static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
 	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
 	public int lives = MAX_MARIO_LIFE;

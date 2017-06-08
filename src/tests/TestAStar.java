@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -14,6 +15,8 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.LocatorEx.Snapshot;
 
 import MarioAI.FastAndFurious;
 import MarioAI.Hasher;
@@ -165,7 +168,7 @@ public class TestAStar {
 			assertTrue(path.get(i) instanceof RunningEdge);
 		}
 		
-		//verifyPath(path, originalGoalNodes);
+		verifyPath(path, originalGoalNodes);
 		
 	}
 	
@@ -319,7 +322,7 @@ public class TestAStar {
 	public void testTunnelWithEnemyMoreThanOneLife() {
 		setup("straightTunnel", true);
 		TestTools.setMarioPosition(observation, 2, 12);
-		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
+		TestTools.spawnEnemy(observation, 7, 12, -1, EnemyType.GREEN_KOOPA);
 		world.update(observation);
 		TestTools.runOneTick(observation);
 		//TestTools.renderLevel(observation);
@@ -409,6 +412,64 @@ public class TestAStar {
 			assertEquals(edge.source.x, marioInitialXPos + i * 2);
 		}
 	}
+	
+	/**
+	 * Test that Mario's ticks of invincibility and life is set correctly after hitting and enemy
+	 */
+	@Test
+	public void testTicksOfInvincibility() {
+		setup("straightTunnel", true);
+		TestTools.setMarioPosition(observation, 2, 12);
+		
+		// spawn two enemies
+		int enemyOneXStartPos = 7; 
+		TestTools.spawnEnemy(observation, enemyOneXStartPos, 12, -1, EnemyType.GREEN_KOOPA);
+		TestTools.spawnEnemy(observation, enemyOneXStartPos - 1, 12, -1, EnemyType.GREEN_KOOPA);
+		TestTools.runOneTick(observation);
+		world.update(observation);
+		
+		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+		List<DirectedEdge> path = agent.pathCreator.getBestPath();
+		
+		assertNotNull(path);
+		
+		// Go 
+		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		boolean willHitEnemy = false;
+		SpeedNode sn = null;
+		loop: while (world.getMarioNode(observation).x <= enemyOneXStartPos) {
+			TestTools.runOneTick(observation);
+			world.update(observation);
+			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+			path = agent.pathCreator.getBestPath();
+			
+			for (DirectedEdge edge : path) {
+				if (willHitEnemy) break loop;
+				sn = speedNodes.values().stream()
+												   .filter(x -> x.ancestorEdge.equals(edge))
+												   .findFirst().get();
+				if (edge.getMoveInfo().hasCollisions(sn, world)) {
+					willHitEnemy = true;
+				}
+			}
+		}
+		
+		// Assert that a collision will occur before reach of end of while loop as the enemies should have moved to the left of where they were spawned
+		assertTrue(willHitEnemy);
+		assertTrue(sn.currentXPos < enemyOneXStartPos - 0.5);
+		
+		// Verify ticks of invincibility
+		assertNotNull(sn);
+		assertEquals(SpeedNode.MAX_TICKS_OF_INVINCIBILITY, sn.ticksOfInvincibility);
+		
+		// Check that Mario has lost only one life when he reaches the end of the level
+		// This should be the case as the second enemy is close enough for Mario's invincibility not to have worn off
+		int marioStatus = TestTools.runWholeLevelWillWin(observation);
+		assertEquals(Mario.STATUS_WIN, marioStatus);
+		assertEquals(2, observation.getMarioMode());
+		
+	}
+	
 
 	/**
 	 * Verify that the same path is found by A* if initiated from a position later in a previously found solution path

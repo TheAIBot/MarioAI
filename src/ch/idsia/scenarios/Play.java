@@ -26,7 +26,7 @@ public class Play {
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("jumpLevels/semiAdvancedJumpingCourse.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
