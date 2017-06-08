@@ -2,6 +2,8 @@ package tickbased.game.world;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Image;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,12 +113,14 @@ public class LevelScene implements SpriteContext
 	}
     
 	public void init() {
-//		try {
-//			Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
+		try {
+			//Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
+			Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("C:/Users/ELL/Documents/GitHub/MarioAI/tiles.dat")));
+		} catch (IOException e) {
+			System.out.println("fejl ved at loade tiles.dat");
+			e.printStackTrace();
+			System.exit(0);
+		}
 		
 		level = new Level(1000, 15);
 		
