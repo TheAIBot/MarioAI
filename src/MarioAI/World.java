@@ -85,7 +85,7 @@ public class World {
 		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
-		if (changeX != 0 || changeY != 0) {
+		if (changeX != 0 || changeY != 0) { // TODO is it correct to have || and not && here?
 			updateWholeMatrix(observation);
 			setMarioNode(observation);
 			hasWorldChanged = true;

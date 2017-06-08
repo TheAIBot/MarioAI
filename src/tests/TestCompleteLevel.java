@@ -38,12 +38,14 @@ public class TestCompleteLevel {
 		assertEquals(MARIO_WON, testLevel("flat"));
 	}
 	
-	/**
-	 * Mario should not be able to finish this level, because the agent cannot jump 5 blocks horizontally 
-	 */
 	@Test
 	public void testPit() {
-		assertEquals(MARIO_LOST, testLevel("pit12345"));
+		assertEquals(MARIO_WON, testLevel("pit12345"));
+	}
+	
+	@Test
+	public void testPit12345678() {
+		assertEquals(MARIO_WON, testLevel("pit12345678"));
 	}
 	
 	@Test
@@ -69,6 +71,14 @@ public class TestCompleteLevel {
 	@Test
 	public void testDropDown1() {
 		assertEquals(MARIO_WON, testLevel("dropDown1"));
+	}
+	
+	/**
+	 * Level for which no solution exists
+	 */
+	@Test
+	public void testProgramNotCrashInUnsolvableLevel() {
+		assertEquals(MARIO_LOST, testLevel("bumbybox"));
 	}
 	
 }
