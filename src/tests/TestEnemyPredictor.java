@@ -4,13 +4,20 @@ import static org.junit.Assert.*;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import MarioAI.MarioMethods;
+import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.enemySimuation.EnemyType;
 import MarioAI.enemySimuation.simulators.EnemySimulator;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
+import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
@@ -126,8 +133,8 @@ public class TestEnemyPredictor {
 	}
 	
 	private void testEnemy(EnemyType enemyType, boolean makeCopy) {
-		testEnemyOnLevel("plainbox.lvl", enemyType, makeCopy);
-		testEnemyOnLevel("bumpybox.lvl", enemyType, makeCopy);
+		testEnemyOnLevel("testEnemyPredictor/plainbox.lvl", enemyType, makeCopy);
+		testEnemyOnLevel("testEnemyPredictor/bumpybox.lvl", enemyType, makeCopy);
 	}
 	
 	private void testEnemyOnLevel(String levelPath, EnemyType enemyType, boolean makeCopy) {
@@ -245,8 +252,7 @@ public class TestEnemyPredictor {
 			}
 			
 			if (enemiesLeftToFind > 0) {
-				Assert.fail("Enemy simulator position didn't match any enemy position");	
-				
+				Assert.fail("Enemy simulator position didn't match any enemy position");
 			}
 		}
 		
@@ -264,5 +270,108 @@ public class TestEnemyPredictor {
 		copy.syncFrom(enemyPredictor);
 		
 		return (makeCopy) ? copy : enemyPredictor;
+	}
+	
+	@Test
+	public void asd() {
+		fisk(1, 2, false, EnemyType.GOOMBA);
+	}
+	
+	private void fisk(int xDistance, int jumpHeight, boolean useSuperSpeed, EnemyType enemyType) {
+		final UnitTestAgent agent = new UnitTestAgent();
+		final Environment observation = TestTools.loadLevel("testEnemyPredictor/flat.lvl", agent, true);
+		final World world = new World();
+		final MarioControls marioControls = new MarioControls();
+		final EnemyPredictor enemyPredictor = new EnemyPredictor();
+		world.initialize(observation);
+		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+		
+
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, xDistance, jumpHeight, -jumpHeight, 1, world, useSuperSpeed);
+		
+		testJumpRight(observation, agent, world, marioControls, enemyPredictor, path, enemyType, xDistance);
+	}
+	
+	private void testJumpRight(Environment observation, UnitTestAgent agent, World world, MarioControls marioControls, EnemyPredictor enemyPredictor, ArrayList<DirectedEdge> path, EnemyType enemyType, int xDistance) {
+		
+		final int startXPixel = (4 - xDistance) * World.PIXELS_PER_BLOCK;
+		final int endXPixel = 7 * World.PIXELS_PER_BLOCK;
+		
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		for (int i = startXPixel; i <= endXPixel; i++) {
+			TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
+			TestTools.resetMarioSpeed(observation);
+			final Sprite enemy = TestTools.spawnEnemy(observation, (startXPixel / 16) + 4, (int)startMarioYPos, -1, enemyType);
+			for (int j = 0; j < 3; j++) {
+				TestTools.runOneTick(observation);
+				enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			}
+			
+			TestTools.runOneTick(observation);
+			TestTools.runOneTick(observation);
+			world.update(observation);
+			marioControls.reset();
+			
+			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			
+			final ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
+			pathCopy.add(path.get(0));
+			
+			boolean expectedToHitSomething = false;
+			for (int j = 0; j < pathCopy.get(0).getMoveInfo().getMoveTime(); j++) {
+				final Point2D.Float currentOffset = pathCopy.get(0).getMoveInfo().getPositions()[j];
+				expectedToHitSomething = enemyPredictor.hasEnemy(marioXPos + currentOffset.x, marioYPos + currentOffset.y, MarioMethods.MARIO_WIDTH, 2, j + 1);
+				
+				if (expectedToHitSomething) {
+					break;
+				}
+			}
+			
+			final boolean actualHitSomething = isHittingEnemyOnRoad(observation, pathCopy, agent, marioControls);
+			
+			assertEquals(expectedToHitSomething, actualHitSomething);
+			
+			TestTools.removeEnemy(observation, enemy);
+		}
+	}
+	
+	private boolean isHittingEnemyOnRoad(Environment observation, ArrayList<DirectedEdge> path, UnitTestAgent agent, MarioControls marioControls) {
+		final float startMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		agent.action = marioControls.getActions();
+		TestTools.runOneTick(observation);
+	
+		final MovementInformation moveInfo = path.get(0).getMoveInfo();
+		for (int i = 0; i < moveInfo.getPositions().length; i++) {	
+			marioControls.getNextAction(observation, path);
+			TestTools.runOneTick(observation);
+			
+			final Point2D.Float position = moveInfo.getPositions()[i];
+			
+			final float expectedMarioXPos = startMarioXPos + position.x;
+			final float expectedMarioYPos = startMarioYPos - position.y;
+			
+			final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+			final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			
+			if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos) ||
+				TestTools.getMarioInvulnerableTime(observation) > 0) {
+				Arrays.fill(agent.action, false);
+				return false;
+			}
+		}
+		Arrays.fill(agent.action, false);
+		return true;
+	}
+	
+	private boolean withinAcceptableError(float a1, float b1, float a2, float b2) {
+		return 	withinAcceptableError(a1, b1) && 
+				withinAcceptableError(a2, b2);
+	}
+	
+	private boolean withinAcceptableError(float a, float b) {
+		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
 	}
 }
