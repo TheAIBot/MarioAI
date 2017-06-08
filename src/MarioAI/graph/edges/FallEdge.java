@@ -27,4 +27,9 @@ public class FallEdge extends DirectedEdge {
 		return 0b0000_0010;
 	}
 
+	@Override
+	public DirectedEdge getStompVersion(Node targetNode) {
+		return new FallEdge(source, targetNode, useSuperSpeed);
+	}
+
 }

@@ -44,7 +44,7 @@ public class TestEnemyCollisionDetection {
 	}
 		
 	@Test
-	public void testCorrectMarioBlockPlacementDetection(){//TODO maek version with initial speed.
+	public void testCorrectMarioBlockPlacementDetection(){//TODO make version with initial speed.
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		startup();
 		List<DirectedEdge> Path = new ArrayList<DirectedEdge>(); //Lenght 1 path. Testing one edge.

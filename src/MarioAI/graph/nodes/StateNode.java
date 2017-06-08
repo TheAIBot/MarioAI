@@ -2,6 +2,7 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.Hasher;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyCollision;
 import MarioAI.enemySimuation.EnemyPredictor;
@@ -93,6 +94,21 @@ public class StateNode implements Comparable<StateNode> {
 		this.livingEnemies = livingEnemies;
 	}
 	
+	public StateNode(Node node, StateNode parent, MovementInformation moveInfo, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
+		this.node = node;
+		this.moveInfo = moveInfo;
+		this.vx = moveInfo.getEndSpeed();
+		this.xPos = parent.xPos + moveInfo.getXMovementDistance();
+		this.parent = parent;
+		this.parentXPos = parent.xPos;
+		this.parentVx = parent.parentVx;
+		this.ancestorEdge = ancestorEdge;
+		this.yPos = node.y;
+		this.isSpeedNodeUseable = true;
+		this.hash = hash;
+		this.livingEnemies = livingEnemies;
+	}
+	
 	private boolean determineIfThisNodeIsUseable(World world) {
 		//There are a lot of possible problems for a fall edge.
 		//TODO move below, when implemented
@@ -131,7 +147,7 @@ public class StateNode implements Comparable<StateNode> {
 				
 		boolean hasEnemyCollision = false;
 		
-		for (int i = 0; i < moveInfo.getPositions().length; i++) {
+		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
 			final float y = parent.yPos - currentPosition.y;
@@ -210,4 +226,17 @@ public class StateNode implements Comparable<StateNode> {
 	public String toString() {
 		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
 	}
+
+	public StateNode getStompVersion(EnemyCollision firstCollision, Node targetNode, World world) {
+		//Need to limit the "lenght" of the movement.
+		moveInfo.setStopTime(firstCollision.tickForCollision);
+		DirectedEdge stompAncestorEdge = ancestorEdge.getStompVersion(targetNode);	//TODO save it in a hash set, so it can be reused.
+		//TODO currently has not hash, set to -1 instead.
+		long stompHash = -1;
+		
+		StateNode stompVersion = new StateNode(targetNode, parent, stompAncestorEdge, parent.livingEnemies, stompHash, world);		
+		return stompVersion;
+	}
+	
+	
 }

@@ -17,7 +17,9 @@ public abstract class DirectedEdge {
 	}
 	
 	public abstract float getMaxY();
-		
+	
+	public abstract float getWeight();
+	
 	protected abstract byte getExtraEdgeHashcode();
 		
 	@Override
@@ -53,4 +55,6 @@ public abstract class DirectedEdge {
 	          "[" + target.x + " : " + target.y + "]" +
 				 " H: " + Math.round(getMaxY()) + "\n";
 	}
+
+	public abstract DirectedEdge getStompVersion(Node targetNode);
 }

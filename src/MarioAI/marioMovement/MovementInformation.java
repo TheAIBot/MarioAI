@@ -20,7 +20,9 @@ public class MovementInformation{
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
 	private final boolean useSuperSpeed;
-	
+	private final int originalTicksForMovement;
+	private int ticksForMovement; //Necessary for stomp to work.
+	boolean hasStomp = false;
 	//position information
 	private final Point2D.Float[] positions;
 	
@@ -29,8 +31,9 @@ public class MovementInformation{
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
 		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
-		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
+		this.originalTicksForMovement = Math.max(totalTicksXMoved, totalTicksJumped); ;
+		this.ticksForMovement = originalTicksForMovement;
 		
 		this.pressXButton = new boolean[getMoveTime()];
 		for (int i = 0; i < xMoveInfo.pressXButton.size(); i++) {
@@ -104,24 +107,24 @@ public class MovementInformation{
 		return actions;
 	}
 	
-	public int getXMovementTime() {
-		return totalTicksXMoved;
-	}
-	
 	public float getXMovementDistance() {
 		return xMovedDistance;
 	}
 	
 	public float getEndSpeed() {
-		return endSpeed;
+		if (ticksForMovement != originalTicksForMovement) {
+			
+		} else return endSpeed;
 	}
 	
 	public int getTotalTicksJumped() {
-		return totalTicksJumped;
+		if (ticksForMovement != originalTicksForMovement) {
+			return Math.min(ticksForMovement, totalTicksJumped);
+		} else return totalTicksJumped;
 	}
 	
 	public int getMoveTime() {
-		return Math.max(totalTicksXMoved, totalTicksJumped);
+		return ticksForMovement;
 	}
 	
 	public Point2D.Float[] getPositions() {
@@ -154,6 +157,9 @@ public class MovementInformation{
 			}
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
 				return false;
+			} 
+			else if (bb.ticksForMovement != ticksForMovement){
+				return false;
 			}
 			else if (bb.useSuperSpeed != useSuperSpeed) {
 				return false;
@@ -174,9 +180,9 @@ public class MovementInformation{
 
 	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastYValue = positions[positions.length - 1].y;
+		final float lastYValue = positions[ticksForMovement - 1].y;
 		
-		for (int i = 0; i < positions.length; i++) { 
+		for (int i = 0; i < ticksForMovement; i++) { //Up to the end of the movement. 
 			final Point2D.Float currentPosition = positions[i];
 			if (world.isColliding(currentPosition, previousPosition, sourceNode, lastYValue)) {
 				return true;
@@ -188,8 +194,8 @@ public class MovementInformation{
 	
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastYValue = positions[positions.length - 1].y;
-		for (int i = 0; i < positions.length; i++) { 
+		final float lastYValue = positions[ticksForMovement - 1].y;
+		for (int i = 0; i < ticksForMovement; i++) { 
 			final Point2D.Float currentPosition = positions[i];
 			if (world.isColliding(currentPosition, previousPosition, startX, startY, lastYValue)) {
 				return true;
@@ -197,5 +203,10 @@ public class MovementInformation{
 			previousPosition = currentPosition;
 		}	
 		return false;
+	}
+
+	public void setStopTime(int tickForCollision) {
+		totalTicksJumped = tickForCollision;
+		return
 	}
 }

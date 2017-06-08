@@ -23,4 +23,9 @@ public class RunningEdge extends DirectedEdge{
 	protected byte getExtraEdgeHashcode() {
 		return 0b0000_0000; //0 represents it being a running edge. Nothing else needed.
 	}
+
+	@Override
+	public DirectedEdge getStompVersion(Node targetNode) {
+		return new RunningEdge(source, targetNode, useSuperSpeed);
+	}
 }

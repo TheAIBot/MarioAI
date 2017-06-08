@@ -47,7 +47,7 @@ public class JumpingEdge extends DirectedEdge {
 	
 	public JumpingEdge(Node source, Node target, int ceiledTopPointY, boolean useSuperSpeed) {
 		this(source, target, useSuperSpeed);
-		this.ceiledTopPointY = ceiledTopPointY + source.y;
+		this.ceiledTopPointY = ceiledTopPointY;
 		this.topPointY = ceiledTopPointY;
 		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
@@ -147,6 +147,11 @@ public class JumpingEdge extends DirectedEdge {
 	
 	public float getParameterC(){
 		return this.c;
+	}
+
+	@Override
+	public DirectedEdge getStompVersion(Node targetNode) {
+		return new JumpingEdge(source, targetNode, ceiledTopPointY, useSuperSpeed);
 	}
 	
 }

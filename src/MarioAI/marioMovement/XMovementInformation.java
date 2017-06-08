@@ -9,13 +9,14 @@ class XMovementInformation {
 	public final ArrayList<Float> xPositions; 
 	public final ArrayList<Boolean> pressXButton;
 	public final boolean useSuperSpeed;
+	private int useNumberOfPosition;
 	
 	public XMovementInformation(float xMovedDistance, 
-								float endSpeed, 
-								int totalTicksXMoved,  
-								ArrayList<Float> xPositions,
-								ArrayList<Boolean> pressXButton,
-								boolean useSuperSpeed) {
+										 float endSpeed, 
+										 int totalTicksXMoved,  
+										 ArrayList<Float> xPositions,
+										 ArrayList<Boolean> pressXButton,
+										 boolean useSuperSpeed) {
 		this.xMovedDistance = xMovedDistance;
 		this.endSpeed = endSpeed;
 		this.totalTicksXMoved = totalTicksXMoved;

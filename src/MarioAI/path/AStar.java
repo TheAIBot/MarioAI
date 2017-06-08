@@ -80,12 +80,12 @@ class AStar {
 			
 			synchronized (lockBestSpeedNode) {
 				
-				final StateNode current = openSet.remove();
-				openSetMap.remove(current.hash);
+				final StateNode currentState = openSet.remove();
+				openSetMap.remove(currentState.hash);
 				
 				// If goal is reached return solution path.
-				if (current.node.equals(goal.node)) {
-					currentBestPathEnd = current;
+				if (currentState.node.equals(goal.node)) {
+					currentBestPathEnd = currentState;
 					foundBestPath = true;
 					return;
 				}
@@ -94,58 +94,58 @@ class AStar {
 				//System.out.println("Current node edges:");
 				//System.out.println(current.node.edges + "\n");
 				// Current node has been explored.
-				final int endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
+				final int endHash = Hasher.hashEndSpeedNode(currentState, hashGranularity);
 				closedSet.add(endHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
 				// Explore each neighbor of current node
-				for (DirectedEdge neighborEdge : current.node.getEdges()) {
-					final StateNode sn = getSpeedNode(neighborEdge, current, world);
+				for (DirectedEdge neighborEdge : currentState.node.getEdges()) {
+					final StateNode nextState = getSpeedNode(neighborEdge, currentState, world);
 					
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
-					final int snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
-					if (closedSet.contains(snEndHash)) {
+					final int nextEndHash = Hasher.hashEndSpeedNode(nextState, hashGranularity);
+					if (closedSet.contains(nextEndHash)) {
 						continue;
 					}
 					
 					// Distance from start to neighbor of current node
-					final int tentativeGScore = current.gScore + sn.getMoveTime();
+					final int tentativeGScore = currentState.gScore + nextState.getMoveTime();
 					
 					//If a similar enough node exists and that has a better g score
 					//then there is no need to add this edge as it's worse than the
 					//current one
-					if (openSetMap.containsKey(snEndHash) &&
-							tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+					if (openSetMap.containsKey(nextEndHash) &&
+							tentativeGScore >= openSetMap.get(nextEndHash).gScore) {
 						continue;
 					}
 					
-					if (!sn.isSpeedNodeUseable()) {
+					if (!nextState.isSpeedNodeUseable()) {
 						continue;
 					}
 					
 					// collision detection and invincibility handling 
 					int penalty = 0;
-					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
+					if (!(nextState.ancestorEdge instanceof AStarHelperEdge)) {
+						//Gives extra information about the collision with an enemy, if it happens.
+						EnemyCollision firstCollision = new EnemyCollision(); 
 						
-						EnemyCollision firstCollision = new EnemyCollision();
-						
-						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight, firstCollision)) {
-							if (firstCollision.isStompType) {
-								addStompState(firstCollision, world, current, goal);	
+						if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
+							if (firstCollision.isStompType) { //Stomping means no lost life.
+								addStompState(firstCollision, world, currentState, nextState, goal);	
 								continue; //The rest is handled in the method above.
 							} else {//He has lost life and gets a penalty:
-								if (sn.lives <= 1) {
-									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
+								if (nextState.lives <= 1) {
+									// if Mario would die if he hits an enemy, with this many lives. 
+									//This node can under no circumstances be used on a path
+									continue; 
 								}
-								int livesLost = (current.lives - sn.lives);
+								int livesLost = (currentState.lives - nextState.lives);
 								penalty = livesLost*PENALTY_SCORE;
 							}
 						}
-					}
-					
-					
-					updateOpenSet(sn, tentativeGScore, goal, penalty, current, snEndHash);
+					}									
+					updateOpenSet(nextState, tentativeGScore, goal, penalty, currentState, nextEndHash);
 				}	
 			}
 		}
@@ -154,8 +154,9 @@ class AStar {
 		foundBestPath = false;
 	}
 	
-	private void addStompState(EnemyCollision firstCollision, World world, StateNode current, StateNode goal) {
-		//TODO when done, go through a discuss.
+	private void addStompState(EnemyCollision firstCollision, World world, StateNode currentState, StateNode wrongNextState, StateNode goal) {
+		
+		//TODO when done, go through and discuss.
 		//Temp test to try to ensure that he lands on enemies:
 		int penalty = -PENALTY_SCORE; 
 		System.out.println("Temp target enemy");
@@ -166,7 +167,8 @@ class AStar {
 		Node[] enemyColumn = world.getColumn(enemyX);
 		Node targetNode;
 		
-		if (enemyColumn != null && enemyColumn[enemyY] != null) { //Ie. the enemy is placed in a block!
+		if ((enemyColumn != null && enemyColumn[enemyY] != null) || 
+			  enemyColumn == null) { //Ie. the enemy is placed in a block! Or the column with it on is not known!
 			throw new Error("Logic error");	
 			//Might not be a total logic error, if the enemy is at a permeable block.   
 			//TODO remove, not needed, after tests
@@ -174,7 +176,7 @@ class AStar {
 			int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
 			//Make a modified speed node to the top of this position,
 	 		//from the former position data.
-			if (world.hasEnemyCollisionNode(enemyNodeHash)) {
+			if (world.hasEnemyCollisionNode(enemyNodeHash)) { //Stomped on this enemy before?
 				targetNode = world.getEnemyCollisionNode(enemyX,enemyY);
 				//Add the target to this speed node
 			} else {
@@ -183,20 +185,27 @@ class AStar {
 				//!!!!!! TODO Ensure no parallel connection with EdgeCreator. Shouldn't happen:
 				//TODO little mistake: might think it is able to run, after the stomp
 				grapher.connectLoneNode(targetNode, world);
-				world.addEnemyCollisionNode(targetNode);											
+				world.addEnemyCollisionNode(targetNode); //To be reused later.						
 			}
 		}	
-		//TODO change hashGranularity to the one desired
+		//TODO change hashGranularity to the one desired	
+		//TODO reuse the speed node.
+		//Do it from the living enemies described above.
 		
-		StateNode stompState = new StateNode(targetNode, current, current.livingEnemies);
+		StateNode stompState = wrongNextState.getStompVersion(firstCollision, targetNode, world);
 		//Make the target equal to targetNode, and finish the creation of the speed node.
 		EnemyPredictor.hitEnemy(firstCollision, stompState);
-		//Do it from the living enemies described above.
-		stompNodeHash = 
-		//TODO change tentativeGScore.
-		updateOpenSet(stompState, tentativeGScore, goal, penalty, current, stompNodeHash);
-		throw new Error("Make this.");
-		continue;
+		final int tentativeGScore = currentState.gScore + stompState.getMoveTime();	
+		long stompNodeHash = Hasher.hashEndSpeedNode(stompState, hashGranularity);
+		
+		//Needs the same A* checks as before:
+		
+		if (closedSet.contains(stompNodeHash) ||
+			(openSetMap.containsKey(stompNodeHash) &&	tentativeGScore >= openSetMap.get(stompNodeHash).gScore)) {
+			//ie, it has already been used, or we have a better version.
+			return;
+		}	else updateOpenSet(stompState, tentativeGScore, goal, penalty, currentState, (int) stompNodeHash);
+		
 		
 		/*
 		closedSet.add(snEndHash); //Ensures
