@@ -115,6 +115,7 @@ class AStar {
 					int penalty = 0;
 					if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 						sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
+						sn.parentXPos = current.currentXPos;
 						
 						if (!sn.isSpeedNodeUseable(world)) {
 							continue;
@@ -122,10 +123,13 @@ class AStar {
 						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+								continue;
+								/*
 								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
 								penalty = PENALTY_SCORE;
+								*/
 							}
 						}
 					}
@@ -158,7 +162,6 @@ class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
-			//System.out.println("DiffX: " + (speedNode.creationXPos - (current.currentXPos + speedNode.getMoveInfo().getXMovementDistance())));
 			return speedNode;
 		}
 		
