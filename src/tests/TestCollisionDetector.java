@@ -394,21 +394,24 @@ public class TestCollisionDetector {
 	}
 	
 	@Test
-	public void testJumpSlow() {
+	public void testJumpRightSlow() {
 		for (int jumpLength = 1; jumpLength <= 4; jumpLength++) {
 			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
-				testJump(jumpLength, jumpHeight, false);
+				testJumpRight(jumpLength, jumpHeight, false);
 			}
 		}
-		testJump(1, 1, false);
 	}
 	@Test
-	public void testJumpFast() {
-		
+	public void testJumpRightFast() {
+		for (int jumpLength = 1; jumpLength <= 4; jumpLength++) {
+			for (int jumpHeight = 1; jumpHeight <= 4; jumpHeight++) {
+				testJumpRight(jumpLength, jumpHeight, true);
+			}
+		}
 	}
-	private void testJump(int jumpLength, int jumpHeight, boolean useSuperSpeed) {
+	private void testJumpRight(int jumpLength, int jumpHeight, boolean useSuperSpeed) {
 		final UnitTestAgent agent = new UnitTestAgent();
-		final Environment observation = TestTools.loadLevel("testCollisionDetector/jumpDown-" + jumpHeight + ".lvl", agent, true, false);
+		final Environment observation = TestTools.loadLevel("testCollisionDetector/jumpDown-" + jumpHeight + ".lvl", agent, false);
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
 		world.initialize(observation);
@@ -431,7 +434,7 @@ public class TestCollisionDetector {
 			final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			
-			ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
+			final ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
 			pathCopy.add(path.get(0));
 			
 			final boolean expectedToHitSomething = !pathCopy.get(0).getMoveInfo().hasCollisions(marioXPos, Math.round(marioYPos), world);
@@ -449,9 +452,6 @@ public class TestCollisionDetector {
 	
 		final MovementInformation moveInfo = path.get(0).getMoveInfo();
 		for (int i = 0; i < moveInfo.getPositions().length; i++) {	
-			if (i == 8) {
-				System.out.println();
-			}
 			marioControls.getNextAction(observation, path);
 			TestTools.runOneTick(observation);
 			
