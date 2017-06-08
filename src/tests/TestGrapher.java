@@ -103,7 +103,7 @@ public class TestGrapher {
 		// Edge node that should only point to right, as there is
 		// nothing to the left:
 		Node currentNode = world[9][marioNode.y];
-		assertEquals(1, currentNode.getNumberOfEdgesOfType(runningEdgeType));
+		assertEquals(2, currentNode.getNumberOfEdgesOfType(runningEdgeType));
 		assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x + 1, currentNode.y,
 				runningEdgeType));
 		// The other nodes to the left are null, and thus a running edge

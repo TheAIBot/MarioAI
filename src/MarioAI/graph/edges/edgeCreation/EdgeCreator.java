@@ -17,7 +17,7 @@ public class EdgeCreator {
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
-	public static final boolean ALLOW_SPEED_KEY = false;
+	public static final boolean ALLOW_SPEED_KEY = true;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {
@@ -42,7 +42,7 @@ public class EdgeCreator {
 		
 		//Then for the unfinished enemy collision nodes:
 		//This code needs to be placed last, see connectLoneNode.
-		for (int i = world.unfinishedEnemyCollisionNodes.size(); i >= 0; i--) {
+		for (int i = world.unfinishedEnemyCollisionNodes.size() - 1; i >= 0; i--) {
 			//Going backwards, depending on the implementation of the list, should be faster:
 			Node currentNode = world.unfinishedEnemyCollisionNodes.get(i);
 			connectLoneNode(currentNode, world);
