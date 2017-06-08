@@ -103,7 +103,7 @@ public class TestAStar {
 				 TestTools.renderLevel(observation);
 				 assertTrue(path != null);
 				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
-			}		
+			}
 			TestTools.runOneTick(observation);
 			numberOfTicks++;
 		}
@@ -275,7 +275,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testTunnelWithEnemyMoreThanOneLife() {
-		setup("straightTunnel", false);
+		setup("straightTunnel", true);
 		TestTools.setMarioPosition(observation, 2, 12);
 		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
 		TestTools.runOneTick(observation);

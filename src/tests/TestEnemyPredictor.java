@@ -78,16 +78,16 @@ public class TestEnemyPredictor {
 	}
 	
 	private void testEnemy(EnemyType enemyType) {
-		testEnemyOnLevel("plainbox.lvl", enemyType);
-		testEnemyOnLevel("bumpybox.lvl", enemyType);
+		testEnemyOnLevel("plainboxV3.lvl", enemyType);
+		//testEnemyOnLevel("bumpybox.lvl", enemyType);
 	}
 	
 	private void testEnemyOnLevel(String levelPath, EnemyType enemyType) {
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
-		Environment observation = TestTools.loadLevel(levelPath, new UnitTestAgent(), false);
+		Environment observation = TestTools.loadLevel(levelPath, new UnitTestAgent(), true);
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 		TestTools.setMarioInvulnerability(observation, true);
-		TestTools.setMarioXPosition(observation, 10);
+		TestTools.setMarioXPosition(observation, 11);
 		TestTools.runOneTick(observation);
 		
 		testEnemy(observation, enemyPredictor, enemyType);
@@ -95,22 +95,27 @@ public class TestEnemyPredictor {
 	
 	private void testEnemy(Environment observation, EnemyPredictor enemyPredictor, EnemyType enemyType) {
 		ArrayList<Sprite> enemies = new ArrayList<Sprite>();
-		enemies.add(TestTools.spawnEnemy(observation, 2, 2, 1, enemyType));
-		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 1, 80, enemyType.name());
-		enemies.clear();
-		
-		enemies.add(TestTools.spawnEnemy(observation, 20, 2, -1, enemyType));
-		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 1, 80, enemyType.name());
-		enemies.clear();
-		
-		enemies.add(TestTools.spawnEnemy(observation, 2, 2, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 2, 3, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 3, 4, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 4, 5, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 5, 2, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 6, 3, 1, enemyType));
-		enemies.add(TestTools.spawnEnemy(observation, 7, 4, 1, enemyType));
+//		enemies.add(TestTools.spawnEnemy(observation, 2, 2, 1, enemyType));
+//		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 1, 80, enemyType.name());
+//		enemies.clear();
+//		
+//		enemies.add(TestTools.spawnEnemy(observation, 20, 2, -1, enemyType));
+//		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 1, 80, enemyType.name());
+//		enemies.clear();
+
+		enemies.add(TestTools.spawnEnemy(observation, 4, 4, 1, enemyType));
 		enemies.add(TestTools.spawnEnemy(observation, 8, 5, 1, enemyType));
+		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 2, 80, enemyType.name());
+		enemies.clear();
+		
+		enemies.add(TestTools.spawnEnemy(observation, 2, 2, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 3, 3, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 4, 4, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 5, 5, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 6, 6, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 7, 7, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 8, 8, 1, enemyType));
+		enemies.add(TestTools.spawnEnemy(observation, 9, 9, 1, enemyType));
 		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 8, 80, enemyType.name());
 		enemies.clear();
 		
@@ -144,7 +149,7 @@ public class TestEnemyPredictor {
 		testNoRemovalOfEnemyAndPrediction(observation, enemyPredictor, enemies, 16, 80, enemyType.name());
 		enemies.clear();
 	}
-		
+	
 	private void testNoRemovalOfEnemyAndPrediction(Environment observation, EnemyPredictor enemyPredictor, ArrayList<Sprite> enemies, int enemyCount, int testTime, String enemyName) {
 		for (int i = 0; i < 3; i++) {
 			TestTools.runOneTick(observation);
@@ -154,28 +159,45 @@ public class TestEnemyPredictor {
 		
 		final ArrayList<Point2D.Float[]> predictedPositions = new ArrayList<Point2D.Float[]>();
 		for (EnemySimulator enemy : enemyPredictor.getEnemies()) {
-			for (int i = 0; i < enemyCount; i++) {
-				final Point2D.Float[] enemyPredictedPositions = new Point2D.Float[testTime];
-				
-				for (int j = 0; j < testTime; j++) {
-					enemyPredictedPositions[j] = enemy.getPositionAtTime(j + 1);
-				}
-				
-				predictedPositions.add(enemyPredictedPositions);
+			final Point2D.Float[] enemyPredictedPositions = new Point2D.Float[testTime];
+			
+			for (int j = 0; j < testTime; j++) {
+				enemyPredictedPositions[j] = enemy.getPositionAtTime(j + 1);
 			}
+			
+			predictedPositions.add(enemyPredictedPositions);
 		}
 		
 		for (int i = 0; i < 80; i++) {
+			if (i==15) {
+				System.out.println("i=" + i);
+			}
+
 			TestTools.runOneTick(observation);
 			final float[] enemyArray = observation.getEnemiesFloatPos();
-			enemyPredictor.updateEnemies(enemyArray);
-			
+			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+
+
 			final int currentEnemyCount = enemyArray.length / EnemyPredictor.FLOATS_PER_ENEMY;
 			
+			if (enemyArray.length == 0) {
+				System.out.println("ENEMYARRAY HAR LÆNGDE 0");
+			}
+			if (currentEnemyCount != enemyPredictor.getEnemies().size()) {
+				System.out.println("asd");
+			}
 			assertEquals("Lost " + enemyName + " after " + i + " ticks", currentEnemyCount, enemyPredictor.getEnemies().size());
 			
-			int removedEnemies = currentEnemyCount -  enemyPredictor.getEnemies().size();
-			for (Point2D.Float[] simulatedEnemyPositions : predictedPositions) {
+			int removedEnemies = currentEnemyCount - enemyPredictor.getEnemies().size();
+			if (enemyArray.length == 0 && removedEnemies == 0) {
+				break;
+			}
+			int enemiesLeftToFind = enemyArray.length / 3;
+			for (int q = 0; q < predictedPositions.size(); q++) {
+				Point2D.Float[] simulatedEnemyPositions = predictedPositions.get(q);
+				if (enemiesLeftToFind == 0) {
+					break;
+				}
 				boolean foundEnemyPosition = false;
 				for (int j = 0; j < enemyArray.length; j += EnemyPredictor.FLOATS_PER_ENEMY) {
 					final float deltaX = Math.abs(simulatedEnemyPositions[i].x - enemyArray[j + EnemyPredictor.X_OFFSET]);
@@ -185,16 +207,24 @@ public class TestEnemyPredictor {
 						deltaY < EnemyPredictor.ACCEPTED_POSITION_DEVIATION) {
 						foundEnemyPosition = true;
 						break;
+					} else {
+						System.out.println();
 					}
 				}
+
 				if (!foundEnemyPosition) {
-					if (removedEnemies > 0) {
+					/*if (removedEnemies > 0) {
 						removedEnemies--;
-					}
-					else {
-						Assert.fail("Enemy simulator position didn't match any enemy position");	
-					}
+						enemiesLeftToFind--;
+					}*/
 				}
+				else {
+					enemiesLeftToFind--;
+				}
+			}
+			if (enemiesLeftToFind > 0) {
+				Assert.fail("Enemy simulator position didn't match any enemy position");	
+				
 			}
 		}
 		

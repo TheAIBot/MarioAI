@@ -27,7 +27,7 @@ class AStar {
 	private boolean foundBestPath = false;
 	private final Object lockBestSpeedNode = new Object();
 	
-	private static final int PENALTY_SCORE = 9000; // arbitrary high value;
+	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
@@ -89,10 +89,12 @@ class AStar {
 				closedSet.add(endHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
+				
+				
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : current.node.getEdges()) {
 					final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
-					
+
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
 					final long snEndHash = Hasher.hashEndSpeedNode(sn, hashGranularity);
@@ -121,6 +123,10 @@ class AStar {
 							continue;
 						}
 						
+//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//							continue;
+//						}
+						
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 								continue;
@@ -133,21 +139,27 @@ class AStar {
 							}
 						}
 					}
+					// The current best speednode is the one furthest to the right
+					// (disregarding if it passes through an enemy or not).
+					if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
+						currentBestPathEnd = current;
+					}
+					//currentBestPathEnd = openSet.peek();
 					
 					
-					//Update the edges position in the priority queue
-					//by updating the scores and taking it in and out of the queue.
+					// Update the edges position in the priority queue
+					// by updating the scores and taking it in and out of the queue.
 					if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 					sn.gScore = tentativeGScore;
 					sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
 					sn.parent = current;
 					openSet.add(sn);
 					openSetMap.put(snEndHash, sn);
-				}	
+				}
 			}
 		}
 		
-		currentBestPathEnd = null;
+		//currentBestPathEnd = null;
 		foundBestPath = false;
 	}
 	
@@ -183,12 +195,7 @@ class AStar {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
-			if (foundBestPath) {
-				return new AStarPath(currentBestPathEnd, true, hashGranularity);
-			}
-			else {
-				return new AStarPath(openSet.peek(), false, hashGranularity);
-			}
+			return new AStarPath(currentBestPathEnd, true, hashGranularity);
 		}
 	}
 	

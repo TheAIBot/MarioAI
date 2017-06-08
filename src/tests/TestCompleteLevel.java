@@ -61,6 +61,16 @@ public class TestCompleteLevel {
 		assertEquals(MARIO_WON, testLevel("jumpLevels/semiAdvancedJumpingCourse"));
 	}
 	
+	@Test
+	public void testTheMaze() {
+		assertEquals(MARIO_WON, testLevel("theMaze"));
+	}
+	
+	@Test
+	public void testDropDown1() {
+		assertEquals(MARIO_WON, testLevel("dropDown1"));
+	}
+	
 }
 
 
