@@ -591,4 +591,16 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public void setMarioXPosition(int x) {
 		mario.setXPosition(x);
 	}
+	
+	public void setMarioPixelPosition(int x, int y) {
+		mario.setPixelPosition(x, y);
+	}
+	
+	public void setMarioXPixelPosition(int x) {
+		mario.setXPixelPosition(x);
+	}
+	
+	public void resetMarioSpeed() {
+		mario.resetSpeed();
+	}
 }

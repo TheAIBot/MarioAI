@@ -16,8 +16,9 @@ public class World {
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
+	public static final int PIXELS_PER_BLOCK = 16;
 	private static final int MARIO_START_X_POS = 2;
-
+	
 	private final CollisionDetection collisionDetection = new CollisionDetection();
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
 	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
@@ -180,12 +181,12 @@ public class World {
 		}
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode){
-		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, this);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastY){
+		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, lastY, this);
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY){
-		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, this);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastY){
+		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, lastY, this);
 	}
 	
 	public boolean hasGoalNodesChanged() {
