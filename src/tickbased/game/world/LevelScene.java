@@ -1,14 +1,8 @@
 package tickbased.game.world;
 
-import java.awt.Image;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.idsia.mario.engine.Generalizer;
-import ch.idsia.mario.environments.Environment;
-import ch.idsia.utils.MathX;
 import tickbased.game.enemies.BulletBill;
 import tickbased.game.enemies.CoinAnim;
 import tickbased.game.enemies.FireFlower;
@@ -116,15 +110,17 @@ public class LevelScene implements SpriteContext
 	}
     
 	public void init() {
-		try {
-			//Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
-			//Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("C:/Users/ELL/Documents/GitHub/MarioAI/tiles.dat")));
-			Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("tiles.dat")));
-		} catch (IOException e) {
-			System.out.println("fejl ved at loade tiles.dat");
-			e.printStackTrace();
-			System.exit(0);
-		}
+//		try {
+//			//Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")));
+//			//Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("C:/Users/ELL/Documents/GitHub/MarioAI/tiles.dat")));
+//			Level.loadBehaviors(new DataInputStream(LevelScene.class.getResourceAsStream("tiles.dat")));
+//		} catch (IOException e) {
+//			System.out.println("fejl ved at loade tiles.dat");
+//			e.printStackTrace();
+//			System.exit(0);
+//		}
+		
+		Level.loadTilesData();
 		
 		level = new Level(1000, 15);
 		
@@ -138,7 +134,8 @@ public class LevelScene implements SpriteContext
 		startTime = 1;
 
 		timeLeft = totalTime * 15;
-
+		
+		//tick = 0;
 		tick = 1;
 	}
     

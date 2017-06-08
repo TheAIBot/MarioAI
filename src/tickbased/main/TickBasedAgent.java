@@ -14,30 +14,31 @@ import tickbased.search.TickProblem;
 
 public class TickBasedAgent implements Agent {
 	protected String name = "TickBasedAgent";
+	boolean[] action;
 	
 	AStarTickBased aStar;
 	TickProblem problem;
+	Iterator<Action> iter;
 	
 	List<Action> plan;
-	Iterator<Action> iter;
 	
 	public TickBasedAgent() {
 		reset();
 	}
 
 	public boolean[] getAction(Environment observation) {
+		long startTime = System.currentTimeMillis();
 		problem.updateLevel(observation);
 		
 		if (aStar.finishedNewRun) {
-			plan = aStar.runAStar(problem);
+			plan = aStar.runAStar(problem, startTime);
 			iter = plan.iterator();
 		}
 		
 		if (plan == null || plan.size() == 0) {
-			boolean[] action = new boolean[Environment.numberOfButtons];
-	        action[Mario.KEY_RIGHT] = true;
-	        action[Mario.KEY_SPEED] = true;
-	        action[Mario.KEY_JUMP] = true;
+//	        action[Mario.KEY_RIGHT] = true;
+//	        action[Mario.KEY_SPEED] = true;
+//	        action[Mario.KEY_JUMP] = true;
 	        return action;
 		}
 		
@@ -58,6 +59,8 @@ public class TickBasedAgent implements Agent {
 
 	@Override
 	public void reset() {
+		action = new boolean[Environment.numberOfButtons];
+		
 		aStar = new AStarTickBased();
 		problem = new TickProblem();
 		
@@ -66,7 +69,7 @@ public class TickBasedAgent implements Agent {
 		
 		problem.initialState = new Node(levelScene);
 		problem.goalState = new Node(levelScene);
-		((Node) problem.goalState).x = 15;
+		((Node) problem.goalState).x = 100;
 		
 		plan = null;
 		iter = null;

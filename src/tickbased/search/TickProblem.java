@@ -17,9 +17,9 @@ import tickbased.main.State;
 
 public class TickProblem extends Problem {
 
-	private static final float MAX_RIGHT = 200;
+	private static final float MAX_RIGHT = 200 * 16;
 	private static final int SCREEN_WIDTH = 22, SCREEN_HEIGHT = 15; // TODO
-	public int maxRightSeenSoFar = 10; // TODO
+	public int maxRightSeenSoFar = 15 * 16; // TODO
 	public LevelScene levelScene;
 	public List<Sprite> sprites = new ArrayList<Sprite>();
 
@@ -29,23 +29,28 @@ public class TickProblem extends Problem {
 		
 		List<Action> actions = new ArrayList<Action>();
 
-		// move right
-		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
-		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
-
-		// move left
-		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
-		actions.add(new MarioAction(node, createAction(true, false, false, false, true)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
-
-		// jump straight up
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
+//		// move right
+//		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
+//		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
+//
+//		// move left
+//		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+//		actions.add(new MarioAction(node, createAction(true, false, false, false, true)));
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
+//
+//		// jump straight up
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
+//		
+//		// stand still and jump
+//		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
 		
-		// stand still and jump
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
+		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
+		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
+		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
 		
 		return actions;
 	}
@@ -146,7 +151,9 @@ public class TickProblem extends Problem {
         	boolean hasFoundEnemy = false;
         	for (Sprite spr : sprites) {
         		// check if enemy has been seen previously
-        		if (Math.abs(spr.x - x) < delta && Math.abs(spr.y - y) < delta && spr.kind == kind) {
+        		if (Math.abs(spr.x - x) < delta && Math.abs(spr.y - y) < delta && spr.kind == kind
+        			&& spr.kind != Sprite.KIND_SHELL
+	        		&& spr.kind != Sprite.KIND_BULLET_BILL) {
         			if (!spr.hasFacingBeenSet) { // if enemy.facing has not been set previously
         				((Enemy) spr).facing = (spr.x - x > 0) ? 1 : -1;
         			}
