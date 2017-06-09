@@ -70,18 +70,9 @@ public abstract class EnemySimulator {
 				}
 			//}
 		}
-<<<<<<< HEAD
 		return positionAtTime.get(time+positionsIndexOffset);
 	}
-
-	public int getWidthInPixels() {
-		return widthInPixels;
-	}
-
-	public int getHeightInPixels() {
-		return heightInPixels;
-	}
-
+	
 	/** Based on the normal enemies code. Returns true if a stomp would happen, else false.
 	 * 
 	 * @param time
@@ -92,8 +83,8 @@ public abstract class EnemySimulator {
 		float xMarioD = marioX*16 - x*16;
 		float yMarioD = marioY*16 - y*16;
 		//float w = 16;
-		if (xMarioD > -(widthInPixels/2) * 2 - 4 && xMarioD < (widthInPixels/2) * 2 + 4 &&
-			 yMarioD > -heightInPixels 			  && yMarioD < marioHeight*16) { //*16 to get it in pixels.
+		if (xMarioD > -(width/2) * 2 - 4 && xMarioD < (width/2) * 2 + 4 &&
+			 yMarioD > -height 			  	&& yMarioD < marioHeight*16) { //*16 to get it in pixels.
 			if (!(this instanceof WalkingEnemySimulator && 
 				 ((WalkingEnemySimulator) this).type != WalkingEnemySimulator.ENEMY_SPIKY)){
 				if (movingDownwards && yMarioD <= 0	&& isOrWasNotOnGround){
@@ -102,8 +93,6 @@ public abstract class EnemySimulator {
 			}
 		} 
 		return false;
-	}
-
 	}
 
 	public float getWidth() {
