@@ -350,10 +350,10 @@ public class MarioControls {
 	}
 	
 	private static void getDriftingPositions(final float speed, final int driftTime, final float startXPosition, final int startSize, final float[] xPositions) {
-		float xMoved = 0;
+		float xMoved = startXPosition;
 		for (int i = startSize; i < startSize + driftTime; i++) {	
 			xMoved += getNextDriftingDistance(speed, i - startSize);
-			xPositions[i] = startXPosition + xMoved;
+			xPositions[i] = xMoved;
 		}
 	}
 	
