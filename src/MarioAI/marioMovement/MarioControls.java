@@ -335,10 +335,11 @@ public class MarioControls {
 		return Math.abs(newSpeed) < MIN_MARIO_SPEED ? 0f : newSpeed;
 	}
 	
-	private static float getDriftingDistance(final float speed, final int driftTime) {
+	private static float getDriftingDistance(float speed, final int driftTime) {
 		float driftDistance = 0;
-		for (int i = 0; i < driftTime; i++) {				
-			driftDistance += getNextDriftingDistance(speed, i);
+		for (int i = 0; i < driftTime; i++) {
+			speed = getNextDriftingSpeed(speed);
+			driftDistance += speed;
 		}
 		return driftDistance;
 	}
@@ -349,21 +350,18 @@ public class MarioControls {
 		return getLastSpeedDrifting(speed, distanceMoved, xPositions,  startSize);
 	}
 	
-	private static void getDriftingPositions(final float speed, final int driftTime, final float startXPosition, final int startSize, final float[] xPositions) {
+	private static void getDriftingPositions(float speed, final int driftTime, final float startXPosition, final int startSize, final float[] xPositions) {
 		float xMoved = startXPosition;
-		for (int i = startSize; i < startSize + driftTime; i++) {	
-			xMoved += getNextDriftingDistance(speed, i - startSize);
+		for (int i = startSize; i < startSize + driftTime; i++) {
+			speed = getNextDriftingSpeed(speed);
+			xMoved += speed;
 			xPositions[i] = xMoved;
 		}
 	}
 	
-	private static float getNextDriftingDistance(float speed, float ticksDrifting) {
-		final float a = speed;
-		final float b = -0.11653355831586142f;
-		final float c = -0.00000056420864292f;
-		final float currentSpeed = (float) (a * Math.exp(b * (ticksDrifting + 1)) + c);
-		
-		return (currentSpeed <= MIN_MARIO_SPEED) ? 0 : currentSpeed;
+	private static float getNextDriftingSpeed(float speed) {
+		speed = 0.89f * speed;
+		return (speed <= MIN_MARIO_SPEED)? 0 : speed;
 	}
 	
 	private static float getLastSpeedDrifting(float speed, float distanceMoved, final float[] driftPositions, int initialSize) {
