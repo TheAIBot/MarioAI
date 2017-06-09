@@ -37,22 +37,22 @@ public class MovementInformation{
 		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
 	}
 	
-	private Point2D.Float[] getCombinedXYMovementPositions(ArrayList<Float> x, float[] y, int moveTime) {
+	private Point2D.Float[] getCombinedXYMovementPositions(float[] x, float[] y, int moveTime) {
 		final Point2D.Float[] combinedPositions = new Point2D.Float[moveTime];
 		
-		for (int i = 0; i < Math.max(x.size(), y.length); i++) {
+		for (int i = 0; i < Math.max(x.length, y.length); i++) {
 			float xPos;
 			float yPos;
 			
-			if (x.size() == 0) {
+			if (x.length == 0) {
 				xPos = 0;
 			}
-			else if (x.size() <= i) {
+			else if (x.length <= i) {
 				throw new Error("not enough x positions for the movement");
 				//xPos = x.get(x.size() - 1);
 			}
 			else {
-				xPos = x.get(i);
+				xPos = x[i];
 			}
 			
 			if (y.length == 0) {
