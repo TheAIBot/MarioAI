@@ -57,9 +57,9 @@ public class EnemyPredictor {
 				firstCollison.enemy = enemySimulation;
 				firstCollison.tickForCollision = time;
 				firstCollison.indexEnemy = i;
-				//if(enemySimulation.stomp(time, marioHeight,marioXInPixels, marioYInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
-				//	firstCollison.isStompType = true;
-				//}
+				if(enemySimulation.stomp(time, marioHeight,marioXInPixels, marioYInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
+					firstCollison.isStompType = true;
+				}
 				return true;
 			}
 		}
