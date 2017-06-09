@@ -123,21 +123,22 @@ class AStar {
 							continue;
 						}
 						
-//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-//							continue;
-//						}
-						
+						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+							continue;
+						}
+						/*
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 								continue;
-								/*
+								
 								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
 								penalty = PENALTY_SCORE;
-								*/
+								
 							}
 						}
+						 */
 					}
 					// The current best speednode is the one furthest to the right
 					// (disregarding if it passes through an enemy or not).

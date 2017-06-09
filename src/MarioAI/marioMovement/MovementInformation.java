@@ -170,7 +170,7 @@ public class MovementInformation{
 		}
 	}
 
-	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.
+	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
 		Point2D.Float previousPosition = new Point2D.Float(0, 0);
 		final float lastY = positions[positions.length - 1].y;
 		for (int i = 0; i < positions.length; i++) { 
