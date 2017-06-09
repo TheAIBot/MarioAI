@@ -2,6 +2,9 @@ package MarioAI.enemySimuation.simulators;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.World;
+import MarioAI.enemySimuation.EnemyPredictor;
+
 public class BulletBillSimulator extends EnemySimulator
 {
     private int facing;
@@ -22,6 +25,18 @@ public class BulletBillSimulator extends EnemySimulator
 
         xa = facing * sideWaysSpeed;
         x += xa;
+    }
+    
+    @Override
+    public boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight)
+    {    	
+        final float xMarioD = marioX - enemyX;
+        final float yMarioD = marioY - enemyY;
+        
+        return (xMarioD > -16 && 
+        		xMarioD < 16 && 
+        		yMarioD > -height && 
+        		yMarioD < marioHeight);
     }
 
 	@Override

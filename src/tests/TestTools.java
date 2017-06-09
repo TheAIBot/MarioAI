@@ -193,4 +193,8 @@ public class TestTools {
 	public static int getMarioInvulnerableTime(Environment observation) {
 		return ((MarioComponent)observation).getMarioInvulnerableTime();
 	}
+	
+	public static void resetMarioHealth(Environment observation) {
+		((MarioComponent)observation).resetMarioHealth();
+	}
 }

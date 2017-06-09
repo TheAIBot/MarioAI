@@ -32,7 +32,6 @@ public class TestEnemyPredictor {
 	public void testPredictingRedKoopaFromCopy() {
 		testEnemy(EnemyType.RED_KOOPA, true);
 	}
-	
 	@Test
 	public void testPredictingRedKoopaWinged() {
 		testEnemy(EnemyType.RED_KOOPA.asWinged(), false);
@@ -50,7 +49,6 @@ public class TestEnemyPredictor {
 	public void testPredictingGreenKoopaFromCopy() {
 		testEnemy(EnemyType.GREEN_KOOPA, true);
 	}
-	
 	@Test
 	public void testPredictingGreenKoopaWinged() {
 		testEnemy(EnemyType.GREEN_KOOPA.asWinged(), false);
@@ -68,7 +66,6 @@ public class TestEnemyPredictor {
 	public void testPredictingGoombaFromCopy() {
 		testEnemy(EnemyType.GOOMBA, true);
 	}
-	
 	@Test
 	public void testPredictingGoombaWinged() {
 		testEnemy(EnemyType.GOOMBA.asWinged(), false);
@@ -86,7 +83,6 @@ public class TestEnemyPredictor {
 	public void testPredictingSpikyFromCopy() {
 		testEnemy(EnemyType.SPIKY, true);
 	}
-	
 	@Test
 	public void testPredictingSpikyWinged() {
 		testEnemy(EnemyType.SPIKY.asWinged(), false);
@@ -273,13 +269,208 @@ public class TestEnemyPredictor {
 	}
 	
 	@Test
-	public void asd() {
-		fisk(1, 2, false, EnemyType.GOOMBA);
+	public void testRedKoopaCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_KOOPA, false);
+			}
+		}
+	}
+	@Test
+	public void testRedKoopaCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_KOOPA, true);
+			}
+		}
+	}
+	@Test
+	public void testRedKoopaCollisionBoxWinged() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_KOOPA.asWinged(), false);
+			}
+		}
+	}
+	@Test
+	public void testRedKoopaCollisionBoxWingedFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_KOOPA.asWinged(), true);
+			}
+		}
 	}
 	
-	private void fisk(int xDistance, int jumpHeight, boolean useSuperSpeed, EnemyType enemyType) {
+	@Test
+	public void testGreenKoopaCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_KOOPA, false);
+			}
+		}
+	}
+	@Test
+	public void testGreenKoopaCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_KOOPA, true);
+			}
+		}
+	}
+	@Test
+	public void testGreenKoopaCollisionBoxWinged() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_KOOPA.asWinged(), false);
+			}
+		}
+	}
+	@Test
+	public void testGreenKoopaCollisionBoxWingedFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_KOOPA.asWinged(), true);
+			}
+		}
+	}
+	
+	@Test
+	public void testGoombaCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GOOMBA, false);
+			}
+		}
+	}
+	@Test
+	public void testGoombaCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GOOMBA, true);
+			}
+		}
+	}
+	@Test
+	public void testGoombaCollisionBoxWinged() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GOOMBA.asWinged(), false);
+			}
+		}
+	}
+	@Test
+	public void testGoombaCollisionBoxWingedFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GOOMBA.asWinged(), true);
+			}
+		}
+	}
+	
+	@Test
+	public void testSpikyCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.SPIKY, false);
+			}
+		}
+	}
+	@Test
+	public void testSpikyCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.SPIKY, true);
+			}
+		}
+	}
+	@Test
+	public void testSpikyCollisionBoxWinged() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.SPIKY.asWinged(), false);
+			}
+		}
+	}
+	@Test
+	public void testSpikyCollisionBoxWingedFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.SPIKY.asWinged(), true);
+			}
+		}
+	}
+	
+	@Test
+	public void testFlowerCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.FLOWER, false);
+			}
+		}
+	}
+	@Test
+	public void testFlowerCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.FLOWER, true);
+			}
+		}
+	}
+	
+	@Test
+	public void testRedShellCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_SHELL, false);
+			}
+		}
+	}
+	@Test
+	public void testRedShellCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.RED_SHELL, true);
+			}
+		}
+	}
+	
+	@Test
+	public void testGreenShellCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_SHELL, false);
+			}
+		}
+	}
+	@Test
+	public void testGreenShellCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.GREEN_SHELL, true);
+			}
+		}
+	}
+	
+	@Test
+	public void testBulletBillCollisionBox() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.BULLET_BILL, false);
+			}
+		}
+	}
+	@Test
+	public void testBulletBillCollisionBoxFromCopy() {
+		for (int xDistance = 1; xDistance < 4; xDistance++) {
+			for (int jumpHeight = 0; jumpHeight < 4; jumpHeight++) {
+				checkCollisionBoxForEnemy(xDistance, jumpHeight, EnemyType.BULLET_BILL, true);
+			}
+		}
+	}
+	
+	private void checkCollisionBoxForEnemy(int xDistance, int jumpHeight, EnemyType enemyType, boolean makeCopy) {
 		final UnitTestAgent agent = new UnitTestAgent();
-		final Environment observation = TestTools.loadLevel("testEnemyPredictor/flat.lvl", agent, true);
+		final Environment observation = TestTools.loadLevel("testEnemyPredictor/flat.lvl", agent, false);
 		final World world = new World();
 		final MarioControls marioControls = new MarioControls();
 		final EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -287,29 +478,25 @@ public class TestEnemyPredictor {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 		
 
-		final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, xDistance, jumpHeight, -jumpHeight, 1, world, useSuperSpeed);
+		final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, xDistance, jumpHeight, 0, 1, world, false);
 		
-		testJumpRight(observation, agent, world, marioControls, enemyPredictor, path, enemyType, xDistance);
+		testJumpRight(observation, agent, world, marioControls, enemyPredictor, path, enemyType, xDistance, makeCopy);
 	}
 	
-	private void testJumpRight(Environment observation, UnitTestAgent agent, World world, MarioControls marioControls, EnemyPredictor enemyPredictor, ArrayList<DirectedEdge> path, EnemyType enemyType, int xDistance) {
+	private void testJumpRight(Environment observation, UnitTestAgent agent, World world, MarioControls marioControls, EnemyPredictor enemyPredictor, ArrayList<DirectedEdge> path, EnemyType enemyType, int xDistance, boolean makeCopy) {
 		
 		final int startXPixel = (4 - xDistance) * World.PIXELS_PER_BLOCK;
-		final int endXPixel = 7 * World.PIXELS_PER_BLOCK;
+		final int endXPixel = 6 * World.PIXELS_PER_BLOCK;
 		
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		for (int i = startXPixel; i <= endXPixel; i++) {
 			TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
 			TestTools.resetMarioSpeed(observation);
+			TestTools.resetMarioHealth(observation);
 			final Sprite enemy = TestTools.spawnEnemy(observation, (startXPixel / 16) + 4, (int)startMarioYPos, -1, enemyType);
-			for (int j = 0; j < 3; j++) {
-				TestTools.runOneTick(observation);
-				enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
-			}
+			final EnemyPredictor potentialEnemyPredictorCopy = findEnemies(observation, enemyPredictor, makeCopy);
 			
-			TestTools.runOneTick(observation);
-			TestTools.runOneTick(observation);
 			world.update(observation);
 			marioControls.reset();
 			
@@ -322,7 +509,10 @@ public class TestEnemyPredictor {
 			boolean expectedToHitSomething = false;
 			for (int j = 0; j < pathCopy.get(0).getMoveInfo().getMoveTime(); j++) {
 				final Point2D.Float currentOffset = pathCopy.get(0).getMoveInfo().getPositions()[j];
-				expectedToHitSomething = enemyPredictor.hasEnemy(marioXPos + currentOffset.x, marioYPos + currentOffset.y, MarioMethods.MARIO_WIDTH, 2, j + 1);
+				
+				final float expectedMarioXPos = marioXPos + currentOffset.x;
+				final float expectedMarioYPos = marioYPos - currentOffset.y;
+				expectedToHitSomething = potentialEnemyPredictorCopy.hasEnemy(expectedMarioXPos, expectedMarioYPos, MarioMethods.MARIO_WIDTH, 2, j + 1);
 				
 				if (expectedToHitSomething) {
 					break;
@@ -334,6 +524,10 @@ public class TestEnemyPredictor {
 			assertEquals(expectedToHitSomething, actualHitSomething);
 			
 			TestTools.removeEnemy(observation, enemy);
+			
+			if (expectedToHitSomething && actualHitSomething) {
+				break;
+			}
 		}
 	}
 	
@@ -356,14 +550,16 @@ public class TestEnemyPredictor {
 			final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 			
+			final int marioInvulnerabilityTime = TestTools.getMarioInvulnerableTime(observation);
+			
 			if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos) ||
-				TestTools.getMarioInvulnerableTime(observation) > 0) {
+				marioInvulnerabilityTime > 0) {
 				Arrays.fill(agent.action, false);
-				return false;
+				return true;
 			}
 		}
 		Arrays.fill(agent.action, false);
-		return true;
+		return false;
 	}
 	
 	private boolean withinAcceptableError(float a1, float b1, float a2, float b2) {

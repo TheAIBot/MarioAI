@@ -738,4 +738,8 @@ public class Mario extends Sprite {
 	public int getInvulnerableTime() {
 		return invulnerableTime;
 	}
+
+	public void resetMarioHealth() {
+		setLarge(true, true);
+	}
 }

@@ -607,4 +607,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public int getMarioInvulnerableTime() {
 		return mario.getInvulnerableTime();
 	}
+	
+	public void resetMarioHealth() {
+		mario.resetMarioHealth();
+	}
 }

@@ -2,8 +2,10 @@ package MarioAI.enemySimuation.simulators;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
+import ch.idsia.mario.engine.sprites.Shell;
 
 
 public class WalkingEnemySimulator extends EnemySimulator
@@ -177,6 +179,18 @@ public class WalkingEnemySimulator extends EnemySimulator
         }
 
         return world.level.isBlocking(x, y, xa, ya);
+    }
+    
+    @Override
+    public boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight)
+    {
+        final float xMarioD = marioX - enemyX;
+        final float yMarioD = marioY - enemyY;
+        
+        return (xMarioD > -width*2-4 && 
+        		xMarioD < width*2+4 &&
+        		yMarioD > -height && 
+        		yMarioD < marioHeight);
     }
 
 	@Override

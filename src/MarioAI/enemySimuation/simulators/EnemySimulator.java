@@ -24,6 +24,8 @@ public abstract class EnemySimulator {
     
     protected abstract void move();
     
+    public abstract boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight);
+    
     public abstract EnemySimulator copy();
 	
     public int getKind() {
