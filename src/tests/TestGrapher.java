@@ -62,7 +62,7 @@ public class TestGrapher {
 	public World flatlandWorld() {
 		EdgeCreator grapher = new EdgeCreator();
 		World graph = getStartLevelWorld("flat.lvl");
-		grapher.setMovementEdges(graph, marioNode);
+		//grapher.setMovementEdges(graph, marioNode);
 		return graph;
 	}
 
@@ -132,9 +132,7 @@ public class TestGrapher {
 	public void testCanJumpRight() {
 		World graph = totalFlatland(flatlandWorld(), marioNode);
 		grapher.setMovementEdges(graph, marioNode);
-		boolean[] possibleJumpLenghts = new boolean[5];// 5 for the five
-								// different
-								// jump lengths
+		boolean[] possibleJumpLenghts = new boolean[(int) EdgeCreator.MAX_JUMP_RANGE];//
 		for (DirectedEdge edge : marioNode.getEdges()) {
 			if (edge instanceof JumpingEdge) {
 				JumpingEdge polynomialEdge = (JumpingEdge) edge;
@@ -168,7 +166,7 @@ public class TestGrapher {
 			}
 		}
 		for (int i = 0; i < possibleJumpLenghts.length; i++) {
-			assertTrue("Failure at lenght " + (i + 1), possibleJumpLenghts[i]);
+			assertTrue("Failure at lenght " + (i + 1) + ", have array: " + Arrays.toString(possibleJumpLenghts), possibleJumpLenghts[i]);
 		}
 	}
 
@@ -265,18 +263,14 @@ public class TestGrapher {
 	
 	@Test
 	public void testAbleToJumpUpThroughCertainMaterials() {
-		EdgeCreator grapher = new EdgeCreator();
 		World graph = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] world = graph.getLevelMatrix();
 		for (int i = 0; i < world.length; i++) {
 			world[i][(short) (marioNode.y - 3)] = new Node(getXPositionFromColoumn(marioNode, i),
 					(short) (marioNode.y - 3), (byte) -11);
 		}
-		grapher.setMovementEdges(graph, marioNode); // TODO remove -1
-								// after adding
-								// possibility
-								// for left
-								// jump.
+		// TODO remove -1 after adding  possibility for left jump.
+		grapher.setMovementEdges(graph, marioNode); 
 		for (int i = 0; i < world.length; i++) {
 			boolean hasEdgeToUpperLevel = false;
 			for (DirectedEdge edge : world[i][marioNode.y].getEdges()) {
