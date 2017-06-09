@@ -42,7 +42,7 @@ public class EdgeCreator {
 		
 		//Then for the unfinished enemy collision nodes:
 		//This code needs to be placed last, see connectLoneNode.
-		for (int i = world.unfinishedEnemyCollisionNodes.size(); i >= 0; i--) {
+		for (int i = world.unfinishedEnemyCollisionNodes.size() - 1; i >= 0; i--) {
 			//Going backwards, depending on the implementation of the list, should be faster:
 			Node currentNode = world.unfinishedEnemyCollisionNodes.get(i);
 			connectLoneNode(currentNode, world);

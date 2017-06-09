@@ -140,7 +140,7 @@ class AStar {
 							//TODO look at this
 							continue;
 						}*/
-						
+						/*
 						//Gives extra information about the collision with an enemy, if it happens.
 						EnemyCollision firstCollision = new EnemyCollision(); 
 						
@@ -157,7 +157,8 @@ class AStar {
 								int livesLost = (currentState.lives - nextState.lives);
 								penalty = livesLost*PENALTY_SCORE;
 							}
-						}									
+						}
+*/								
 					}
 					
 					// Update the edges position in the priority queue
