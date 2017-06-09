@@ -403,9 +403,9 @@ public class EncodeBase64 {
                                  (byte)'g', (byte)'q', (byte)'v', (byte)'g', (byte)'@', (byte)'!', (byte)'+', (byte)'y',
                                  (byte)'h', (byte)'#', (byte)'c', (byte)'u', (byte)'j', (byte)'"', (byte)'p', (byte)'t',
                                  (byte)'8', (byte)'e', (byte)'d', (byte)'i', (byte)'.', (byte)'$', (byte)'l', (byte)'f',
-                                 (byte)'i', (byte)'g', (byte)'t', (byte)'o', (byte)'�', (byte)'%', (byte)'o', (byte)'8',
-                                 (byte)'?', (byte)'6', (byte)'6', (byte)'=', (byte)'�', (byte)'&', (byte)'o', (byte)'0',
-                                 (byte)'o', (byte)'8', (byte)'7', (byte)'?', (byte)')', (byte)'(', (byte)'j', (byte)'�',
+                                 (byte)'i', (byte)'g', (byte)'t', (byte)'o', (byte)'?', (byte)'%', (byte)'o', (byte)'8',
+                                 (byte)'?', (byte)'6', (byte)'6', (byte)'=', (byte)'?', (byte)'&', (byte)'o', (byte)'0',
+                                 (byte)'o', (byte)'8', (byte)'7', (byte)'?', (byte)')', (byte)'(', (byte)'j', (byte)'?',
                                  (byte)'a', (byte)'h', (byte)',', (byte)'q', (byte)'Q', (byte)'Y', (byte)')', (byte)'[',
                                  (byte)'d', (byte)'7', (byte)',', (byte)'w', (byte)'F', (byte)'7', (byte)'0', (byte)']',
                                  (byte)'5', (byte)'/', (byte)'n', (byte)'e', (byte)'H', (byte)'0', (byte)'{', (byte)'*',
@@ -413,9 +413,9 @@ public class EncodeBase64 {
                                  (byte)'g', (byte)'q', (byte)'v', (byte)'g', (byte)'@', (byte)'!', (byte)'+', (byte)'y',
                                  (byte)'h', (byte)'#', (byte)'c', (byte)'u', (byte)'j', (byte)'"', (byte)'p', (byte)'t',
                                  (byte)'8', (byte)'e', (byte)'d', (byte)'i', (byte)'.', (byte)'$', (byte)'l', (byte)'f',
-                                 (byte)'i', (byte)'g', (byte)'t', (byte)'o', (byte)'�', (byte)'%', (byte)'o', (byte)'8',
-                                 (byte)'?', (byte)'6', (byte)'6', (byte)'=', (byte)'�', (byte)'&', (byte)'o', (byte)'0',
-                                 (byte)'o', (byte)'8', (byte)'7', (byte)'?', (byte)')', (byte)'(', (byte)'j', (byte)'�', (byte)'m'
+                                 (byte)'i', (byte)'g', (byte)'t', (byte)'o', (byte)'?', (byte)'%', (byte)'o', (byte)'8',
+                                 (byte)'?', (byte)'6', (byte)'6', (byte)'=', (byte)'?', (byte)'&', (byte)'o', (byte)'0',
+                                 (byte)'o', (byte)'8', (byte)'7', (byte)'?', (byte)')', (byte)'(', (byte)'j', (byte)'?', (byte)'m'
                                  };
     //original = new byte[]{(byte)'a',(byte)'b',(byte)'c'};
 

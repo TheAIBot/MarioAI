@@ -1,7 +1,6 @@
 package MarioAI.marioMovement;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import MarioAI.World;
@@ -21,7 +20,9 @@ public class MovementInformation{
 	private final boolean useSuperSpeed;
 	
 	//position information
-	private final Point2D.Float[] positions;
+	//private final Point2D.Float[] positions;
+        private final float[] positionsX;
+        private final float[] positionsY;
 	
 	public MovementInformation(XMovementInformation xMoveInfo, YMovementInformation yMoveInfo) {
 		this.xMovedDistance = xMoveInfo.xMovedDistance;
@@ -33,42 +34,24 @@ public class MovementInformation{
 		
 		this.pressXButton = xMoveInfo.pressXButton;
 		this.pressYButton = yMoveInfo.pressYButton;
-		
-		this.positions = getCombinedXYMovementPositions(xMoveInfo.xPositions, yMoveInfo.yPositions, getMoveTime());
-	}
-	
-	private Point2D.Float[] getCombinedXYMovementPositions(float[] x, float[] y, int moveTime) {
-		final Point2D.Float[] combinedPositions = new Point2D.Float[moveTime];
-		
-		for (int i = 0; i < Math.max(x.length, y.length); i++) {
-			float xPos;
-			float yPos;
-			
-			if (x.length == 0) {
-				xPos = 0;
-			}
-			else if (x.length <= i) {
-				throw new Error("not enough x positions for the movement");
-				//xPos = x.get(x.size() - 1);
-			}
-			else {
-				xPos = x[i];
-			}
-			
-			if (y.length == 0) {
-				yPos = 0;
-			}
-			else if (y.length <= i) {
-				yPos = y[y.length - 1];
-			}
-			else {
-				yPos = y[i];
-			}
-			
-			combinedPositions[i] = new Point2D.Float(xPos, yPos);
+                
+		if (xMoveInfo.xPositions.length > yMoveInfo.yPositions.length) {
+	        this.positionsX = xMoveInfo.xPositions;
+	        this.positionsY = new float[this.positionsX.length];
+	        
+	        if (yMoveInfo.yPositions.length > 0) {
+	            for (int i = 0; i < yMoveInfo.yPositions.length; i++) {
+	                this.positionsY[i] = yMoveInfo.yPositions[i];
+	            }
+	            for (int i = yMoveInfo.yPositions.length; i < this.positionsX.length; i++) {
+	                this.positionsY[i] = yMoveInfo.yPositions[yMoveInfo.yPositions.length - 1];
+	            }
+	        }
 		}
-		
-		return combinedPositions;
+		else {
+			this.positionsX = new float[yMoveInfo.yPositions.length];
+			this.positionsY = yMoveInfo.yPositions;
+		}
 	}
 	
 	public boolean[] getActionsFromTick(int tick, boolean[] actions) {
@@ -122,8 +105,12 @@ public class MovementInformation{
 		return Math.max(totalTicksXMoved, totalTicksJumped);
 	}
 	
-	public Point2D.Float[] getPositions() {
-		return positions;
+	public float[] getXPositions() {
+		return positionsX;
+	}
+        
+        public float[] getYPositions() {
+		return positionsY;
 	}
 
 	public boolean[] getPressXButton() {
@@ -171,27 +158,29 @@ public class MovementInformation{
 	}
 
 	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
-		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastY = positions[positions.length - 1].y;
-		for (int i = 0; i < positions.length; i++) { 
-			final Point2D.Float currentPosition = positions[i];
-			if (world.isColliding(currentPosition, previousPosition, sourceNode, lastY)) {
+		float previousPositionX = 0;
+                float previousPositionY = 0;
+		final float lastY = positionsY[positionsY.length - 1];
+		for (int i = 0; i < positionsX.length; i++) { 
+			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, sourceNode, lastY)) {
 				return true;
 			}
-			previousPosition = currentPosition;
+			previousPositionX = positionsX[i];
+                        previousPositionY = positionsY[i];
 		}	
 		return false;
 	}
 	
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
-		Point2D.Float previousPosition = new Point2D.Float(0, 0);
-		final float lastY = positions[positions.length - 1].y;
-		for (int i = 0; i < positions.length; i++) { 
-			final Point2D.Float currentPosition = positions[i];
-			if (world.isColliding(currentPosition, previousPosition, startX, startY, lastY)) {
+		float previousPositionX = 0;
+                float previousPositionY = 0;
+		final float lastY = positionsY[positionsY.length - 1];
+		for (int i = 0; i < positionsX.length; i++) { 
+			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, startX, startY, lastY)) {
 				return true;
 			}
-			previousPosition = currentPosition;
+			previousPositionX = positionsX[i];
+                        previousPositionY = positionsY[i];
 		}	
 		return false;
 	}

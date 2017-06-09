@@ -431,11 +431,9 @@ public class TestEnemyPredictor {
 			}
 			
 			boolean expectedToHitSomething = false;
-			for (int j = 0; j < path.get(0).getMoveInfo().getMoveTime(); j++) {
-				final Point2D.Float currentOffset = path.get(0).getMoveInfo().getPositions()[j];
-				
-				final float expectedMarioXPos = marioXPos + currentOffset.x;
-				final float expectedMarioYPos = marioYPos - currentOffset.y;
+			for (int j = 0; j < path.get(0).getMoveInfo().getMoveTime(); j++) {				
+				final float expectedMarioXPos = marioXPos + path.get(0).getMoveInfo().getXPositions()[j];
+				final float expectedMarioYPos = marioYPos - path.get(0).getMoveInfo().getYPositions()[j];
 				expectedToHitSomething = potentialEnemyPredictorCopy.hasEnemy(expectedMarioXPos, expectedMarioYPos, MarioMethods.MARIO_WIDTH, 2, j + 1);
 				
 				if (expectedToHitSomething) {
@@ -464,7 +462,7 @@ public class TestEnemyPredictor {
 		TestTools.runOneTick(observation);
 	
 		final MovementInformation moveInfo = path.get(0).getMoveInfo();
-		for (int i = 0; i < moveInfo.getPositions().length; i++) {	
+		for (int i = 0; i < moveInfo.getMoveTime(); i++) {	
 			marioControls.getNextAction(observation, path);
 			TestTools.runOneTick(observation);
 			/*
@@ -474,11 +472,9 @@ public class TestEnemyPredictor {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			*/
-			final Point2D.Float position = moveInfo.getPositions()[i];
-			
-			final float expectedMarioXPos = startMarioXPos + position.x;
-			final float expectedMarioYPos = startMarioYPos - position.y;
+			*/			
+			final float expectedMarioXPos = startMarioXPos + moveInfo.getXPositions()[i];
+			final float expectedMarioYPos = startMarioYPos - moveInfo.getYPositions()[i];
 			
 			final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());

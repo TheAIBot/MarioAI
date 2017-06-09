@@ -108,10 +108,10 @@ public class TestCollisionDetector {
 					boolean shouldHaveCollisionRight = false;
 					boolean shouldHaveCollisionLeft = false;
 					
-					for (int k = 0; k < snRight.getMoveInfo().getPositions().length; k++) {
-						Point2D.Float currentPosition = snRight.getMoveInfo().getPositions()[k];
+					for (int k = 0; k < snRight.getMoveInfo().getMoveTime(); k++) {
+						float currentPositionX = snRight.getMoveInfo().getXPositions()[k];
 						//Starting at the middle of the block + offset.
-						double rightMarioPlace = snRight.parentXPos + currentPosition.getX(); 
+						double rightMarioPlace = snRight.parentXPos + currentPositionX;
 						if ((11+i <= rightMarioPlace + CollisionDetection.MARIO_WIDTH/(16) && 
 							          rightMarioPlace + CollisionDetection.MARIO_WIDTH/(16) <= 11+i+1 
 							  && 
@@ -122,10 +122,10 @@ public class TestCollisionDetector {
 						}
 					}
 					
-					for (int k = 0; k < snRight.getMoveInfo().getPositions().length; k++) {
-						Point2D.Float currentPosition = snLeft.getMoveInfo().getPositions()[k];
+					for (int k = 0; k < snRight.getMoveInfo().getMoveTime(); k++) {
+						float currentPositionX = snLeft.getMoveInfo().getXPositions()[k];
 						//Starting at the middle of the block + offset.
-						double leftMarioPlace = snLeft.parentXPos + currentPosition.getX(); 
+						double leftMarioPlace = snLeft.parentXPos + currentPositionX; 
 						if (11-i >= leftMarioPlace - CollisionDetection.MARIO_WIDTH/(16) && 
 								       leftMarioPlace - CollisionDetection.MARIO_WIDTH/(16) >= 11-i-1 
 							&& 
@@ -181,11 +181,12 @@ public class TestCollisionDetector {
 				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable(world)) { //Does not take the ceiling into account
-					if (Arrays.asList(sn.getMoveInfo().getPositions()).stream().anyMatch(position -> position.y + 2 > currentHeight - 1)) { //If it collides with the ceiling
+                                    throw new Error("Fix test by fixing below commented code");
+					/*if (Arrays.asList(sn.getMoveInfo().getYPositions()).stream().anyMatch(position -> position + 2 > currentHeight - 1)) { //If it collides with the ceiling
 						assertTrue(sn.getMoveInfo().hasCollisions(startNode, world));
 					} else {
 						assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));
-					}
+					}*/
 				} 
 			}
 			//Removes it again.
@@ -266,7 +267,7 @@ public class TestCollisionDetector {
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
-				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode, lastYPosition);
+				boolean hasCollision = world.isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, startNode, lastYPosition);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				//TODO discuss if this is fine, and the desired result. (*)
 				// 1.0/16 needs to be added, as this is subtracted in the method, and not added later.
@@ -276,7 +277,7 @@ public class TestCollisionDetector {
 					assertTrue(errorMessage, 	hasCollision);
 				} else{
 					if (hasCollision) {
-						hasCollision = world.isColliding(futureOffset, currentOffset, startNode, lastYPosition);
+						hasCollision = world.isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, startNode, lastYPosition);
 					}
 					assertFalse(errorMessage,	hasCollision);
 				}
@@ -313,7 +314,7 @@ public class TestCollisionDetector {
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
 				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
-				boolean hasCollision = world.isColliding(futureOffset, currentOffset, startNode, lastYPosition);
+				boolean hasCollision = world.isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, startNode, lastYPosition);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
 				
 				if (9  <= j) { //TODO check should it also hold true with j=9?
@@ -451,14 +452,12 @@ public class TestCollisionDetector {
 		TestTools.runOneTick(observation);
 	
 		final MovementInformation moveInfo = path.get(0).getMoveInfo();
-		for (int i = 0; i < moveInfo.getPositions().length; i++) {	
+		for (int i = 0; i < moveInfo.getMoveTime(); i++) {	
 			marioControls.getNextAction(observation, path);
 			TestTools.runOneTick(observation);
 			
-			final Point2D.Float position = moveInfo.getPositions()[i];
-			
-			final float expectedMarioXPos = startMarioXPos + position.x;
-			final float expectedMarioYPos = startMarioYPos - position.y;
+			final float expectedMarioXPos = startMarioXPos + moveInfo.getXPositions()[i];
+			final float expectedMarioYPos = startMarioYPos - moveInfo.getYPositions()[i];
 			
 			final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 			final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());

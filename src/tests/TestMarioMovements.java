@@ -490,11 +490,9 @@ public class TestMarioMovements {
 			final DirectedEdge edge = path.get(i);
 			final MovementInformation moveInfo = edge.getMoveInfo();
 			
-			for (int z = 0; z < moveInfo.getMoveTime(); z++) {
-				final Point2D.Float position = moveInfo.getPositions()[z];
-				
-				final float x = position.x + xOffset;
-				final float y = position.y + yOffset;
+			for (int z = 0; z < moveInfo.getMoveTime(); z++) {				
+				final float x = moveInfo.getXPositions()[z] + xOffset;
+				final float y = moveInfo.getYPositions()[z] + yOffset;
 				
 				positions.add(new Point2D.Float(x, y));
 				
@@ -513,10 +511,8 @@ public class TestMarioMovements {
 			assertTrue("Calculated speed " + lastXSpeed + " is not equal end speed " + moveInfo.getEndSpeed(),withinAcceptableError(lastXSpeed, moveInfo.getEndSpeed()));
 			speedIndexOffset += moveInfo.getMoveTime();
 			
-			
-			final Point2D.Float endPoint = moveInfo.getPositions()[moveInfo.getPositions().length - 1];
-			xOffset += endPoint.x;
-			yOffset += endPoint.y;
+			xOffset += moveInfo.getXPositions()[moveInfo.getXPositions().length - 1];
+			yOffset += moveInfo.getYPositions()[moveInfo.getYPositions().length - 1];
 		}
 		
 	}
@@ -533,14 +529,12 @@ public class TestMarioMovements {
 		for (int z = 0; z < path.size(); z++) {	
 			final DirectedEdge edge = path.get(0);
 			final MovementInformation moveInfo = edge.getMoveInfo();
-			for (int i = 0; i < moveInfo.getPositions().length; i++) {				
+			for (int i = 0; i < moveInfo.getMoveTime(); i++) {				
 				marioControls.getNextAction(observation, path);
 				TestTools.runOneTick(observation);
 				
-				final Point2D.Float position = moveInfo.getPositions()[i];
-				
-				final float expectedMarioXPos = startMarioXPos + position.x + xOffset;
-				final float expectedMarioYPos = startMarioYPos - position.y + yOffset;
+				final float expectedMarioXPos = startMarioXPos + moveInfo.getXPositions()[i] + xOffset;
+				final float expectedMarioYPos = startMarioYPos - moveInfo.getYPositions()[i] + yOffset;
 				
 				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
@@ -573,9 +567,8 @@ public class TestMarioMovements {
 							"\nspeed diff: " + (expectedMarioSpeed - actualMarioSpeed));
 			}
 			
-			final Point2D.Float endPoint = moveInfo.getPositions()[moveInfo.getPositions().length - 1];
-			xOffset += endPoint.x;
-			yOffset += endPoint.y;
+			xOffset += moveInfo.getXPositions()[moveInfo.getXPositions().length - 1];
+			yOffset += moveInfo.getYPositions()[moveInfo.getYPositions().length - 1];
 		}
 	}
 	

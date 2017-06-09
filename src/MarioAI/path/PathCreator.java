@@ -64,10 +64,11 @@ public class PathCreator {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		final Point2D.Float edgeEndDistance = currentEdge.getMoveInfo().getPositions()[currentEdge.getMoveInfo().getPositions().length - 1];
+                final float edgeEndDistanceX = currentEdge.getMoveInfo().getXPositions()[currentEdge.getMoveInfo().getXPositions().length - 1];
+                final float edgeEndDistanceY = currentEdge.getMoveInfo().getYPositions()[currentEdge.getMoveInfo().getYPositions().length - 1];
 		
-		final float futureMarioXPos = marioXPos + edgeEndDistance.x;
-		final float futureMarioYPos = marioYPos - edgeEndDistance.y;
+		final float futureMarioXPos = marioXPos + edgeEndDistanceX;
+		final float futureMarioYPos = marioYPos - edgeEndDistanceY;
 		
 		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
 		
