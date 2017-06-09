@@ -38,7 +38,7 @@ public abstract class DirectedEdge {
 		
 	public void setMoveInfo(MovementInformation moveInfo) {
 		this.moveInfo = moveInfo;
-		this.movementTime = moveInfo.getTicksOfMovement();
+		this.movementTime = moveInfo.;
 	}
 	
 	public MovementInformation getMoveInfo() {
