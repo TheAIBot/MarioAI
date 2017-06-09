@@ -84,7 +84,8 @@ public class MarioControls {
 			distanceMoved += speed;
 		}
 		
-		return (distanceMoved >= Math.abs(distanceToMove));
+		//add half speed because not completely reaching the node is also accepted
+		return (distanceMoved + (MAX_X_VELOCITY / 2) >= Math.abs(distanceToMove));
 	}
 	
 	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
