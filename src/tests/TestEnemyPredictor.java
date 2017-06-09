@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,6 +20,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
@@ -395,7 +398,7 @@ public class TestEnemyPredictor {
 	private void testJumpRight(Environment observation, UnitTestAgent agent, World world, MarioControls marioControls, EnemyPredictor enemyPredictor, ArrayList<DirectedEdge> path, EnemyType enemyType, int xDistance, boolean makeCopy) {
 		
 		final int startXPixel = (4 - xDistance) * World.PIXELS_PER_BLOCK;
-		final int endXPixel = 6 * World.PIXELS_PER_BLOCK;
+		final int endXPixel = 8 * World.PIXELS_PER_BLOCK;
 		
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
@@ -406,6 +409,8 @@ public class TestEnemyPredictor {
 			final Sprite enemy = TestTools.spawnEnemy(observation, (startXPixel / 16) + 7, (int)startMarioYPos, -1, enemyType);
 			final EnemyPredictor potentialEnemyPredictorCopy = findEnemies(observation, enemyPredictor, makeCopy);
 			
+			assertEquals(1, potentialEnemyPredictorCopy.getEnemies().size());
+			
 			world.update(observation);
 			marioControls.reset();
 			
@@ -415,9 +420,19 @@ public class TestEnemyPredictor {
 			final ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
 			pathCopy.add(path.get(0));
 			
+			if (i == 48) {
+				System.out.println();
+			}
+			
+			final boolean actualHitSomething = isHittingEnemyOnRoad(observation, pathCopy, agent, marioControls);
+			
+			if (actualHitSomething) {
+				System.out.println();
+			}
+			
 			boolean expectedToHitSomething = false;
-			for (int j = 0; j < pathCopy.get(0).getMoveInfo().getMoveTime(); j++) {
-				final Point2D.Float currentOffset = pathCopy.get(0).getMoveInfo().getPositions()[j];
+			for (int j = 0; j < path.get(0).getMoveInfo().getMoveTime(); j++) {
+				final Point2D.Float currentOffset = path.get(0).getMoveInfo().getPositions()[j];
 				
 				final float expectedMarioXPos = marioXPos + currentOffset.x;
 				final float expectedMarioYPos = marioYPos - currentOffset.y;
@@ -428,7 +443,9 @@ public class TestEnemyPredictor {
 				}
 			}
 			
-			final boolean actualHitSomething = isHittingEnemyOnRoad(observation, pathCopy, agent, marioControls);
+			if (expectedToHitSomething != actualHitSomething) {
+				System.out.println();
+			}
 			
 			assertEquals(expectedToHitSomething, actualHitSomething);
 			
@@ -450,7 +467,14 @@ public class TestEnemyPredictor {
 		for (int i = 0; i < moveInfo.getPositions().length; i++) {	
 			marioControls.getNextAction(observation, path);
 			TestTools.runOneTick(observation);
-			
+			/*
+			try {
+				Thread.sleep(40);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			*/
 			final Point2D.Float position = moveInfo.getPositions()[i];
 			
 			final float expectedMarioXPos = startMarioXPos + position.x;
@@ -478,5 +502,36 @@ public class TestEnemyPredictor {
 	
 	private boolean withinAcceptableError(float a, float b) {
 		return 	Math.abs(a - b) <= MarioControls.ACCEPTED_DEVIATION;
+	}
+
+	@Test
+	public void testMultithreadedEnemyAccess() {
+		final UnitTestAgent agent = new UnitTestAgent();
+		final Environment observation = TestTools.loadLevel("testEnemyPredictor/flat.lvl", agent, true);
+		final World world = new World();
+		final EnemyPredictor enemyPredictor = new EnemyPredictor();
+		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+		ExecutorService exe = Executors.newFixedThreadPool(160);
+		TestTools.spawnEnemy(observation, 1, 1, 1, EnemyType.BULLET_BILL);
+		final EnemyPredictor copy = findEnemies(observation, enemyPredictor, true);
+		
+		for (int i = 0; i < 10000000; i++) {
+			final int finalI = i;
+			exe.submit(() -> copy.getEnemies().get(0).getPositionAtTime(finalI));
+		}
+		
+		for (int i = 0; i < 10000000; i++) {
+			enemyPredictor.getEnemies().get(0).getPositionAtTime(i);
+		}
+		
+		for (int i = 0; i < 10000000; i++) {
+			Point2D.Float singleThreadedResult = enemyPredictor.getEnemies().get(0).getPositionAtTime(i);
+			Point2D.Float multiThreadedResult = copy.getEnemies().get(0).getPositionAtTime(i);
+			
+			assertEquals("x was not the same", singleThreadedResult.x, multiThreadedResult.x, MarioControls.ACCEPTED_DEVIATION);
+			assertEquals("y was not the same", singleThreadedResult.y, multiThreadedResult.y, MarioControls.ACCEPTED_DEVIATION);
+		}
+		
+		
 	}
 }
