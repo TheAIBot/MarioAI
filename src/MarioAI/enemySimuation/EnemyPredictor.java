@@ -125,9 +125,6 @@ public class EnemyPredictor {
 					//enemySimulation.setY(simulatedPosition.y);
 					
 					notDeletedSimulations.add(enemySimulation);
-				}	
-				else {
-					System.out.println("removed");
 				}
 			}
 		}
