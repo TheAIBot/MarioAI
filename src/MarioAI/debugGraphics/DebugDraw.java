@@ -241,12 +241,14 @@ public class DebugDraw {
 		if (path != null) {
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {
-				for (Point2D.Float pos : edge.getMoveInfo().getPositions()) {
-					Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + pos.x, edge.source.y - pos.y);
-					convertLevelPointToOnScreenPoint(observation, correctPos);
-					
-					positions.add(new Point((int)correctPos.x, (int)correctPos.y));
-				}
+                            for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
+                                final float posX = edge.getMoveInfo().getXPositions()[i];
+                                final float posY = edge.getMoveInfo().getYPositions()[i];
+                                Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + posX, edge.source.y - posY);
+                                convertLevelPointToOnScreenPoint(observation, correctPos);
+
+                                positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+                            }
 			}
 			addDebugDrawing(observation, new DebugLines(Color.RED, positions));
 		}

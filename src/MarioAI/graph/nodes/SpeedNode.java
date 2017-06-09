@@ -163,17 +163,16 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		
 		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
 		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
-		if (i >= moveInfo.getPositions().length) {
-			this.ticksOfInvincibility -= moveInfo.getPositions().length;
+		if (i >= moveInfo.getMoveTime()) {
+			this.ticksOfInvincibility -= moveInfo.getMoveTime();
 			return false;
 		}
 		
 		currentTick += i;
 		boolean hasEnemyCollision = false;
-		for (; i < moveInfo.getPositions().length; i++) {
-			Point2D.Float currentPosition = moveInfo.getPositions()[i];
-			final float x = parentXPos  + currentPosition.x;
-			final float y = parent.yPos - currentPosition.y;
+		for (; i < moveInfo.getMoveTime(); i++) {
+			final float x = parentXPos  + moveInfo.getXPositions()[i];
+			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			
 			if (enemyPredictor.hasEnemy(x, y, MarioMethods.MARIO_WIDTH, marioHeight, currentTick)) {
 				hasEnemyCollision = true;
@@ -201,16 +200,16 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
 		
-		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = parentXPos  + position.x;
-			final float y = parent.yPos - position.y;
+                for (int i = 0; i < moveInfo.getMoveTime(); i++) {
+                    final float x = parentXPos  + moveInfo.getXPositions()[i];
+                    final float y = parent.yPos - moveInfo.getYPositions()[i];
+
+                    if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
+                        return true;
+                    }
 			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				return true;
-			}
-			
-			currentTick++;
-		}
+                    currentTick++;
+                }
 		return false;
 	}
 	
