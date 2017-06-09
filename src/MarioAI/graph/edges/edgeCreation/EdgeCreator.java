@@ -567,7 +567,8 @@ public class EdgeCreator {
 	}
 
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
-			return 0 < yPosition && yPosition < GRID_HEIGHT &&
+			//TODO it crashed to changed 0 to 1 in 1 < yPosition to fix it
+			return 1 < yPosition && yPosition < GRID_HEIGHT &&
 				   isOnSolidGround((int) (yPosition), coloumn) && 
 				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 1]) &&
 				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]);
