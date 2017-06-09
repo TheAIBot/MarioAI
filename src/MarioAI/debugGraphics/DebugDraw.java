@@ -218,12 +218,12 @@ public class DebugDraw {
 	
 	public static void drawEnemies(final Environment observation, EnemyPredictor enemyPredictor) {
 		for (EnemySimulator enemy : enemyPredictor.getEnemies()) {
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1; i++) {
 				final Point2D.Float enemyPos = enemy.getPositionAtTime(i);
-				final Point2D.Float startPos = new Point2D.Float(((enemyPos.x - enemy.getWidthInPixels()) / BLOCK_PIXEL_SIZE), 
-																 ((enemyPos.y - enemy.getHeightInPixels()) / BLOCK_PIXEL_SIZE) + 0.5f);
-				final Point2D.Float size = new Point2D.Float((float)enemy.getWidthInPixels() * Art.SIZE_MULTIPLIER, 
-															 (float)enemy.getHeightInPixels() * Art.SIZE_MULTIPLIER);
+				final Point2D.Float startPos = new Point2D.Float(((enemyPos.x - enemy.getWidth()) / BLOCK_PIXEL_SIZE), 
+																 ((enemyPos.y - enemy.getHeight()) / BLOCK_PIXEL_SIZE) + 0.5f);
+				final Point2D.Float size = new Point2D.Float((float)enemy.getWidth() * 2 * Art.SIZE_MULTIPLIER, 
+															 (float)enemy.getHeight() * Art.SIZE_MULTIPLIER);
 				
 				
 				convertLevelPointToOnScreenPoint(observation, startPos);

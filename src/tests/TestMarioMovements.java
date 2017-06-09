@@ -469,7 +469,8 @@ public class TestMarioMovements {
 			assertEquals(positions1.get(i).y, positions2.get(i).y, MarioControls.ACCEPTED_DEVIATION);
 			
 			assertEquals(xActions1.get(i), xActions2.get(i));
-			
+		}
+		for (int i = 0; i < yActions1.size(); i++) {
 			assertEquals(yActions1.get(i), yActions2.get(i));
 		}
 		for (int i = 0; i < speed1.size(); i++) {
@@ -498,7 +499,9 @@ public class TestMarioMovements {
 				positions.add(new Point2D.Float(x, y));
 				
 				xActions.add(moveInfo.getPressXButton()[z]);
-				yActions.add(moveInfo.getPressYButton()[z]);
+				if (moveInfo.getPressYButton().length > z) {
+					yActions.add(moveInfo.getPressYButton()[z]);	
+				}
 				
 				final Point2D.Float currentSpeed = new Point2D.Float(x - oldPos.x, y - oldPos.y);
 				speed.add(currentSpeed);
@@ -525,18 +528,15 @@ public class TestMarioMovements {
 		float actualMarioSpeed = 0;
 		float xOffset = 0;
 		float yOffset = 0;
+		agent.action = marioControls.getActions();
+		TestTools.runOneTick(observation);
 		for (int z = 0; z < path.size(); z++) {	
-			DirectedEdge edge = path.get(0);
-			MovementInformation moveInfo = edge.getMoveInfo();
+			final DirectedEdge edge = path.get(0);
+			final MovementInformation moveInfo = edge.getMoveInfo();
 			for (int i = 0; i < moveInfo.getPositions().length; i++) {				
-				final boolean[] newActions = marioControls.getNextAction(observation, path);
-				for (int j = 0; j < newActions.length; j++) {
-					agent.action[j] = newActions[j];
-				}
+				marioControls.getNextAction(observation, path);
 				TestTools.runOneTick(observation);
 				
-				edge = path.get(0);
-				moveInfo = edge.getMoveInfo();
 				final Point2D.Float position = moveInfo.getPositions()[i];
 				
 				final float expectedMarioXPos = startMarioXPos + position.x + xOffset;

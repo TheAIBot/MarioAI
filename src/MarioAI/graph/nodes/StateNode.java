@@ -2,18 +2,16 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
-import MarioAI.Hasher;
+import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyCollision;
 import MarioAI.enemySimuation.EnemyPredictor;
-import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
-import javafx.util.Pair;
 
 public class StateNode implements Comparable<StateNode> {
 	public final float SCORE_MULTIPLIER = 1024;
@@ -21,11 +19,12 @@ public class StateNode implements Comparable<StateNode> {
 	public final Node node;
 	public final float vx;
 	public StateNode parent;
-	public final float parentXPos;
+	public float parentXPos;
 	public final float parentVx;
 	public final long hash;
 	public final DirectedEdge ancestorEdge;
-	public float xPos;
+	public final float creationXPos;
+	public float currentXPos;
 	public final int yPos;
 	public int gScore = 0;
 	public float fScore = 0;
@@ -48,7 +47,8 @@ public class StateNode implements Comparable<StateNode> {
 		this.parentXPos = node.x;
 		this.parentVx = 0;
 		this.ancestorEdge = null;
-		this.xPos = node.x;
+		this.creationXPos = node.x;
+		this.currentXPos = this.creationXPos;
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
@@ -57,7 +57,7 @@ public class StateNode implements Comparable<StateNode> {
 	
 	public StateNode(Node node, float marioX, float vx, long hash, long livingEnemies) {
 		this(node, vx, hash, livingEnemies);
-		this.xPos = marioX;
+		this.currentXPos = marioX;
 	}
 	
 	///Should only be used for testing purposes
@@ -65,7 +65,8 @@ public class StateNode implements Comparable<StateNode> {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
-		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.creationXPos = parentXPos + moveInfo.getXMovementDistance();
+		this.currentXPos = this.creationXPos;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
@@ -76,14 +77,15 @@ public class StateNode implements Comparable<StateNode> {
 	}
 	
 	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
-		this(node, parent, parent.xPos, parent.vx, ancestorEdge, hash, livingEnemies, world);
+		this(node, parent, parent.creationXPos, parent.vx, ancestorEdge, hash, livingEnemies, world);
 	}
 	
 	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
-		this.xPos = parentXPos + moveInfo.getXMovementDistance();
+		this.creationXPos = parentXPos + moveInfo.getXMovementDistance();
+		this.currentXPos = this.creationXPos;
 		this.parent = parent;
 		this.parentXPos = parentXPos;
 		this.parentVx = parentVx;
@@ -94,29 +96,17 @@ public class StateNode implements Comparable<StateNode> {
 		this.livingEnemies = livingEnemies;
 	}
 	
-	public StateNode(Node node, StateNode parent, MovementInformation moveInfo, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
-		this.node = node;
-		this.moveInfo = moveInfo;
-		this.vx = moveInfo.getEndSpeed();
-		this.xPos = parent.xPos + moveInfo.getXMovementDistance();
-		this.parent = parent;
-		this.parentXPos = parent.xPos;
-		this.parentVx = parent.parentVx;
-		this.ancestorEdge = ancestorEdge;
-		this.yPos = node.y;
-		this.isSpeedNodeUseable = true;
-		this.hash = hash;
-		this.livingEnemies = livingEnemies;
-	}
-	
 	private boolean determineIfThisNodeIsUseable(World world) {
-		//There are a lot of possible problems for a fall edge.
-		//TODO move below, when implemented
 		if (this.ancestorEdge instanceof FallEdge &&
-			 !MarioControls.canMarioUseFallEdge(ancestorEdge, xPos)) {
+			 !MarioControls.canMarioUseFallEdge(ancestorEdge, currentXPos)) {
 			return false;
 		}
 		
+		if (this.ancestorEdge instanceof JumpingEdge && 
+			!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
+			return false;
+		}
+			
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
@@ -124,15 +114,6 @@ public class StateNode implements Comparable<StateNode> {
 			return false;
 		}
 		
-		//In a jump it's possible to jump too far
-		//and there is nothing that mario can do about it
-		//TODO this should maybe be removed in the future
-		if (this.ancestorEdge instanceof JumpingEdge && 
-			!MarioControls.canMarioUseJumpEdge(ancestorEdge, xPos)) {
-			return false;
-		}
-		
-		//TODO remove this when changed moveinformation is implemented
 		if (getMoveInfo().hasCollisions(parent, world)) {
 			return false;
 		}
@@ -140,13 +121,43 @@ public class StateNode implements Comparable<StateNode> {
 		return true;
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight, EnemyCollision firstCollision) {
+	public boolean isSpeedNodeUseable(World world) {
+		final float diffX = Math.abs(creationXPos - currentXPos);
+		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
+			//In a jump it's possible to jump too far
+			//and there is nothing that mario can do about it
+			//TODO this should maybe be removed in the future
+			
+			if (this.ancestorEdge instanceof JumpingEdge && 
+				!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
+				return false;
+			}
+			
+			//Make sure the edge is possible to use
+			//all Running edges are possible
+			//not all jumps are possible
+			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped())) {
+				return false;
+			}
+			
+			if (getMoveInfo().hasCollisions(parent, world)) {
+				return false;
+			}	
+			
+			return true;
+		}
+		else {
+			return isSpeedNodeUseable;
+		}
+	}
+	
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight,  EnemyCollision firstCollision) {
 		int currentTick = startTime;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
-		parent.ticksOfInvincibility = 0;
-				
-		boolean hasEnemyCollision = false;
+		parent.ticksOfInvincibility = 0;				
 		
+		
+		boolean hasEnemyCollision = false;
 		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
 			Point2D.Float currentPosition = moveInfo.getPositions()[i];
 			final float x = parentXPos  + currentPosition.x;
@@ -165,7 +176,7 @@ public class StateNode implements Comparable<StateNode> {
 			
 			//I will take the first actual collision, 
 			//as though that is the one that determines the type of collision with enemies.
-			if (enemyPredictor.hasEnemy(x, y, 0.5f, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {
+			if (enemyPredictor.hasEnemy(x, y,  MarioMethods.MARIO_WIDTH, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {
 				if(firstCollision.isStompType){ //Stomp type collision
 					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
 					//Notice that if has more ticks of invincibility than 1, this is overwritten.
@@ -183,9 +194,9 @@ public class StateNode implements Comparable<StateNode> {
 				ticksOfInvincibility--;
 			}
 			
+			
 			currentTick++;
-		}
-		
+		}		
 		return hasEnemyCollision;
 	}
 		
@@ -199,10 +210,6 @@ public class StateNode implements Comparable<StateNode> {
 	
 	public int getMoveTime() {
 		return moveInfo.getMoveTime();
-	}
-	
-	public boolean isSpeedNodeUseable() {
-		return isSpeedNodeUseable;
 	}
 	
 	@Override

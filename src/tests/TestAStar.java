@@ -103,7 +103,7 @@ public class TestAStar {
 				 TestTools.renderLevel(observation);
 				 assertTrue(path != null);
 				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
-			}		
+			}
 			TestTools.runOneTick(observation);
 			numberOfTicks++;
 		}
@@ -245,7 +245,7 @@ public class TestAStar {
 		StateNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
 													.findFirst().get();
 				
-		assertTrue(end.isSpeedNodeUseable());
+		assertTrue(end.isSpeedNodeUseable(world));
 		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
 	
@@ -275,7 +275,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testTunnelWithEnemyMoreThanOneLife() {
-		setup("straightTunnel", false);
+		setup("straightTunnel", true);
 		TestTools.setMarioPosition(observation, 2, 12);
 		TestTools.spawnEnemy(observation, 12, 12, -1, EnemyType.GREEN_KOOPA);
 		TestTools.runOneTick(observation);
@@ -405,8 +405,13 @@ public class TestAStar {
 		}
 		
 		long hashCode = Hasher.hashSpeedNode(edge.getMoveInfo().getEndSpeed(), edge, agent.pathCreator.getBlockingGranularity());
+<<<<<<< HEAD
 		StateNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
 		assertEquals(correspondingSpeedNode.xPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
+=======
+		SpeedNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
+		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
+>>>>>>> Astar-multithreaded
 		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}
 }

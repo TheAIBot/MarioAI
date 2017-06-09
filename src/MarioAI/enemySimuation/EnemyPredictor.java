@@ -24,7 +24,6 @@ public class EnemyPredictor {
 	public static final int TYPE_OFFSET = 0;
 	public static final int X_OFFSET = 1;
 	public static final int Y_OFFSET = 2;
-	private static final int BLOCK_PIXEL_SIZE = 16;
 	public static final int ACCEPTED_POSITION_DEVIATION = 1;
 	
 	private LevelScene levelScene;
@@ -38,35 +37,27 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(final float marioX2, final float marioY2, 	 final float marioWidth, 	  final float marioHeight, 
-									final int time, 		boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison,
-									long livingEnemies) {
-		//b
-		final float marioX1 = marioX2 - marioWidth;
-		final float marioY1 = marioY2 - marioHeight;
-		
+
+	public boolean hasEnemy(float marioX, final float marioY, final float marioWidth, final float marioHeight, final int time,
+									boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison, long livingEnemies) {
 		for (int i = 0; i < verifiedEnemySimulations.size(); i++) {
 			if (!isEnemyAlive(livingEnemies, i)) {
 				continue;
 			}
 			EnemySimulator enemySimulation = verifiedEnemySimulations.get(i);
-			final Point2D.Float enemyPosition = enemySimulation.getPositionAtTime(time);
-			//a
-			final float enemyX2 = enemyPosition.x / BLOCK_PIXEL_SIZE;
-			final float enemyY2 = enemyPosition.y / BLOCK_PIXEL_SIZE;
-			final float enemyX1 = enemyX2 - (enemySimulation.getWidthInPixels() / BLOCK_PIXEL_SIZE);
-			final float enemyY1 = enemyY2 - (enemySimulation.getHeightInPixels() / BLOCK_PIXEL_SIZE);
+			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
 			
-			//check if the rectangle of mario intersects with the enemy's rectangle
-			if (enemyX1 <= marioX2 && 
-				enemyX2 >= marioX1 &&
-				enemyY1 <= marioY2 &&
-				enemyY2 >= marioY1) {
+			final float marioXInPixels = marioX * World.PIXELS_PER_BLOCK;
+			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK;
+			final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
+			
+			if (enemySimulation.collideCheck(enemyPositionInPixels.x, enemyPositionInPixels.y, marioXInPixels, marioYInPixels, marioHeightInPixels)) {
+				//TODO merge below correctly. All inside this if statement.
+
 				firstCollison.enemy = enemySimulation;
 				firstCollison.tickForCollision = time;
 				firstCollison.indexEnemy = i;
-				if(enemySimulation.stomp(time, marioHeight, marioX2 - marioWidth/2,
-						                   marioY1, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
+				if(enemySimulation.stomp(time, marioHeight,marioXInPixels, marioYInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
 					firstCollison.isStompType = true;
 				}
 				return true;
@@ -94,12 +85,12 @@ public class EnemyPredictor {
 		final HashMap<Integer, ArrayList<Point2D.Float>> byType = new HashMap<Integer, ArrayList<Point2D.Float>>();
 		for (int i = 0; i < enemyInfo.length; i += FLOATS_PER_ENEMY) {
 			final int kind = (int) enemyInfo[i + TYPE_OFFSET];
-			final float x = enemyInfo[i + X_OFFSET];
-			final float y = enemyInfo[i + Y_OFFSET];
+			final float x  =       enemyInfo[i + X_OFFSET];
+			final float y  =       enemyInfo[i + Y_OFFSET];
 			
 			final Point2D.Float enemyPos = new Point2D.Float(x, y);
 			
-			if (byType.get(kind) == null) {
+			if (!byType.containsKey(kind)) {
 				byType.put(kind, new ArrayList<Point2D.Float>());
 			}
 			
@@ -149,9 +140,6 @@ public class EnemyPredictor {
 					//enemySimulation.setY(simulatedPosition.y);
 					
 					notDeletedSimulations.add(enemySimulation);
-				}	
-				else {
-					System.out.println("removed");
 				}
 			}
 		}
@@ -220,8 +208,8 @@ public class EnemyPredictor {
 						final float deltaX = Math.abs(xa);
 						final float deltaY = Math.abs(ya);
 						
-						if (deltaX <= BLOCK_PIXEL_SIZE && 
-							deltaY <= BLOCK_PIXEL_SIZE) {
+						if (deltaX <= World.PIXELS_PER_BLOCK && 
+							deltaY <= World.PIXELS_PER_BLOCK) {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
 							//the xa and ya are 1 tick too old so they are updated here
 							potentialSimulation.moveEnemy();

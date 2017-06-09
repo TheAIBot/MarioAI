@@ -20,7 +20,7 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 480, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
@@ -37,7 +37,7 @@ public class PathCreator {
 	public PathCreator(int threadCount) {
 		//There can't be more threads than granularities as two threads
 		//would then have to share the same granularity.
-		threadCount = Math.min(threadCount, HASH_GRANULARITY.length);
+		threadCount = Math.min(threadCount, MAX_THREAD_COUNT);
 		threadPool = Executors.newFixedThreadPool(threadCount);
 		runningTasks = new CompletableFuture[threadCount];
 		
@@ -192,6 +192,7 @@ public class PathCreator {
 			return false;
 		}
 		
+		
 		return true;
 	}
 	
@@ -216,6 +217,9 @@ public class PathCreator {
 	
 	public void syncWithRealWorld(World realWorld, EnemyPredictor realEnemyPredictor) {
 		world.syncFrom(realWorld);
+		if (realEnemyPredictor.getEnemies().size() > 0) {
+			System.out.println();
+		}
 		enemyPredictor.syncFrom(realEnemyPredictor);
 	}
 	
