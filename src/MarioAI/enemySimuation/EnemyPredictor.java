@@ -12,6 +12,7 @@ import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.enemySimuation.simulators.FlowerEnemy;
 import MarioAI.enemySimuation.simulators.ShellSimulator;
 import MarioAI.enemySimuation.simulators.WalkingEnemySimulator;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.path.PathCreator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
@@ -288,5 +289,19 @@ public class EnemyPredictor {
 
 	public void resetNewEnemySpawned() {
 		newEnemySpawned = false;
+	}
+	
+	public boolean isEnemyAlive(long livingEnemies, int enemyIndex) {
+		return ((livingEnemies >> enemyIndex) & 1) == 1;
+	}
+	
+	public static void hitEnemy(EnemyCollision firstCollision, StateNode state) {
+		// TODO Temporarily just kills the enemy.
+		state.livingEnemies &= ~(1 << firstCollision.indexEnemy);
+		
+	}
+
+	public long getCurrentLivingEnemies() {
+		return -1;
 	}
 }

@@ -94,7 +94,7 @@ class AStar {
 				
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : currentState.node.getEdges()) {
-					final StateNode nextState = getStateNode(neighborEdge, currentState, world);
+					final StateNode nextState = getStateNode(neighborEdge, currentState, enemyPredictor.getCurrentLivingEnemies(), world);
 
 					//If a similar enough node has already been run through
 					//no need to add this one at that point
@@ -123,11 +123,11 @@ class AStar {
 						if (!nextState.isSpeedNodeUseable(world)) {
 							continue;
 						}
-						/*
+						
 						if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight)) {
 							continue;
 						}
-						*/
+						/*
 						
 						EnemyCollision firstCollision = new EnemyCollision(); 
 						
@@ -145,6 +145,8 @@ class AStar {
 								penalty = livesLost*PENALTY_SCORE;
 							}
 						}
+						*/
+						
 					}
 					// The current best speednode is the one furthest to the right
 					// (disregarding if it passes through an enemy or not).
@@ -189,7 +191,7 @@ class AStar {
 			//Might not be a total logic error, if the enemy is at a permeable block.   
 			//TODO remove, not needed, after tests
 		} else {
-			int enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
+			long enemyNodeHash = Hasher.hashNode(enemyX, enemyY);
 			//Make a modified speed node to the top of this position,
 	 		//from the former position data.
 			if (world.hasEnemyCollisionNode(enemyNodeHash)) { //Stomped on this enemy before?
@@ -250,7 +252,7 @@ class AStar {
 	 * @param world
 	 * @return speedNode
 	 */
-	private StateNode getStateNode(DirectedEdge neighborEdge, StateNode current, World world) {
+	private StateNode getStateNode(DirectedEdge neighborEdge, StateNode current, long livingEnemies, World world) {
 		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 5000);
 		
 		final StateNode speedNode = stateNodes.get(hash);
@@ -258,7 +260,7 @@ class AStar {
 			return speedNode;
 		}
 		
-		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, world);
+		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, livingEnemies, world);
 		stateNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}

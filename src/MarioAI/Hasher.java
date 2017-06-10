@@ -97,4 +97,15 @@ public class Hasher {
 		
 		return b1 | b2 | b3 | b4 | b5 | b6;
 	}
+
+
+	public static long hashNode(int xPos, int yPos){
+		final int b1Mask = 0b0000_0000_0000_0000_0000_0000_0000_1111;
+		final int b2Mask = 0b0000_0000_0000_0000_0001_1111_1111_0000;
+		final int b1Place = 0;
+		final int b2Place = 4;
+		final int b1 = ( xPos               << b1Place) & b1Mask;
+		final int b2 = ( yPos               << b2Place) & b2Mask;
+		return b1 | b2;
+	}
 }

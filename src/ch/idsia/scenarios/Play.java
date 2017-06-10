@@ -78,7 +78,8 @@ public class Play {
 			}
                 */
 	        System.out.println("Seed = " + seed);
-	        //options.setLevelRandSeed(1179126435); //Går ret dårligt på der her seed.
+	        options.setLevelRandSeed(1182521566); //Seed hvor han hopper ind i en fjende, pga. han laver for langt hop. Saet restriktion.
+	        //options.setLevelRandSeed(1179126435); //Gaar ret dårligt på der her seed.
 	        //options.setLevelRandSeed(1975381315);
 	        //options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
@@ -114,7 +115,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(-1);	 
+	        options.setLevelDifficulty(0);	 
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);
