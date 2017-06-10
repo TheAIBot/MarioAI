@@ -78,7 +78,8 @@ public class Play {
 			}
                 */
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1975381315);
+	        //options.setLevelRandSeed(1179126435); //Går ret dårligt på der her seed.
+	        //options.setLevelRandSeed(1975381315);
 	        //options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
