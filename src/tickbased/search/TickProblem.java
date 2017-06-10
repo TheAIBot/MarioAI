@@ -21,7 +21,8 @@ public class TickProblem extends Problem {
 	public static final int SCREEN_WIDTH = 22; // TODO
 	private static final int SCREEN_HEIGHT = 15;
 	public int maxRightSeenSoFar = 15 * 16; // TODO
-	public LevelScene levelScene;
+	public LevelScene worldScene;
+	public LevelScene tentativeScene;
 	public List<Sprite> sprites = new ArrayList<Sprite>();
 
 	@Override
@@ -50,8 +51,8 @@ public class TickProblem extends Problem {
 		
 		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
 		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
-		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+		actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
+		actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
 		
 		return actions;
 	}
@@ -80,6 +81,7 @@ public class TickProblem extends Problem {
 		Node node = (Node) searchNode.state;
 		MarioAction marioAction = (MarioAction) action;
 		
+		// TODO dont make more levelscenes. Instead manipulate the tentativeLevelscene by taking back-ups and advancing it in time.
 		// Clone the levelScene and update it by executing the given action
 		LevelScene levelScene = new LevelScene(node.levelScene);
 		levelScene.mario.setKeys(marioAction.action);
@@ -125,9 +127,9 @@ public class TickProblem extends Problem {
     	float[] enemyPositions = observation.getEnemiesFloatPos();
 		float[] marioPosition = observation.getMarioFloatPos();
 		
-		levelScene.mario.x = marioPosition[0];
-		levelScene.mario.y = marioPosition[1];
-		Mario mario = levelScene.mario;
+		worldScene.mario.x = marioPosition[0];
+		worldScene.mario.y = marioPosition[1];
+		Mario mario = worldScene.mario;
 		
 		int marioXPos = (int) mario.x / 16;
 		int marioYPos = (int) mario.y / 16;
@@ -137,7 +139,7 @@ public class TickProblem extends Problem {
         	int xStart = (marioXPos - SCREEN_WIDTH > 0) ? marioXPos - SCREEN_WIDTH : 0;
         	int xEnd = (marioXPos <= 15) ? 15 : marioXPos - SCREEN_WIDTH ; // in the beginning Mario cannot see very far for some reason. So take care of this.
         	for (int x = xStart; x < xEnd; x++) {
-        		levelScene.level.setBlock(x, y, blockPositions[x][y]);
+        		worldScene.level.setBlock(x, y, blockPositions[x][y]);
         	}
         }
         
@@ -167,16 +169,16 @@ public class TickProblem extends Problem {
 				if (kind == Enemy.ENEMY_FLOWER) {
 					int xBlockPos = (int) x / 16;
 					int yBlockPos = (int) y / 16;
-					sprite = new FlowerEnemy(levelScene, (int) x, (int) y, xBlockPos, yBlockPos);
+					sprite = new FlowerEnemy(worldScene, (int) x, (int) y, xBlockPos, yBlockPos);
 				} else if (kind == Sprite.KIND_BULLET_BILL) {
-					sprite = new BulletBill(levelScene, x, y, -1);
+					sprite = new BulletBill(worldScene, x, y, -1);
 				} else {
 					boolean winged = false; // TODO temporarily not taken care of
-					sprite = new Enemy(levelScene, (int) x, (int) y, -1, kind, winged, (int) x / 16, (int) y / 16);
+					sprite = new Enemy(worldScene, (int) x, (int) y, -1, kind, winged, (int) x / 16, (int) y / 16);
 				}
 				sprites.add(sprite);
         	}
-			if (sprite != null) levelScene.addSprite(sprite);
+			if (sprite != null) worldScene.addSprite(sprite);
         	
         }
         

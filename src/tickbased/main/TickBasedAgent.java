@@ -29,6 +29,7 @@ public class TickBasedAgent implements Agent {
 		problem.updateLevel(observation);
 		
 		if (plan.size() == 0) {
+			problem.states.clear();
 			plan = aStar.runAStar(problem, startTime);
 		}
 		
@@ -60,7 +61,7 @@ public class TickBasedAgent implements Agent {
 		problem = new TickProblem();
 		
 		LevelScene levelScene = new LevelScene();
-		problem.levelScene = levelScene;
+		problem.worldScene = problem.tentativeScene = levelScene;
 		
 		problem.initialState = new Node(levelScene);
 		problem.goalState = new Node(levelScene);
