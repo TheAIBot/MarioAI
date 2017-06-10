@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import org.omg.CORBA.COMM_FAILURE;
 
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import ch.idsia.mario.environments.Environment;
 
 
@@ -181,7 +181,7 @@ public class World {
 		}
 	}
 	
-	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, SpeedNode sourceNode, float lastY){
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, StateNode sourceNode, float lastY){
 		return collisionDetection.isColliding(futureOffsetX, futureOffsetY, currentOffsetX, currentOffsetY, sourceNode.currentXPos, sourceNode.yPos, lastY, this);
 	}
 	

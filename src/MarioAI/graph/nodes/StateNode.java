@@ -11,12 +11,12 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
-public class SpeedNode implements Comparable<SpeedNode> {
+public class StateNode implements Comparable<StateNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
 	public final Node node;
 	public final float vx;
-	public SpeedNode parent;
+	public StateNode parent;
 	public float parentXPos;
 	public final float parentVx;
 	public final long hash;
@@ -34,7 +34,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public int ticksOfInvincibility = 0;
 	public int lives = MAX_MARIO_LIFE;
 	
-	public SpeedNode(Node node, float vx, long hash) {
+	public StateNode(Node node, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -49,7 +49,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, float marioX, float vx, long hash) {
+	public StateNode(Node node, float marioX, float vx, long hash) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -66,7 +66,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	///Should only be used for testing purposes
-	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -80,11 +80,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, World world) {
 		this(node, parent, parent.creationXPos, parent.vx, ancestorEdge, hash, world);
 	}
 	
-	public SpeedNode(Node node, SpeedNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
+	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -230,15 +230,15 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		if (b == null) {
 			return false;
 		}
-		if (b instanceof SpeedNode) {
-			SpeedNode bb = (SpeedNode) b;
+		if (b instanceof StateNode) {
+			StateNode bb = (StateNode) b;
 			return bb.hash == hash;
 		} else {
 			return false;
 		}
 	}
 	
-	public int compareTo(SpeedNode o) {
+	public int compareTo(StateNode o) {
 		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
 	}
 	

@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 
 import MarioAI.World;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
 public class MovementInformation{
@@ -157,7 +157,7 @@ public class MovementInformation{
 		}
 	}
 
-	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
+	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
 		float previousPositionX = 0;
                 float previousPositionY = 0;
 		final float lastY = positionsY[positionsY.length - 1];

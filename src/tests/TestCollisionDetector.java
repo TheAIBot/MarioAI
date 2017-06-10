@@ -18,7 +18,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
@@ -89,15 +89,15 @@ public class TestCollisionDetector {
 
 				float marioRightSpeed = 0;
 				float marioLeftSpeed = 0;
-				SpeedNode currentRight = new SpeedNode(rightWalkingPath.get(0).source, marioRightSpeed, Long.MAX_VALUE);
-				SpeedNode currentLeft = new SpeedNode(leftWalkingPath.get(0).source, marioLeftSpeed, Long.MAX_VALUE);
+				StateNode currentRight = new StateNode(rightWalkingPath.get(0).source, marioRightSpeed, Long.MAX_VALUE);
+				StateNode currentLeft = new StateNode(leftWalkingPath.get(0).source, marioLeftSpeed, Long.MAX_VALUE);
 				for (int j = 0; j < rightWalkingPath.size(); j++) { //Going through the paths.		
 					DirectedEdge currentRightEdge = rightWalkingPath.get(j);		
 					DirectedEdge currentLeftEdge 	= leftWalkingPath.get(j);
 					
-					final SpeedNode snRight = new SpeedNode(currentRightEdge.target, currentRight	,
+					final StateNode snRight = new StateNode(currentRightEdge.target, currentRight	,
 							                                  currentRightEdge, 0, world); //Don't care about the hash.
-					final SpeedNode snLeft 	= new SpeedNode(currentLeftEdge.target	, currentLeft	,
+					final StateNode snLeft 	= new StateNode(currentLeftEdge.target	, currentLeft	,
 							                                  currentLeftEdge	, 0, world); //Don't care about the hash.
 					if (!snRight.isSpeedNodeUseable(world) ||
 						!snLeft .isSpeedNodeUseable(world)) {
@@ -176,9 +176,9 @@ public class TestCollisionDetector {
 				level[i][marioNode.y - height] = new Node(marioNode.x + i - 11, marioNode.y - height , (byte) -10);
 			}
 			final int currentHeight = height;
-			SpeedNode startNode = new SpeedNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
+			StateNode startNode = new StateNode(marioNode, 0, Long.MAX_VALUE); //Starts at the normal speed
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
+				final StateNode sn = new StateNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable(world)) { //Does not take the ceiling into account
                                     throw new Error("Fix test by fixing below commented code");
@@ -212,9 +212,9 @@ public class TestCollisionDetector {
 		//For all movements, given an arbitrary starting speed, since he starts on a flat world,
 		//there shouldn't be any collisions:
 		for (float speed = (float) -0.35; speed < 0.35; speed += 0.01) {
-			SpeedNode startNode = new SpeedNode(marioNode, speed, Long.MAX_VALUE);
+			StateNode startNode = new StateNode(marioNode, speed, Long.MAX_VALUE);
 			for (DirectedEdge edge : marioNode.getEdges()) {
-				final SpeedNode sn = new SpeedNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
+				final StateNode sn = new StateNode(edge.target, startNode	, edge, 0, world); //Don't care about the hash.
 				
 				if (sn.isSpeedNodeUseable(world)) {
 					assertFalse(sn.getMoveInfo().hasCollisions(startNode, world));
@@ -265,7 +265,7 @@ public class TestCollisionDetector {
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top. 
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 14, (byte) -10);
-				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
+				StateNode startNode = new StateNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the jump ends at y=0.
 				boolean hasCollision = world.isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, startNode, lastYPosition);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;
@@ -312,7 +312,7 @@ public class TestCollisionDetector {
 				//Starts at the normal speed. Doesn't have any significans.
 				//Starts from the top	. 
 				Node fakeNode = new Node((int) (level[(int) i][9].x) , 0, (byte) -11);
-				SpeedNode startNode = new SpeedNode(fakeNode, 0, Long.MAX_VALUE); 
+				StateNode startNode = new StateNode(fakeNode, 0, Long.MAX_VALUE); 
 				float lastYPosition = 14; //Lets just say that the fall ends at y=14.
 				boolean hasCollision = world.isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, startNode, lastYPosition);
 				String errorMessage = "Error at height = " + j + ", at i = " + i;

@@ -28,7 +28,7 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.environments.Environment;
 
@@ -148,7 +148,7 @@ public class TestAStar {
 		setup("TestAStarJump", false);
 		//agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
 		
-		Map<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		Map<Long, StateNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
 		final int MAX_NUMBER_OF_SPEED_NODES = agent.pathCreator.getBlockingGranularity() * 2 + 1;
 		final int NUMBER_OF_TEST_TICKS = 100;
@@ -158,7 +158,7 @@ public class TestAStar {
 			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, world);
 //			List<DirectedEdge> path = agent.pathCreator.getBestPath();
 			
-			for (SpeedNode speedNode : speedNodes.values()) {
+			for (StateNode speedNode : speedNodes.values()) {
 				if (!searchedNodes.contains(speedNode.hash)) {
 					int hashCode = speedNode.ancestorEdge.hashCode(); // used to be: speedNode.node.hashCode();
 					if (numberOfNodesMap.containsKey(hashCode)) {
@@ -237,12 +237,12 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);
+		StateNode start = new StateNode(source, source.x, 0, Long.MAX_VALUE);
 		start.gScore = 0;
 		start.fScore = 0;
 		
-		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
-		SpeedNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
+		HashMap<Long, StateNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		StateNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
 													.findFirst().get();
 				
 		assertTrue(end.isSpeedNodeUseable(world));
@@ -256,7 +256,7 @@ public class TestAStar {
 	public void testTunnelWithEnemyOneLife() {
 		setup("straightTunnel", false);
 		
-		SpeedNode.MAX_MARIO_LIFE = 1; // make sure Mario will only have one life in this test (technically he will have more, but he will act as if he only had one)
+		StateNode.MAX_MARIO_LIFE = 1; // make sure Mario will only have one life in this test (technically he will have more, but he will act as if he only had one)
 		
 		TestTools.setMarioPosition(observation, 2, 12);
 		TestTools.spawnEnemy(observation, 7, 12, -1, EnemyType.GREEN_KOOPA);
@@ -287,10 +287,10 @@ public class TestAStar {
 		//assertNull(path);
 		assertNotNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway, eventhough the fscore is high.
 		
-		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		HashMap<Long, StateNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		boolean hasHitEnemy = false;
 		for (DirectedEdge edge : path) {
-			SpeedNode sn = speedNodes.values().stream()
+			StateNode sn = speedNodes.values().stream()
 											   .filter(x -> x.ancestorEdge.equals(edge))
 											   .findFirst().get();
 			if (edge.getMoveInfo().hasCollisions(sn, world)) hasHitEnemy = true;
@@ -405,7 +405,7 @@ public class TestAStar {
 		}
 		
 		long hashCode = Hasher.hashSpeedNode(edge.getMoveInfo().getEndSpeed(), edge, agent.pathCreator.getBlockingGranularity());
-		SpeedNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
+		StateNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
 		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}

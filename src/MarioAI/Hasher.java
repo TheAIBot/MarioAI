@@ -1,7 +1,7 @@
 package MarioAI;
 
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.nodes.SpeedNode;
+import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 
 public class Hasher {
@@ -26,7 +26,7 @@ public class Hasher {
 		return b1 | b2;
 	}
 	
-	public static long hashEndSpeedNode(SpeedNode sn, int hashGranularity) {
+	public static long hashEndStateNode(StateNode sn, int hashGranularity) {
 		return hashEndSpeedNode(sn.node.x, sn.node.y, sn.vx, hashGranularity);
 	}
 	
