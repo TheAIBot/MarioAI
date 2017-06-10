@@ -1,12 +1,10 @@
 package tickbased.main;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.idsia.ai.agents.Agent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-import tickbased.game.world.Level;
 import tickbased.game.world.LevelScene;
 import tickbased.search.MarioAction;
 import tickbased.search.Node;
@@ -18,9 +16,9 @@ public class TickBasedAgent implements Agent {
 	
 	AStarTickBased aStar;
 	TickProblem problem;
-	Iterator<Action> iter;
 	
-	List<Action> plan;
+	List<Action> plan = new ArrayList<Action>();
+	
 	
 	public TickBasedAgent() {
 		reset();
@@ -30,19 +28,16 @@ public class TickBasedAgent implements Agent {
 		long startTime = System.currentTimeMillis();
 		problem.updateLevel(observation);
 		
-		if (aStar.finishedNewRun) {
+		if (plan.size() == 0) {
 			plan = aStar.runAStar(problem, startTime);
-			iter = plan.iterator();
 		}
 		
 		if (plan == null || plan.size() == 0) {
-//	        action[Mario.KEY_RIGHT] = true;
-//	        action[Mario.KEY_SPEED] = true;
-//	        action[Mario.KEY_JUMP] = true;
-	        return action;
+	        return action; // empty action
 		}
 		
-		return ((MarioAction) (iter.next())).action;
+		return ((MarioAction) plan.remove(0)).action;
+		
 	}
 	
 	public AGENT_TYPE getType() {
@@ -69,9 +64,7 @@ public class TickBasedAgent implements Agent {
 		
 		problem.initialState = new Node(levelScene);
 		problem.goalState = new Node(levelScene);
-		((Node) problem.goalState).x = 100;
+		((Node) problem.goalState).x = ((Node) problem.initialState).x + TickProblem.SCREEN_WIDTH / 2 * 16;
 		
-		plan = null;
-		iter = null;
 	}
 }

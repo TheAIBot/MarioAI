@@ -18,7 +18,8 @@ import tickbased.main.State;
 public class TickProblem extends Problem {
 
 	private static final float MAX_RIGHT = 200 * 16;
-	private static final int SCREEN_WIDTH = 22, SCREEN_HEIGHT = 15; // TODO
+	public static final int SCREEN_WIDTH = 22; // TODO
+	private static final int SCREEN_HEIGHT = 15;
 	public int maxRightSeenSoFar = 15 * 16; // TODO
 	public LevelScene levelScene;
 	public List<Sprite> sprites = new ArrayList<Sprite>();
@@ -178,7 +179,8 @@ public class TickProblem extends Problem {
 			if (sprite != null) levelScene.addSprite(sprite);
         	
         }
-
+        
+        ((Node) goalState).x = ((Node) initialState).x + TickProblem.SCREEN_WIDTH / 2 * 16;
 	}
 
 }
