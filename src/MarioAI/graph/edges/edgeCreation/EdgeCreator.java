@@ -17,7 +17,7 @@ public class EdgeCreator {
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
-	public static final boolean ALLOW_SPEED_KEY = true;
+	public static final boolean ALLOW_SPEED_KEY = false;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {

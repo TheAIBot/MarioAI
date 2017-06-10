@@ -18,6 +18,8 @@ public class MovementInformation{
 	private final boolean[] pressXButton;
 	private final boolean[] pressYButton;
 	private final boolean useSuperSpeed;
+	private final int originalTicksOfMovement;
+	private int ticksOfMovement; //Necessary for stomp to work.
 	
 	//position information
 	//private final Point2D.Float[] positions;
@@ -29,8 +31,9 @@ public class MovementInformation{
 		this.endSpeed = xMoveInfo.endSpeed;
 		this.totalTicksXMoved = xMoveInfo.totalTicksXMoved;
 		this.useSuperSpeed = xMoveInfo.useSuperSpeed;
-		
 		this.totalTicksJumped = yMoveInfo.totalTicksJumped;
+		this.originalTicksOfMovement = Math.max(totalTicksXMoved, totalTicksJumped); ;
+		this.ticksOfMovement = originalTicksOfMovement;
 		
 		this.pressXButton = xMoveInfo.pressXButton;
 		this.pressYButton = yMoveInfo.pressYButton;
@@ -42,11 +45,11 @@ public class MovementInformation{
 	        if (yMoveInfo.yPositions.length > 0) {
 	            for (int i = 0; i < yMoveInfo.yPositions.length; i++) {
 	                this.positionsY[i] = yMoveInfo.yPositions[i];
-	            }
+	            			}
 	            for (int i = yMoveInfo.yPositions.length; i < this.positionsX.length; i++) {
 	                this.positionsY[i] = yMoveInfo.yPositions[yMoveInfo.yPositions.length - 1];
-	            }
-	        }
+	            			}
+	        		}
 		}
 		else {
 			this.positionsX = new float[yMoveInfo.yPositions.length];
@@ -102,7 +105,7 @@ public class MovementInformation{
 	}
 	
 	public int getMoveTime() {
-		return Math.max(totalTicksXMoved, totalTicksJumped);
+		return ticksOfMovement;
 	}
 	
 	public float[] getXPositions() {
@@ -140,6 +143,12 @@ public class MovementInformation{
 			else if (bb.totalTicksXMoved != totalTicksXMoved) {
 				return false;
 			}
+			else if (bb.originalTicksOfMovement != originalTicksOfMovement) {
+				return false;
+			}
+			else if (bb.ticksOfMovement != ticksOfMovement) {
+				return false;
+			}
 			else if (bb.useSuperSpeed != useSuperSpeed) {
 				return false;
 			}
@@ -159,29 +168,33 @@ public class MovementInformation{
 
 	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
 		float previousPositionX = 0;
-                float previousPositionY = 0;
-		final float lastY = positionsY[positionsY.length - 1];
-		for (int i = 0; i < positionsX.length; i++) { 
+      float previousPositionY = 0;
+		final float lastY = positionsY[getMoveTime() - 1];
+		for (int i = 0; i < getMoveTime(); i++) { 
 			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, sourceNode, lastY)) {
 				return true;
 			}
 			previousPositionX = positionsX[i];
-                        previousPositionY = positionsY[i];
+         previousPositionY = positionsY[i];
 		}	
 		return false;
 	}
 	
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		float previousPositionX = 0;
-                float previousPositionY = 0;
-		final float lastY = positionsY[positionsY.length - 1];
-		for (int i = 0; i < positionsX.length; i++) { 
+		float previousPositionY = 0;
+		final float lastY = positionsY[getMoveTime() - 1];
+		for (int i = 0; i < getMoveTime(); i++) { 
 			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, startX, startY, lastY)) {
 				return true;
 			}
 			previousPositionX = positionsX[i];
-                        previousPositionY = positionsY[i];
+			previousPositionY = positionsY[i];
 		}	
 		return false;
+	}
+	
+	public void setStopTime(int tickForCollision) {
+		ticksOfMovement = tickForCollision;
 	}
 }

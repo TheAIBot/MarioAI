@@ -78,12 +78,14 @@ public class Play {
 			}
                 */
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1182521566); //Seed hvor han hopper ind i en fjende, pga. han laver for langt hop. Saet restriktion.
+	        options.setLevelRandSeed(493269332);
+	        //options.setLevelRandSeed(362336148);
+	        //options.setLevelRandSeed(1182521566); //Seed hvor han hopper ind i en fjende, pga. han laver for langt hop. Saet restriktion.
 	        //options.setLevelRandSeed(1179126435); //Gaar ret dårligt på der her seed.
 	        //options.setLevelRandSeed(1975381315);
 	        //options.setLevelRandSeed(238114835);
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
-	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
+	        //options.setLevelRandSeed(632962519); //Without speed enabled, he will act quite strange.
 	        //options.setLevelRandSeed(860788790);
 	        //options.setLevelRandSeed(1145934057);
 	        //options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
@@ -115,7 +117,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(0);	 
+	        options.setLevelDifficulty(1);	 
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

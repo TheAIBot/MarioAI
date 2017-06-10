@@ -53,6 +53,9 @@ public class StateNode implements Comparable<StateNode> {
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
+		if (livingEnemies != -1) {
+			System.out.println("meh");
+		}
 	}
 	
 	public StateNode(Node node, float marioX, float vx, long hash, long livingEnemies) {
@@ -69,10 +72,13 @@ public class StateNode implements Comparable<StateNode> {
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
+		if (livingEnemies != -1) {
+			System.out.println("meh");
+		}
 	}
 	
 	///Should only be used for testing purposes
-	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world, long livingEnemies) {
+	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -85,6 +91,9 @@ public class StateNode implements Comparable<StateNode> {
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
+		if (livingEnemies != -1) {
+			System.out.println("meh");
+		}
 	}
 	
 	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
@@ -105,6 +114,9 @@ public class StateNode implements Comparable<StateNode> {
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
+		if (livingEnemies != -1) {
+			System.out.println("meh");
+		}
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
@@ -211,7 +223,7 @@ public class StateNode implements Comparable<StateNode> {
 		if (hasEnemyCollision) {
 			lives--;
 		}
-		
+
 		return hasEnemyCollision;
 	}
 	
@@ -225,17 +237,17 @@ public class StateNode implements Comparable<StateNode> {
 	 */
 	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
 		int currentTick = startTime;
-		
-                for (int i = 0; i < moveInfo.getMoveTime(); i++) {
-                    final float x = parentXPos  + moveInfo.getXPositions()[i];
-                    final float y = parent.yPos - moveInfo.getYPositions()[i];
 
-                    if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-                        return true;
-                    }
-			
-                    currentTick++;
-                }
+		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
+			final float x = parentXPos + moveInfo.getXPositions()[i];
+			final float y = parent.yPos - moveInfo.getYPositions()[i];
+
+			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick, false, false, null, livingEnemies)) {
+				return true;
+			}
+
+			currentTick++;
+		}
 		return false;
 	}
 	

@@ -3,145 +3,131 @@ package ch.idsia.mario.engine.sprites;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.LevelScene;
 
+public class BulletBill extends Sprite {
+	private int width = 4;
+	int height = 24;
 
-public class BulletBill extends Sprite
-{
-    private int width = 4;
-    int height = 24;
+	private LevelScene world;
+	public int facing;
 
-    private LevelScene world;
-    public int facing;
+	public boolean avoidCliffs = false;
+	public int anim;
 
-    public boolean avoidCliffs = false;
-    public int anim;
+	public boolean dead = false;
+	private int deadTime = 0;
 
-    public boolean dead = false;
-    private int deadTime = 0;
+	public BulletBill(LevelScene world, float x, float y, int dir) {
+		kind = KIND_BULLET_BILL; // added by SK
+		sheet = Art.enemies;
 
+		this.x = x;
+		this.y = y;
+		this.world = world;
+		xPicO = 8;
+		yPicO = 31;
 
-    public BulletBill(LevelScene world, float x, float y, int dir)
-    {
-        kind = KIND_BULLET_BILL;     //added by SK
-        sheet = Art.enemies;
+		height = 12;
+		facing = 0;
+		wPic = 16;
+		yPic = 5;
 
-        this.x = x;
-        this.y = y;
-        this.world = world;
-        xPicO = 8;
-        yPicO = 31;
+		xPic = 0;
+		ya = -5;
+		this.facing = dir;
+	}
 
-        height = 12;
-        facing = 0;
-        wPic = 16;
-        yPic = 5;
+	public void collideCheck() {
+		if (dead)
+			return;
 
-        xPic = 0;
-        ya = -5;
-        this.facing = dir;
-    }
+		float xMarioD = world.mario.x - x;
+		float yMarioD = world.mario.y - y;
+		float w = 16;
+		if (xMarioD > -16 && xMarioD < 16) {
+			if (yMarioD > -height && yMarioD < world.mario.height) {
+				if (world.mario.ya > 0 && yMarioD <= 0
+						&& (!world.mario.onGround || !world.mario.wasOnGround)) {
+					world.mario.stomp(this);
+					dead = true;
 
-    public void collideCheck()
-    {
-        if (dead) return;
+					xa = 0;
+					ya = 1;
+					deadTime = 100;
+				} else {
+					world.mario.getHurt();
+				}
+			}
+		}
+	}
 
-        float xMarioD = world.mario.x - x;
-        float yMarioD = world.mario.y - y;
-        float w = 16;
-        if (xMarioD > -16 && xMarioD < 16)
-        {
-            if (yMarioD > -height && yMarioD < world.mario.height)
-            {
-                if (world.mario.ya > 0 && yMarioD <= 0 && (!world.mario.onGround || !world.mario.wasOnGround))
-                {
-                    world.mario.stomp(this);
-                    dead = true;
+	public void move() {
+		if (deadTime > 0) {
+			deadTime--;
 
-                    xa = 0;
-                    ya = 1;
-                    deadTime = 100;
-                }
-                else
-                {
-                    world.mario.getHurt();
-                }
-            }
-        }
-    }
+			if (deadTime == 0) {
+				deadTime = 1;
+				for (int i = 0; i < 8; i++) {
+					world.addSprite(new Sparkle((int) (x + Math.random() * 16 - 8) + 4,
+							(int) (y - Math.random() * 8) + 4,
+							(float) (Math.random() * 2 - 1), (float) Math.random() * -1, 0,
+							1, 5));
+				}
+				spriteContext.removeSprite(this);
+			}
 
-    public void move()
-    {
-        if (deadTime > 0)
-        {
-            deadTime--;
+			x += xa;
+			y += ya;
+			ya *= 0.95;
+			ya += 1;
 
-            if (deadTime == 0)
-            {
-                deadTime = 1;
-                for (int i = 0; i < 8; i++)
-                {
-                    world.addSprite(new Sparkle((int) (x + Math.random() * 16 - 8) + 4, (int) (y - Math.random() * 8) + 4, (float) (Math.random() * 2 - 1), (float) Math.random() * -1, 0, 1, 5));
-                }
-                spriteContext.removeSprite(this);
-            }
+			return;
+		}
 
-            x += xa;
-            y += ya;
-            ya *= 0.95;
-            ya += 1;
+		float sideWaysSpeed = 4f;
 
-            return;
-        }
+		xa = facing * sideWaysSpeed;
+		xFlipPic = facing == -1;
+		move(xa, 0);
+	}
 
-        float sideWaysSpeed = 4f;
+	private boolean move(float xa, float ya) {
+		x += xa;
+		return true;
+	}
 
-        xa = facing * sideWaysSpeed;
-        xFlipPic = facing == -1;
-        move(xa, 0);
-    }
+	public boolean fireballCollideCheck(Fireball fireball) {
+		if (deadTime != 0)
+			return false;
 
-    private boolean move(float xa, float ya)
-    {
-        x += xa;
-        return true;
-    }
-    
-    public boolean fireballCollideCheck(Fireball fireball)
-    {
-        if (deadTime != 0) return false;
+		float xD = fireball.x - x;
+		float yD = fireball.y - y;
 
-        float xD = fireball.x - x;
-        float yD = fireball.y - y;
+		if (xD > -16 && xD < 16) {
+			if (yD > -height && yD < fireball.height) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-        if (xD > -16 && xD < 16)
-        {
-            if (yD > -height && yD < fireball.height)
-            {
-                return true;
-            }
-        }
-        return false;
-    }      
+	public boolean shellCollideCheck(Shell shell) {
+		if (deadTime != 0)
+			return false;
 
-    public boolean shellCollideCheck(Shell shell)
-    {
-        if (deadTime != 0) return false;
+		float xD = shell.x - x;
+		float yD = shell.y - y;
 
-        float xD = shell.x - x;
-        float yD = shell.y - y;
+		if (xD > -16 && xD < 16) {
+			if (yD > -height && yD < shell.height) {
+				dead = true;
 
-        if (xD > -16 && xD < 16)
-        {
-            if (yD > -height && yD < shell.height)
-            {
-                dead = true;
+				xa = 0;
+				ya = 1;
+				deadTime = 100;
 
-                xa = 0;
-                ya = 1;
-                deadTime = 100;
-
-                return true;
-            }
-        }
-        return false;
-    }      
+				return true;
+			}
+		}
+		return false;
+	}
 }
