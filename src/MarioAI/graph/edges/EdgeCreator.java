@@ -83,9 +83,9 @@ public class EdgeCreator {
 		}
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
+			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
 
 		if (foundAllEdges)
@@ -218,12 +218,9 @@ public class EdgeCreator {
 	 * @return
 	 */
 	public boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
-		JumpingEdge polynomial = new JumpingEdge(null, null); // The
-									// jump
-									// polynomial.
+		JumpingEdge polynomial = new JumpingEdge(null, null);
 		boolean foundAllEdges = true;
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
-			// TODO ensure result doesn't contain null
 			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { 
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,	JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; // TODO ERROR if removed onshortdeadend

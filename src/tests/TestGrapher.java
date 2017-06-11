@@ -86,6 +86,7 @@ public class TestGrapher {
 	public void testRunningEdgesToNeighbors() {
 		World graph = flatlandWorld();
 		Node[][] world = graph.getLevelMatrix();
+		grapher.setMovementEdges(graph, marioNode);
 		assertTrue(marioNode.containsEdgeWithTargetAndType(marioNode.x - 1, marioNode.y, runningEdgeType));
 		assertTrue(marioNode.containsEdgeWithTargetAndType(marioNode.x + 1, marioNode.y, runningEdgeType));
 	}
@@ -94,14 +95,13 @@ public class TestGrapher {
 	public void testRunningEdgesAlongRow() {
 		World graph = flatlandWorld();
 		Node[][] world = graph.getLevelMatrix();
+		grapher.setMovementEdges(graph, marioNode);
 		// All the reachable nodes from the mario node:
 		for (int i = 10; i < world.length - 1; i++) {
 			Node currentNode = world[i][marioNode.y];
 			assertEquals(2*2, currentNode.getNumberOfEdgesOfType(runningEdgeType));
-			assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x - 1, currentNode.y,
-					runningEdgeType));
-			assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x + 1, currentNode.y,
-					runningEdgeType));
+			assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x - 1, currentNode.y,	runningEdgeType));
+			assertTrue(currentNode.containsEdgeWithTargetAndType(currentNode.x + 1, currentNode.y,	runningEdgeType));
 		}
 		// Edge node that should only point to right, as there is
 		// nothing to the left:
@@ -688,7 +688,7 @@ public class TestGrapher {
 		
 		//Testing the ascending function:
 		
-		for (int i = 0; i <= level.length; i++) {
+		for (int i = 0; i < level.length; i++) {
 			//The blocks are at height = 9
 			
 			//Does not allow only the bottom to hit the ground, as this is not possible in reality.
@@ -706,15 +706,10 @@ public class TestGrapher {
 				
 				String errorMessage = "Failure at i = " + i + ", height/j = " + j;
 				//Plus/minus 0.01, as this is added in the sub-methods
-				if (9 <= j - EdgeCreator.MARIO_HEIGHT && j - EdgeCreator.MARIO_HEIGHT <= 10 ) {		
-					if (i == 0) { 
-						//The left corner will not hit the ceiling, and it will think it is a wall collision
-						assertEquals(errorMessage, Collision.HIT_WALL, rightwardsCollision);
-					} else {
-						assertEquals(errorMessage, Collision.HIT_CEILING, rightwardsCollision);
-					}
+				if (9 <= j - EdgeCreator.MARIO_HEIGHT && j - EdgeCreator.MARIO_HEIGHT <= 10 ) {	
+					assertEquals(errorMessage, Collision.HIT_CEILING, rightwardsCollision);
 					
-					if (i == level.length) {
+					if (i == level.length - 1) {
 						//The right corner will not hit the ceiling, and it will think it is a wall collision
 						leftwardsCollision  = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS	, startingPosition, listOfEdges);
 						assertEquals(errorMessage, Collision.HIT_WALL, leftwardsCollision);
@@ -777,7 +772,7 @@ public class TestGrapher {
 				
 				//Case leftwards:
 				//Should count as though the x position is one to the left. Therefore:
-				if (xPos < 9 + 1) { //Beginning of the floor.
+				if (xPos < 9 ) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeft);
 				} else {
 					//There might be a collision:
@@ -871,7 +866,7 @@ public class TestGrapher {
 
 				//Case Left upwards:
 				//Should count as though the x position is one to the left. Therefore:
-				if (xPos < 9 + 1) { //Beginning of the floor.
+				if (xPos < 9 ) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftUp);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallLeftUp);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYLeftUp);
@@ -894,7 +889,7 @@ public class TestGrapher {
 				
 				//Case Left downwards:
 				//Should count as though the x position is one to the left. Therefore:
-				if (xPos < 9 + 1) { //Beginning of the floor.
+				if (xPos < 9 ) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftDown);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallLeftDown);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionSameYLeftDown);
@@ -982,7 +977,7 @@ public class TestGrapher {
 
 				//Case Left upwards:
 				//Should count as though the x position is one to the left. Therefore:
-				if (xPos < 9 + 1) { //Beginning of the floor.
+				if (xPos < 9) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftUp);
 					//Thinks it has reached the top of a wall:
 					assertEquals(errorMessage, Collision.HIT_GROUND, currentCollisionHittingWallLeftUp);
@@ -1002,7 +997,7 @@ public class TestGrapher {
 				
 				//Case Left downwards:
 				//Should count as though the x position is one to the left. Therefore:
-				if (xPos < 9 + 1) { //Beginning of the floor.
+				if (xPos < 9) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftDown);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallLeftDown);
 				} else {
@@ -1030,8 +1025,8 @@ public class TestGrapher {
 		}
 		
 		grapher.setMovementEdges(world, marioNode);		
-		
-		for (int xPos = 0; xPos < level.length; xPos++) { //This is the column position.
+		//Only withing the bounds
+		for (int xPos = 1; xPos < level.length - 1; xPos++) { //This is the column position.
 			for (float yPos = 1; yPos < level[xPos].length; yPos += 0.01) {
 				String errorMessage = "Error at xPos = " + xPos + ", yPos = " + yPos;
 				//Only cases for downwards directions:
@@ -1053,7 +1048,7 @@ public class TestGrapher {
 				}					
 				
 				//Case Left downwards:
-				if (xPos < 9) { //Beginning of the floor.
+				if (xPos < 9 - 1) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftDown);
 				} else {
 					//There might be a collision:
@@ -1078,8 +1073,8 @@ public class TestGrapher {
 		}
 		
 		grapher.setMovementEdges(world, marioNode);		
-		
-		for (int xPos = 0; xPos < level.length; xPos++) { //This is the column position.
+		//Only withing the limits
+		for (int xPos = 1; xPos < level.length - 1; xPos++) { //This is the column position.
 			for (float yPos = 1; yPos < level[xPos].length; yPos += 0.01) {
 				String errorMessage = "Error at xPos = " + xPos + ", yPos = " + yPos;
 				//Only cases for upwards directions:
@@ -1102,7 +1097,7 @@ public class TestGrapher {
 				}					
 				
 				//Case Left downwards:
-				if (xPos < 9) { //Beginning of the floor.
+				if (xPos < 9-1) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionLeftDown);
 				} else {
 					//There might be a collision:
