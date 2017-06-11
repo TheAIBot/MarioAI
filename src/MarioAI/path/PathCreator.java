@@ -47,6 +47,8 @@ public class PathCreator {
 		for (int i = 0; i < threadCount; i++) {
 			aStars[i] = new AStar(HASH_GRANULARITY[i]);
 		}
+		
+		Arrays.sort(aStars, (AStar a, AStar b) -> a.hashGranularity - b.hashGranularity);
 	}
 	
 	public void initialize(Environment observation) {
@@ -160,8 +162,6 @@ public class PathCreator {
 		for (int i = 0; i < aStars.length; i++) {
 			paths[i] = aStars[i].getCurrentBestPath();
 		}
-		
-		Arrays.sort(paths, (AStarPath a, AStarPath b) -> a.granularity - b.granularity);
 		
 		//Of one or more paths are finished then chose
 		//the path with the highest granularity.

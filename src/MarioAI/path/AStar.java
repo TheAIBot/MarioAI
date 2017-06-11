@@ -21,7 +21,7 @@ class AStar {
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Map<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
-	final int hashGranularity;
+	public final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;

@@ -11,7 +11,7 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 4;
+	private static final float MAX_JUMP_RANGE = 8;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
@@ -22,12 +22,9 @@ public class EdgeCreator {
 
 	public void setMovementEdges(World world, Node marioNode) {
 		observationGraph = world.getLevelMatrix();
-		marioNode.deleteAllEdges();
 
 		// First connects all the edges for Mario:
-		if (isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) && canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
-			connectNode(marioNode, GRID_WIDTH / 2, marioNode);
-		}
+		setMovementEdgesForMario(world, marioNode);
 
 		// Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) {
@@ -40,6 +37,12 @@ public class EdgeCreator {
 			}
 		}
 
+	}
+	
+	public void setMovementEdgesForMario(World world, Node marioNode) {
+		if (isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) && canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
+			connectNode(marioNode, GRID_WIDTH / 2, marioNode);
+		}
 	}
 
 	private void connectNode(Node node, int coloumn, Node marioNode) {

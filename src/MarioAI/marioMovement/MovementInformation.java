@@ -166,7 +166,7 @@ public class MovementInformation{
 				return true;
 			}
 			previousPositionX = positionsX[i];
-                        previousPositionY = positionsY[i];
+            previousPositionY = positionsY[i];
 		}	
 		return false;
 	}
