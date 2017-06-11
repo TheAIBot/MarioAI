@@ -1,8 +1,5 @@
 package MarioAI.path;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 import MarioAI.Hasher;
@@ -12,28 +9,21 @@ import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
-import it.unimi.dsi.fastutil.Hash;
-import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 class AStar {
-	//private final HashMap<Long, SpeedNode> speedNodes = new HashMap<Long, SpeedNode>();
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
 	
 	// Set of nodes already explored
-	//private final HashSet<Long> closedSet = new HashSet<Long>();
 	private final LongOpenHashSet closedSet = new LongOpenHashSet();
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
-	//private final Object
-	//private final HashMap<Long, SpeedNode> openSetMap = new HashMap<Long, SpeedNode>();
 	private final Long2ObjectOpenHashMap<SpeedNode> openSetMap = new Long2ObjectOpenHashMap<SpeedNode>();
 	public final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
-	private final Object lockBestSpeedNode = new Object();
 	
 	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	
