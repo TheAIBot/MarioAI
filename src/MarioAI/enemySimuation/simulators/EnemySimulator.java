@@ -14,7 +14,6 @@ public abstract class EnemySimulator {
     protected final int height;
     protected final int kind;
     private final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
-    protected int positionsIndexOffset = 0;
 	
     public EnemySimulator(int kind, int width, int height) {
     	this.kind = kind;
@@ -33,14 +32,9 @@ public abstract class EnemySimulator {
     }
 
     public void moveTimeForward() {
-    	positionsIndexOffset++;
-    }
-    
-    public void moveTimeBackwards() {
-    	if (positionsIndexOffset == 0) {
-			throw new Error("positionsIndexOffset can't be less than 0");
+    	if (positionAtTime.size() > 0) {
+			positionAtTime.remove(0);
 		}
-    	positionsIndexOffset--;
     }
     
     public void moveEnemy() {
@@ -61,14 +55,14 @@ public abstract class EnemySimulator {
     }
     
     public synchronized Point2D.Float getPositionAtTime(int time) {
-    	if (positionAtTime.size() - positionsIndexOffset <= time) {
+    	if (positionAtTime.size() <= time) {
 			//synchronized (createPositionsLock) {
-		    	while (positionAtTime.size() - positionsIndexOffset <= time) {
+		    	while (positionAtTime.size() <= time) {
 		    		moveEnemy();
 				}
 			//}
 		}
-    	return positionAtTime.get(time + positionsIndexOffset);
+    	return positionAtTime.get(time);
     }
     
     public float getWidth() {

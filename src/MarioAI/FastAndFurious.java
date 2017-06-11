@@ -28,7 +28,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = true;
+	public boolean DEBUG = false;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -153,14 +153,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	public void findPath(Environment observation) {
-		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world);
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	
 	public void startFindingPathFromPreviousPath(Environment observation) {
-		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		final ArrayList<DirectedEdge> path =  pathCreator.getBestPath();
 		final Node[] goalNodes = world.getGoalNodes(0);

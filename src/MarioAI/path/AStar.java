@@ -40,7 +40,7 @@ class AStar {
 	 * @param marioHeight
 	 * @param world
 	 */
-	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
+	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
@@ -64,7 +64,7 @@ class AStar {
 	 * @param goal
 	 * @return
 	 */
-	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {		
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
 		while (!openSet.isEmpty() && keepRunning) {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);

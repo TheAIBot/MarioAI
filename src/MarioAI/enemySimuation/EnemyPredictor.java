@@ -36,7 +36,7 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-	public boolean hasEnemy(float marioX, final float marioY, final float marioWidth, final int marioHeight, final int time) {
+	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
 			
@@ -58,7 +58,6 @@ public class EnemyPredictor {
 		
 		removeDeadEnemies(sortedEnemyInfo);
 		
-		//System.out.println(verifiedEnemySimulations.size());
 		addCorrectSimulations(sortedEnemyInfo);
 		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
@@ -260,14 +259,6 @@ public class EnemyPredictor {
 	public void moveIntoFuture(final int timeToMove) {
 		for (int i = 0; i < timeToMove; i++) {
 			updateSimulations();
-		}
-	}
-	
-	public void moveIntoPast(final int timeToMove) {
-		for (int i = 0; i < timeToMove; i++) {
-			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-				enemySimulation.moveTimeBackwards();
-			}
 		}
 	}
 	

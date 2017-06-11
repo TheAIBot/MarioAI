@@ -53,7 +53,7 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
 	{
 		final DirectedEdge currentEdge = path.get(0);
 		
@@ -63,9 +63,9 @@ public class PathCreator {
 		
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-		
-                final float edgeEndDistanceX = currentEdge.getMoveInfo().getXPositions()[currentEdge.getMoveInfo().getXPositions().length - 1];
-                final float edgeEndDistanceY = currentEdge.getMoveInfo().getYPositions()[currentEdge.getMoveInfo().getYPositions().length - 1];
+
+        final float edgeEndDistanceX = currentEdge.getMoveInfo().getXPositions()[currentEdge.getMoveInfo().getXPositions().length - 1];
+        final float edgeEndDistanceY = currentEdge.getMoveInfo().getYPositions()[currentEdge.getMoveInfo().getYPositions().length - 1];
 		
 		final float futureMarioXPos = marioXPos + edgeEndDistanceX;
 		final float futureMarioYPos = marioYPos - edgeEndDistanceY;
@@ -77,7 +77,7 @@ public class PathCreator {
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
 	
-	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
 		if (isRunning) {
 			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
 		}
@@ -137,7 +137,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);

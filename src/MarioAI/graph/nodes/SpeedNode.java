@@ -174,7 +174,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			final float x = parentXPos  + moveInfo.getXPositions()[i];
 			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			
-			if (enemyPredictor.hasEnemy(x, y, MarioMethods.MARIO_WIDTH, marioHeight, currentTick)) {
+			if (enemyPredictor.hasEnemy(x, y, marioHeight, currentTick)) {
 				hasEnemyCollision = true;
 				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
 			}
@@ -197,19 +197,19 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	 * @param marioHeight
 	 * @return
 	 */
-	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
+	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		int currentTick = startTime;
 		
-                for (int i = 0; i < moveInfo.getMoveTime(); i++) {
-                    final float x = parentXPos  + moveInfo.getXPositions()[i];
-                    final float y = parent.yPos - moveInfo.getYPositions()[i];
+        for (int i = 0; i < moveInfo.getMoveTime(); i++) {
+            final float x = parentXPos  + moveInfo.getXPositions()[i];
+            final float y = parent.yPos - moveInfo.getYPositions()[i];
 
-                    if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-                        return true;
-                    }
-			
-                    currentTick++;
-                }
+            if (enemyPredictor.hasEnemy(x, y, marioHeight, currentTick + 1)) {
+                return true;
+            }
+	
+            currentTick++;
+        }
 		return false;
 	}
 	
