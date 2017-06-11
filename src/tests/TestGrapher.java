@@ -181,7 +181,7 @@ public class TestGrapher {
 				addWall(WALL_HEIGHT, 11 + i, marioNode.y, world, marioNode);
 				List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
 				grapher.getPolynomialReachingEdges(marioNode, (short) 11, newEdges);
-				System.out.println("meh");
+				//System.out.println("meh");
 				for (DirectedEdge directedEdge : newEdges) {
 
 				}
@@ -301,15 +301,11 @@ public class TestGrapher {
 				}
 				assertFalse("Error at coloumn: " + i, hasEdgeToUpperLevel);
 			}
-			//It should have jumps of a certain height, but not any grater:
-			System.out.println();
+			//It should have jumps of a certain height, but not any greater:
 			//TODO change i back
 			for (int i = 0; i < world.length; i++) {
 				Node currentNode = world[i][marioNode.y];
 				boolean hasEdgeToExtremeHeights = false;
-				System.out.println(currentNode);
-				System.out.println(currentNode.edges.toString());
-				System.out.println();
 				boolean hasEdgesToRequiredHeights = false;
 				for (DirectedEdge edge : currentNode.getEdges()) {
 					// Math.round(getMaxY()) is the height of the jump/run, rounded (will always be relativly precise, 
@@ -319,9 +315,6 @@ public class TestGrapher {
 						hasEdgeToExtremeHeights = true;
 					else if (height - 2 > Math.round(edge.getMaxY()) && Math.round(edge.getMaxY()) >= height - 3) { //required heights.
 						hasEdgesToRequiredHeights = true;
-					}
-					else{
-						System.out.println();
 					}
 				}
 				if (hasEdgeToExtremeHeights || !hasEdgesToRequiredHeights) {
@@ -379,8 +372,8 @@ public class TestGrapher {
 		Node[][] levelMatrix = world.getLevelMatrix();
 		grapher.setMovementEdges(world, marioNode);
 		//For any given pillar, at any given height, he should be able to jump down from it:
-		for (int column = 1; column < EdgeCreator.GRID_WIDTH - 1; column++) { //TODO set back to 0
-			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
+		for (int column = 3; column < EdgeCreator.GRID_WIDTH - 1; column++) { //TODO set back to 0
+			for (int pillarHeight = 3; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
 				addWall(pillarHeight, column, marioNode.y, levelMatrix, marioNode);
 				Node currentNode = levelMatrix[column][marioNode.y - pillarHeight];
 				//Pillars to the currents pillars sides, to the height of the pillar
@@ -410,10 +403,9 @@ public class TestGrapher {
 						default:
 							break;
 					}
-					int rightSupposedEdges = (column < EdgeCreator.GRID_WIDTH - 2)? supposedNumberOfEdges: 2;
-					int leftSupposedEdges = supposedNumberOfEdges; //(column > 1)? supposedNumberOfEdges: 2;
-					//The right case is needed, because it will go out of the level matrix, which won't happen in the left case.
-					//TODO check if it works as intended, with the number above.
+					int rightSupposedEdges = (column < EdgeCreator.GRID_WIDTH - 3)? supposedNumberOfEdges: 2;
+					int leftSupposedEdges = (column > 2)? supposedNumberOfEdges: 2;
+					
 					grapher.clearAllEdges();
 					grapher.resetFoundAllEdges();
 					grapher.setMovementEdges(world, currentNode);
@@ -501,9 +493,6 @@ public class TestGrapher {
 				boolean jumpIntoTheCeiling = level[i][10].edges.stream().anyMatch(edge -> Math.round(edge.getMaxY())  > 1);
 				boolean jumpThroughWall = level[i][10].edges.stream().anyMatch(edge -> edge.target.x >= 17);
 				boolean jumpAwayFromFloor = level[i][10].edges.stream().anyMatch(edge -> edge.target.y != 10);
-				if (jumpIntoTheCeiling || jumpThroughWall || jumpAwayFromFloor) {
-					System.out.println();
-				}
 				assertFalse(errorMessage, jumpIntoTheCeiling);
 				assertFalse(errorMessage, jumpThroughWall);
 				assertFalse(errorMessage, jumpAwayFromFloor);
@@ -536,9 +525,6 @@ public class TestGrapher {
 				if (height == maxHeight) {
 					assertEquals(0, straightUpEdges.size()); //The height is to great, mario shouldn't be able to reach it.
 				} else{
-					if (numberDistinctEdges != straightUpEdges.size()) {
-						System.out.println();
-					}
 					assertEquals(numberDistinctEdges, straightUpEdges.size());
 				}
 				//Correct height:

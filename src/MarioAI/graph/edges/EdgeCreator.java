@@ -166,22 +166,23 @@ public class EdgeCreator {
 		for (int fallRange = 1; fallRange <= MAX_FALL_RANGE; fallRange++) {
 			// it should start from initialXPosition, as Mario first needs to go of the ledge.
 			int currentFallRange = fallRange * direction.getHorizontalDirectionAsInt();
-			polynomial.setToFallPolynomial(startingNode, initialXPosition+((direction.isLeftType())? 1:0), currentFallRange);
+			polynomial.setToFallPolynomial(startingNode, initialXPosition, currentFallRange);
 			
 			// The opposite vertical direction is used, as it is inverted in the method.
 			// Plus direction.getHorizontalDirectionAsInt(), as it moved one back later.
 			//Only to the right side, as the x difference between the right and the left=1
 			//and the later code will then handle the rest.
-			int jumpStartPosition = (direction.isLeftType())? initialXPosition:  initialXPosition + direction.getHorizontalDirectionAsInt();
-			foundAllEdges = jumpAlongPolynomial(startingNode, jumpStartPosition, polynomial,
-															direction.getOppositeVerticalDirection(), jumpDownEdges) && foundAllEdges;
+			int jumpStartPosition = initialXPosition + direction.getHorizontalDirectionAsInt();
+			foundAllEdges = jumpAlongPolynomial(startingNode, jumpStartPosition, polynomial, direction.getOppositeVerticalDirection(), jumpDownEdges) && foundAllEdges;
 		}
 		// The edges added by the method above, is polynomials.
 		// They need to be converted to fallDownEdges:
 		for (DirectedEdge edge : jumpDownEdges) {
 			if (edge.useSuperSpeed) {
 				listOfEdges.add(new FallEdge(edge.source, edge.target, true));				
-			} else listOfEdges.add(new FallEdge(edge.source, edge.target, true));
+			} else {
+				listOfEdges.add(new FallEdge(edge.source, edge.target, false));
+			}
 		}	
 		
 		return foundAllEdges;
@@ -355,30 +356,20 @@ public class EdgeCreator {
 				break;
 			} 
 			//For the case that Mario have just risen above a wall
-			else if (upperFacingMarioCorner 	== Collision.HIT_NOTHING && 
-					   middleFacingMarioCorner == Collision.HIT_NOTHING &&
-					   lowerFacingMarioCorner 	== Collision.HIT_GROUND) {
+			else if (ascendingRisenAboveWall(lowerFacingMarioCorner, upperFacingMarioCorner, middleFacingMarioCorner)) {
 				collisionDetection = Collision.HIT_GROUND;
 				int groundXPosition = currentXPosition;
-				if (direction.isLeftType()) {
-					groundXPosition += direction.getHorizontalDirectionAsInt();
-				}
 				if (addEdges) {
 					listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPosition][(int) Math.ceil(y)], polynomial, false));
 					if (ALLOW_SPEED_KEY) {
 						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPosition][(int) Math.ceil(y)], polynomial, true));						
-					}
-					if (listOfEdges.get(listOfEdges.size()-1).target == null) {
-						System.out.println("target = null error");
 					}
 				}
 				break; //We call it quits here.
 			} 
 			//The former cases where more severe. If any of the corners hit a wall, 
 			//without any ceiling collisions or something simililar, a wall is hit:
-			else if (upperFacingMarioCorner == Collision.HIT_WALL  || 
-						  middleFacingMarioCorner == Collision.HIT_WALL || //Note this isn't taken into account, if mario's height isn't 2.
-						  lowerFacingMarioCorner == Collision.HIT_WALL) {
+			else if (hitsWall(lowerFacingMarioCorner, middleFacingMarioCorner, upperFacingMarioCorner)) {
 				collisionDetection = Collision.HIT_WALL;
 				isHittingWall = true;
 				if (stopAtAnyCollision) {
@@ -388,6 +379,13 @@ public class EdgeCreator {
 			}
 		}
 		return collisionDetection;
+	}
+
+	private boolean ascendingRisenAboveWall(final Collision lowerFacingMarioCorner,
+			final Collision upperFacingMarioCorner, final Collision middleFacingMarioCorner) {
+		return upperFacingMarioCorner 	== Collision.HIT_NOTHING && 
+				   middleFacingMarioCorner == Collision.HIT_NOTHING &&
+				   lowerFacingMarioCorner  == Collision.HIT_GROUND;
 	}
 
 	public Collision descendingPolynomial(float formerLowerYPosition, float bound, int currentXPosition,
@@ -412,16 +410,11 @@ public class EdgeCreator {
 			final Collision upperFacingMarioCorner 	= upperFacingCornerCollision  (y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision(y, currentXPosition, direction);
 			
-			//TODO discuss why it is HIT_NOTHING or HIT_WALL for upperFacingMarioCorner.
-			if ((upperFacingMarioCorner == Collision.HIT_NOTHING ||
-				  upperFacingMarioCorner == Collision.HIT_WALL ) 
-				 && 
-			    (lowerFacingMarioCorner == Collision.HIT_GROUND || 
-			     lowerOppositeMarioCorner == Collision.HIT_GROUND)) {
+			if (landsFacing(lowerFacingMarioCorner, upperFacingMarioCorner, lowerOppositeMarioCorner)) {
 				collisionDetection = Collision.HIT_GROUND;
 				
 				//Hits the facing corner.
-				if(lowerFacingMarioCorner 	== Collision.HIT_GROUND && 
+				if(landsOpposite(lowerFacingMarioCorner) && 
 					upperFacingMarioCorner 	== Collision.HIT_NOTHING &&
 					middleFacingMarioCorner == Collision.HIT_NOTHING)	{
 					int groundXPos = currentXPosition; 
@@ -430,12 +423,8 @@ public class EdgeCreator {
 					if (ALLOW_SPEED_KEY) {
 						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y],polynomial, true));						
 					}
-
-					if (listOfEdges.get(listOfEdges.size()-1).target == null) {
-						System.out.println("target = null error");
-					}
 				}										 
-				else if (lowerOppositeMarioCorner == Collision.HIT_GROUND) { //lands on the opposite corner.
+				else if (landsOpposite(lowerOppositeMarioCorner)) { //lands on the opposite corner.
 					int groundXPos = currentXPosition;
 					//TODO (*) I rapporten, explicit forklar hvorfor der skal vaere det paa dene case,
 					//men ikke i casen ovenfor. TODO tror det er forkert.
@@ -445,17 +434,10 @@ public class EdgeCreator {
 					if (ALLOW_SPEED_KEY) {
 						listOfEdges.add(new JumpingEdge(startingPosition, observationGraph[groundXPos][(int) y], polynomial, true));						
 					}
-
-					if (listOfEdges.get(listOfEdges.size()-1).target == null) {
-						lowerFacingCornerCollision  (y, currentXPosition, direction, collisionDetection);
-						System.out.println("target = null error");
-					}
 					
 				}
 				break;
-			} else if (upperFacingMarioCorner == Collision.HIT_WALL ||
-						  middleFacingMarioCorner == Collision.HIT_WALL ||
-						  lowerFacingMarioCorner == Collision.HIT_WALL) {
+			} else if (hitsWall(lowerFacingMarioCorner, middleFacingMarioCorner, upperFacingMarioCorner)) {
 				// It is purposefully made so that the hit wall will never stop,
 				//until the ground is hit.
 				collisionDetection = Collision.HIT_WALL;
@@ -464,6 +446,24 @@ public class EdgeCreator {
 			}
 		}
 		return collisionDetection;
+	}
+
+	private boolean hitsWall(final Collision lowerFacingMarioCorner,
+			final Collision middleFacingMarioCorner, final Collision upperFacingMarioCorner) {
+		return upperFacingMarioCorner == Collision.HIT_WALL ||
+					  middleFacingMarioCorner == Collision.HIT_WALL ||
+					  lowerFacingMarioCorner == Collision.HIT_WALL;
+	}
+
+	private boolean landsOpposite(final Collision lowerOppositeMarioCorner) {
+		return lowerOppositeMarioCorner == Collision.HIT_GROUND;
+	}
+
+	private boolean landsFacing(final Collision lowerFacingMarioCorner, final Collision upperFacingMarioCorner,
+			final Collision lowerOppositeMarioCorner) {
+		return 	(upperFacingMarioCorner == Collision.HIT_NOTHING ||  upperFacingMarioCorner == Collision.HIT_WALL ) 
+					&& 
+					(lowerFacingMarioCorner == Collision.HIT_GROUND  ||  lowerOppositeMarioCorner == Collision.HIT_GROUND);
 	}
 
 	/**
@@ -526,7 +526,7 @@ public class EdgeCreator {
 
 	private boolean isWithinView(int xPosition, JumpDirection direction) {
 		if (direction.isLeftType()) {
-			return xPosition < GRID_WIDTH && xPosition > 1;
+			return xPosition < GRID_WIDTH && xPosition >= 1;
 		} else return xPosition < GRID_WIDTH - 1 && xPosition >= 0;
 	}
 	
