@@ -216,7 +216,7 @@ public class EdgeCreator {
 									// jump
 									// polynomial.
 		boolean foundAllEdges = true;
-		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) { //TODO Error if setting both jump height and jump range to 2, on flat level. 
 			// TODO ensure result doesn't contain null
 			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { // TODO
 													// test
@@ -235,9 +235,9 @@ public class EdgeCreator {
 														// on
 														// shortdeadend
 
-				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
-						JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;
+				//polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
+				//foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
+				//		JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;
 			}
 		}
 		return foundAllEdges;

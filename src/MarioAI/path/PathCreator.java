@@ -17,10 +17,11 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {48, 2, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
@@ -84,7 +85,7 @@ public class PathCreator {
 		
 		isRunning = true;
 		
-		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.getCurrentLivingEnemies());
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.getCurrentLivingEnemies(), Mario.lives);
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
@@ -125,7 +126,7 @@ public class PathCreator {
 			nodesWithAddedEdges[i] = node;
 		}
 		
-		return new StateNode(goal, 0, Long.MIN_VALUE, enemyPredictor.getCurrentLivingEnemies());
+		return new StateNode(goal, 0, Long.MIN_VALUE, enemyPredictor.getCurrentLivingEnemies(), Mario.lives);
 	}
 	
 	private void removeGoalFrame() {
@@ -140,7 +141,7 @@ public class PathCreator {
 	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.getCurrentLivingEnemies());
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.getCurrentLivingEnemies(), Mario.lives);
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);

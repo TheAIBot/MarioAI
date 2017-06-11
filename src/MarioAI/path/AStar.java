@@ -8,10 +8,13 @@ import java.util.PriorityQueue;
 
 import MarioAI.Hasher;
 import MarioAI.World;
+import MarioAI.debugGraphics.DebugDraw;
+import MarioAI.debugGraphics.DebugDrawing;
 import MarioAI.enemySimuation.EnemyCollision;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.StateNode;
@@ -90,7 +93,12 @@ class AStar {
 				closedSet.add(currentEndHash);
 				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
-				
+
+				// The current best speednode is the one furthest to the right
+				// (disregarding if it passes through an enemy or not).
+				if (currentBestPathEnd == null || currentState.currentXPos > currentBestPathEnd.currentXPos) {
+					currentBestPathEnd = currentState;
+				}
 				
 				// Explore each neighbor of current node
 				for (DirectedEdge neighborEdge : currentState.node.getEdges()) {
@@ -124,17 +132,27 @@ class AStar {
 							continue;
 						}
 						
+						
 						if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight)) {
 							continue;
 						}
-						/*
 						
+						
+						
+						/*
 						EnemyCollision firstCollision = new EnemyCollision(); 
 						
 						if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
+							
 							if (firstCollision.isStompType) { //Stomping means no lost life.
-								addStompState(firstCollision, world, currentState, nextState, goal);	
-								continue; //The rest is handled in the method above.
+								//addStompState(firstCollision, world, currentState, nextState, goal);	
+								//continue; //The rest is handled in the method above.
+								nextState.penalty = 9000;
+								if (!(neighborEdge instanceof JumpingEdge)) {
+									throw new Error();
+								}
+								continue;
+								//addStompState(firstCollision, world, currentState, nextState, goal);
 							} else {//He has lost life and gets a penalty:
 								if (nextState.lives <= 1) {
 									// if Mario would die if he hits an enemy, with this many lives. 
@@ -143,17 +161,15 @@ class AStar {
 								}
 								int livesLost = (currentState.lives - nextState.lives);
 								penalty = livesLost*PENALTY_SCORE;
+								continue;
 							}
+							
+							continue;
 						}
 						*/
 						
+						
 					}
-					// The current best speednode is the one furthest to the right
-					// (disregarding if it passes through an enemy or not).
-					if (currentBestPathEnd == null || currentState.currentXPos > currentBestPathEnd.currentXPos) {
-						currentBestPathEnd = currentState;
-					}
-					//currentBestPathEnd = openSet.peek();
 					
 					updateOpenSet(nextState, tentativeGScore, goal, penalty, currentState, nextEndHash);
 					/*
@@ -240,7 +256,10 @@ class AStar {
 		//by updating the scores and taking it in and out of the queue.
 		if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 		sn.gScore = tentativeGScore;
-		sn.fScore = sn.gScore + heuristicFunction(sn, goal)  + penalty;
+		sn.fScore = sn.gScore + heuristicFunction(sn, goal)  + sn.penalty;
+		if (sn.penalty != 0) {
+			System.err.println();
+		}
 		sn.parent = current;
 		openSet.add(sn);
 		openSetMap.put(snEndHash, sn);
@@ -257,10 +276,12 @@ class AStar {
 		
 		final StateNode speedNode = stateNodes.get(hash);
 		if (speedNode != null) {
-			return speedNode;
+			speedNode.penalty = 0;
+			speedNode.ticksOfInvincibility = current.ticksOfInvincibility;
+			//return speedNode;
 		}
 		
-		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, livingEnemies, world);
+		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, livingEnemies, current.lives, world);
 		stateNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}

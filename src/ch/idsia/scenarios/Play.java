@@ -18,7 +18,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -26,8 +26,9 @@ public class Play {
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
-			TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
+			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			//TestTools.spawnEnemy(observation, 5, 9, 1, EnemyType.GOOMBA);
+			//TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
@@ -78,7 +79,8 @@ public class Play {
 			}
                 */
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(493269332);
+	        //options.setLevelRandSeed(1524448900);
+	        //options.setLevelRandSeed(493269332);
 	        //options.setLevelRandSeed(362336148);
 	        //options.setLevelRandSeed(1182521566); //Seed hvor han hopper ind i en fjende, pga. han laver for langt hop. Saet restriktion.
 	        //options.setLevelRandSeed(1179126435); //Gaar ret dårligt på der her seed.
@@ -117,7 +119,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(1);	 
+	        options.setLevelDifficulty(0);	 
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

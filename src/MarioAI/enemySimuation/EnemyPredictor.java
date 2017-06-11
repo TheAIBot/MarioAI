@@ -48,12 +48,12 @@ public class EnemyPredictor {
 			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
 			
 			final float marioXInPixels = marioX * World.PIXELS_PER_BLOCK;
-			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK;
+			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK - 1;
 			final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
 			
 			if (enemySimulation.collideCheck(enemyPositionInPixels.x, enemyPositionInPixels.y, marioXInPixels, marioYInPixels, marioHeightInPixels)) {
 				//Now to check if he also stomps the enemy:
-				if(enemySimulation.stomp(time, marioHeight, marioXInPixels, marioYInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
+				if(enemySimulation.stomp(marioHeight, marioXInPixels, marioYInPixels, enemyPositionInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
 					firstCollision.isStompType = true;
 				}				
 				return true;

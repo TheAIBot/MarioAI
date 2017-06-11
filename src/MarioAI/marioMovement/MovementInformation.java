@@ -167,6 +167,9 @@ public class MovementInformation{
 	}
 
 	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
+		if (getMoveTime() == 0) {
+			return false;
+		}
 		float previousPositionX = 0;
       float previousPositionY = 0;
 		final float lastY = positionsY[getMoveTime() - 1];

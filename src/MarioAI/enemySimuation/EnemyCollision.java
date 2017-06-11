@@ -13,4 +13,6 @@ public class EnemyCollision {
 		this.tickForCollision = tick;
 		this.indexEnemy = indexEnemy;
 	}
+
+	public EnemyCollision() {}
 }

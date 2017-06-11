@@ -90,11 +90,16 @@ public abstract class EnemySimulator {
 	 * @param time
 	 * @return
 	 */
-	public boolean stomp(int time, float marioHeight, float marioX, float marioY, boolean movingDownwards, boolean isOrWasNotOnGround) {
-		System.out.println("Check correct values");
-		final float yMarioD = marioY - y;
-		if (this.kind != Enemy.ENEMY_SPIKY) {
+	public boolean stomp(float marioHeight, float marioX, float marioY, Point2D.Float enemyPositionInPixels, boolean movingDownwards, boolean isOrWasNotOnGround) {
+		//System.out.println("Check correct values"); //Still must be done
+		final float yMarioD = marioY - enemyPositionInPixels.y;
+		if (this.kind != Enemy.ENEMY_SPIKY && this.kind != 12) {
 			if (movingDownwards && yMarioD <= 0 && isOrWasNotOnGround) {
+				System.out.println("It should stomp");
+				System.out.println("Expected x,y = " + marioX + ", " + marioY);
+
+				System.out.println(yMarioD);
+				System.out.println("TODO update");
 				return true;
 			}
 		}

@@ -37,9 +37,11 @@ public class StateNode implements Comparable<StateNode> {
 	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
 	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
-	public int lives = MAX_MARIO_LIFE;
+	public int lives;
+
+	public int penalty = 0;
 	
-	public StateNode(Node node, float vx, long hash, long livingEnemies) {
+	public StateNode(Node node, float vx, long hash, long livingEnemies, int lives) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -56,9 +58,10 @@ public class StateNode implements Comparable<StateNode> {
 		if (livingEnemies != -1) {
 			System.out.println("meh");
 		}
+		this.lives = lives;
 	}
 	
-	public StateNode(Node node, float marioX, float vx, long hash, long livingEnemies) {
+	public StateNode(Node node, float marioX, float vx, long hash, long livingEnemies, int lives) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -75,10 +78,11 @@ public class StateNode implements Comparable<StateNode> {
 		if (livingEnemies != -1) {
 			System.out.println("meh");
 		}
+		this.lives = lives;
 	}
 	
 	///Should only be used for testing purposes
-	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
+	public StateNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, int lives, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -94,13 +98,14 @@ public class StateNode implements Comparable<StateNode> {
 		if (livingEnemies != -1) {
 			System.out.println("meh");
 		}
+		this.lives = lives;
 	}
 	
-	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
-		this(node, parent, parent.creationXPos, parent.vx, ancestorEdge, hash, livingEnemies, world);
+	public StateNode(Node node, StateNode parent, DirectedEdge ancestorEdge, long hash, long livingEnemies, int lives, World world) {
+		this(node, parent, parent.creationXPos, parent.vx, ancestorEdge, hash, livingEnemies, lives, world);
 	}
 	
-	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, World world) {
+	public StateNode(Node node, StateNode parent, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, long livingEnemies, int lives, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
 		this.vx = moveInfo.getEndSpeed();
@@ -117,6 +122,7 @@ public class StateNode implements Comparable<StateNode> {
 		if (livingEnemies != -1) {
 			System.out.println("meh");
 		}
+		this.lives = lives;
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
@@ -200,19 +206,23 @@ public class StateNode implements Comparable<StateNode> {
 			//as though that is the one that determines the type of collision with enemies.
 			if(enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {				
 				if(firstCollision.isStompType){ //Stomp type collision
-					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
+					ticksOfInvincibility = 1000; //Gets one tick of invincibility, in case of a stomp.
 					//Notice that if has more ticks of invincibility than 1, this is overwritten.
 					//This is how it is done in the game code.
 					//TODO check correct.
+					hasEnemyCollision = true;
 					return true; //Stops the collision here, as the path taken must be changed.
 				} else if(ticksOfInvincibility == 0){ //Normal collision, where Mario is damaged
 					hasEnemyCollision = true;
 					lives--;
 					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
 				} else {
+					hasEnemyCollision = true;
 					ticksOfInvincibility--;
 				}
-			} else {
+				return true;
+			} else if (ticksOfInvincibility > 0) {
+				hasEnemyCollision = true;
 				ticksOfInvincibility--;
 			}
 			
@@ -220,9 +230,6 @@ public class StateNode implements Comparable<StateNode> {
 			currentTick++;
 		}
 		
-		if (hasEnemyCollision) {
-			lives--;
-		}
 
 		return hasEnemyCollision;
 	}
