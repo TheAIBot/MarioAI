@@ -28,7 +28,7 @@ public class PathCreator {
 	private AStarPath bestPath = null;
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
-	private final CompletableFuture<Boolean>[] runningTasks;
+	private final CompletableFuture<Void>[] runningTasks;
 	private final AStarHelperEdge[] addedEdges = new AStarHelperEdge[World.LEVEL_HEIGHT];
 	private final Node[] nodesWithAddedEdges = new Node[World.LEVEL_HEIGHT];
 	private Point2D.Float marioFuturePosition;
@@ -92,11 +92,7 @@ public class PathCreator {
 		
 		for (int i = 0; i < aStars.length; i++) {
 			final int q = i;
-			runningTasks[i] = CompletableFuture.supplyAsync(() -> 
-			{
-				aStars[q].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
-				return true;
-			}, threadPool);
+			runningTasks[i] = CompletableFuture.runAsync(() -> aStars[q].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world), threadPool);
 		}
 	}
 	
@@ -238,13 +234,14 @@ public class PathCreator {
 			throw new Error("PathCreator wasn't running. Start PathCreator before stopping it again.");
 		}
 		
-		for (AStar aStar : aStars) {
-			aStar.stop();
-		}
+
 		try {
 			CompletableFuture.allOf(runningTasks);
 		} catch (Exception e) {
 			System.out.println("Threadpool in PathCreator failed to shutdown the threads in an orderly manner.\n" + e.getMessage());
+		}
+		for (AStar aStar : aStars) {
+			aStar.stop();
 		}
 		removeGoalFrame();
 		isRunning = false;

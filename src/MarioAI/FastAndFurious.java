@@ -27,7 +27,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = false;
+	public boolean DEBUG = true;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -76,10 +76,10 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
-				/*
+				
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
-				*/
+				
 				/*
 				if (world.hasGoalNodesChanged()) {
 					System.out.println("Reason: World");
@@ -97,7 +97,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					System.out.println("Reason: No path");
 				}
 				*/
-				
+				/*
 				if (pathCreator.isRunning) {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
@@ -127,15 +127,15 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
 				}				
-				
+				*/
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			else if (marioController.canUpdatePath && 
+			/*else if (marioController.canUpdatePath && 
 					 pathCreator.isRunning) {
 				pathCreator.stop();
 //				System.out.println("Tick: " + tickCount + " Path ignored");
-			}
+			}*/
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
