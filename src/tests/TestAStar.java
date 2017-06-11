@@ -358,8 +358,8 @@ public class TestAStar {
 		
 		TestTools.setMarioPosition(observation, marioBeginningXPos, marioBeginningYPos);
 		world.update(observation);
-		TestTools.runOneTick(observation);
 		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		TestTools.runOneTick(observation);
 
 //		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 //		DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
@@ -377,7 +377,7 @@ public class TestAStar {
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNotNull(path);
 		
-		// --- Check the first elements in the path only consists of jumps
+		// --- Check the first elements in the path only consist of jumps
 		
 		assertTrue(path.get(0) instanceof JumpingEdge);
 		assertEquals(marioBeginningXPos, path.get(0).target.x);
@@ -476,19 +476,22 @@ public class TestAStar {
 	 */
 	private void verifyPath(List<DirectedEdge> path, Node[] originalGoalNodes) {
 		
+		float oldSpeed = 0;
 		for (int i = 0; i < path.size(); i++) {
 //			Node nextNode = path.get(i).source;
-			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
-			List<DirectedEdge> newPath = agent.pathCreator.getBestPath();
+//			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world);
+//			List<DirectedEdge> newPath = agent.pathCreator.getBestPath();
 			
-			assertEquals(path.size() - i, newPath.size());
+//			assertEquals(path.size() - i, newPath.size());
 			// Go through edges and check they are same and verify the movement 
 			//iter.next();
 			
-			for (int j = 0; j < originalGoalNodes.length; j++) {
-				assertEquals(path.get(j + i), newPath.get(i));
-				verifyMoveAlongEdge(newPath.get(i));				
-			}
+//			for (int j = 0; j < originalGoalNodes.length; j++) {
+//				assertEquals(path.get(j + i), newPath.get(i));
+			final DirectedEdge edge = path.get(0);
+			verifyMoveAlongEdge(edge, oldSpeed);
+			oldSpeed = edge.getMoveInfo().getEndSpeed();
+//			}
 		}
 	}
 
@@ -497,25 +500,17 @@ public class TestAStar {
 	 * @param aStar
 	 * @param edge
 	 */
-	private void verifyMoveAlongEdge(DirectedEdge edge) {
-		final int maxTicksAllowedToRun = 200;
-		int c = 0;
-		float delta = MarioControls.ACCEPTED_DEVIATION;
-		while (Math.abs(world.getMarioNode(observation).x - edge.target.x) < delta
-				&& Math.abs(world.getMarioNode(observation).y - edge.target.y) < delta) {
-			c++;
+	private void verifyMoveAlongEdge(DirectedEdge edge, float vx) {
+		for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
 			TestTools.runOneTick(observation);
-//			TestTools.renderLevel(observation);
-			world.update(observation);
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
-			if (c >= maxTicksAllowedToRun) Assert.fail("Never reaches destination."); 
 		}
+		TestTools.runOneTick(observation);
 		
 		// Compare speednode with Mario's position
-		long hashCode = Hasher.hashSpeedNode(edge.getMoveInfo().getEndSpeed(), edge, agent.pathCreator.getBlockingGranularity());
+		long hashCode = Hasher.hashSpeedNode(vx, edge, 5000); //TODO
 		SpeedNode correspondingSpeedNode = agent.pathCreator.getSpeedNodes().get(hashCode);
 		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
-		assertEquals(correspondingSpeedNode.yPos, MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
+		assertEquals(correspondingSpeedNode.yPos - (1f / World.PIXELS_PER_BLOCK), MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}
 }
 

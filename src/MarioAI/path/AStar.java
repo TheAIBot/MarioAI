@@ -133,19 +133,19 @@ class AStar {
 						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 							continue;
 						}
-						/*
-						if (sn.ticksOfInvincibility == 0) {
-							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-								continue;
-								
-								if (sn.lives <= 1) {
-									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
-								}
-								penalty = PENALTY_SCORE;
-								
-							}
-						}
-						 */
+						
+//						if (sn.ticksOfInvincibility == 0) {
+//							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//								continue;
+//								
+//								if (sn.lives <= 1) {
+//									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
+//								}
+//								penalty = PENALTY_SCORE;
+//								
+//							}
+//						}
+						
 					}
 					
 					// Update the edges position in the priority queue
