@@ -86,7 +86,7 @@ public class TestAStar {
 		int numberOfTicks = 0;
 		DebugDraw.resetGraphics(observation);
 		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-		DebugDraw.drawPathMovement(observation, path);
+		DebugDraw.drawPathMovement(observation, path, false);
 		TestTools.renderLevel(observation);
 		assertTrue(path != null);
 		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
@@ -99,7 +99,7 @@ public class TestAStar {
 				 agent.pathCreator.getBestPath();
 				 DebugDraw.resetGraphics(observation);
 				 DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-				 DebugDraw.drawPathMovement(observation, path);
+				 DebugDraw.drawPathMovement(observation, path, false);
 				 TestTools.renderLevel(observation);
 				 assertTrue(path != null);
 				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
@@ -124,7 +124,7 @@ public class TestAStar {
 		assertTrue(path != null);
 		
 		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-		DebugDraw.drawPathMovement(observation, path);
+		DebugDraw.drawPathMovement(observation, path, false);
 		TestTools.renderLevel(observation);
 		assertEquals(10, path.size());
 		

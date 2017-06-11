@@ -11,13 +11,13 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 8;
+	private static final float MAX_JUMP_RANGE = 4;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
-	public static final boolean ALLOW_SPEED_KEY = true;
+	public static final boolean ALLOW_SPEED_KEY = false;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {

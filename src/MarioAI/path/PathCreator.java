@@ -184,15 +184,17 @@ public class PathCreator {
 	}
 	
 	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
-		if (newPotentialPath.path == null) {
+		/*if (newPotentialPath.path == null) {
 			return false;
 		}
 		if (!newPotentialPath.isBestPath && 
 			bestPath.isBestPath &&
 			bestPath.path.size() > 1) {
 			return false;
+		}*/
+		if (!newPotentialPath.isBestPath) {
+			System.out.println("Not best path");
 		}
-		
 		
 		return true;
 	}

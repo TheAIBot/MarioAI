@@ -80,6 +80,12 @@ class AStar {
 					foundBestPath = true;
 					return;
 				}
+				// The current best speednode is the one furthest to the right
+				// (disregarding if it passes through an enemy or not).
+				if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
+					currentBestPathEnd = current;
+				}
+				
 				//System.out.println("Current node:");
 				//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
 				//System.out.println("Current node edges:");
@@ -138,15 +144,8 @@ class AStar {
 								
 							}
 						}
-						 */
-					}
-					// The current best speednode is the one furthest to the right
-					// (disregarding if it passes through an enemy or not).
-					if (currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) {
-						currentBestPathEnd = current;
-					}
-					//currentBestPathEnd = openSet.peek();
-					
+						*/
+					}					
 					
 					// Update the edges position in the priority queue
 					// by updating the scores and taking it in and out of the queue.
@@ -196,7 +195,7 @@ class AStar {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
 		synchronized (lockBestSpeedNode) {
-			return new AStarPath(currentBestPathEnd, true, hashGranularity);
+			return new AStarPath(currentBestPathEnd, foundBestPath, hashGranularity);
 		}
 	}
 	

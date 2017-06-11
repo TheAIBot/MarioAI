@@ -211,13 +211,21 @@ public class TestEnemyPrediction {
 			TestTools.runOneTick(observation);
 			final float[] enemyArray = observation.getEnemiesFloatPos();
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			EnemyPredictor copy = new EnemyPredictor();
+			copy.intialize(((MarioComponent)observation).getLevelScene());
+			if (makeCopy) {
+				copy.syncFrom(enemyPredictor);
+			}
+			else {
+				copy = enemyPredictor;
+			}
 
 
 			final int currentEnemyCount = enemyArray.length / EnemyPredictor.FLOATS_PER_ENEMY;
 			
-			assertEquals("Lost " + enemyName + " after " + i + " ticks", currentEnemyCount, enemyPredictor.getEnemies().size());
+			assertEquals("Lost " + enemyName + " after " + i + " ticks", currentEnemyCount, copy.getEnemies().size());
 			
-			if (enemyArray.length == 0 && enemyPredictor.getEnemies().size() == 0) {
+			if (enemyArray.length == 0 && copy.getEnemies().size() == 0) {
 				break;
 			}
 			

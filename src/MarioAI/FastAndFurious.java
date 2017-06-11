@@ -2,7 +2,6 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,7 +27,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = false;
+	public boolean DEBUG = true;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -142,7 +141,11 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
-				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
+				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
+						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
+						 							enemyPredictor.hasNewEnemySpawned();// ||
+						 							//pathCreator.getBestPath() == null;
+				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
 				DebugDraw.drawAction(observation, marioController.getActions());
 				//TestTools.renderLevel(observation);
 			}
