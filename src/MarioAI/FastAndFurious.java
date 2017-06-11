@@ -72,14 +72,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			}
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
-				 enemyPredictor.hasNewEnemySpawned()/* ||
-				 pathCreator.getBestPath() == null*/) && 
+				 enemyPredictor.hasNewEnemySpawned() ||
+				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
-				
+				/*
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
-				
+				*/
 				/*
 				if (world.hasGoalNodesChanged()) {
 					System.out.println("Reason: World");
@@ -97,14 +97,19 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					System.out.println("Reason: No path");
 				}
 				*/
-				/*
+				
 				if (pathCreator.isRunning) {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
-						save(observation);
-						throw new Error("Mario didn't follow the path correctly.");
+						//save(observation);
+						//throw new Error("Mario didn't follow the path correctly.");
+						pathCreator.syncWithRealWorld(world, enemyPredictor);
+						findPath(observation);
 					}
-					pathCreator.updateBestPath();
+					else {
+						pathCreator.updateBestPath(enemyPredictor.hasNewEnemySpawned());
+					}
+
 //					System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning && 
@@ -122,15 +127,15 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
 				}				
-				*/
+				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			/*else if (marioController.canUpdatePath && 
+			else if (marioController.canUpdatePath && 
 					 pathCreator.isRunning) {
 				pathCreator.stop();
 //				System.out.println("Tick: " + tickCount + " Path ignored");
-			}*/
+			}
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
