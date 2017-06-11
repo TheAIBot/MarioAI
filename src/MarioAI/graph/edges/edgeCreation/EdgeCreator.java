@@ -49,7 +49,7 @@ public class EdgeCreator {
 			if   (connectingEdge.target != null && // Must go to an actual block, not just air.
 					isOnLevelMatrix(connectingEdge.target, marioNode) && // It must be on the current level matrix.
 					canMarioStandThere(connectingEdge.target, marioNode) && // The edge must not go into for example a wall.
-					connectingEdge.source != connectingEdge.target) { // No movement to the same node. Notice that no equals method are needed.
+					connectingEdge.source.hashCode() != connectingEdge.target.hashCode()) { // No movement to the same node. Notice that no equals method are needed.
 				// TODO (*) Maybe allow above.
 				node.addEdge(connectingEdge);
 			}
@@ -568,7 +568,7 @@ public class EdgeCreator {
 
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
 			//TODO it crashed to changed 0 to 1 in 1 < yPosition to fix it
-			return 1 < yPosition && yPosition < GRID_HEIGHT &&
+			return 2 <= yPosition && yPosition < GRID_HEIGHT &&
 				   isOnSolidGround((int) (yPosition), coloumn) && 
 				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 1]) &&
 				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]);

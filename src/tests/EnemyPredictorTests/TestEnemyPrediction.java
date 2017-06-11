@@ -196,17 +196,6 @@ public class TestEnemyPrediction {
 		
 		assertEquals("Didn't find " + enemyName + " after the first 3 ticks", enemyCount, enemyPredictor.getEnemies().size());
 		
-		final ArrayList<Point2D.Float[]> predictedPositions = new ArrayList<Point2D.Float[]>();
-		for (EnemySimulator enemy : enemyPredictor.getEnemies()) {
-			final Point2D.Float[] enemyPredictedPositions = new Point2D.Float[testTime];
-			
-			for (int j = 0; j < testTime; j++) {
-				enemyPredictedPositions[j] = enemy.getPositionAtTime(j + 1);
-			}
-			
-			predictedPositions.add(enemyPredictedPositions);
-		}
-		
 		for (int i = 0; i < 80; i++) {
 			TestTools.runOneTick(observation);
 			final float[] enemyArray = observation.getEnemiesFloatPos();
@@ -229,7 +218,7 @@ public class TestEnemyPrediction {
 				break;
 			}
 			
-			final int enemiesLeftToFind = getMissingEnemies(predictedPositions, currentEnemyCount, enemyArray, i);
+			final int enemiesLeftToFind = getMissingEnemies(copy, currentEnemyCount, enemyArray, i);
 			
 			if (enemiesLeftToFind > 0) {
 				Assert.fail("Enemy simulator position didn't match any enemy position");
@@ -239,17 +228,17 @@ public class TestEnemyPrediction {
 		enemies.forEach(x -> TestTools.removeEnemy(observation, x));
 	}
 	
-	private int getMissingEnemies(ArrayList<Point2D.Float[]> predictedPositions, int enemiesLeftToFind, float[] enemyArray, int time) {
-		for (int q = 0; q < predictedPositions.size(); q++) {
-			final Point2D.Float[] simulatedEnemyPositions = predictedPositions.get(q);
-			
+	private int getMissingEnemies(EnemyPredictor enemyPredictor, int enemiesLeftToFind, float[] enemyArray, int time) {
+		for (EnemySimulator simulation : enemyPredictor.getEnemies()) {
 			if (enemiesLeftToFind == 0) {
 				break;
 			}
 			
+			final Point2D.Float enemyPosition = simulation.getCurrentPosition();
+			
 			for (int j = 0; j < enemyArray.length; j += EnemyPredictor.FLOATS_PER_ENEMY) {
-				final float deltaX = Math.abs(simulatedEnemyPositions[time].x - enemyArray[j + EnemyPredictor.X_OFFSET]);
-				final float deltaY = Math.abs(simulatedEnemyPositions[time].y - enemyArray[j + EnemyPredictor.Y_OFFSET]);
+				final float deltaX = Math.abs(enemyPosition.x - enemyArray[j + EnemyPredictor.X_OFFSET]);
+				final float deltaY = Math.abs(enemyPosition.y - enemyArray[j + EnemyPredictor.Y_OFFSET]);
 				
 				if (deltaX < EnemyPredictor.ACCEPTED_POSITION_DEVIATION && 
 					deltaY < EnemyPredictor.ACCEPTED_POSITION_DEVIATION) {

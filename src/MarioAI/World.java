@@ -86,9 +86,9 @@ public class World {
 		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
+		setMarioNode(observation);
 		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
-			setMarioNode(observation);
 			hasWorldChanged = true;
 		}
 		else {
@@ -97,12 +97,12 @@ public class World {
 	}
 	
 	private void setMarioNode(final Environment observation) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
-		int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		//limit mario y pos to a position inside the matrix
 		marioYPos = Math.min(Math.max(marioYPos, 0), LEVEL_HEIGHT - 1);
 		
-		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+		marioNode = new Node(Math.round(marioXPos), Math.round(marioYPos), (byte)0);
 	}
 
 	public Node getMarioNode(final Environment observation)

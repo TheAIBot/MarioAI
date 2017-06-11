@@ -137,7 +137,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -149,13 +149,13 @@ public class PathCreator {
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
-		if (shouldUpdateToNewPath(path)) {
+		if (shouldUpdateToNewPath(path, newEnemiesSpawned)) {
 			path.usePath();
 			bestPath = path;	
 		}
 	}
 	
-	public void updateBestPath() {
+	public void updateBestPath(final boolean newEnemiesSpawned) {
 		final AStarPath[] paths = new AStarPath[aStars.length];
 		for (int i = 0; i < aStars.length; i++) {
 			paths[i] = aStars[i].getCurrentBestPath();
@@ -174,7 +174,7 @@ public class PathCreator {
 			}
 		}
 		
-		if (shouldUpdateToNewPath(paths[paths.length - 1])) {
+		if (shouldUpdateToNewPath(paths[paths.length - 1], newEnemiesSpawned)) {
 			//Otherwise chose the path from the astar
 			//with the highest granularity
 			paths[paths.length - 1].usePath();
@@ -183,15 +183,21 @@ public class PathCreator {
 		}
 	}
 	
-	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath) {
-		/*if (newPotentialPath.path == null) {
+	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath, final boolean newEnemiesSpawned) {
+		if (newPotentialPath.path == null) {
 			return false;
 		}
-		if (!newPotentialPath.isBestPath && 
+		if (bestPath == null ||
+			bestPath.path == null) {
+			return true;
+		}
+		
+		if (!newEnemiesSpawned &&
+			!newPotentialPath.isBestPath && 
 			bestPath.isBestPath &&
 			bestPath.path.size() > 1) {
 			return false;
-		}*/
+		}
 		if (!newPotentialPath.isBestPath) {
 			System.out.println("Not best path");
 		}
