@@ -1,22 +1,19 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import com.sun.javafx.geom.Edge;
-import com.sun.javafx.scene.traversal.Direction;
 
 import MarioAI.World;
 import MarioAI.graph.Collision;
@@ -679,15 +676,14 @@ public class TestGrapher {
 	public void testCollisonDetectionUpIntoCeiling() {
 		//In essence testing when exactly it should give a collision,
 		//by slowly increasing marios y position
-		//In essence testing when exactly it should give a collision
 		
 		World world = totalFlatland(flatlandWorld(), marioNode); 
 		grapher.setMovementEdges(world, marioNode);
 		Node[][] level = world.getLevelMatrix();
-		//Sets the floor to something impasable:
+		//Sets the floor to something solid:
 		
 		for (int i = 0; i < level.length; i++) {
-			if (level[i][9] != null) level[i][9] = new Node(level[i][9].x, level[i][9].y, (byte) -10);
+			if (level[i][9] != null) level[i][9] = new Node(i, level[i][9].y, (byte) -10);
 		}
 		
 		//Testing the ascending function:
@@ -701,13 +697,12 @@ public class TestGrapher {
 				//Should only collide if Mario, at height = 1.8, is within the block, or on top of it.
 				
 				//Simply uses a random node for the starting node:
-				Node startingPosition = new Node(2, 9, (byte) 22);
-				Node targetPosition = new Node(5, 9, (byte) 22);
+				Node startingPosition = new Node(i, 9, (byte) 22);
 				List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 				JumpingEdge polynomial = new JumpingEdge(null, null);
 				polynomial.setToJumpPolynomial(startingPosition, 11, 5, 4);
-				Collision rightwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_UPWARDS	, startingPosition, listOfEdges);
-				Collision leftwardsCollision  = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS	, startingPosition, listOfEdges);
+				Collision rightwardsCollision = grapher.ascendingPolynomial(j - 0.01f, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_UPWARDS	, startingPosition, listOfEdges);
+				Collision leftwardsCollision  = grapher.ascendingPolynomial(j - 0.01f, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS	, startingPosition, listOfEdges);
 				
 				String errorMessage = "Failure at i = " + i + ", height/j = " + j;
 				//Plus/minus 0.01, as this is added in the sub-methods
@@ -724,6 +719,11 @@ public class TestGrapher {
 						leftwardsCollision  = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS	, startingPosition, listOfEdges);
 						assertEquals(errorMessage, Collision.HIT_WALL, leftwardsCollision);
 					} else {
+						if (leftwardsCollision != Collision.HIT_CEILING) {
+							rightwardsCollision = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.RIGHT_UPWARDS	, startingPosition, listOfEdges);
+							leftwardsCollision  = grapher.ascendingPolynomial(j, j, i, Collision.HIT_NOTHING, polynomial, JumpDirection.LEFT_UPWARDS	, startingPosition, listOfEdges);
+							
+						}
 						assertEquals(errorMessage, Collision.HIT_CEILING, leftwardsCollision);
 					}
 					assertEquals(0, listOfEdges.size());
