@@ -31,6 +31,7 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class TestAStar {
 	FastAndFurious agent;
@@ -241,7 +242,7 @@ public class TestAStar {
 		start.gScore = 0;
 		start.fScore = 0;
 		
-		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		Long2ObjectOpenHashMap<SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		SpeedNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
 													.findFirst().get();
 				
@@ -287,7 +288,7 @@ public class TestAStar {
 		//assertNull(path);
 		assertNotNull(path); // this assumes Mario will see that there is no path not colliding with enemies and has to choose it anyway, eventhough the fscore is high.
 		
-		HashMap<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
+		Long2ObjectOpenHashMap<SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		boolean hasHitEnemy = false;
 		for (DirectedEdge edge : path) {
 			SpeedNode sn = speedNodes.values().stream()
