@@ -18,6 +18,7 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
 	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
@@ -249,7 +250,7 @@ public class PathCreator {
 		isRunning = false;
 	}
 	
-	public HashMap<Long, SpeedNode> getSpeedNodes() {
+	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodes() {
 		return aStars[aStars.length-1].getSpeedNodes();
 	}
 	

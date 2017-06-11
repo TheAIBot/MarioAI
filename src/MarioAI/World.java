@@ -9,6 +9,7 @@ import org.omg.CORBA.COMM_FAILURE;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 
 public class World {
@@ -21,7 +22,8 @@ public class World {
 	
 	private final CollisionDetection collisionDetection = new CollisionDetection();
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
-	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
+	//private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
+	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos;
