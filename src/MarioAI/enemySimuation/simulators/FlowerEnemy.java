@@ -1,7 +1,9 @@
 package MarioAI.enemySimuation.simulators;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import MarioAI.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
 
@@ -19,7 +21,7 @@ public class FlowerEnemy extends EnemySimulator
     
     private FlowerEnemy(LevelScene world, float x, float y, float ya, boolean fromFlowerState)
     {
-    	super(Sprite.KIND_ENEMY_FLOWER, 16, 21);
+    	super(Sprite.KIND_ENEMY_FLOWER, 4, 12);
         
     	this.world = world;
     	this.x = x;
@@ -89,6 +91,18 @@ public class FlowerEnemy extends EnemySimulator
         ya*=0.9;
         ya+=0.1f;
     }
+    
+    @Override
+    public boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight)
+    {
+        final float xMarioD = marioX - enemyX;
+        final float yMarioD = marioY - enemyY;
+        
+        return (xMarioD > -width*2-4 && 
+        		xMarioD < width*2+4 &&
+        		yMarioD > -height && 
+        		yMarioD < marioHeight);
+    }
 
 	@Override
 	public EnemySimulator copy() {
@@ -98,6 +112,8 @@ public class FlowerEnemy extends EnemySimulator
 		copy.xa = xa;
 		copy.ya = ya;
 		//copy.positionsIndexOffset = positionsIndexOffset;
+		Point2D.Float currentPosition = getCurrentPosition();
+		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		copy.jumpTime = jumpTime;
 		

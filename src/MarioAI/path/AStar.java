@@ -40,7 +40,7 @@ class AStar {
 	 * @param marioHeight
 	 * @param world
 	 */
-	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {
+	public void initAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
 		closedSet.clear();
 		openSet.clear();
 		openSetMap.clear();
@@ -64,7 +64,7 @@ class AStar {
 	 * @param goal
 	 * @return
 	 */
-	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, int marioHeight, World world) {		
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
 		while (!openSet.isEmpty() && keepRunning) {
 			//System.out.println("Current open set:");
 			//System.out.println(openSet);
@@ -130,21 +130,22 @@ class AStar {
 							continue;
 						}
 						
-//						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-//							continue;
-//						}
-						
+						if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+							continue;
+						}
+						/*
 						if (sn.ticksOfInvincibility == 0) {
 							if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 								continue;
-								/*
+								
 								if (sn.lives <= 1) {
 									continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 								}
 								penalty = PENALTY_SCORE;
-								*/
+								
 							}
 						}
+						 */
 					}
 					
 					// Update the edges position in the priority queue

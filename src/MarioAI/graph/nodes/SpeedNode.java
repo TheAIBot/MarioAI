@@ -2,6 +2,7 @@ package MarioAI.graph.nodes;
 
 import java.awt.geom.Point2D;
 
+import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
@@ -162,19 +163,18 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		
 		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
 		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
-		if (i >= moveInfo.getPositions().length) {
-			this.ticksOfInvincibility -= moveInfo.getPositions().length;
+		if (i >= moveInfo.getMoveTime()) {
+			this.ticksOfInvincibility -= moveInfo.getMoveTime();
 			return false;
 		}
 		
 		currentTick += i;
 		boolean hasEnemyCollision = false;
-		for (; i < moveInfo.getPositions().length; i++) {
-			Point2D.Float currentPosition = moveInfo.getPositions()[i];
-			final float x = parentXPos  + currentPosition.x;
-			final float y = parent.yPos - currentPosition.y;
+		for (; i < moveInfo.getMoveTime(); i++) {
+			final float x = parentXPos  + moveInfo.getXPositions()[i];
+			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
+			if (enemyPredictor.hasEnemy(x, y, marioHeight, currentTick)) {
 				hasEnemyCollision = true;
 				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
 			}
@@ -197,19 +197,19 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	 * @param marioHeight
 	 * @return
 	 */
-	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
+	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		int currentTick = startTime;
 		
-		for (Point2D.Float position : moveInfo.getPositions()) {
-			final float x = parentXPos  + position.x;
-			final float y = parent.yPos - position.y;
-			
-			if (enemyPredictor.hasEnemy(x, y, 1, marioHeight, currentTick)) {
-				return true;
-			}
-			
-			currentTick++;
-		}
+        for (int i = 0; i < moveInfo.getMoveTime(); i++) {
+            final float x = parentXPos  + moveInfo.getXPositions()[i];
+            final float y = parent.yPos - moveInfo.getYPositions()[i];
+
+            if (enemyPredictor.hasEnemy(x, y, marioHeight, currentTick + 1)) {
+                return true;
+            }
+	
+            currentTick++;
+        }
 		return false;
 	}
 	

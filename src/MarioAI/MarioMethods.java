@@ -7,6 +7,7 @@ public class MarioMethods {
 
 	private static final int BLOCK_PIXEL_SIZE = 16;
 	private static final float BLOCK_CENTERING_OFFSET = 0.5f;
+	public static final float MARIO_WIDTH = 4f / BLOCK_PIXEL_SIZE;
 
 	public static int getMarioXPos(final float[] marioPos) {
 		return (int) getPreciseMarioXPos(marioPos);
@@ -32,14 +33,14 @@ public class MarioMethods {
 		return getPreciseMarioYPos(marioPos) - BLOCK_CENTERING_OFFSET;
 	}
 	
-	public static int getMarioHeightFromMarioMode(int mode) {
+	public static float getMarioHeightFromMarioMode(int mode) {
 		switch (mode) {
 		case 0:
-			return 1;
+			return 0.75f;
 		case 1:
-			return 2;
+			return 1.5f;
 		case 2:
-			return 2;
+			return 1.5f;
 		}
 		throw new Error("Invalid mario mode given: " + mode);
 	}

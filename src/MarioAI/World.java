@@ -181,12 +181,12 @@ public class World {
 		}
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastY){
-		return collisionDetection.isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, lastY, this);
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, SpeedNode sourceNode, float lastY){
+		return collisionDetection.isColliding(futureOffsetX, futureOffsetY, currentOffsetX, currentOffsetY, sourceNode.currentXPos, sourceNode.yPos, lastY, this);
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastY){
-		return collisionDetection.isColliding(futureOffset, currentOffset, startX, startY, lastY, this);
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, float startX, float startY, float lastY){
+		return collisionDetection.isColliding(futureOffsetX, futureOffsetY, currentOffsetX, currentOffsetY, startX, startY, lastY, this);
 	}
 	
 	public boolean hasGoalNodesChanged() {

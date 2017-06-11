@@ -1,6 +1,5 @@
 package MarioAI.marioMovement;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +84,8 @@ public class MarioControls {
 			distanceMoved += speed;
 		}
 		
-		return (distanceMoved >= Math.abs(distanceToMove));
+		//add half speed because not completely reaching the node is also accepted
+		return (distanceMoved + (MAX_X_VELOCITY / 2) >= Math.abs(distanceToMove));
 	}
 	
 	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
@@ -234,167 +234,147 @@ public class MarioControls {
 		return new YMovementInformation(0, new float[0], new boolean[0]);
 	}
 	
-	private static XMovementInformation getXMovementTime(float neededXDistance, float speed, final int airTime, boolean useSuperSpeed) {
-		final ArrayList<Float> xPositions = new ArrayList<Float>(8);
-		final boolean distanceIsNegative = neededXDistance < 0;
-		float distanceMoved = 0;
-		int totalTicks = 0;
-		//If Mario currently moves the opposite way of the way he should go,
-		//he first needs to deaccelerate		
-		if ((neededXDistance < 0 && speed > 0) ||
-			(neededXDistance > 0 && speed < 0)) {
-			speed = Math.abs(speed);
-			
-			speed = addOnDeaccelerationPositions(speed, xPositions, useSuperSpeed);
-			
-			totalTicks = xPositions.size();
-			distanceMoved = xPositions.get(xPositions.size() - 1);		
-			
-			//because mario has now completely 
-			//deaccelerated his speed is now 0
-			//speed = 0;
-		} else if (neededXDistance == 0) {
-			return new XMovementInformation(0, speed, 0, xPositions, new boolean[0], useSuperSpeed);
+	private static XMovementInformation getXMovementTime(final float originalNeededXDistance, final float startSpeed, final int airTime, final boolean useSuperSpeed) {
+		if (originalNeededXDistance == 0) {
+			return new XMovementInformation(0, startSpeed, 0, new float[0], new boolean[0], useSuperSpeed);
 		}
 		
-		//The calculations are independent of the direction:
-		speed = Math.abs(speed);
-		neededXDistance = Math.abs(neededXDistance);
+		float speed = startSpeed;
+		
+		if ((originalNeededXDistance < 0 && startSpeed > 0) ||
+			(originalNeededXDistance > 0 && startSpeed < 0)) {
+			speed = -Math.abs(startSpeed);
+		}
+		else {
+			speed = Math.abs(startSpeed);
+		}
+		
+		//final ArrayList<Float> xPositions = new ArrayList<Float>(8);
+		final boolean distanceIsNegative = originalNeededXDistance < 0;
+		float distanceMoved = 0;
+		int ticksAccelerating = 0;
+		
+		//These calculations are independent of the direction
+		//The direction of the movement is added at the end of this method
+		final float neededXDistance = Math.abs(originalNeededXDistance);
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
-		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - totalTicks));
+		float distanceToTarget = neededXDistance - (distanceMoved + getDriftingDistance(speed, airTime - ticksAccelerating));
 		while (distanceToTarget > ACCEPTED_DEVIATION) {
-			////BLOCK 1////
 			final float futureSpeed = getNextTickSpeed(speed, useSuperSpeed);
 			final float futureDistanceMoved = distanceMoved + futureSpeed;
 			
 			final float oldDistanceToTarget = distanceToTarget;
-			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - totalTicks));
+			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating));
 			
-			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget)) {
+			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget) && Math.abs(oldDistanceToTarget) < MAX_X_VELOCITY / 2) {
 				break;
 			}
 			
 			speed = futureSpeed;
 			distanceMoved = futureDistanceMoved;
-			xPositions.add(distanceMoved);
-			totalTicks++;
-			////BLOCK 1////
+			ticksAccelerating++;
 			
 		}
-		final int ticksDrifting = Math.max(0, airTime - totalTicks);
-		final int ticksAccelerating = totalTicks;
-		totalTicks += ticksDrifting;
-		final boolean[] pressButton = new boolean[totalTicks + ((airTime > 0) ? 1 : 0)];
+		
+		final int ticksDrifting = Math.max(0, airTime - ticksAccelerating);
+		final int totalTicks = ticksAccelerating + ticksDrifting + ((airTime > 0) ? 1 : 0);
+		final boolean[] pressButton = new boolean[totalTicks];
+		final float[] xPositions = new float[totalTicks];
+		
+		if ((originalNeededXDistance < 0 && startSpeed > 0) ||
+			(originalNeededXDistance > 0 && startSpeed < 0)) {
+			speed = -Math.abs(startSpeed);
+		}
+		else {
+			speed = Math.abs(startSpeed);
+		}
+		
+		float tdistanceMoved = 0;
 		for (int i = 0; i < ticksAccelerating; i++) {
 			pressButton[i] = true;
+			speed = getNextTickSpeed(speed, useSuperSpeed);
+			tdistanceMoved += speed;
+			xPositions[i] = tdistanceMoved;
 		}
 		
 		if (airTime > 0) {
 			
-			speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, xPositions);
-			distanceMoved = (xPositions.size() == 0)? 0 : xPositions.get(xPositions.size() - 1);
+			speed = addOnDriftingPositionsAndReturnLastSpeed(speed, distanceMoved, ticksDrifting, ticksAccelerating, xPositions);
+			distanceMoved = xPositions[xPositions.length - 2];
 			
 			//move the last tick
 			//which should be on ground
 			//this allows two jumping edges
 			//after each other.
-			////BLOCK 1 COPY////
 			speed = getNextTickSpeed(speed, useSuperSpeed);
 			distanceMoved += speed;
-			xPositions.add(distanceMoved);
+			xPositions[xPositions.length - 1] = distanceMoved;
 			pressButton[pressButton.length - 1] = true;
-			totalTicks++;
-			////BLOCK 1 COPY////		
-		}		
+			
+			//already accounted for when totalTicks is created
+			//totalTicks++;
+		}
 		
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction
 		if (distanceIsNegative) {
 			speed = -speed;
 			distanceMoved = -distanceMoved;
-			for (int i = 0; i < xPositions.size(); i++) {
-				xPositions.set(i, -xPositions.get(i));
+			for (int i = 0; i < xPositions.length; i++) {
+				xPositions[i] = -xPositions[i];
 			}
 		}
 
 		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton, useSuperSpeed);
 	}
 	
-	private static float addOnDeaccelerationPositions(final float speed, final ArrayList<Float> xPositions, final boolean useSuperSpees) {
-		return getDeaccelerationPositions(speed, xPositions, useSuperSpees);		
-	}
-	
-	private static float getDeaccelerationPositions(float speed, final ArrayList<Float> xPositions, final boolean useSuperSpees) {
-		float xMovement = 0;
-		do {
-			if (useSuperSpees) {
-				speed = speed * 0.89f - 0.075f;
-			}
-			else {
-				speed = speed * 0.89f - 0.0375f;	
-			}
-			if (Math.abs(speed) < MIN_MARIO_SPEED) {
-				speed = 0;
-			}
-			xMovement += speed;
-			xPositions.add(-xMovement);
-		} while (speed >= MIN_MARIO_SPEED);
-		return speed;
-	}
-	
 	public static float getNextTickSpeed(final float speed, final boolean useSuperSpees) {
-		if (useSuperSpees) {
-			return speed * 0.89f + 0.075f;
-		}
-		else {
-			return speed * 0.89f + 0.0375f;	
-		}
+		final float c = useSuperSpees ? 0.075f : 0.0375f;
+		final float newSpeed = speed * 0.89f + c;
+		return Math.abs(newSpeed) < MIN_MARIO_SPEED ? 0f : newSpeed;
 	}
 	
-	private static float getDriftingDistance(final float speed, final int driftTime) {
+	private static float getDriftingDistance(float speed, final int driftTime) {
 		float driftDistance = 0;
-		for (int i = 0; i < driftTime; i++) {				
-			driftDistance += getNextDriftingDistance(speed, i);
+		for (int i = 0; i < driftTime; i++) {
+			speed = getNextDriftingSpeed(speed);
+			driftDistance += speed;
 		}
 		return driftDistance;
 	}
 	
-	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, ArrayList<Float> xPositions) {
-		final int startSize = xPositions.size();
-		getDriftingPositions(speed, driftTime, distanceMoved, xPositions);
+	private static float addOnDriftingPositionsAndReturnLastSpeed(final float speed, float distanceMoved, int driftTime, final int startSize, float[] xPositions) {
+		getDriftingPositions(speed, driftTime, distanceMoved, startSize, xPositions);
 		
 		return getLastSpeedDrifting(speed, distanceMoved, xPositions,  startSize);
 	}
 	
-	private static void getDriftingPositions(final float speed, final int driftTime, final float startXPosition, final ArrayList<Float>xPositions) {
-		float xMoved = 0;
-		for (int i = 0; i < driftTime; i++) {	
-			xMoved += getNextDriftingDistance(speed, i);
-			xPositions.add(startXPosition + xMoved);
+	private static void getDriftingPositions(float speed, final int driftTime, final float startXPosition, final int startSize, final float[] xPositions) {
+		float xMoved = startXPosition;
+		for (int i = startSize; i < startSize + driftTime; i++) {
+			speed = getNextDriftingSpeed(speed);
+			xMoved += speed;
+			xPositions[i] = xMoved;
 		}
 	}
 	
-	private static float getNextDriftingDistance(float speed, float ticksDrifting) {
-		final float a = speed;
-		final float b = -0.11653355831586142f;
-		final float c = -0.00000056420864292f;
-		final float currentSpeed = (float) (a * Math.exp(b * (ticksDrifting + 1)) + c);
-		
-		return (currentSpeed <= MIN_MARIO_SPEED) ? 0 : currentSpeed;
+	private static float getNextDriftingSpeed(float speed) {
+		speed = 0.89f * speed;
+		return (speed <= MIN_MARIO_SPEED)? 0 : speed;
 	}
 	
-	private static float getLastSpeedDrifting(float speed, float distanceMoved, ArrayList<Float> driftPositions, int initialSize) {
-		if (driftPositions.size() - initialSize == 0) {
+	private static float getLastSpeedDrifting(float speed, float distanceMoved, final float[] driftPositions, int initialSize) {
+		if (driftPositions.length - initialSize == 1) {
 			return speed;
 		}
-		else if (driftPositions.size() - initialSize == 1) {
-			return driftPositions.get(initialSize) - distanceMoved;
+		else if (driftPositions.length - initialSize == 2) {
+			return driftPositions[initialSize] - distanceMoved;
 		}
 		else {
-			final float last = driftPositions.get(driftPositions.size() - 1);
-			final float secondLast = driftPositions.get(driftPositions.size() - 2);
+			final float last = driftPositions[driftPositions.length - 2];
+			final float secondLast = driftPositions[driftPositions.length - 3];
 			return last - secondLast;
 		}
 	}

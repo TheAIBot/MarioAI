@@ -37,7 +37,7 @@ public class PathCreator {
 	public PathCreator(int threadCount) {
 		//There can't be more threads than granularities as two threads
 		//would then have to share the same granularity.
-		threadCount = Math.min(threadCount, HASH_GRANULARITY.length);
+		threadCount = Math.min(threadCount, MAX_THREAD_COUNT);
 		threadPool = Executors.newFixedThreadPool(threadCount);
 		runningTasks = new CompletableFuture[threadCount];
 		
@@ -53,7 +53,7 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
 	{
 		final DirectedEdge currentEdge = path.get(0);
 		
@@ -63,11 +63,12 @@ public class PathCreator {
 		
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+
+        final float edgeEndDistanceX = currentEdge.getMoveInfo().getXPositions()[currentEdge.getMoveInfo().getXPositions().length - 1];
+        final float edgeEndDistanceY = currentEdge.getMoveInfo().getYPositions()[currentEdge.getMoveInfo().getYPositions().length - 1];
 		
-		final Point2D.Float edgeEndDistance = currentEdge.getMoveInfo().getPositions()[currentEdge.getMoveInfo().getPositions().length - 1];
-		
-		final float futureMarioXPos = marioXPos + edgeEndDistance.x;
-		final float futureMarioYPos = marioYPos - edgeEndDistance.y;
+		final float futureMarioXPos = marioXPos + edgeEndDistanceX;
+		final float futureMarioYPos = marioYPos - edgeEndDistanceY;
 		
 		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
 		
@@ -76,7 +77,7 @@ public class PathCreator {
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
 	
-	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
 		if (isRunning) {
 			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
 		}
@@ -136,7 +137,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -191,6 +192,7 @@ public class PathCreator {
 			bestPath.path.size() > 1) {
 			return false;
 		}
+		
 		
 		return true;
 	}

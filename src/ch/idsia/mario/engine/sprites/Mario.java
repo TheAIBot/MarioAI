@@ -734,4 +734,13 @@ public class Mario extends Sprite {
 		this.ya = 0;
 		this.jumpTime = 0;
 	}
+	
+	public int getInvulnerableTime() {
+		return invulnerableTime;
+	}
+
+	public void resetMarioHealth() {
+		setLarge(true, true);
+		invulnerableTime = 0;
+	}
 }

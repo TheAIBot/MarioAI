@@ -28,7 +28,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = true;
+	public boolean DEBUG = false;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -99,8 +99,8 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				if (pathCreator.isRunning) {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
-						//save(observation);
-						//throw new Error();
+						save(observation);
+						throw new Error("Mario didn't follow the path correctly.");
 					}
 					pathCreator.updateBestPath();
 //					System.out.println("Tick: " + tickCount + " Stopped");
@@ -139,7 +139,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				//DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
@@ -153,14 +153,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	public void findPath(Environment observation) {
-		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world);
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	
 	public void startFindingPathFromPreviousPath(Environment observation) {
-		final int marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		final ArrayList<DirectedEdge> path =  pathCreator.getBestPath();
 		final Node[] goalNodes = world.getGoalNodes(0);

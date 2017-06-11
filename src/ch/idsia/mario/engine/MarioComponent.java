@@ -126,15 +126,15 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		adjustFPS();
 		//EvaluationInfo evaluationInfo = new EvaluationInfo();
 
-		VolatileImage image = null;
 		Graphics g = null;
 		Graphics og = null;
 		if (GlobalOptions.VisualizationOn) {
-			image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			if (debugRenderImage == null) {
+				debugRenderImage = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);	
+			}
 			g = getGraphics();
-			og = image.getGraphics();
+			og = debugRenderImage.getGraphics();
 			debugRenderGraphics = og;
-			debugRenderImage = image;
 		}
 
 		addFocusListener(this);
@@ -200,7 +200,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			LevelScene.drawStringDropShadow(og, "Trial:", 33, 4, 7);
 			LevelScene.drawStringDropShadow(og, msg, 33, 5, 7);
 
-			g.drawImage(image, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+			g.drawImage(debugRenderImage, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
 			/*
 			if (width != 320 || height != 240) {
 				g.drawImage(image, 0, 0, 640 * 2, 480 * 2, null);
@@ -602,5 +602,13 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	
 	public void resetMarioSpeed() {
 		mario.resetSpeed();
+	}
+	
+	public int getMarioInvulnerableTime() {
+		return mario.getInvulnerableTime();
+	}
+	
+	public void resetMarioHealth() {
+		mario.resetMarioHealth();
 	}
 }
