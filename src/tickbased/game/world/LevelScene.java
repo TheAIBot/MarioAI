@@ -88,7 +88,7 @@ public class LevelScene implements SpriteContext
      * @param levelScene
      */
     public LevelScene(LevelScene levelScene) {
-    	this();
+//    	this();
 //        this.graphicsConfiguration = levelScene.graphicsConfiguration;
 //        this.levelSeed = levelScene.levelSeed;
 ////        this.renderer = levelScene.renderer;
@@ -100,6 +100,13 @@ public class LevelScene implements SpriteContext
         this.killedCreaturesByFireBall = levelScene.killedCreaturesByFireBall;
         this.killedCreaturesByStomp = levelScene.killedCreaturesByStomp;
         this.killedCreaturesByShell = levelScene.killedCreaturesByShell;
+        
+        this.level = levelScene.level;
+        this.sprites = levelScene.sprites;
+		this.mario = levelScene.mario;
+		startTime = 1;
+		timeLeft = totalTime * 15;
+		tick = 1;
     }
 
     /**

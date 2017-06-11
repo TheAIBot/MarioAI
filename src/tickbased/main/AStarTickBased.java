@@ -35,8 +35,9 @@ public class AStarTickBased {
 		start.gScore = 0;
 		start.fScore = problem.heuristicFunction(start, goal);
 		
+		int timeTaken = (int) (System.currentTimeMillis() - startTime);
 		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
-		while (!frontier.isEmpty() && (System.currentTimeMillis() - startTime < problem.MAX_ALLOWED_RUN_TIME)) {
+		while (!frontier.isEmpty() && (timeTaken < problem.MAX_ALLOWED_RUN_TIME)) {
 			SearchNode current = frontier.remove();
 			frontierMap.remove(current.hashCode());
 
@@ -68,11 +69,16 @@ public class AStarTickBased {
 					insertChildNode(child, current, tentativeGScore, problem, goal, frontier, frontierMap);
 				}
 			}
+			
+			timeTaken = (int) (System.currentTimeMillis() - startTime);
+			System.out.println(timeTaken);
+			System.out.println(current.toString());
 		}
 		
 		// No solution exists or no solution was found in the given time.
 		// Return the best route found so far.
 		finishedNewRun = true;
+		System.out.println("------------------------");
 		return reconstructPath(currentBest);
 	}
 	

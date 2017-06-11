@@ -87,7 +87,7 @@ public class TickProblem extends Problem {
 		levelScene.mario.setKeys(marioAction.action);
 		levelScene.tick();
 		
-		State newNode = new Node(levelScene);
+		State newNode = new Node(levelScene, node.ticksInFuture + 1);
 		states.add(newNode);
 		
 		SearchNode sn = new SearchNode(newNode, action);
@@ -131,8 +131,8 @@ public class TickProblem extends Problem {
 		worldScene.mario.y = marioPosition[1];
 		Mario mario = worldScene.mario;
 		
-		int marioXPos = (int) mario.x / 16;
-		int marioYPos = (int) mario.y / 16;
+		int marioXPos = (int) mario.x / 16; // block precision
+		int marioYPos = (int) mario.y / 16; // block precision
 
 		// Blocks
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
@@ -182,7 +182,10 @@ public class TickProblem extends Problem {
         	
         }
         
+        ((Node) initialState).x = marioPosition[0];
+        ((Node) initialState).y = marioPosition[1];
         ((Node) goalState).x = ((Node) initialState).x + TickProblem.SCREEN_WIDTH / 2 * 16;
+        ((Node) goalState).y = 0;
 	}
 
 }

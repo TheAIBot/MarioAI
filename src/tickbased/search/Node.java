@@ -9,13 +9,21 @@ public class Node implements State {
 
 	public float x, y; // coordinates for the position
 //	public List<Action> marioActions = new ArrayList<Action>();
-	public int hash;
+	int ticksInFuture;
+
 	
 	// TODO add ticks in future to constructor
-	public Node(LevelScene levelScene) {
+//	public Node(LevelScene levelScene) {
+//		this.levelScene = levelScene;
+//		this.x = levelScene.mario.x;
+//		this.y = levelScene.mario.y;
+//	}
+	
+	public Node(LevelScene levelScene, int ticksInFuture) {
 		this.levelScene = levelScene;
 		this.x = levelScene.mario.x;
 		this.y = levelScene.mario.y;
+		this.ticksInFuture = ticksInFuture;
 	}
 
 //	public void addAction(MarioAction action) {
@@ -23,14 +31,21 @@ public class Node implements State {
 //	}
 	
 	public String toString() {
-		return "(" + x + "," + y + ")";
+		return "(" + x + "," + y + "," + ticksInFuture + ")";
 	}
 	
 	// TODO compare x,y and ticks in future
 	public boolean equals(Object o) {
+		int delta = 1; // for now
+		int timeDelta = 1; // for now
 		if (o == null) return false;
 		if (o instanceof Node) {
-			return this.hashCode() == o.hashCode();
+			Node oo = (Node) o; 
+			if (Math.abs(oo.x - x) < delta
+				&& Math.abs(oo.y - y) < delta
+				&& Math.abs(oo.ticksInFuture - ticksInFuture) < timeDelta) {
+				
+			}
 		}
 		return false;
 	}

@@ -63,9 +63,9 @@ public class TickBasedAgent implements Agent {
 		LevelScene levelScene = new LevelScene();
 		problem.worldScene = problem.tentativeScene = levelScene;
 		
-		problem.initialState = new Node(levelScene);
-		problem.goalState = new Node(levelScene);
+		problem.initialState = new Node(levelScene, 0);
+		problem.goalState = new Node(levelScene, 0);
 		((Node) problem.goalState).x = ((Node) problem.initialState).x + TickProblem.SCREEN_WIDTH / 2 * 16;
-		
+		((Node) problem.goalState).y = 0; // top of screen
 	}
 }
