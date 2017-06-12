@@ -36,8 +36,9 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
-			//TestTools.setMarioPosition(observation, 15, 10);
-			Environment observation = TestTools.loadLevel("jumpLevels/truePillar.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
+
+			TestTools.setMarioPosition(observation, 3, 11);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 			TestTools.runWholeLevel(observation);
 		} else {
