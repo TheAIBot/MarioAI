@@ -91,19 +91,19 @@ public class CollisionDetection {
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world))) {
 			collide = true;
 		} 
-		if 	(ya < 0 && 
+                else if 	(ya < 0 && 
 				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world))) {
 			collide = true;
 		}
-		if 	(xa > 0 && 
+                else if 	(xa > 0 && 
 						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) || 
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
-		if 	(xa < 0 &&
+                else if 	(xa < 0 &&
 						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
@@ -115,16 +115,16 @@ public class CollisionDetection {
 				currentPosition.x = (int) ((currentPosition.x - MARIO_WIDTH) / 16) * 16 + MARIO_WIDTH;
 				//this.xa = 0;
 			}
-			if (xa > 0) {
+                        else if (xa > 0) {
 				currentPosition.x = (int) ((currentPosition.x + MARIO_WIDTH) / 16 + 1) * 16 - MARIO_WIDTH - 1;
 				//this.xa = 0;
 			}
-			if (ya < 0) {
+                        else if (ya < 0) {
 				currentPosition.y = (int) ((currentPosition.y - MARIO_HEIGHT) / 16) * 16 + MARIO_HEIGHT;
 				//jumpTime = 0;
 				//this.ya = 0;
 			}
-			if (ya > 0) {
+                        else if (ya > 0) {
 				currentPosition.y = (int) ((currentPosition.y - 1) / 16 + 1) * 16 - 1;
 				//onGround = true;
 			}
