@@ -187,10 +187,10 @@ public class StateNode implements Comparable<StateNode> {
 					hasEnemyCollision = true;
 					lives--;
 					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
-				} else {
+				} else if (ticksOfInvincibility >= 0){
 					ticksOfInvincibility--;
 				}
-			} else {
+			} else if (ticksOfInvincibility >= 0){
 				ticksOfInvincibility--;
 			}
 			
@@ -207,13 +207,13 @@ public class StateNode implements Comparable<StateNode> {
 	 * @param marioHeight
 	 * @return
 	 */
-	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
+	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight, EnemyCollision firstCollision) {
 		int currentTick = startTime;		
 		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
 			final float x = parentXPos + moveInfo.getXPositions()[i];
 			final float y = parent.yPos - moveInfo.getYPositions()[i];
 
-			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, false, false, null, -1)) {
+			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, false, false, firstCollision, -1)) {
 				return true;
 			}
 
@@ -263,7 +263,7 @@ public class StateNode implements Comparable<StateNode> {
 		//TODO currently has not hash, set to -1 instead.
 		long stompHash = -1;
 		
-		StateNode stompVersion = new StateNode(targetNode, parent, stompAncestorEdge, parent.livingEnemies, stompHash, world);		
+		StateNode stompVersion = new StateNode(targetNode, parent, stompAncestorEdge, stompHash,  parent.livingEnemies, world);		
 		return stompVersion;
 	}
 	

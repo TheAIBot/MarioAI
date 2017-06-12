@@ -70,7 +70,8 @@ class AStar {
 	 * @return
 	 */
 	private void runAStar(final StateNode start, final StateNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
-		while (!openSet.isEmpty() && keepRunning) {				
+		while (!openSet.isEmpty() && keepRunning) {	
+			
 			final StateNode currentState = openSet.remove();
 			openSetMap.remove(currentState.hash);
 			
@@ -121,14 +122,16 @@ class AStar {
 					if (!nextState.isStateNodeUseable(world)) {
 						continue;
 					}
-						
-					if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight)) {
+
+					EnemyCollision firstCollision = new EnemyCollision(); 
+					
+					if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
 						//TODO look at this
 						continue;
 					}
-						
+					
+					/*
 					//Gives extra information about the collision with an enemy, if it happens.
-					EnemyCollision firstCollision = new EnemyCollision(); 
 					
 					if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
 						if (firstCollision.isStompType) { //Stomping means no lost life.
@@ -146,6 +149,7 @@ class AStar {
 						penalty = PENALTY_SCORE;
 						
 					}	
+					*/
 					
 					// Update the edges position in the priority queue
 					// by updating the scores and taking it in and out of the queue.
@@ -226,7 +230,7 @@ class AStar {
 		//by updating the scores and taking it in and out of the queue.
 		if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 		sn.gScore = tentativeGScore;
-		sn.fScore = sn.gScore + heuristicFunction(sn, goal)  + penalty;
+		sn.fScore = sn.gScore + heuristicFunction(sn, goal) + penalty;
 		sn.parent = current;
 		openSet.add(sn);
 		openSetMap.put(snEndHash, sn);
@@ -244,10 +248,10 @@ class AStar {
 		
 		final StateNode speedNode = stateNodes.get(hash);
 		if (speedNode != null) {
-			return speedNode;
+			//return speedNode;
 		}
 		
-		final StateNode newStateNode = new StateNode(neighborEdge.target, current, neighborEdge, current.livingEnemies, hash, world);
+		final StateNode newStateNode = new StateNode(neighborEdge.target, current, neighborEdge, hash, current.livingEnemies, world);
 		stateNodes.put(hash, newStateNode);
 		return newStateNode;
 	}

@@ -180,8 +180,8 @@ public class WalkingEnemySimulator extends EnemySimulator {
 		final float xMarioD = marioX - enemyX;
 		final float yMarioD = marioY - enemyY;
 
-		return (xMarioD > -width * 2 - 4 && xMarioD < width * 2 + 4 && yMarioD > -height
-				&& yMarioD < marioHeight);
+		return 	(xMarioD > -width * 2 - 4 	&& xMarioD < width * 2 + 4 && 
+					 yMarioD > -height			&& yMarioD < marioHeight);
 	}
 
 	@Override

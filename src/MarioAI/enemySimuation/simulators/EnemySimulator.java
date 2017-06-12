@@ -75,20 +75,14 @@ public abstract class EnemySimulator {
 	 * @param time
 	 * @return
 	 */
-	public boolean stomp(int time, float marioHeight, float marioX, float marioY, boolean movingDownwards, boolean isOrWasNotOnGround){
-		System.out.println("Check correct x and y value.");
-		float xMarioD = marioX*16 - x*16;
-		float yMarioD = marioY*16 - y*16;
+	public boolean stomp(int time, float marioHeight, float marioXInPixels, float marioYInPixels, float enemyY, boolean movingDownwards, boolean isOrWasNotOnGround){
+		final float yMarioD = marioYInPixels - enemyY;
 		//float w = 16;
-		if (xMarioD > -(width/2) * 2 - 4 && xMarioD < (width/2) * 2 + 4 &&
-			 yMarioD > -height 			  	&& yMarioD < marioHeight*16) { //*16 to get it in pixels.
-			if (!(this instanceof WalkingEnemySimulator && 
-				 ((WalkingEnemySimulator) this).type != WalkingEnemySimulator.ENEMY_SPIKY)){
-				if (movingDownwards && yMarioD <= 0	&& isOrWasNotOnGround){
-					return true;
-				}
+		if (!(this instanceof WalkingEnemySimulator && ((WalkingEnemySimulator) this).type != WalkingEnemySimulator.ENEMY_SPIKY)){
+			if (movingDownwards && yMarioD <= 0	&& isOrWasNotOnGround){
+				return true;
 			}
-		} 
+		}
 		return false;
 	}
 

@@ -40,9 +40,9 @@ public class EnemyPredictor {
 	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time,
 									boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison, long livingEnemies) {
 		for (int i = 0; i < verifiedEnemySimulations.size(); i++) {
-			if (!isEnemyAlive(livingEnemies, i)) {
-				continue;
-			}
+			//if (!isEnemyAlive(livingEnemies, i)) {
+				//continue;
+			//}
 			EnemySimulator enemySimulation = verifiedEnemySimulations.get(i);
 			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
 			
@@ -56,7 +56,7 @@ public class EnemyPredictor {
 				firstCollison.enemy = enemySimulation;
 				firstCollison.tickForCollision = time;
 				firstCollison.indexEnemy = i;
-				if(enemySimulation.stomp(time, marioHeight,marioXInPixels, marioYInPixels, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
+				if(enemySimulation.stomp(time, marioHeight,marioXInPixels, marioYInPixels, enemyPositionInPixels.y, movingDownwards, isOrWasNotOnGround)){ //Discerns if it is a stomp type collision or not.
 					firstCollison.isStompType = true;
 				}
 				return true;

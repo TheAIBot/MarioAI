@@ -141,7 +141,7 @@ public class PathCreator {
 	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE,enemyPredictor.currentLivingEnemies());
+		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.currentLivingEnemies());
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
