@@ -316,6 +316,9 @@ public class MarioControls {
 			//already accounted for when totalTicks is created
 			//totalTicks++;
 		}
+		if (totalTicks == 0) {
+			System.out.println();
+		}
 		
 		//if distance is negative then put sign back on values as it was lost before and
 		//turn all points around as the movement is in the wrong direction

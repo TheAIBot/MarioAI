@@ -33,14 +33,14 @@ public class MarioMethods {
 		return getPreciseMarioYPos(marioPos) - BLOCK_CENTERING_OFFSET;
 	}
 	
-	public static int getMarioHeightFromMarioMode(int mode) {
+	public static float getMarioHeightFromMarioMode(int mode) {
 		switch (mode) {
 		case 0:
-			return 1;
+			return 0.75f;
 		case 1:
-			return 2;
+			return 1.5f;
 		case 2:
-			return 2;
+			return 1.5f;
 		}
 		throw new Error("Invalid mario mode given: " + mode);
 	}

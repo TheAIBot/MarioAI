@@ -237,7 +237,7 @@ public class DebugDraw {
 		}
 	}
 	
-	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
+	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path, final boolean pathShouldBeUpdated) {
 		if (path != null) {
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {
@@ -250,7 +250,12 @@ public class DebugDraw {
                                 positions.add(new Point((int)correctPos.x, (int)correctPos.y));
                             }
 			}
-			addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			if (pathShouldBeUpdated) {
+				addDebugDrawing(observation, new DebugLines(Color.BLUE, positions));
+			}
+			else {
+				addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			}
 		}
 	}
 	

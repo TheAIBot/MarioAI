@@ -61,7 +61,7 @@ public class Play {
 	        options.setMatlabFileName("");
 	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
 	        options.setLevelRandSeed(seed);
-                /*
+            
 	        if (new File(FastAndFurious.saveStateFileName).exists()) {
 	        	String fileContent = null;
 				try {
@@ -77,7 +77,7 @@ public class Play {
 					System.out.println("Failed to load level state");
 				}
 			}
-                */
+            
 	        System.out.println("Seed = " + seed);
 	        //options.setLevelRandSeed(1524448900);
 	        //options.setLevelRandSeed(493269332);
