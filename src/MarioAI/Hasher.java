@@ -11,7 +11,7 @@ public class Hasher {
 		return x + Short.MAX_VALUE * y;
 	}
 
-	public static long hashSpeedNode(float vx, DirectedEdge edge, int hashGranularity) {	
+	public static long hashStateNode(float vx, DirectedEdge edge, int hashGranularity) {	
 		final long edgeHash = edge.hashCode();
 		final long speedHash = hashSpeed(vx, hashGranularity);
 				
@@ -27,11 +27,11 @@ public class Hasher {
 		return b1 | b2;
 	}
 	
-	public static long hashEndSpeedNode(StateNode state, int hashGranularity) {
-		return hashEndSpeedNode(state.node.x, state.node.y, state.vx, hashGranularity);
+	public static long hashEndStateNode(StateNode state, int hashGranularity) {
+		return hashEndStateNode(state.node.x, state.node.y, state.vx, hashGranularity);
 	}
 	
-	public static long hashEndSpeedNode(int x, int y, float vx, int hashGranularity) {
+	public static long hashEndStateNode(int x, int y, float vx, int hashGranularity) {
 		final long speedHash = hashSpeed(vx, hashGranularity);
 		
 		final long b1Mask = 0b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111L;

@@ -29,7 +29,7 @@ public class StateNode implements Comparable<StateNode> {
 	public int gScore = 0;
 	public float fScore = 0;
 	private final MovementInformation moveInfo;
-	private final boolean isSpeedNodeUseable;
+	private final boolean isStateNodeUseable;
 	//Bit string, representing the enemies living. 
 	//Must not be reused.
 	public long livingEnemies; 
@@ -50,7 +50,7 @@ public class StateNode implements Comparable<StateNode> {
 		this.creationXPos = node.x;
 		this.currentXPos = this.creationXPos;
 		this.yPos = node.y;
-		this.isSpeedNodeUseable = true;
+		this.isStateNodeUseable = true;
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
 	}
@@ -71,7 +71,7 @@ public class StateNode implements Comparable<StateNode> {
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
 		this.yPos = node.y;
-		this.isSpeedNodeUseable = true;
+		this.isStateNodeUseable = true;
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
 	}
@@ -91,7 +91,7 @@ public class StateNode implements Comparable<StateNode> {
 		this.parentVx = parentVx;
 		this.ancestorEdge = ancestorEdge;
 		this.yPos = node.y;
-		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
+		this.isStateNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
 		this.livingEnemies = livingEnemies;
 	}
@@ -121,7 +121,7 @@ public class StateNode implements Comparable<StateNode> {
 		return true;
 	}
 	
-	public boolean isSpeedNodeUseable(World world) {
+	public boolean isStateNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
 		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
 			//In a jump it's possible to jump too far
@@ -147,7 +147,7 @@ public class StateNode implements Comparable<StateNode> {
 			return true;
 		}
 		else {
-			return isSpeedNodeUseable;
+			return isStateNodeUseable;
 		}
 	}
 	
@@ -156,27 +156,27 @@ public class StateNode implements Comparable<StateNode> {
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
 		parent.ticksOfInvincibility = 0;				
 		
-		
 		boolean hasEnemyCollision = false;
 		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
-			Point2D.Float currentPosition = moveInfo.getPositions()[i];
-			final float x = parentXPos  + currentPosition.x;
-			final float y = parent.yPos - currentPosition.y;
+			final float currentXPos = moveInfo.getXPositions()[i];
+			final float currentYPos = moveInfo.getYPositions()[i];
+			final float x = parentXPos  + currentXPos;
+			final float y = parent.yPos - currentYPos;
 			
 			//In the beginning of a movement, Mario will always be on the ground, thus not accelerating downwards.
 			//Necessary to stomp the enemies.
-			boolean movingDownwards = (i == 0)? false: (moveInfo.getPositions()[i-1].y > moveInfo.getPositions()[i].y);
+			boolean movingDownwards = (i == 0)? false: (moveInfo.getYPositions()[i-1] >  currentYPos);
 			//He must also land on the enemy, ie, not be on the ground, or not have been on the ground the tick before:
-			boolean wasOnGround 	= (i == 0)? true: (moveInfo.getPositions()[i-1].y != moveInfo.getPositions()[i].y);
+			boolean wasOnGround 		= (i == 0)? true:  (moveInfo.getYPositions()[i-1] != currentYPos);
 			//He is on the ground, if and only if he is a running edge,
 			//or he is at the last two positions on any other type of edge
 			//( the last, curtesy of mario always landing before coming to the end of a block):
-			boolean isOnGround	= (this.ancestorEdge instanceof RunningEdge || moveInfo.getPositions().length - 2 <= i);
+			boolean isOnGround	= (this.ancestorEdge instanceof RunningEdge || moveInfo.getMoveTime() - 2 <= i);
 			boolean isOrWasNotOnGround = !wasOnGround || !isOnGround;
 			
 			//I will take the first actual collision, 
 			//as though that is the one that determines the type of collision with enemies.
-			if (enemyPredictor.hasEnemy(x, y,  MarioMethods.MARIO_WIDTH, marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {
+			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {
 				if(firstCollision.isStompType){ //Stomp type collision
 					ticksOfInvincibility = 1; //Gets one tick of invincibility, in case of a stomp.
 					//Notice that if has more ticks of invincibility than 1, this is overwritten.
@@ -194,12 +194,34 @@ public class StateNode implements Comparable<StateNode> {
 				ticksOfInvincibility--;
 			}
 			
-			
 			currentTick++;
 		}		
 		return hasEnemyCollision;
 	}
-		
+	
+	/**
+	 * Old collision method. Momentarily only for ease of reference.
+	 * TODO remove this method
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return
+	 */
+	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
+		int currentTick = startTime;		
+		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
+			final float x = parentXPos + moveInfo.getXPositions()[i];
+			final float y = parent.yPos - moveInfo.getYPositions()[i];
+
+			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, false, false, null, -1)) {
+				return true;
+			}
+
+			currentTick++;
+		}
+		return false;
+	}
+	
 	public MovementInformation getMoveInfo() {
 		return moveInfo;
 	}

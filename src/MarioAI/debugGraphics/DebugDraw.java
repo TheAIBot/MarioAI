@@ -237,18 +237,25 @@ public class DebugDraw {
 		}
 	}
 	
-	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
+	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path, final boolean pathShouldBeUpdated) {
 		if (path != null) {
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {
-				for (int i = 0; i < edge.getMoveTime(); i++) {
-					Point2D.Float pos = edge.getMoveInfo().getPositions()[i];
-					Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + pos.x, edge.source.y - pos.y);
-					convertLevelPointToOnScreenPoint(observation, correctPos);					
-					positions.add(new Point((int)correctPos.x, (int)correctPos.y));
-				}
+                            for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
+                                final float posX = edge.getMoveInfo().getXPositions()[i];
+                                final float posY = edge.getMoveInfo().getYPositions()[i];
+                                Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + posX, edge.source.y - posY);
+                                convertLevelPointToOnScreenPoint(observation, correctPos);
+
+                                positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+                            }
 			}
-			addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			if (pathShouldBeUpdated) {
+				addDebugDrawing(observation, new DebugLines(Color.BLUE, positions));
+			}
+			else {
+				addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			}
 		}
 	}
 	

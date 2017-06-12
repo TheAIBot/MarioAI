@@ -36,7 +36,7 @@ public class MarioMethods {
 	public static float getMarioHeightFromMarioMode(int mode) {
 		switch (mode) {
 		case 0:
-			return 1;
+			return 0.75f;
 		case 1:
 			return 1.5f;
 		case 2:

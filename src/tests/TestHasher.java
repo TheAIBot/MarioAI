@@ -237,17 +237,17 @@ public class TestHasher {
 						final RunningEdge edge1 = new RunningEdge(source, target, false);
 						for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 							//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v, edge1, speedGranularity));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge1, speedGranularity));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge1, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v, edge1, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v + speedIncrements / 3, edge1, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v - speedIncrements / 3, edge1, speedGranularity));
 						}
 						
 						final RunningEdge edge2 = new RunningEdge(source, target, true);
 						for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 							//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v, edge2, speedGranularity));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge2, speedGranularity));
-							allSpeedNodeHashcodes.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge2, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v, edge2, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v + speedIncrements / 3, edge2, speedGranularity));
+							allSpeedNodeHashcodes.add(Hasher.hashStateNode(v - speedIncrements / 3, edge2, speedGranularity));
 						}
 					}
 				}
@@ -284,17 +284,17 @@ public class TestHasher {
 									final JumpingEdge edge1 = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), false);
 									for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 										//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-										allSpeedNodeHashcodes1.add(Hasher.hashSpeedNode(v, edge1, speedGranularity));
-										allSpeedNodeHashcodes2.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge1, speedGranularity));
-										allSpeedNodeHashcodes3.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge1, speedGranularity));
+										allSpeedNodeHashcodes1.add(Hasher.hashStateNode(v, edge1, speedGranularity));
+										allSpeedNodeHashcodes2.add(Hasher.hashStateNode(v + speedIncrements / 3, edge1, speedGranularity));
+										allSpeedNodeHashcodes3.add(Hasher.hashStateNode(v - speedIncrements / 3, edge1, speedGranularity));
 									}
 									
 									final JumpingEdge edge2 = new JumpingEdge(new Node(sourceX, sourceY, (byte)10), new Node(targetX, targetY, (byte)10), true);
 									for (float v = -speedLimit; v <= speedLimit + 0.0001f; v += speedIncrements) {
 										//final SpeedNode sn = new SpeedNode(new Node(x, y, (byte) 0), v, Hasher.hashEndSpeedNode(x, y, v));
-										allSpeedNodeHashcodes1.add(Hasher.hashSpeedNode(v, edge2, speedGranularity));
-										allSpeedNodeHashcodes2.add(Hasher.hashSpeedNode(v + speedIncrements / 3, edge2, speedGranularity));
-										allSpeedNodeHashcodes3.add(Hasher.hashSpeedNode(v - speedIncrements / 3, edge2, speedGranularity));
+										allSpeedNodeHashcodes1.add(Hasher.hashStateNode(v, edge2, speedGranularity));
+										allSpeedNodeHashcodes2.add(Hasher.hashStateNode(v + speedIncrements / 3, edge2, speedGranularity));
+										allSpeedNodeHashcodes3.add(Hasher.hashStateNode(v - speedIncrements / 3, edge2, speedGranularity));
 									}
 								}
 							}

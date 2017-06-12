@@ -25,23 +25,23 @@ public class CollisionDetection {
 		loadTileBehaviors();
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, StateNode sourceNode, float lastYValue, World world){
-		return isColliding(futureOffset, currentOffset, sourceNode.currentXPos, sourceNode.yPos, lastYValue, world);
+	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, StateNode sourceNode, float lastY, World world){
+		return isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, sourceNode.currentXPos, sourceNode.yPos, lastY, world);
 	}
 	
-	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, float startX, float startY, float lastY, World world){
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, float startX, float startY, float lastY, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
-		final float xa =  (futureOffset.x - currentOffset.x) * 16;
-		float ya = -(futureOffset.y - currentOffset.y) * 16; //yes, it is the correct placement.
+		final float xa =  (futureOffsetX - currentOffsetX) * 16;
+		float ya = -(futureOffsetY - currentOffsetY) * 16; //yes, it is the correct placement.
 		//Change below to just use current position, if one want to get the actual position after the collision.
 		//Note how the y direction is handled.
 		//The minus one is needed to reflect how it is done by the mario code.
-		final Point2D.Float currentPosition = new Point2D.Float( (currentOffset.x + startX) * 16,
-															     (startY - currentOffset.y) * 16 - 1);
+		final Point2D.Float currentPosition = new Point2D.Float( (currentOffsetX + startX) * 16,
+															     (startY - currentOffsetY) * 16 - 1);
 		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
-		if (lastY == futureOffset.y) {
+		if (lastY == futureOffsetY) {
 			ya += 1;
 		}
 		move(currentPosition, xa, 0, world);
@@ -91,19 +91,19 @@ public class CollisionDetection {
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya + 1, xa, ya, world))) {
 			collide = true;
 		} 
-		else if 	(ya < 0 && 
+		else if 		(ya < 0 && 
 				  		(isBlocking(currentPosition, currentPosition.x + xa, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 				  		 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 				  		 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world))) {
 			collide = true;
 		}
-		else if 	(xa > 0 && 
+		else if 		(xa > 0 && 
 						(isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) || 
 						 isBlocking(currentPosition, currentPosition.x + xa + MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
 			collide = true;
 		}
-		else if 	(xa < 0 &&
+		else if 		(xa < 0 &&
 						(isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya - MARIO_HEIGHT / 2, xa, ya, world) ||
 						 isBlocking(currentPosition, currentPosition.x + xa - MARIO_WIDTH, currentPosition.y + ya, xa, ya, world))) {
@@ -115,16 +115,16 @@ public class CollisionDetection {
 				currentPosition.x = (int) ((currentPosition.x - MARIO_WIDTH) / 16) * 16 + MARIO_WIDTH;
 				//this.xa = 0;
 			}
-			if (xa > 0) {
+                        else if (xa > 0) {
 				currentPosition.x = (int) ((currentPosition.x + MARIO_WIDTH) / 16 + 1) * 16 - MARIO_WIDTH - 1;
 				//this.xa = 0;
 			}
-			if (ya < 0) {
+                        else if (ya < 0) {
 				currentPosition.y = (int) ((currentPosition.y - MARIO_HEIGHT) / 16) * 16 + MARIO_HEIGHT;
 				//jumpTime = 0;
 				//this.ya = 0;
 			}
-			if (ya > 0) {
+                        else if (ya > 0) {
 				currentPosition.y = (int) ((currentPosition.y - 1) / 16 + 1) * 16 - 1;
 				//onGround = true;
 			}

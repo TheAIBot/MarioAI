@@ -1,9 +1,6 @@
 package MarioAI.path;
 
 import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 import com.sun.corba.se.spi.orbutil.fsm.State;
@@ -19,22 +16,21 @@ import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
-import javafx.util.Pair;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 class AStar {
-	private final HashMap<Long, StateNode> speedNodes = new HashMap<Long, StateNode>();
-	private final EdgeCreator grapher = new EdgeCreator(); //TODO shouldn give any problems there.
-	
+	private final Long2ObjectOpenHashMap<StateNode> stateNodes = new Long2ObjectOpenHashMap<StateNode>();
+	EdgeCreator grapher = new EdgeCreator();
 	// Set of nodes already explored
-	private final HashSet<Long> closedSet = new HashSet<Long>();
+	private final LongOpenHashSet closedSet = new LongOpenHashSet();
 	// Set of nodes yet to be explored
 	private final PriorityQueue<StateNode> openSet = new PriorityQueue<StateNode>();
-	private final Map<Long, StateNode> openSetMap = new HashMap<Long, StateNode>();
-	final int hashGranularity;
+	private final Long2ObjectOpenHashMap<StateNode> openSetMap = new Long2ObjectOpenHashMap<StateNode>();
+	public final int hashGranularity;
 	private StateNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
-	private final Object lockBestSpeedNode = new Object();
 	
 	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	
@@ -74,92 +70,82 @@ class AStar {
 	 * @return
 	 */
 	private void runAStar(final StateNode start, final StateNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
-		while (!openSet.isEmpty() && keepRunning) {
-			//System.out.println("Current open set:");
-			//System.out.println(openSet);
+		while (!openSet.isEmpty() && keepRunning) {				
+			final StateNode currentState = openSet.remove();
+			openSetMap.remove(currentState.hash);
 			
-			synchronized (lockBestSpeedNode) {
+			// If goal is reached return solution path.
+			if (currentState.node.equals(goal.node)) {
+				currentBestPathEnd = currentState;
+				foundBestPath = true;
+				return;
+			}
+			// The current best speednode is the one furthest to the right
+			// (disregarding if it passes through an enemy or not).
+			if ((currentBestPathEnd == null || currentState.currentXPos > currentBestPathEnd.currentXPos) && currentState != start) {
+				currentBestPathEnd = currentState;
+			}
+			
+			final long endHash = Hasher.hashEndStateNode(currentState, hashGranularity);
+			closedSet.add(endHash);
+			//System.out.println(openSet.size()); //Used to check how AStar performs.
+			
+			
+			
+			// Explore each neighbor of current node
+			for (DirectedEdge neighborEdge : currentState.node.getEdges()) {
+				final StateNode nextState = getStateNode(neighborEdge, currentState, world);
 				
-				final StateNode currentState = openSet.remove();
-				openSetMap.remove(currentState.hash);
-				
-				// If goal is reached return solution path.
-				if (currentState.node.equals(goal.node)) {
-					currentBestPathEnd = currentState;
-					foundBestPath = true;
-					return;
+				//If a similar enough node has already been run through
+				//no need to add this one at that point
+				final long nextEndHash = Hasher.hashEndStateNode(nextState, hashGranularity);
+				if (closedSet.contains(nextEndHash)) {
+					continue;
 				}
-				//System.out.println("Current node:");
-				//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-				//System.out.println("Current node edges:");
-				//System.out.println(current.node.edges + "\n");
-				// Current node has been explored.
-				final long endHash = Hasher.hashEndSpeedNode(currentState, hashGranularity);
-				closedSet.add(endHash);
-				//System.out.println(openSet.size()); //Used to check how AStar performs.
 				
-
-				// The current best speednode is the one furthest to the right
-				// (disregarding if it passes through an enemy or not).
-				if (currentBestPathEnd == null || currentState.currentXPos > currentBestPathEnd.currentXPos) {
-					currentBestPathEnd = currentState;
+				// Distance from start to neighbor of current node
+				final int tentativeGScore = currentState.gScore + nextState.getMoveTime();
+				
+				//If a similar enough node exists and that has a better g score
+				//then there is no need to add this edge as it's worse than the
+				//current one
+				if (openSetMap.containsKey(nextEndHash) && tentativeGScore >= openSetMap.get(nextEndHash).gScore) {
+					continue;
 				}
-				
-				// Explore each neighbor of current node
-				for (DirectedEdge neighborEdge : currentState.node.getEdges()) {
-					final StateNode nextState = getSpeedNode(neighborEdge, currentState, world);
+				// collision detection and invincibility handling 
+				int penalty = 0;
+				if (!(nextState.ancestorEdge instanceof AStarHelperEdge)) {
+					nextState.currentXPos = nextState.currentXPos + nextState.getMoveInfo().getXMovementDistance();
+					nextState.parentXPos = currentState.currentXPos;
 					
-					//If a similar enough node has already been run through
-					//no need to add this one at that point
-					final long nextEndHash = Hasher.hashEndSpeedNode(nextState, hashGranularity);
-					if (closedSet.contains(nextEndHash)) {
+					if (!nextState.isStateNodeUseable(world)) {
 						continue;
 					}
-					
-					// Distance from start to neighbor of current node
-					final int tentativeGScore = currentState.gScore + nextState.getMoveTime();
-					
-					//If a similar enough node exists and that has a better g score
-					//then there is no need to add this edge as it's worse than the
-					//current one
-					if (openSetMap.containsKey(nextEndHash) &&
-							tentativeGScore >= openSetMap.get(nextEndHash).gScore) {
+						
+					if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight)) {
+						//TODO look at this
 						continue;
 					}
-					// collision detection and invincibility handling 
-					int penalty = 0;
-					if (!(nextState.ancestorEdge instanceof AStarHelperEdge)) {
-						nextState.currentXPos = nextState.currentXPos + nextState.getMoveInfo().getXMovementDistance();
-						nextState.parentXPos = currentState.currentXPos;
 						
-						if (!nextState.isSpeedNodeUseable(world)) {
-							continue;
-						}
-						/*
-						if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight)) {
-							//TODO look at this
-							continue;
-						}*/
-						/*
-						//Gives extra information about the collision with an enemy, if it happens.
-						EnemyCollision firstCollision = new EnemyCollision(); 
-						
-						if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
-							if (firstCollision.isStompType) { //Stomping means no lost life.
-								addStompState(firstCollision, world, currentState, nextState, goal);	
-								continue; //The rest is handled in the method above.
-							} else {//He has lost life and gets a penalty:
-								if (nextState.lives <= 1) {
-									// if Mario would die if he hits an enemy, with this many lives. 
-									//This node can under no circumstances be used on a path
-									continue; 
-								}
-								int livesLost = (currentState.lives - nextState.lives);
-								penalty = livesLost*PENALTY_SCORE;
+					//Gives extra information about the collision with an enemy, if it happens.
+					EnemyCollision firstCollision = new EnemyCollision(); 
+					
+					if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
+						if (firstCollision.isStompType) { //Stomping means no lost life.
+							addStompState(firstCollision, world, currentState, nextState, goal);	
+							continue; //The rest is handled in the method above.
+						} else {//He has lost life and gets a penalty:
+							if (nextState.lives <= 1) {
+								// if Mario would die if he hits an enemy, with this many lives. 
+								//This node can under no circumstances be used on a path
+								continue; 
 							}
+							int livesLost = (currentState.lives - nextState.lives);
+							penalty = livesLost*PENALTY_SCORE;
 						}
-*/								
-					}
+						penalty = PENALTY_SCORE;
+						
+					}	
 					
 					// Update the edges position in the priority queue
 					// by updating the scores and taking it in and out of the queue.
@@ -214,7 +200,7 @@ class AStar {
 		//Make the target equal to targetNode, and finish the creation of the speed node.
 		EnemyPredictor.hitEnemy(firstCollision, stompState);
 		final int tentativeGScore = currentState.gScore + stompState.getMoveTime();	
-		long stompNodeHash = Hasher.hashEndSpeedNode(stompState, hashGranularity);
+		long stompNodeHash = Hasher.hashEndStateNode(stompState, hashGranularity);
 		
 		//Needs the same A* checks as before:
 		
@@ -253,17 +239,17 @@ class AStar {
 	 * @param world
 	 * @return speedNode
 	 */
-	private StateNode getSpeedNode(DirectedEdge neighborEdge, StateNode current, World world) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 5000);
+	private StateNode getStateNode(DirectedEdge neighborEdge, StateNode current, World world) {
+		final long hash = Hasher.hashStateNode(current.vx, neighborEdge, 5000);
 		
-		final StateNode speedNode = speedNodes.get(hash);
+		final StateNode speedNode = stateNodes.get(hash);
 		if (speedNode != null) {
 			return speedNode;
 		}
 		
-		final StateNode newSpeedNode = new StateNode(neighborEdge.target, current, neighborEdge, current.livingEnemies, hash, world);
-		speedNodes.put(hash, newSpeedNode);
-		return newSpeedNode;
+		final StateNode newStateNode = new StateNode(neighborEdge.target, current, neighborEdge, current.livingEnemies, hash, world);
+		stateNodes.put(hash, newStateNode);
+		return newStateNode;
 	}
 	
 	/**
@@ -278,13 +264,11 @@ class AStar {
 	public AStarPath getCurrentBestPath() {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change
-		synchronized (lockBestSpeedNode) {
-			return new AStarPath(currentBestPathEnd, true, hashGranularity);
-		}
+		return new AStarPath(currentBestPathEnd, foundBestPath, hashGranularity);
 	}
 	
-	public HashMap<Long, StateNode> getSpeedNodes() {
-		return speedNodes;
+	public Long2ObjectOpenHashMap<StateNode> getStateNodes() {
+		return stateNodes;
 	}
 	
 	public void stop() {

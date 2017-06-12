@@ -37,8 +37,7 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
-
-	public boolean hasEnemy(float marioX, final float marioY, final float marioWidth, final float marioHeight, final int time,
+	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time,
 									boolean movingDownwards, boolean isOrWasNotOnGround, EnemyCollision firstCollison, long livingEnemies) {
 		for (int i = 0; i < verifiedEnemySimulations.size(); i++) {
 			if (!isEnemyAlive(livingEnemies, i)) {
@@ -73,7 +72,6 @@ public class EnemyPredictor {
 		
 		removeDeadEnemies(sortedEnemyInfo);
 		
-		//System.out.println(verifiedEnemySimulations.size());
 		addCorrectSimulations(sortedEnemyInfo);
 		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
@@ -148,8 +146,6 @@ public class EnemyPredictor {
 	}
 	
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
-		//keep true until set false;
-		newEnemySpawned = newEnemySpawned || false;
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
@@ -275,14 +271,6 @@ public class EnemyPredictor {
 	public void moveIntoFuture(final int timeToMove) {
 		for (int i = 0; i < timeToMove; i++) {
 			updateSimulations();
-		}
-	}
-	
-	public void moveIntoPast(final int timeToMove) {
-		for (int i = 0; i < timeToMove; i++) {
-			for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-				enemySimulation.moveTimeBackwards();
-			}
 		}
 	}
 	
