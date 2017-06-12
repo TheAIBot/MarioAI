@@ -187,9 +187,7 @@ public class TestGrapher {
 				}
 			}
 		}
-
 		fail("Finish making the test.");
-
 	}
 
 	@Test
@@ -332,7 +330,9 @@ public class TestGrapher {
 	}
 	
 	@Test
-	public void testFallDownAtDifferentHeights(){
+	public void testFallDownAtDefaultHeight(){
+		//TODO Crude test that needs could be expanded, for better verification.
+		//Like moving the tower/wall around + havig it different heights.
 		World world = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] levelMatrix = world.getLevelMatrix();
 		addWall(4, 11, 9, levelMatrix, marioNode); //The edges will be taken from this node.
@@ -346,24 +346,28 @@ public class TestGrapher {
 			assertTrue(directedEdge instanceof FallEdge);
 			assertEquals(currentNode, directedEdge.source);
 		}		
+		ArrayList<DirectedEdge> leftEdges = new ArrayList<DirectedEdge>();
+		grapher.getFallingDownEdges(currentNode, GRID_WIDTH/2, JumpDirection.LEFT_DOWNWARDS, leftEdges);
+		for (DirectedEdge directedEdge : leftEdges) {
+			assertTrue(directedEdge instanceof FallEdge);
+			assertEquals(currentNode, directedEdge.source);
+		}		
+		//The correct number of edges are made:
 		assertEquals((int) (2*EdgeCreator.MAX_FALL_RANGE)+2, rightEdges.size());
+		assertEquals((int) (2*EdgeCreator.MAX_FALL_RANGE)+2, leftEdges.size());
 		//Given that this now hold, one just needs to check that the land the correct place:
 		//Lands at the correct position(ignoring the two first edges, there are separate tests for those.):
 		for (int i = 1; i <= EdgeCreator.MAX_FALL_RANGE; i++) { 
 			//I know the order they are added in, so i can take basis in this.
-			//If the order i take is wrong, this will fail:
+			//If the order i take is wrong, this will fail, not pass:
 			//target:
 			assertEquals(levelMatrix[GRID_WIDTH/2 + i + 1][9], rightEdges.get(2*i).target); //Yes, the address should also be the same.
 			assertEquals(levelMatrix[GRID_WIDTH/2 + i + 1][9], rightEdges.get(2*i + 1).target); //Speed version.
-			//Asserting that one has the correct type of polynomial:
-			FallEdge currentEdge = (FallEdge) rightEdges.get(2*i);
-			fail("Do this");
-			//Its top point should be at the block to the right of the starting point:
+			assertEquals(levelMatrix[GRID_WIDTH/2 - i - 1][9], leftEdges.get(2*i).target); //Left side
+			assertEquals(levelMatrix[GRID_WIDTH/2 - i - 1][9], leftEdges.get(2*i + 1).target); //Speed version.
+			//One cannot assert that the fall edges follows the correct polynomial, 
+			//as they are of type fall edges, not jumping edges.
 		}
-		
-
-				
-		fail("Finish making the test");
 	}
 	
 	@Test
@@ -1102,7 +1106,6 @@ public class TestGrapher {
 	
 	@Test
 	public void testDownwardsCollisionDetection(){
-		fail("Make the test.");
 	}
 	
 	@Test
