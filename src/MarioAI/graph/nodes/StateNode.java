@@ -180,7 +180,7 @@ public class StateNode implements Comparable<StateNode> {
 		}
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight, EnemyCollision firstCollision) {
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight, EnemyCollision firstCollision) {
 		int currentTick = startTime;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
 		parent.ticksOfInvincibility = 0;
@@ -188,7 +188,7 @@ public class StateNode implements Comparable<StateNode> {
 		boolean hasEnemyCollision = false;
 		
 		for (int i = 0; i < moveInfo.getMoveTime(); i++) {
-			final float x = parentXPos  + moveInfo.getXPositions()[i];
+			final float x = parentXPos + moveInfo.getXPositions()[i];
 			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			//In the beginning of a movement, Mario will always be on the ground, thus not accelerating downwards.
 			//Necessary to stomp the enemies.
@@ -203,9 +203,9 @@ public class StateNode implements Comparable<StateNode> {
 			
 			//I will take the first actual collision, 
 			//as though that is the one that determines the type of collision with enemies.
-			if(enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {				
+			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick, movingDownwards, isOrWasNotOnGround, firstCollision, this.livingEnemies)) {				
 				if(firstCollision.isStompType){ //Stomp type collision
-					ticksOfInvincibility = 1000; //Gets one tick of invincibility, in case of a stomp.
+					//ticksOfInvincibility = 1000; //Gets one tick of invincibility, in case of a stomp.
 					//Notice that if has more ticks of invincibility than 1, this is overwritten.
 					//This is how it is done in the game code.
 					//TODO check correct.

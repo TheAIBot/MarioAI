@@ -205,4 +205,8 @@ public class World {
 	public void resetHasWorldChanged() {
 		hasWorldChanged = false;
 	}
+
+	public float getMarioXPos(final Environment observation) {
+		return MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+	}
 }

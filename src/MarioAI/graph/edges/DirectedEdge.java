@@ -53,6 +53,7 @@ public abstract class DirectedEdge {
 		return "[" + source.x + " : " + source.y + "]" + 
 				   " --> " + 
 	          "[" + target.x + " : " + target.y + "]" +
-				 " H: " + Math.round(getMaxY()) + "\n";
+				 " H: " + Math.round(getMaxY()) + 
+				 " S: " + ((useSuperSpeed)? "t": "f") + "\n";
 	}
 }

@@ -94,7 +94,6 @@ public class Hasher {
 		final int b4 = ( edge.source.x               << b4Place) & b4Mask;
 		final int b5 = ((edge.useSuperSpeed ? 1 : 0) << b5Place) & b5Mask;
 		final int b6 = ( extraHash                   << b6Place) & b6Mask;
-		
 		return b1 | b2 | b3 | b4 | b5 | b6;
 	}
 

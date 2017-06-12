@@ -156,6 +156,9 @@ public class PathCreator {
 		}
 		if (current.ancestorEdge != null) {
 			System.out.println();
+
+			aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
+			aStars[aStars.length - 1].stop();
 		}
 		
 		removeGoalFrame();

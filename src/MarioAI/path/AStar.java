@@ -75,9 +75,10 @@ class AStar {
 	private void runAStar(final StateNode start, final StateNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
 		System.out.println("Start");
 		while (!openSet.isEmpty() && keepRunning) {
-			System.out.println(openSet.toString());
+			System.out.println("\n" + openSet.toString());
 			final StateNode currentState = openSet.remove();
 			System.out.println("Chosen: " + currentState.toString());
+			System.out.println();
 			openSetMap.remove(currentState.hash);
 			
 			// If goal is reached return solution path.
@@ -136,21 +137,22 @@ class AStar {
 					}
 
 					EnemyCollision firstCollision = new EnemyCollision(); 
+					/*
 					
 					if (nextState.tempDoesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
 						continue;
 					}
+					*/
 					
 					
 					
-					/*
 					
 					if (nextState.doesMovementCollideWithEnemy(currentState.gScore, enemyPredictor, marioHeight, firstCollision)) {
 						
 						if (firstCollision.isStompType) { //Stomping means no lost life.
 							//addStompState(firstCollision, world, currentState, nextState, goal);	
 							//continue; //The rest is handled in the method above.
-							nextState.penalty = 9000;
+							nextState.penalty = -9000;
 							if (!(neighborEdge instanceof JumpingEdge)) {
 								throw new Error();
 							}
@@ -167,9 +169,8 @@ class AStar {
 							continue;
 						}
 						
-						continue;
 					}
-					*/
+					
 					
 					
 				}

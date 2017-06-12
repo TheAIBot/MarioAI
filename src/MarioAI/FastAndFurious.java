@@ -19,7 +19,6 @@ import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
-
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	public final EdgeCreator grapher = new EdgeCreator();
@@ -28,7 +27,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
 	public boolean DEBUG = true;
-	
+
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
 	private boolean savePlace = false;
@@ -41,27 +40,25 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public void reset() {
 		marioController.reset();
 	}
-	
+
 	public boolean[] getAction(Environment observation) {
 		executeKeyCommands(observation);
-
 		if (tickCount == 30) {
-			//Create the initial world and all its edges
+			// Create the initial world and all its edges
 			world.initialize(observation);
 			grapher.setMovementEdges(world, world.getMarioNode(observation));
 			
 			enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
-			
-			
 			pathCreator.initialize(observation);
 			pathCreator.syncWithRealWorld(world, enemyPredictor);
 			findPath(observation);
-			
+
 		} else if (tickCount > 30) {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 			marioController.update(observation);
 			world.update(observation);
-			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation));
+			grapher.setWorld(world);
+			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation), world.getMarioXPos(observation));
 			
 			if (world.hasWorldChanged()) {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
@@ -112,22 +109,23 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 
 //					System.out.println("Tick: " + tickCount + " Stopped");
 				}
-				if (!pathCreator.isRunning && 
-					 pathCreator.getBestPath() != null && 
-					 pathCreator.getBestPath().size() > 0) {
+				if (!pathCreator.isRunning && pathCreator.getBestPath() != null
+						&& pathCreator.getBestPath().size() > 0) {
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					startFindingPathFromPreviousPath(observation);
 //					System.out.println("Tick: " + tickCount + " Started\n");
 				}
-				if (!pathCreator.isRunning && 
-					(pathCreator.getBestPath() == null || 
-					 pathCreator.getBestPath().size() == 0)) {
-					
+				if (!pathCreator.isRunning && (pathCreator.getBestPath() == null
+						|| pathCreator.getBestPath().size() == 0)) {
+
 					pathCreator.syncWithRealWorld(world, enemyPredictor);
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
 				}				
 				*/
+
+				grapher.setMovementEdgesForMario(world, world.getMarioNode(observation), world.getMarioXPos(observation));
+				
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
@@ -162,14 +160,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 		
 		return marioController.getActions();
 	}
-	
+
 	public void findPath(Environment observation) {
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world, enemyPredictor.hasNewEnemySpawned());
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
-	
+
 	public void startFindingPathFromPreviousPath(Environment observation) {
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
@@ -177,16 +175,16 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 		final Node[] goalNodes = world.getGoalNodes(0);
 		pathCreator.start(observation, path, goalNodes, marioHeight);
 	}
-	
+
 	private void executeKeyCommands(Environment observation) {
 		synchronized (keyLock) {
 			unpauseForOneTick = false;
-			
+
 			if (savePlace) {
 				save(observation);
 				savePlace = false;
 			}
-			
+
 			if (deletePlace) {
 				delete();
 				deletePlace = false;
@@ -195,27 +193,28 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 		if (runToTick && tickToRunTo == tickCount) {
 			pauseGame = true;
 		}
-		while(pauseGame && !unpauseForOneTick) {
+		while (pauseGame && !unpauseForOneTick) {
 			try {
 				Thread.sleep(10);
-				
+
 				if (savePlace) {
 					save(observation);
 					savePlace = false;
 				}
-				
+
 				if (deletePlace) {
 					delete();
 					deletePlace = false;
 				}
-			} catch (InterruptedException e) { }
+			} catch (InterruptedException e) {
+			}
 		}
 	}
-	
+
 	private void save(Environment observation) {
-		final long seed = ((MarioComponent)observation).getLevelScene().getSeed();
+		final long seed = ((MarioComponent) observation).getLevelScene().getSeed();
 		String fileContent = seed + " " + tickCount;
-		
+
 		try {
 			Files.write(Paths.get(saveStateFileName), fileContent.getBytes(), StandardOpenOption.CREATE);
 			System.out.println("Saved game stat to file.");
@@ -223,7 +222,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			System.out.println("Failed to save game state.");
 		}
 	}
-	
+
 	private void delete() {
 		try {
 			Files.delete(Paths.get(saveStateFileName));
@@ -232,32 +231,30 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			System.out.println("Failed to delete save state.");
 		}
 	}
-	
-    public void keyPressed(KeyEvent e)
-    {
-        toggleKey(e.getKeyCode(), true);
-    }
 
-    public void keyReleased(KeyEvent e)
-    {
-        toggleKey(e.getKeyCode(), false);
-    }
-    
-    private void toggleKey(int keyCode, boolean pressed) {
-    	switch (keyCode) {
+	public void keyPressed(KeyEvent e) {
+		toggleKey(e.getKeyCode(), true);
+	}
+
+	public void keyReleased(KeyEvent e) {
+		toggleKey(e.getKeyCode(), false);
+	}
+
+	private void toggleKey(int keyCode, boolean pressed) {
+		switch (keyCode) {
 		case KeyEvent.VK_P:
 			if (pressed) {
-				pauseGame = !pauseGame;	
+				pauseGame = !pauseGame;
 			}
 			break;
 		case KeyEvent.VK_O:
 			synchronized (keyLock) {
-				unpauseForOneTick = pressed;	
+				unpauseForOneTick = pressed;
 			}
 			break;
 		case KeyEvent.VK_I:
 			synchronized (keyLock) {
-				savePlace = pressed;	
+				savePlace = pressed;
 			}
 			break;
 		case KeyEvent.VK_L:
@@ -266,12 +263,12 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			}
 			break;
 		}
-    }
-    
-    public void runToTick(int tick) {
-    	tickToRunTo = tick;
-    	runToTick = true;
-    }
+	}
+
+	public void runToTick(int tick) {
+		tickToRunTo = tick;
+		runToTick = true;
+	}
 
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;
@@ -284,5 +281,4 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public void setName(String name) {
 	}
 
-	
 }
