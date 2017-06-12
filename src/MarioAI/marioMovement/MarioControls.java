@@ -257,6 +257,7 @@ public class MarioControls {
 		//These calculations are independent of the direction
 		//The direction of the movement is added at the end of this method
 		final float neededXDistance = Math.abs(originalNeededXDistance);
+		boolean moveInLastMovemet = true;
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
@@ -265,8 +266,16 @@ public class MarioControls {
 			final float futureSpeed = getNextTickSpeed(speed, useSuperSpeed);
 			final float futureDistanceMoved = distanceMoved + futureSpeed;
 			
+			float lastMovementDistance = 0;
+			if (airTime > 0) {
+				float speedAfterDrifting = (float) Math.pow(0.89f, airTime - ticksAccelerating - 1) * futureSpeed;
+				speedAfterDrifting = Math.abs(speedAfterDrifting) < MIN_MARIO_SPEED ? 0 : speedAfterDrifting;
+				lastMovementDistance = getNextTickSpeed(speedAfterDrifting, useSuperSpeed);
+			}
+			
 			final float oldDistanceToTarget = distanceToTarget;
 			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating - 1));
+			distanceToTarget -= lastMovementDistance;
 			
 			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget) && Math.abs(oldDistanceToTarget) < MAX_X_VELOCITY / 2) {
 				break;
@@ -276,6 +285,10 @@ public class MarioControls {
 			distanceMoved = futureDistanceMoved;
 			ticksAccelerating++;
 			
+			if (distanceToTarget < -(MAX_X_VELOCITY / 2)) {
+				moveInLastMovemet = false;
+				break;
+			}			
 		}
 		
 		final int ticksDrifting = Math.max(0, airTime - ticksAccelerating);
@@ -291,12 +304,12 @@ public class MarioControls {
 			speed = Math.abs(startSpeed);
 		}
 		
-		float tdistanceMoved = 0;
+		distanceMoved = 0;
 		for (int i = 0; i < ticksAccelerating; i++) {
 			pressButton[i] = true;
 			speed = getNextTickSpeed(speed, useSuperSpeed);
-			tdistanceMoved += speed;
-			xPositions[i] = tdistanceMoved;
+			distanceMoved += speed;
+			xPositions[i] = distanceMoved;
 		}
 		
 		if (airTime > 0) {
@@ -308,10 +321,18 @@ public class MarioControls {
 			//which should be on ground
 			//this allows two jumping edges
 			//after each other.
-			speed = getNextTickSpeed(speed, useSuperSpeed);
-			distanceMoved += speed;
-			xPositions[xPositions.length - 1] = distanceMoved;
-			pressButton[pressButton.length - 1] = true;
+			if (moveInLastMovemet) {
+				speed = getNextTickSpeed(speed, useSuperSpeed);
+				distanceMoved += speed;
+				xPositions[xPositions.length - 1] = distanceMoved;
+				pressButton[pressButton.length - 1] = true;	
+			}
+			else {
+				speed = getNextDriftingSpeed(speed);
+				distanceMoved += speed;
+				xPositions[xPositions.length - 1] = distanceMoved;
+				pressButton[pressButton.length - 1] = false;
+			}
 			
 			//already accounted for when totalTicks is created
 			//totalTicks++;
