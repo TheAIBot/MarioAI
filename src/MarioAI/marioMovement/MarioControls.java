@@ -266,7 +266,7 @@ public class MarioControls {
 			final float futureDistanceMoved = distanceMoved + futureSpeed;
 			
 			final float oldDistanceToTarget = distanceToTarget;
-			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating));
+			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating - 1));
 			
 			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget) && Math.abs(oldDistanceToTarget) < MAX_X_VELOCITY / 2) {
 				break;
