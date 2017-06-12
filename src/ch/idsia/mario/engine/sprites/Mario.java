@@ -740,7 +740,7 @@ public class Mario extends Sprite {
 	}
 
 	public void resetMarioHealth() {
-		setLarge(true, true);
 		invulnerableTime = 0;
+		setLarge(true, true);
 	}
 }

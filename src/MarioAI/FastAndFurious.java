@@ -2,7 +2,6 @@ package MarioAI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,7 +27,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
-	public boolean DEBUG = false;
+	public boolean DEBUG = true;
 	
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
@@ -62,22 +61,25 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 			marioController.update(observation);
 			world.update(observation);
+			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation));
 			
 			if (world.hasWorldChanged()) {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
 			}
-			
+			if (pathCreator.getBestPath() == null) {
+				System.out.println();
+			}
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned() ||
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
-				/*
+				
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
-				*/
+				
 				/*
 				if (world.hasGoalNodesChanged()) {
 					System.out.println("Reason: World");
@@ -95,14 +97,19 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					System.out.println("Reason: No path");
 				}
 				*/
-				
+				/*
 				if (pathCreator.isRunning) {
 					pathCreator.stop();					
 					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
-						save(observation);
-						throw new Error("Mario didn't follow the path correctly.");
+						//save(observation);
+						//throw new Error("Mario didn't follow the path correctly.");
+						pathCreator.syncWithRealWorld(world, enemyPredictor);
+						findPath(observation);
 					}
-					pathCreator.updateBestPath();
+					else {
+						pathCreator.updateBestPath(enemyPredictor.hasNewEnemySpawned());
+					}
+
 //					System.out.println("Tick: " + tickCount + " Stopped");
 				}
 				if (!pathCreator.isRunning && 
@@ -120,15 +127,15 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 					findPath(observation);
 					System.out.println("Failed to find path. Restarting.");
 				}				
-				
+				*/
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			else if (marioController.canUpdatePath && 
+			/*else if (marioController.canUpdatePath && 
 					 pathCreator.isRunning) {
 				pathCreator.stop();
 //				System.out.println("Tick: " + tickCount + " Path ignored");
-			}
+			}*/
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
@@ -142,7 +149,11 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
-				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath());
+				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
+						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
+						 							enemyPredictor.hasNewEnemySpawned();// ||
+						 							//pathCreator.getBestPath() == null;
+				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
 				DebugDraw.drawAction(observation, marioController.getActions());
 				//TestTools.renderLevel(observation);
 			}
@@ -155,7 +166,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public void findPath(Environment observation) {
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world);
+		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world, enemyPredictor.hasNewEnemySpawned());
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	

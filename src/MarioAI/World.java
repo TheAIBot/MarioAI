@@ -1,14 +1,11 @@
 package MarioAI;
 
-import java.awt.geom.Point2D;
-import java.util.HashMap;
 import java.util.Map.Entry;
-
-import org.omg.CORBA.COMM_FAILURE;
 
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 
 public class World {
@@ -21,7 +18,7 @@ public class World {
 	
 	private final CollisionDetection collisionDetection = new CollisionDetection();
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
-	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
+	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos;
@@ -86,9 +83,9 @@ public class World {
 		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
-		if (changeX != 0 || changeY != 0) { // TODO is it correct to have || and not && here?
+		setMarioNode(observation);
+		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
-			setMarioNode(observation);
 			hasWorldChanged = true;
 		}
 		else {
@@ -97,12 +94,12 @@ public class World {
 	}
 	
 	private void setMarioNode(final Environment observation) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
-		int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		//limit mario y pos to a position inside the matrix
 		marioYPos = Math.min(Math.max(marioYPos, 0), LEVEL_HEIGHT - 1);
 		
-		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+		marioNode = new Node(Math.round(marioXPos), Math.round(marioYPos), (byte)0);
 	}
 
 	public Node getMarioNode(final Environment observation)

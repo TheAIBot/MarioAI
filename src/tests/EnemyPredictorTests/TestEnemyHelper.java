@@ -75,9 +75,9 @@ class TestEnemyHelper {
 													  MarioControls marioControls, EnemyPredictor enemyPredictor, ArrayList<DirectedEdge> path, 
 													  EnemyType enemyType, int xDistance, boolean makeCopy, 
 													  int i, float startMarioYPos, int enemySpawnXPos, int enemyDirection) {
+		TestTools.resetMarioHealth(observation);
 		TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
 		TestTools.resetMarioSpeed(observation);
-		TestTools.resetMarioHealth(observation);
 		final Sprite enemy = TestTools.spawnEnemy(observation, enemySpawnXPos, (int)startMarioYPos, enemyDirection, enemyType);
 		final EnemyPredictor potentialEnemyPredictorCopy = TestEnemyHelper.findEnemies(observation, enemyPredictor, makeCopy);
 		
@@ -89,6 +89,8 @@ class TestEnemyHelper {
 		final boolean hitEnemy = verifySimulationToGame(observation, agent, world, marioControls, potentialEnemyPredictorCopy, path, i);
 		
 		TestTools.removeEnemy(observation, enemy);
+		TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
+		TestTools.runOneTick(observation);
 		
 		return hitEnemy;
 	}
@@ -163,6 +165,9 @@ class TestEnemyHelper {
 			
 			if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos) ||
 				marioInvulnerabilityTime > 0) {
+				if (marioInvulnerabilityTime == 0) {
+					System.out.println();
+				}
 				Arrays.fill(agent.action, false);
 				return true;
 			}

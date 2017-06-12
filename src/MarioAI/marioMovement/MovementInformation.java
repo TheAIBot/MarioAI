@@ -159,14 +159,14 @@ public class MovementInformation{
 
 	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
 		float previousPositionX = 0;
-                float previousPositionY = 0;
+		float previousPositionY = 0;
 		final float lastY = positionsY[positionsY.length - 1];
 		for (int i = 0; i < positionsX.length; i++) { 
 			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, sourceNode, lastY)) {
 				return true;
 			}
 			previousPositionX = positionsX[i];
-                        previousPositionY = positionsY[i];
+            previousPositionY = positionsY[i];
 		}	
 		return false;
 	}

@@ -35,6 +35,9 @@ public abstract class EnemySimulator {
     	if (positionAtTime.size() > 0) {
 			positionAtTime.remove(0);
 		}
+    	else {
+    		move();
+    	}
     }
     
     public void moveEnemy() {
