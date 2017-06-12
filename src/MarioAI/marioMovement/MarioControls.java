@@ -6,6 +6,7 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
@@ -62,9 +63,12 @@ public class MarioControls {
 		oldX = marioXPos;
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved) {
 		if (edge instanceof RunningEdge) {
 			return true;
+		}
+		if (edge instanceof FallEdge) {
+			return false;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
 		
@@ -77,21 +81,9 @@ public class MarioControls {
 			    speed == 0)) {
 			return false;
 		}
-		float distanceMoved = 0;
-		speed = Math.abs(speed);
-		for (int i = 0; i < ticksJumping; i++) {
-			speed = getNextTickSpeed(speed, edge.useSuperSpeed);
-			distanceMoved += speed;
-		}
 		
-		//add half speed because not completely reaching the node is also accepted
-		return (distanceMoved + (MAX_X_VELOCITY / 2) >= Math.abs(distanceToMove));
+		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
 	}
-	
-	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
-		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY / 2;
-	}
-		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
 			final DirectedEdge next = path.get(0);
@@ -150,12 +142,7 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
-		MovementInformation movementInformation = getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
-		//if (movementInformation.hasCollisions(edge)) {
-		//	//Curses!
-		//	return movementInformation;
-		//}
-		return movementInformation;
+		return getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
 	}
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -170,8 +157,7 @@ public class MarioControls {
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, YMovementInformation jumpInfo, boolean useSuperSpeed) {
 		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, jumpInfo.totalTicksJumped, useSuperSpeed);
-		MovementInformation movementInformation = new MovementInformation(xMovementInfo, jumpInfo);
-		return movementInformation;
+		return new MovementInformation(xMovementInfo, jumpInfo);
 	}
 	
 	private static int getIndexForYMovement(int jumpHeight, int jumpHeightDifference) {
@@ -337,7 +323,7 @@ public class MarioControls {
 			//already accounted for when totalTicks is created
 			//totalTicks++;
 		}
-		if (totalTicks == 0) {
+		if (Math.abs(xPositions[xPositions.length - 1]) > Math.abs(originalNeededXDistance) + 0.5f) {
 			System.out.println();
 		}
 		
@@ -350,7 +336,7 @@ public class MarioControls {
 				xPositions[i] = -xPositions[i];
 			}
 		}
-
+		
 		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton, useSuperSpeed);
 	}
 	
@@ -407,12 +393,6 @@ public class MarioControls {
 		return currentXSpeed;
 	}
 
-	public static boolean canMarioUseFallEdge(DirectedEdge ancestorEdge, float xPos) {
-		// Not currently
-		//TODO make method
-		return false;
-	}
-	
 	public boolean[] getActions() {
 		return actions;
 	}
