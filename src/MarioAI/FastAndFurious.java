@@ -109,9 +109,13 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	public void findPath(Environment observation) {
+		final Node marioNode = world.getMarioNode(observation);
+		final Node[] goalNodes = world.getGoalNodes(0);
+		final float xVelocity = marioController.getXVelocity();
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final boolean hasNewEnemySpawned = enemyPredictor.hasNewEnemySpawned();
 		//long startTime = System.currentTimeMillis();
-		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world, enemyPredictor.hasNewEnemySpawned());
+		pathCreator.blockingFindPath(observation, marioNode, goalNodes, xVelocity, enemyPredictor, marioHeight, world, hasNewEnemySpawned);
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	

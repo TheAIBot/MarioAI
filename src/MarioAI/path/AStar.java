@@ -64,8 +64,6 @@ class AStar {
 	 */
 	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
 		while (!openSet.isEmpty() && keepRunning) {
-			//System.out.println("Current open set:");
-			//System.out.println(openSet);
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
@@ -82,14 +80,9 @@ class AStar {
 				currentBestPathEnd = current;
 			}
 			
-			//System.out.println("Current node:");
-			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-			//System.out.println("Current node edges:");
-			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 			closedSet.add(endHash);
-			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			
 			
@@ -110,8 +103,9 @@ class AStar {
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
-				if (openSetMap.containsKey(snEndHash) &&
-						tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+				final SpeedNode contester = openSetMap.get(snEndHash);
+				if (contester != null &&
+					tentativeGScore >= contester.gScore) {
 					continue;
 				}
 				

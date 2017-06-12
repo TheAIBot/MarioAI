@@ -64,9 +64,6 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved) {
-		System.out.println(edge.target.x - (currentXPos + xMoved));
-		System.out.println(currentXPos);
-		System.out.println(edge.target.x);
 		if (edge instanceof RunningEdge) {
 			return true;
 		}
