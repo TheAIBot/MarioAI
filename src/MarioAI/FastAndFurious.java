@@ -147,7 +147,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 						 							enemyPredictor.hasNewEnemySpawned();// ||
 						 							//pathCreator.getBestPath() == null;
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-				/*
+				
 				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
@@ -156,7 +156,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawAction(observation, marioController.getActions());
-				*/
+				
 				//TestTools.renderLevel(observation);
 			}
 		}

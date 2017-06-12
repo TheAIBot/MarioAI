@@ -11,7 +11,7 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 8;
+	private static final float MAX_JUMP_RANGE = 4;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
@@ -233,29 +233,13 @@ public class EdgeCreator {
 	 * @return
 	 */
 	public boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
-		JumpingEdge polynomial = new JumpingEdge(null, null); // The
-									// jump
-									// polynomial.
+		JumpingEdge polynomial = new JumpingEdge(null, null); 
 		boolean foundAllEdges = true;
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
-			// TODO ensure result doesn't contain null
-			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { // TODO
-													// test
-													// only
-													// jumprange
-													// =
-													// 6,
-													// no
-													// running.
+			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { 
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
-						JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; // TODO
-														// ERROR
-														// if
-														// removed
-														// on
-														// shortdeadend
-
+						JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; 
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
 						JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;

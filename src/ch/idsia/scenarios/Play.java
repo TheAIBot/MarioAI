@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import MarioAI.FastAndFurious;
-import MarioAI.enemySimuation.EnemyType;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
@@ -114,7 +113,7 @@ public class Play {
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
 	        //options.setLevelDifficulty(2);	 
-	        options.setLevelDifficulty(2);	
+	        options.setLevelDifficulty(-1);	
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

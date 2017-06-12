@@ -36,21 +36,20 @@ public class MovementInformation{
 		
 		this.pressXButton = xMoveInfo.pressXButton;
 		this.pressYButton = yMoveInfo.pressYButton;
-                
+
 		if (xMoveInfo.xPositions.length > yMoveInfo.yPositions.length) {
-	        this.positionsX = xMoveInfo.xPositions;
-	        this.positionsY = new float[this.positionsX.length];
-	        
-	        if (yMoveInfo.yPositions.length > 0) {
-	            for (int i = 0; i < yMoveInfo.yPositions.length; i++) {
-	                this.positionsY[i] = yMoveInfo.yPositions[i];
-	            }
-	            for (int i = yMoveInfo.yPositions.length; i < this.positionsX.length; i++) {
-	                this.positionsY[i] = yMoveInfo.yPositions[yMoveInfo.yPositions.length - 1];
-	            }
-	        }
-		}
-		else {
+			this.positionsX = xMoveInfo.xPositions;
+			this.positionsY = new float[this.positionsX.length];
+
+			if (yMoveInfo.yPositions.length > 0) {
+				for (int i = 0; i < yMoveInfo.yPositions.length; i++) {
+					this.positionsY[i] = yMoveInfo.yPositions[i];
+				}
+				for (int i = yMoveInfo.yPositions.length; i < this.positionsX.length; i++) {
+					this.positionsY[i] = yMoveInfo.yPositions[yMoveInfo.yPositions.length - 1];
+				}
+			}
+		} else {
 			this.positionsX = new float[yMoveInfo.yPositions.length];
 			this.positionsY = yMoveInfo.yPositions;
 		}
@@ -192,7 +191,7 @@ public class MovementInformation{
 				return true;
 			}
 			previousPositionX = positionsX[i];
-                        previousPositionY = positionsY[i];
+         previousPositionY = positionsY[i];
 		}	
 		return false;
 	}
