@@ -1,7 +1,6 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -13,10 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
-
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.LocatorEx.Snapshot;
 
 import MarioAI.FastAndFurious;
 import MarioAI.Hasher;
@@ -92,38 +88,7 @@ public class TestAStar {
 		// run until Mario finishes the level, counting the number of jumps on the way
 		int numberOfJumps = 0;
 		while (((MarioComponent) observation).getMarioStatus() != Mario.STATUS_WIN) {
-//=======
-//	public void testTakeFastestJump() {
-//		//TODO Remember to fix bug with different speeds after running along a path, compared to what the path describes.
-//		//setup("flatWithJump", true, true);
-//		setup("flatWithJump", false);
-//		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);
-//		List<DirectedEdge> path = agent.pathCreator.getBestPath();
-//		int numberOfActions = 1;
-//		int numberOfTicks = 0;
-//		DebugDraw.resetGraphics(observation);
-//		DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-//		DebugDraw.drawPathMovement(observation, path, false);
-//		TestTools.renderLevel(observation);
-//		assertTrue(path != null);
-//		assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
-//		//Assert.fail("Test will run forever after this line, though it works as expected");
-//		while(numberOfActions <= 5){
-//			if (marioControls.canUpdatePath && world.hasGoalNodesChanged() || 
-//				 path.size() > 0 && MarioControls.isPathInvalid(observation, path)) {
-//				 numberOfActions++;
-//				 agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);
-//				 agent.pathCreator.getBestPath();
-//				 DebugDraw.resetGraphics(observation);
-//				 DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-//				 DebugDraw.drawPathMovement(observation, path, false);
-//				 TestTools.renderLevel(observation);
-//				 assertTrue(path != null);
-//				 assertEquals("Fail at action: " + numberOfActions + ", at tick: " + numberOfTicks, 1, path.stream().filter(edge -> edge instanceof JumpingEdge).count()); //Should only jump ones.
-//			}
-//>>>>>>> refs/remotes/origin/fix-all-the-bugs
-//			TestTools.runOneTick(observation);
-			world.update(observation);
+			TestTools.runOneTick(observation);
 			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);
 			List<DirectedEdge> path = agent.pathCreator.getBestPath();
 			numberOfJumps += path.stream().filter(edge -> edge instanceof JumpingEdge).count();
@@ -176,7 +141,7 @@ public class TestAStar {
 	 */
 	@Test
 	public void testAStarJumping() {
-		setup("TestAStarJump", false);
+		setup("TestAStarJump", true);
 		Node[] originalGoalNodes = world.getGoalNodes(0);
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
@@ -211,9 +176,9 @@ public class TestAStar {
 		
 		Map<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
-		final int MAX_NUMBER_OF_SPEED_NODES = agent.pathCreator.getBlockingGranularity() * 2 + 1; // this is the maximum number of speednodes, which can be created at the same position.
-		final int NUMBER_OF_TEST_TICKS = 200; // arbitrary number. Higher -> more thorugh test
-		final HashSet<Long> searchedNodes = new HashSet<Long>(); 
+		final int MAX_NUMBER_OF_SPEED_NODES = agent.pathCreator.getBlockingGranularity() * 2 + 1;
+		final int NUMBER_OF_TEST_TICKS = 100;
+		final HashSet<Long>searchedNodes = new HashSet<Long>(); 
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {
 			TestTools.runOneTick(observation);
 			agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);
@@ -234,8 +199,6 @@ public class TestAStar {
 				}
 			}
 		}
-		
-		// assert that the highest number of speednodes at any position is not higher than the maximum allowed
 		assertTrue("Maximum number " + numberOfNodesMap.values().stream().max(Integer::compare).get() + 
 				   "instead of " + MAX_NUMBER_OF_SPEED_NODES,
 				   numberOfNodesMap.values().stream().allMatch(x -> x <= MAX_NUMBER_OF_SPEED_NODES));
@@ -540,8 +503,8 @@ public class TestAStar {
 		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 		assertEquals(correspondingSpeedNode.yPos - (1f / World.PIXELS_PER_BLOCK), MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 	}
+	
 }
-
 
 
 
