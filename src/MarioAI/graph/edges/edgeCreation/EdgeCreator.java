@@ -197,9 +197,9 @@ public class EdgeCreator {
 		
 		//Run to the left:
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
+			//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
 			if (ALLOW_SPEED_KEY) {
-				listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));				
+				//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));				
 			}
 		}	else foundAllEdges = false;
 
@@ -215,29 +215,12 @@ public class EdgeCreator {
 	 * @return
 	 */
 	public boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
-		JumpingEdge polynomial = new JumpingEdge(null, null); // The
-									// jump
-									// polynomial.
+		JumpingEdge polynomial = new JumpingEdge(null, null); 
 		boolean foundAllEdges = true;
-		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) { //TODO Error if setting both jump height and jump range to 2, on flat level. 
-			// TODO ensure result doesn't contain null
-			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { // TODO
-													// test
-													// only
-													// jumprange
-													// =
-													// 6,
-													// no
-													// running.
+		for (int jumpHeight = (int) 2; jumpHeight <= 2; jumpHeight++) {
+			for (int jumpRange = (int) 3; jumpRange <= 3; jumpRange++) { 
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
-						JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; // TODO
-														// ERROR
-														// if
-														// removed
-														// on
-														// shortdeadend
-
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,	JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges;
 				//polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
 				//foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,
 				//		JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;
@@ -288,20 +271,10 @@ public class EdgeCreator {
 			}
 
 			if (!isPastTopPointColumn && polynomial.isPastTopPoint(direction,
-					currentXPosition + xPositionOffsetForJump)) { // TODO
-											// fix
-											// here,
-											// probably
-											// a
-											// bug.
+					currentXPosition + xPositionOffsetForJump)) {
 				currentYPosition = Math.max(polynomial.getTopPointY(),
-						polynomial.f(currentXPosition + xPositionOffsetForJump)); // TODO
-														// no
-														// max
-														// needed?
+						polynomial.f(currentXPosition + xPositionOffsetForJump)); 
 				currentYPosition = roundWithingMargin(currentYPosition, (float) 0.02);
-				// TODO error in rounding, does not always give
-				// decimal number.
 			} else {
 				currentYPosition = polynomial.f(currentXPosition + xPositionOffsetForJump);
 				// Because of the cursed limited precision:

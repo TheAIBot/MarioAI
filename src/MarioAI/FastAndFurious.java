@@ -23,7 +23,7 @@ import ch.idsia.mario.environments.Environment;
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	public final EdgeCreator grapher = new EdgeCreator();
-	public final PathCreator pathCreator = new PathCreator(2);
+	public final PathCreator pathCreator = new PathCreator(1);
 	public final MarioControls marioController = new MarioControls();
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;

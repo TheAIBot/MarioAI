@@ -31,7 +31,7 @@ class AStar {
 	private final PriorityQueue<StateNode> openSet = new PriorityQueue<StateNode>();
 	private final Long2ObjectOpenHashMap<StateNode> openSetMap = new Long2ObjectOpenHashMap<StateNode>();
 	public final int hashGranularity;
-	private StateNode currentBestPathEnd = null;
+	StateNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	
@@ -73,9 +73,11 @@ class AStar {
 	 * @return
 	 */
 	private void runAStar(final StateNode start, final StateNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
-
+		System.out.println("Start");
 		while (!openSet.isEmpty() && keepRunning) {
+			System.out.println(openSet.toString());
 			final StateNode currentState = openSet.remove();
+			System.out.println("Chosen: " + currentState.toString());
 			openSetMap.remove(currentState.hash);
 			
 			// If goal is reached return solution path.
@@ -172,7 +174,7 @@ class AStar {
 					
 				}
 				
-				updateOpenSet(nextState, tentativeGScore, goal, penalty, currentState, nextEndHash);
+				updateOpenSet(nextState, tentativeGScore, goal, neighborEdge, penalty, currentState, nextEndHash);
 				
 			}
 		}
@@ -240,14 +242,14 @@ class AStar {
 		
 	}
 
-	public void updateOpenSet(final StateNode sn, final int tentativeGScore	, final StateNode goal, 
+	public void updateOpenSet(final StateNode sn, final int tentativeGScore	, final StateNode goal, final DirectedEdge ancestorEdge, 
 									  final int penalty , final StateNode current	, final long snEndHash){
 
 		//Update the edges position in the priority queue
 		//by updating the scores and taking it in and out of the queue.
 		if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 		sn.gScore = tentativeGScore;
-		sn.fScore = sn.gScore + heuristicFunction(sn, goal)  + sn.penalty;
+		sn.fScore = sn.gScore + heuristicFunction(sn, goal) + ancestorEdge.getWeight()  + sn.penalty;
 		if (sn.penalty != 0) {
 			System.err.println();
 		}

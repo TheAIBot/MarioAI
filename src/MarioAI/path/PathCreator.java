@@ -8,11 +8,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.sun.corba.se.spi.orbutil.fsm.State;
+
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.StateNode;
 import MarioAI.marioMovement.MarioControls;
@@ -22,7 +25,7 @@ import ch.idsia.mario.environments.Environment;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {48, 2, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
@@ -146,9 +149,21 @@ public class PathCreator {
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
 		aStars[aStars.length - 1].stop();
 		
+		StateNode current = aStars[aStars.length - 1].currentBestPathEnd;
+		
+		while (current.ancestorEdge != null && !(current.ancestorEdge instanceof JumpingEdge)) {
+			current = current.parent;			
+		}
+		if (current.ancestorEdge != null) {
+			System.out.println();
+		}
+		
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
+		
+		
+		
 		if (shouldUpdateToNewPath(path, newEnemiesSpawned)) {
 			path.usePath();
 			bestPath = path;	

@@ -287,7 +287,14 @@ public class StateNode implements Comparable<StateNode> {
 	
 	@Override
 	public String toString() {
-		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + "\n");
+		String edgeType = ""; 
+		if (ancestorEdge instanceof RunningEdge) {
+			edgeType = ", edge: R ";
+		} else {
+			edgeType = ", edge: J ";
+		}
+		if (ancestorEdge != null) edgeType += ancestorEdge.toString();
+		return node.toString() + (" gScore: " + gScore + ", fScore: " + fScore + edgeType + "\n");
 	}
 	
 	public StateNode getStompVersion(EnemyCollision firstCollision, Node targetNode, World world) {
