@@ -64,6 +64,9 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved) {
+		System.out.println(edge.target.x - (currentXPos + xMoved));
+		System.out.println(currentXPos);
+		System.out.println(edge.target.x);
 		if (edge instanceof RunningEdge) {
 			return true;
 		}
@@ -81,7 +84,6 @@ public class MarioControls {
 			    speed == 0)) {
 			return false;
 		}
-		
 		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
 	}
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
@@ -142,6 +144,9 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
+		if (edge.source.x == edge.target.x) {
+			System.out.println();
+		}
 		return getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
 	}
 	
@@ -322,9 +327,6 @@ public class MarioControls {
 			
 			//already accounted for when totalTicks is created
 			//totalTicks++;
-		}
-		if (Math.abs(xPositions[xPositions.length - 1]) > Math.abs(originalNeededXDistance) + 0.5f) {
-			System.out.println();
 		}
 		
 		//if distance is negative then put sign back on values as it was lost before and

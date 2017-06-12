@@ -61,15 +61,13 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
 			marioController.update(observation);
 			world.update(observation);
-			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation));
+			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation), MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
 			
 			if (world.hasWorldChanged()) {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
 			}
-			if (pathCreator.getBestPath() == null) {
-				System.out.println();
-			}
+			
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 				 enemyPredictor.hasNewEnemySpawned() ||
@@ -79,63 +77,10 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				
 				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
-				
-				/*
-				if (world.hasGoalNodesChanged()) {
-					System.out.println("Reason: World");
-				}
-				if (MarioControls.isPathInvalid(observation, pathCreator.getBestPath())) {
-					System.out.println("Reason: Path invalid");
-				}
-				if (enemyPredictor.hasNewEnemySpawned()) {
-					System.out.println("Reason: New enemies");
-				}
-				if (marioController.canUpdatePath) {
-					System.out.println("Reason: Edge finished");
-				}
-				if (pathCreator.getBestPath() == null) {
-					System.out.println("Reason: No path");
-				}
-				*/
-				/*
-				if (pathCreator.isRunning) {
-					pathCreator.stop();					
-					if (!pathCreator.isMarioAtExpectedPosition(observation)) {
-						//save(observation);
-						//throw new Error("Mario didn't follow the path correctly.");
-						pathCreator.syncWithRealWorld(world, enemyPredictor);
-						findPath(observation);
-					}
-					else {
-						pathCreator.updateBestPath(enemyPredictor.hasNewEnemySpawned());
-					}
 
-//					System.out.println("Tick: " + tickCount + " Stopped");
-				}
-				if (!pathCreator.isRunning && 
-					 pathCreator.getBestPath() != null && 
-					 pathCreator.getBestPath().size() > 0) {
-					pathCreator.syncWithRealWorld(world, enemyPredictor);
-					startFindingPathFromPreviousPath(observation);
-//					System.out.println("Tick: " + tickCount + " Started\n");
-				}
-				if (!pathCreator.isRunning && 
-					(pathCreator.getBestPath() == null || 
-					 pathCreator.getBestPath().size() == 0)) {
-					
-					pathCreator.syncWithRealWorld(world, enemyPredictor);
-					findPath(observation);
-					System.out.println("Failed to find path. Restarting.");
-				}				
-				*/
 				world.resetGoalNodesChanged();
 				enemyPredictor.resetNewEnemySpawned();
 			}
-			/*else if (marioController.canUpdatePath && 
-					 pathCreator.isRunning) {
-				pathCreator.stop();
-//				System.out.println("Tick: " + tickCount + " Path ignored");
-			}*/
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
