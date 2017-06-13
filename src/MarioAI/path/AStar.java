@@ -118,6 +118,7 @@ class AStar {
 				// Distance from start to neighbor of current node
 				final int tentativeGScore = currentState.gScore + nextState.getMoveTime();
 				
+				StateNode element = openSetMap.get(nextEndHash);
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one

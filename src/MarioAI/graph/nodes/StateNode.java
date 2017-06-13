@@ -126,20 +126,10 @@ public class StateNode implements Comparable<StateNode> {
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
-		if (this.ancestorEdge instanceof FallEdge &&
-			 !MarioControls.canMarioUseFallEdge(ancestorEdge, currentXPos)) {
-			return false;
-		}
-		
-		if (this.ancestorEdge instanceof JumpingEdge && 
-			!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
-			return false;
-		}
-			
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
-		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped())) {
+		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
 			return false;
 		}
 		
@@ -153,19 +143,10 @@ public class StateNode implements Comparable<StateNode> {
 	public boolean isSpeedNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
 		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
-			//In a jump it's possible to jump too far
-			//and there is nothing that mario can do about it
-			//TODO this should maybe be removed in the future
-			
-			if (this.ancestorEdge instanceof JumpingEdge && 
-				!MarioControls.canMarioUseJumpEdge(ancestorEdge, currentXPos)) {
-				return false;
-			}
-			
 			//Make sure the edge is possible to use
 			//all Running edges are possible
 			//not all jumps are possible
-			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped())) {
+			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
 				return false;
 			}
 			

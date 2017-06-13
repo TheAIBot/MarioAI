@@ -3,6 +3,8 @@ package MarioAI.marioMovement;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 
+import com.sun.jndi.url.iiopname.iiopnameURLContextFactory;
+
 import MarioAI.World;
 import MarioAI.graph.nodes.StateNode;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -167,9 +169,6 @@ public class MovementInformation{
 	}
 
 	public boolean hasCollisions(StateNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
-		if (getMoveTime() == 0) {
-			return false;
-		}
 		float previousPositionX = 0;
       float previousPositionY = 0;
 		final float lastY = positionsY[getMoveTime() - 1];
@@ -199,5 +198,9 @@ public class MovementInformation{
 	
 	public void setStopTime(int tickForCollision) {
 		ticksOfMovement = tickForCollision;
+	}
+	
+	public void resetStopTime(){
+		ticksOfMovement = originalTicksOfMovement;
 	}
 }
