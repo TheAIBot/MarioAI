@@ -11,6 +11,7 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import javafx.scene.Parent;
 
 class AStar {
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
@@ -24,8 +25,6 @@ class AStar {
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
-	
-	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
@@ -91,8 +90,6 @@ class AStar {
 			closedSet.add(endHash);
 			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
-			
-			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
@@ -110,44 +107,34 @@ class AStar {
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
-				if (openSetMap.containsKey(snEndHash) &&
-						tentativeGScore >= openSetMap.get(snEndHash).gScore) {
+				if (openSetMap.containsKey(snEndHash)
+					&& tentativeGScore + sn.parent.penalty >= openSetMap.get(snEndHash).gScore) {
 					continue;
 				}
 				
 				// collision detection and invincibility handling 
-				int penalty = 0;
 				if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
-					sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
-					sn.parentXPos = current.currentXPos;
 					
 					if (!sn.isSpeedNodeUseable(world)) {
 						continue;
 					}
 					
-					if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-						continue;
-					}
-					/*
-					if (sn.ticksOfInvincibility == 0) {
-						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-							continue;
-							
-							if (sn.lives <= 1) {
-								continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
-							}
-							penalty = PENALTY_SCORE;
-							
+//					if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+//						continue;
+//					}
+					
+					if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+						if (sn.lives < 1) {
+							continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
 						}
 					}
-					*/
-				}					
+				}
 				
 				// Update the edges position in the priority queue
 				// by updating the scores and taking it in and out of the queue.
 				if (openSetMap.containsKey(sn.hash)) openSet.remove(sn);
 				sn.gScore = tentativeGScore;
-				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + penalty;
+				sn.fScore = sn.gScore + heuristicFunction(sn, goal) + neighborEdge.getWeight() + sn.penalty;
 				sn.parent = current;
 				openSet.add(sn);
 				openSetMap.put(snEndHash, sn);
@@ -169,6 +156,10 @@ class AStar {
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
+			speedNode.currentXPos = current.currentXPos + speedNode.getMoveInfo().getXMovementDistance();
+			speedNode.parentXPos = current.currentXPos;
+			speedNode.penalty = current.penalty;
+			speedNode.lives = current.lives;
 			return speedNode;
 		}
 		

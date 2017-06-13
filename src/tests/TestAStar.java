@@ -436,15 +436,17 @@ public class TestAStar {
 		Long2ObjectOpenHashMap<SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		boolean willHitEnemy = false;
 		SpeedNode sn = null;
+		SpeedNode newSn = sn;
 		
 		for (DirectedEdge edge : path) {
-			sn = speedNodes.values().stream()
+			newSn = speedNodes.values().stream()
 					.filter(x -> x.ancestorEdge.equals(edge))
 					.findFirst().get();
+			if (willHitEnemy) break;
 			if (edge.getMoveInfo().hasCollisions(sn, world)) {
 				willHitEnemy = true;
-				break;
 			}
+			sn = newSn;
 		}
 		assertTrue(willHitEnemy);
 //		assertTrue(sn.currentXPos < enemyOneXStartPos - 0.5);
@@ -452,6 +454,7 @@ public class TestAStar {
 		// Verify ticks of invincibility
 		assertNotNull(sn);
 		assertEquals(SpeedNode.MAX_TICKS_OF_INVINCIBILITY, sn.ticksOfInvincibility);
+		assertEquals(sn.ticksOfInvincibility - newSn.ticksOfInvincibility, newSn.ancestorEdge.getMoveInfo().getMoveTime());
 		
 		// Check that Mario has lost only one life when he reaches the end of the level
 		// This should be the case as the second enemy is close enough for Mario's invincibility not to have worn off

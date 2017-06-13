@@ -10,6 +10,7 @@ import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
+import ch.idsia.mario.engine.sprites.Mario;
 
 public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
@@ -30,9 +31,12 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	private final boolean isSpeedNodeUseable;
 	
 	public static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
+
+	public static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	public static int MAX_MARIO_LIFE = 3;
 	public int ticksOfInvincibility = 0;
-	public int lives = MAX_MARIO_LIFE;
+	public int lives = MarioMethods.getMarioLives();
+	public int penalty;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -47,6 +51,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.penalty = 0; // parent is null
 	}
 	
 	public SpeedNode(Node node, float marioX, float vx, long hash) {
@@ -62,7 +67,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
-		
+		this.penalty = 0; // parent is null
 	}
 	
 	///Should only be used for testing purposes
@@ -78,6 +83,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.penalty = 0; // parent is null
 	}
 	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
@@ -97,6 +103,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
+		this.lives = parent.lives;
+		this.penalty = parent.penalty;
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
@@ -154,17 +162,16 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		}
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		int currentTick = startTime;
 		int i = parent.ticksOfInvincibility;
 		this.lives = parent.lives;
 		this.ticksOfInvincibility = parent.ticksOfInvincibility;
-		parent.ticksOfInvincibility = 0;
 		
 		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
 		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
 		if (i >= moveInfo.getMoveTime()) {
-			this.ticksOfInvincibility -= moveInfo.getMoveTime();
+			ticksOfInvincibility -= moveInfo.getMoveTime();
 			return false;
 		}
 		
@@ -175,15 +182,21 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			
 			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick)) {
-				hasEnemyCollision = true;
-				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+				if (ticksOfInvincibility == 0) {
+					hasEnemyCollision = true;
+					lives--;
+					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+					this.penalty += 9000;
+				} else if (ticksOfInvincibility > 0){
+					ticksOfInvincibility--;
+				} else {
+					throw new Error("Negative invincibility error. It is: " + ticksOfInvincibility);
+				}
+			} else {
+				ticksOfInvincibility--;
 			}
 			
 			currentTick++;
-		}
-		
-		if (hasEnemyCollision) {
-			lives--;
 		}
 		
 		return hasEnemyCollision;
