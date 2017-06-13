@@ -12,7 +12,7 @@ import MarioAI.marioMovement.MarioControls;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-class AStar {
+public class AStar {
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
 	
 	// Set of nodes already explored
@@ -62,7 +62,7 @@ class AStar {
 	 */
 	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {	
 		final long startMiliseconds = System.currentTimeMillis();
-		final long MAX_TIME_IN_ASTAR = 25000;
+		final long MAX_TIME_IN_ASTAR = 35;
 		while (!openSet.isEmpty() && keepRunning && startMiliseconds + MAX_TIME_IN_ASTAR > System.currentTimeMillis()) {
 			
 			final SpeedNode current = openSet.remove();
@@ -74,11 +74,13 @@ class AStar {
 				foundBestPath = true;
 				return;
 			}
+			
 			// The current best speednode is the one furthest to the right
 			// (disregarding if it passes through an enemy or not).
 			if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
 				currentBestPathEnd = current;
 			}
+			
 			if (current.ticksOfInvincibility  > 0) {
 
 				System.out.println(current.ticksOfInvincibility + 
@@ -91,7 +93,7 @@ class AStar {
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 			closedSet.add(endHash);
 			
-			// Explore each neighbor of current node
+			// Go through the possible actions (edges) for the current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
 

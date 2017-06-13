@@ -70,6 +70,7 @@ public class TestAStar {
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false, 3);
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();
 		assertNotNull(path);
+		
 		//He should run through the level:
 		for (DirectedEdge directedEdge : path) {
 			assertTrue(directedEdge instanceof RunningEdge);

@@ -157,7 +157,7 @@ public class MovementInformation{
 		}
 	}
 
-	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
+	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only come from the ground.		
 		float previousPositionX = 0;
 		float previousPositionY = 0;
 		final float lastY = positionsY[positionsY.length - 1];
@@ -171,7 +171,7 @@ public class MovementInformation{
 		return false;
 	}
 	
-	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
+	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only come from the ground.
 		float previousPositionX = 0;
 		float previousPositionY = 0;
 		final float lastY = positionsY[positionsY.length - 1];

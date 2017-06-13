@@ -6,6 +6,9 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
+/**
+ * A speed node corresponds to a search node in the A* search algorithm, but includes more information and functionallity.
+ */
 public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
@@ -26,10 +29,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
 
-	public static final int PENALTY_SCORE = 70005; // arbitrary high value; "It's over 9000".
+	public static final int PENALTY_SCORE = 70005; // semi arbitrary high value
 	public int ticksOfInvincibility = 0;
 	public int lives;
-	public int penalty;
+	public int penalty; // the penalty this node will get for hitting an enemy. To be used for influencing the choices made in A*
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -102,6 +105,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.penalty = parent.penalty;
 	}
 	
+	/**
+	 * @param world
+	 * @return true if the speednode does not have collisions with blocks in the world and the movement leading to this speed node
+	 * is actually possible to carry out.
+	 */
 	private boolean determineIfThisNodeIsUseable(World world) {
 		//Make sure the edge is possible to use
 		//all Running edges are possible
@@ -117,6 +125,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
+	/**
+	 * @param world
+	 * @return true if the speednode does not have collisions with blocks in the world and the movement leading to this speed node
+	 * is actually possible to carry out.
+	 */
 	public boolean isSpeedNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
 		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
@@ -127,6 +140,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 				return false;
 			}
 			
+			// Are there any collisions with blocks in the world (this is not an enemy collision check) 
 			if (getMoveInfo().hasCollisions(parent, world)) {
 				return false;
 			}	
@@ -138,6 +152,14 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		}
 	}
 	
+	/**
+	 * Check if Mario collides with an enemey and set ticks of invincibility, lives and penalty accordingly.
+	 * 
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return true if Mario collides with an enemy during the movement leading to this speed node, false otherwise
+	 */
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		if (ticksOfInvincibility < 0) {
 			System.out.println("Error");
@@ -181,7 +203,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	/**
-	 * Old collision method. Momentarily only for ease of reference.
+	 * Deprecated collision method. Still present for ease of reference.
 	 * TODO remove this method
 	 * @param startTime
 	 * @param enemyPredictor

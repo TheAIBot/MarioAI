@@ -20,6 +20,9 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 
+/**
+ * The main class for the agent of the program
+ */
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	public final EdgeCreator grapher = new EdgeCreator();
@@ -115,7 +118,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 		final float xVelocity = marioController.getXVelocity();
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
 		final boolean hasNewEnemySpawned = enemyPredictor.hasNewEnemySpawned();
-		final int lives = 1; //MarioMethods.getMarioLives(observation.getMarioMode());
+		final int lives = MarioMethods.getMarioLives(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
 		pathCreator.blockingFindPath(observation, marioNode, goalNodes, xVelocity, enemyPredictor, marioHeight, world, hasNewEnemySpawned, lives);
 		//System.out.println(System.currentTimeMillis() - startTime);
