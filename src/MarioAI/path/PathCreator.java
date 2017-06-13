@@ -60,7 +60,7 @@ public class PathCreator {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight, int lives) 
 	{
 		final DirectedEdge currentEdge = path.get(0);
 		
@@ -81,17 +81,18 @@ public class PathCreator {
 		
 		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
 		
-		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
+		// The life given is not correct in multi-thread mode
+		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight, lives);
 	}
 	
-	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight, int lives) {
 		if (isRunning) {
 			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
 		}
 		
 		isRunning = true;
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, lives);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
@@ -140,10 +141,10 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned, int lives) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, lives);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		singleThreadAstar.initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);

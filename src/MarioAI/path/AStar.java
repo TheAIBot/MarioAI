@@ -11,7 +11,6 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import javafx.scene.Parent;
 
 class AStar {
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
@@ -63,7 +62,7 @@ class AStar {
 	 */
 	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {	
 		final long startMiliseconds = System.currentTimeMillis();
-		final long MAX_TIME_IN_ASTAR = 250;
+		final long MAX_TIME_IN_ASTAR = 25000;
 		while (!openSet.isEmpty() && keepRunning && startMiliseconds + MAX_TIME_IN_ASTAR > System.currentTimeMillis()) {
 			
 			final SpeedNode current = openSet.remove();
@@ -79,6 +78,13 @@ class AStar {
 			// (disregarding if it passes through an enemy or not).
 			if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
 				currentBestPathEnd = current;
+			}
+			if (current.ticksOfInvincibility  > 0) {
+
+				System.out.println(current.ticksOfInvincibility + 
+						", " + current.penalty + 
+						", " + current.fScore + 
+						", " + current.lives);	 
 			}
 			
 			// Current node has been explored.
@@ -104,8 +110,8 @@ class AStar {
 				//current one
 				final SpeedNode contester = openSetMap.get(snEndHash);
 				if (contester != null &&
-					tentativeGScore + neighborEdge.getWeight()
-					>= contester.gScore + contester.ancestorEdge.getWeight()
+					tentativeGScore + neighborEdge.getWeight() + sn.penalty
+					>= contester.gScore + contester.ancestorEdge.getWeight() + contester.penalty
 					) {
 					continue;
 				}
@@ -156,6 +162,7 @@ class AStar {
 		if (speedNode != null) {
 			speedNode.currentXPos = current.currentXPos + speedNode.getMoveInfo().getXMovementDistance();
 			speedNode.parentXPos = current.currentXPos;
+			speedNode.ticksOfInvincibility = current.ticksOfInvincibility;
 			speedNode.penalty = current.penalty;
 			speedNode.lives = current.lives;
 			return speedNode;
