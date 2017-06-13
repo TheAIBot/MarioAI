@@ -1,14 +1,20 @@
 package tests;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import MarioAI.FastAndFurious;
 import MarioAI.World;
-import MarioAI.graph.edges.EdgeCreator;
+import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class TestCompleteLevel {
+	final int MARIO_WON = Mario.STATUS_WIN; // 1
+	final int MARIO_LOST = Mario.STATUS_DEAD; // 0
+	
 	Agent agent;
 	Environment observation;
 	World graph;
@@ -23,29 +29,57 @@ public class TestCompleteLevel {
 		new EdgeCreator().setMovementEdges(graph, graph.getMarioNode(observation));
 	}
 	
-	public void testLevel(String path) {
+	public int testLevel(String path) {
 		setup(path);
-		TestTools.runWholeLevel(observation);
+		return TestTools.runWholeLevelWillWin(observation);
 	}
 	
 	@Test
 	public void testFlat() {
-		testLevel("flat");
+		assertEquals(MARIO_WON, testLevel("flat"));
 	}
 	
 	@Test
 	public void testPit() {
-		testLevel("pit12345");
+		assertEquals(MARIO_WON, testLevel("pit12345"));
+	}
+	
+	@Test
+	public void testPit12345678() {
+		assertEquals(MARIO_WON, testLevel("pit12345678"));
 	}
 	
 	@Test
 	public void testStaircase() {
-		testLevel("staircase");
+		assertEquals(MARIO_WON, testLevel("staircase"));
 	}
 	
 	@Test
 	public void testDeadend() {
-		testLevel("deadend");
+		assertEquals(MARIO_WON, testLevel("deadend"));
+	}
+	
+	@Test
+	public void testJumpCourse() {
+		assertEquals(MARIO_WON, testLevel("jumpLevels/semiAdvancedJumpingCourse"));
+	}
+	
+	@Test
+	public void testTheMaze() {
+		assertEquals(MARIO_WON, testLevel("theMaze"));
+	}
+	
+	@Test
+	public void testDropDown1() {
+		assertEquals(MARIO_WON, testLevel("dropDown1"));
+	}
+	
+	/**
+	 * Level for which no solution exists
+	 */
+	@Test
+	public void testProgramNotCrashInUnsolvableLevel() {
+		assertEquals(MARIO_LOST, testLevel("bumbybox"));
 	}
 	
 }

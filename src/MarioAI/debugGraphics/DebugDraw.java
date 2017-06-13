@@ -190,13 +190,15 @@ public class DebugDraw {
 				new Point2D.Float((marioXPos - 10), 14),
 				new Point2D.Float((marioXPos -  9), 14),
 				new Point2D.Float((marioXPos -  8), 14),
-				new Point2D.Float((marioXPos -  9), 13)
+				new Point2D.Float((marioXPos -  9), 13),
+				new Point2D.Float((marioXPos -  8), 13)
 		};
 		final int[] keys = new int[] {
 				Mario.KEY_LEFT,
 				Mario.KEY_DOWN,
 				Mario.KEY_RIGHT,
-				Mario.KEY_JUMP
+				Mario.KEY_JUMP,
+				Mario.KEY_SPEED
 		};
 		
 		final Point size = new Point((int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER), (int)((BLOCK_PIXEL_SIZE * 0.8) * Art.SIZE_MULTIPLIER));
@@ -216,12 +218,12 @@ public class DebugDraw {
 	
 	public static void drawEnemies(final Environment observation, EnemyPredictor enemyPredictor) {
 		for (EnemySimulator enemy : enemyPredictor.getEnemies()) {
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1; i++) {
 				final Point2D.Float enemyPos = enemy.getPositionAtTime(i);
-				final Point2D.Float startPos = new Point2D.Float(((enemyPos.x - enemy.getWidthInPixels()) / BLOCK_PIXEL_SIZE), 
-																 ((enemyPos.y - enemy.getHeightInPixels()) / BLOCK_PIXEL_SIZE) + 0.5f);
-				final Point2D.Float size = new Point2D.Float((float)enemy.getWidthInPixels() * Art.SIZE_MULTIPLIER, 
-															 (float)enemy.getHeightInPixels() * Art.SIZE_MULTIPLIER);
+				final Point2D.Float startPos = new Point2D.Float(((enemyPos.x - enemy.getWidth()) / BLOCK_PIXEL_SIZE), 
+																 ((enemyPos.y - enemy.getHeight()) / BLOCK_PIXEL_SIZE) + 0.5f);
+				final Point2D.Float size = new Point2D.Float((float)enemy.getWidth() * 2 * Art.SIZE_MULTIPLIER, 
+															 (float)enemy.getHeight() * Art.SIZE_MULTIPLIER);
 				
 				
 				convertLevelPointToOnScreenPoint(observation, startPos);
@@ -235,18 +237,25 @@ public class DebugDraw {
 		}
 	}
 	
-	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path) {
+	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path, final boolean pathShouldBeUpdated) {
 		if (path != null) {
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {
-				for (Point2D.Float pos : edge.getMoveInfo().getPositions()) {
-					Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + pos.x, edge.source.y - pos.y);
-					convertLevelPointToOnScreenPoint(observation, correctPos);
-					
-					positions.add(new Point((int)correctPos.x, (int)correctPos.y));
-				}
+                            for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
+                                final float posX = edge.getMoveInfo().getXPositions()[i];
+                                final float posY = edge.getMoveInfo().getYPositions()[i];
+                                Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + posX, edge.source.y - posY);
+                                convertLevelPointToOnScreenPoint(observation, correctPos);
+
+                                positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+                            }
 			}
-			addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			if (pathShouldBeUpdated) {
+				addDebugDrawing(observation, new DebugLines(Color.BLUE, positions));
+			}
+			else {
+				addDebugDrawing(observation, new DebugLines(Color.RED, positions));
+			}
 		}
 	}
 	

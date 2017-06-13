@@ -11,8 +11,6 @@ import org.junit.Assert;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyType;
-import MarioAI.enemySimuation.simulators.BulletBillSimulator;
-import MarioAI.enemySimuation.simulators.ShellSimulator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
@@ -26,6 +24,7 @@ import ch.idsia.mario.engine.sprites.Shell;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
+import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.EvaluationOptions;
 
 public class TestTools {
@@ -40,6 +39,11 @@ public class TestTools {
 		((MarioComponent) observation).run1(0, 1);
 	}
 	
+	public static int runWholeLevelWillWin(Environment observation) {
+		EvaluationInfo ei = ((MarioComponent) observation).run1(0, 1);
+		return ei.marioStatus;
+	}
+	
 	public static byte[][] getLevelMap(Environment observation)
 	{
 		return ((MarioComponent) observation).getLevel().map;
@@ -50,6 +54,10 @@ public class TestTools {
 	}
 	
 	public static Environment loadLevel(String filepath, Agent agent, boolean showGUI) {
+		return loadLevel(filepath, agent, showGUI, !showGUI);
+	}
+	
+	public static Environment loadLevel(String filepath, Agent agent, boolean showGUI, boolean maxFps) {
 		Level level = null;
 		try {
 			level = Level.load(new DataInputStream(new FileInputStream("src/tests/testLevels/" + filepath)));
@@ -61,7 +69,7 @@ public class TestTools {
 		EvaluationOptions options = new CmdLineOptions(new String[0]);
 		options.setAgent(agent);
 		Task task = new ProgressTask(options);
-		options.setMaxFPS(!showGUI);
+		options.setMaxFPS(maxFps);
 		options.setVisualization(showGUI);
 		options.setNumberOfTrials(1);
 		task.setOptions(options);
@@ -168,5 +176,25 @@ public class TestTools {
 	
 	public static void setMarioXPosition(Environment observation, int x) {
 		((MarioComponent)observation).setMarioXPosition(x);
+	}
+	
+	public static void setMarioPixelPosition(Environment observation, int x, int y) {
+		((MarioComponent)observation).setMarioPixelPosition(x, y);
+	}
+	
+	public static void setMarioXPixelPosition(Environment observation, int x) {
+		((MarioComponent)observation).setMarioXPixelPosition(x);
+	}
+	
+	public static void resetMarioSpeed(Environment observation) {
+		((MarioComponent)observation).resetMarioSpeed();
+	}
+	
+	public static int getMarioInvulnerableTime(Environment observation) {
+		return ((MarioComponent)observation).getMarioInvulnerableTime();
+	}
+	
+	public static void resetMarioHealth(Environment observation) {
+		((MarioComponent)observation).resetMarioHealth();
 	}
 }

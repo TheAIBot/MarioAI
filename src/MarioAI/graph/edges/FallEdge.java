@@ -1,16 +1,18 @@
 package MarioAI.graph.edges;
 
+import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
 
 public class FallEdge extends DirectedEdge {
 
-	public FallEdge(Node source, Node target) {
-		super(source, target);
+	public FallEdge(Node source, Node target, boolean useSuperSpeed) {
+		super(source, target, useSuperSpeed);
+		hash = Hasher.hashEdge(this, getExtraEdgeHashcode());
 	}
 
 	@Override
 	public float getMaxY() {
-		return source.y;
+		return 0;
 	}
 
 	@Override
@@ -19,11 +21,10 @@ public class FallEdge extends DirectedEdge {
 	}
 
 	@Override
-	protected int getExtraEdgeHashcode() {
-		final int fallType = 2; //it is a fall edge type
+	protected byte getExtraEdgeHashcode() {
 		//Its fall length does not matter, only its targets position.
 		//Therefore it is not included
-		return fallType;
+		return 0b0000_0010;
 	}
 
 }

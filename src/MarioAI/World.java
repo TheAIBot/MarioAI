@@ -1,11 +1,11 @@
 package MarioAI;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 import MarioAI.graph.nodes.Node;
+import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 
 public class World {
@@ -13,10 +13,12 @@ public class World {
 	public static final int LEVEL_WIDTH = 22;
 	public static final int SIGHT_WIDTH = 22;
 	public static final int SIGHT_HEIGHT = 22;
+	public static final int PIXELS_PER_BLOCK = 16;
 	private static final int MARIO_START_X_POS = 2;
-
+	
+	private final CollisionDetection collisionDetection = new CollisionDetection();
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; // main graph
-	private final HashMap<Integer, Node[]> savedColumns = new HashMap<Integer, Node[]>();
+	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos;
@@ -56,9 +58,9 @@ public class World {
 	private void updateWholeMatrix(final Environment observation) {
 		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 		final int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
-
+		byte[][] scene = observation.getLevelSceneObservation();
 		for (int i = 0; i < levelMatrix.length; i++) {
-			final byte[] byteColumn = getByteColumnFromLevel(observation.getLevelSceneObservation(), marioYPos, i);
+			final byte[] byteColumn = getByteColumnFromLevel(scene, marioYPos, i);
 			final int columnIndex = i + marioXPos - (SIGHT_WIDTH / 2);
 			final Node[] columnToInsert = convertByteColumnToNodeColumn(byteColumn, columnIndex);
 			levelMatrix[i] = columnToInsert;
@@ -81,9 +83,9 @@ public class World {
 		goalNodesChanged = goalNodesChanged || (newMaxMarioXPos != maxMarioXPos);
 		maxMarioXPos = newMaxMarioXPos;		
 		
+		setMarioNode(observation);
 		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
-			setMarioNode(observation);
 			hasWorldChanged = true;
 		}
 		else {
@@ -92,12 +94,12 @@ public class World {
 	}
 	
 	private void setMarioNode(final Environment observation) {
-		final int marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
-		int marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		//limit mario y pos to a position inside the matrix
 		marioYPos = Math.min(Math.max(marioYPos, 0), LEVEL_HEIGHT - 1);
 		
-		marioNode = new Node((short)marioXPos, (short)(marioYPos + 1), (byte)0);
+		marioNode = new Node(Math.round(marioXPos), Math.round(marioYPos), (byte)0);
 	}
 
 	public Node getMarioNode(final Environment observation)
@@ -174,6 +176,14 @@ public class World {
 			}
 			savedColumns.put(entry.getKey().intValue(), columnCopy);
 		}
+	}
+	
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, SpeedNode sourceNode, float lastY){
+		return collisionDetection.isColliding(futureOffsetX, futureOffsetY, currentOffsetX, currentOffsetY, sourceNode.currentXPos, sourceNode.yPos, lastY, this);
+	}
+	
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, float startX, float startY, float lastY){
+		return collisionDetection.isColliding(futureOffsetX, futureOffsetY, currentOffsetX, currentOffsetY, startX, startY, lastY, this);
 	}
 	
 	public boolean hasGoalNodesChanged() {

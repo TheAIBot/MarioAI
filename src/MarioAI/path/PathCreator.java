@@ -1,18 +1,12 @@
 package MarioAI.path;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.validator.PublicClassValidator;
-
-import com.sun.istack.internal.FinalArrayList;
-import com.sun.jndi.rmi.registry.RegistryContext;
 
 import MarioAI.MarioMethods;
 import MarioAI.World;
@@ -21,28 +15,30 @@ import MarioAI.graph.edges.AStarHelperEdge;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-import ch.idsia.ai.tasks.Task;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
-	private ArrayList<DirectedEdge> bestPath = null;
+	private AStarPath bestPath = null;
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
-	private final CompletableFuture<Boolean>[] runningTasks;
+	private final CompletableFuture<Void>[] runningTasks;
 	private final AStarHelperEdge[] addedEdges = new AStarHelperEdge[World.LEVEL_HEIGHT];
 	private final Node[] nodesWithAddedEdges = new Node[World.LEVEL_HEIGHT];
+	private Point2D.Float marioFuturePosition;
 	public boolean isRunning = false;
 	
 	@SuppressWarnings("unchecked")
 	public PathCreator(int threadCount) {
 		//There can't be more threads than granularities as two threads
 		//would then have to share the same granularity.
-		threadCount = Math.min(threadCount, HASH_GRANULARITY.length);
+		threadCount = Math.min(threadCount, MAX_THREAD_COUNT);
 		threadPool = Executors.newFixedThreadPool(threadCount);
 		runningTasks = new CompletableFuture[threadCount];
 		
@@ -52,36 +48,51 @@ public class PathCreator {
 		for (int i = 0; i < threadCount; i++) {
 			aStars[i] = new AStar(HASH_GRANULARITY[i]);
 		}
+		
+		Arrays.sort(aStars, (AStar a, AStar b) -> a.hashGranularity - b.hashGranularity);
 	}
 	
 	public void initialize(Environment observation) {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioSpeed, int marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
 	{
-		final Node startNode = path.get(0).target;
-		final int timeForward = path.get(0).getMoveInfo().getMoveTime();
+		final DirectedEdge currentEdge = path.get(0);
+		
+		final Node futureStartNode = currentEdge.target;
+		final int timeForward = currentEdge.getMoveInfo().getMoveTime();
 		enemyPredictor.moveIntoFuture(timeForward);
 		
-		start(observation, startNode, rightmostNodes, marioSpeed, marioHeight);
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+
+        final float edgeEndDistanceX = currentEdge.getMoveInfo().getXPositions()[currentEdge.getMoveInfo().getXPositions().length - 1];
+        final float edgeEndDistanceY = currentEdge.getMoveInfo().getYPositions()[currentEdge.getMoveInfo().getYPositions().length - 1];
+		
+		final float futureMarioXPos = marioXPos + edgeEndDistanceX;
+		final float futureMarioYPos = marioYPos - edgeEndDistanceY;
+		
+		marioFuturePosition = new Point2D.Float(futureMarioXPos, futureMarioYPos);
+		
+		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
+		
+		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
 	}
 	
-	private void start(final Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final int marioHeight) {
-		isRunning = true;
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
+		if (isRunning) {
+			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
+		}
 		
-		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		isRunning = true;
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
 			final int q = i;
-			runningTasks[i] = CompletableFuture.supplyAsync(() -> 
-			{
-				aStars[q].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
-				return true;
-			}, threadPool);
+			runningTasks[i] = CompletableFuture.runAsync(() -> aStars[q].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world), threadPool);
 		}
 	}
 	
@@ -125,7 +136,7 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final int marioHeight, final World world) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
 		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
@@ -137,70 +148,106 @@ public class PathCreator {
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
-		if (shouldUpdateToNewPath(path.path)) {
+		if (shouldUpdateToNewPath(path, newEnemiesSpawned)) {
 			path.usePath();
-			bestPath = path.path;	
+			bestPath = path;	
 		}
 	}
 	
-	public void updateBestPath() {
+	public void updateBestPath(final boolean newEnemiesSpawned) {
 		final AStarPath[] paths = new AStarPath[aStars.length];
 		for (int i = 0; i < aStars.length; i++) {
 			paths[i] = aStars[i].getCurrentBestPath();
 		}
-		
-		Arrays.sort(paths, (AStarPath a, AStarPath b) -> a.granularity - b.granularity);
 		
 		//Of one or more paths are finished then chose
 		//the path with the highest granularity.
 		for (int i = aStars.length - 1; i >= 0; i--) {
 			if (paths[i].isBestPath) {
 				paths[i].usePath();
-				bestPath = paths[i].path;
+				bestPath = paths[i];
+				//System.out.println("Updated best path");
 				return;
 			}
 		}
 		
-		if (shouldUpdateToNewPath(paths[paths.length - 1].path)) {
+		if (shouldUpdateToNewPath(paths[paths.length - 1], newEnemiesSpawned)) {
 			//Otherwise chose the path from the astar
 			//with the highest granularity
 			paths[paths.length - 1].usePath();
-			bestPath = paths[paths.length - 1].path;	
+			bestPath = paths[paths.length - 1];	
+			//System.out.println("Updated best path");
 		}
 	}
 	
-	private boolean shouldUpdateToNewPath(ArrayList<DirectedEdge> newPotentialPath) {
-		if (newPotentialPath == null) {
+	private boolean shouldUpdateToNewPath(AStarPath newPotentialPath, final boolean newEnemiesSpawned) {
+		if (newPotentialPath.path == null) {
 			return false;
 		}
-		else {
+		if (bestPath == null ||
+			bestPath.path == null) {
 			return true;
 		}
+		
+		if (!newEnemiesSpawned &&
+			!newPotentialPath.isBestPath && 
+			bestPath.isBestPath &&
+			bestPath.path.size() > 1) {
+			return false;
+		}
+		if (!newPotentialPath.isBestPath) {
+			System.out.println("Not best path");
+		}
+		
+		return true;
+	}
+	
+	public boolean isMarioAtExpectedPosition(Environment observation) {
+		if (marioFuturePosition == null) {
+			throw new Error("marioFuturePosition wasn't set.");
+		}
+		
+		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+		final float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+		
+		final float diffX = Math.abs(marioFuturePosition.x - marioXPos);
+		final float diffY = Math.abs(marioFuturePosition.y - marioYPos);
+		
+		return diffX < MarioControls.ACCEPTED_DEVIATION && 
+			   diffY < MarioControls.ACCEPTED_DEVIATION;
 	}
 	
 	public ArrayList<DirectedEdge> getBestPath() {
-		return bestPath;
+		return bestPath == null ? null : bestPath.path;
 	}
 	
 	public void syncWithRealWorld(World realWorld, EnemyPredictor realEnemyPredictor) {
 		world.syncFrom(realWorld);
+		if (realEnemyPredictor.getEnemies().size() > 0) {
+			System.out.println();
+		}
 		enemyPredictor.syncFrom(realEnemyPredictor);
 	}
 	
 	public void stop() {
-		for (AStar aStar : aStars) {
-			aStar.stop();
+		if (!isRunning) {
+			throw new Error("PathCreator wasn't running. Start PathCreator before stopping it again.");
 		}
+		
+
 		try {
 			CompletableFuture.allOf(runningTasks);
 		} catch (Exception e) {
 			System.out.println("Threadpool in PathCreator failed to shutdown the threads in an orderly manner.\n" + e.getMessage());
 		}
+		for (AStar aStar : aStars) {
+			aStar.stop();
+		}
 		removeGoalFrame();
 		isRunning = false;
 	}
 	
-	public HashMap<Long, SpeedNode> getSpeedNodes() {
+	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodes() {
 		return aStars[aStars.length-1].getSpeedNodes();
 	}
 	

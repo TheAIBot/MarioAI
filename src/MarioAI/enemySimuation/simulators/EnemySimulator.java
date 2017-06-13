@@ -10,20 +10,20 @@ public abstract class EnemySimulator {
     protected float y;
     protected float xa;
     protected float ya;
-    protected final int widthInPixels;
-    protected final int heightInPixels;
+    protected final int width;
+    protected final int height;
     protected final int kind;
     private final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
-    protected int positionsIndexOffset = 0;
-    private final Object createPositionsLock = new Object();
 	
-    public EnemySimulator(int kind, int widthInPixels, int heightInPixels) {
+    public EnemySimulator(int kind, int width, int height) {
     	this.kind = kind;
-    	this.widthInPixels = widthInPixels;
-    	this.heightInPixels = heightInPixels;
+    	this.width = width;
+    	this.height = height;
     }
     
     protected abstract void move();
+    
+    public abstract boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight);
     
     public abstract EnemySimulator copy();
 	
@@ -32,14 +32,12 @@ public abstract class EnemySimulator {
     }
 
     public void moveTimeForward() {
-    	positionsIndexOffset++;
-    }
-    
-    public void moveTimeBackwards() {
-    	if (positionsIndexOffset == 0) {
-			throw new Error("positionsIndexOffset can't be less than 0");
+    	if (positionAtTime.size() > 0) {
+			positionAtTime.remove(0);
 		}
-    	positionsIndexOffset--;
+    	else {
+    		move();
+    	}
     }
     
     public void moveEnemy() {
@@ -59,22 +57,26 @@ public abstract class EnemySimulator {
     	return getPositionAtTime(0);
     }
     
-    public Point2D.Float getPositionAtTime(int time) {
-    	if (positionAtTime.size() - positionsIndexOffset <= time) {
-			synchronized (createPositionsLock) {
-		    	while (positionAtTime.size() - positionsIndexOffset <= time) {
+    public synchronized Point2D.Float getPositionAtTime(int time) {
+    	if (positionAtTime.size() <= time) {
+			//synchronized (createPositionsLock) {
+		    	while (positionAtTime.size() <= time) {
 		    		moveEnemy();
 				}
-			}
+			//}
 		}
-    	return positionAtTime.get(time + positionsIndexOffset);
+    	return positionAtTime.get(time);
     }
     
-    public int getWidthInPixels() {
-    	return widthInPixels;
+    public float getWidth() {
+    	return width;
     }
     
-    public int getHeightInPixels() {
-    	return heightInPixels;
+    public float getHeight() {
+    	return height;
+    }
+    
+    public void insertPosition(float x, float y) {
+    	positionAtTime.add(new Point2D.Float(x, y));
     }
 }
