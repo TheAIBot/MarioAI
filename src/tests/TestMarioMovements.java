@@ -526,7 +526,8 @@ public class TestMarioMovements {
 		float yOffset = 0;
 		agent.action = marioControls.getActions();
 		TestTools.runOneTick(observation);
-		for (int z = 0; z < path.size(); z++) {	
+		final int pathSize = path.size();
+		for (int z = 0; z < pathSize; z++) {	
 			final DirectedEdge edge = path.get(0);
 			final MovementInformation moveInfo = edge.getMoveInfo();
 			for (int i = 0; i < moveInfo.getMoveTime(); i++) {				
@@ -579,7 +580,7 @@ public class TestMarioMovements {
 			posX += edge.getMoveInfo().getXMovementDistance();
 			
 			final float diffX = Math.abs(posX - (edge.target.x - startX));
-			if (diffX > MarioControls.MAX_X_VELOCITY) {
+			if (diffX > MarioControls.MAX_X_VELOCITY / 2) {
 				Assert.fail("MovementInformation wasn't close enough to the target node position." + 
 							"\npathEndX: " + posX + 
 							"\ntargetNodeX: " + (edge.target.x - startX));

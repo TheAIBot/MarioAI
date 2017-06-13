@@ -6,6 +6,8 @@ import java.util.List;
 
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.graph.edges.FallEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
@@ -62,9 +64,12 @@ public class MarioControls {
 		oldX = marioXPos;
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping) {
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved, float[] xPositions) {
 		if (edge instanceof RunningEdge) {
 			return true;
+		}
+		if (edge instanceof FallEdge) {
+			return false;
 		}
 		final float distanceToMove = edge.target.x - currentXPos;
 		
@@ -77,21 +82,15 @@ public class MarioControls {
 			    speed == 0)) {
 			return false;
 		}
-		float distanceMoved = 0;
-		speed = Math.abs(speed);
-		for (int i = 0; i < ticksJumping; i++) {
-			speed = getNextTickSpeed(speed, edge.useSuperSpeed);
-			distanceMoved += speed;
+		
+		final float jumpLength = xPositions[ticksJumping - 1];
+		
+		if (jumpLength + (MAX_X_VELOCITY / 2) < edge.target.x - edge.source.x) {
+			return false;
 		}
 		
-		//add half speed because not completely reaching the node is also accepted
-		return (distanceMoved + (MAX_X_VELOCITY / 2) >= Math.abs(distanceToMove));
+		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
 	}
-	
-	public static boolean canMarioUseJumpEdge(DirectedEdge edge, float correctXPos) {
-		return Math.abs(edge.target.x - correctXPos) < MAX_X_VELOCITY / 2;
-	}
-		
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
 			final DirectedEdge next = path.get(0);
@@ -150,12 +149,10 @@ public class MarioControls {
 	}
 	
 	public static MovementInformation getEdgeMovementInformation(DirectedEdge edge, float speed, float xPos) {
-		MovementInformation movementInformation = getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
-		//if (movementInformation.hasCollisions(edge)) {
-		//	//Curses!
-		//	return movementInformation;
-		//}
-		return movementInformation;
+		if (edge.source.x == edge.target.x) {
+			System.out.println();
+		}
+		return getMovementInformationFromEdge(xPos, edge.source.y, edge.target, edge, speed);
 	}
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, Node endNode, DirectedEdge edge, float speed) {
@@ -170,8 +167,7 @@ public class MarioControls {
 	
 	private static MovementInformation getMovementInformationFromEdge(float startX, float startY, float endX, float speed, YMovementInformation jumpInfo, boolean useSuperSpeed) {
 		final XMovementInformation xMovementInfo = getXMovementTime(endX - startX, speed, jumpInfo.totalTicksJumped, useSuperSpeed);
-		MovementInformation movementInformation = new MovementInformation(xMovementInfo, jumpInfo);
-		return movementInformation;
+		return new MovementInformation(xMovementInfo, jumpInfo);
 	}
 	
 	private static int getIndexForYMovement(int jumpHeight, int jumpHeightDifference) {
@@ -257,6 +253,7 @@ public class MarioControls {
 		//These calculations are independent of the direction
 		//The direction of the movement is added at the end of this method
 		final float neededXDistance = Math.abs(originalNeededXDistance);
+		boolean moveInLastMovemet = true;
 		
 		//move mario until the distance between the neededXDistnce
 		//and distance moved is within an accepted deviation.
@@ -265,8 +262,16 @@ public class MarioControls {
 			final float futureSpeed = getNextTickSpeed(speed, useSuperSpeed);
 			final float futureDistanceMoved = distanceMoved + futureSpeed;
 			
+			float lastMovementDistance = 0;
+			if (airTime > 0) {
+				float speedAfterDrifting = (float) Math.pow(0.89f, airTime - ticksAccelerating - 1) * futureSpeed;
+				speedAfterDrifting = Math.abs(speedAfterDrifting) < MIN_MARIO_SPEED ? 0 : speedAfterDrifting;
+				lastMovementDistance = getNextTickSpeed(speedAfterDrifting, useSuperSpeed);
+			}
+			
 			final float oldDistanceToTarget = distanceToTarget;
-			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating));
+			distanceToTarget = neededXDistance - (futureDistanceMoved + getDriftingDistance(futureSpeed, airTime - ticksAccelerating - 1));
+			distanceToTarget -= lastMovementDistance;
 			
 			if (Math.abs(distanceToTarget) > Math.abs(oldDistanceToTarget) && Math.abs(oldDistanceToTarget) < MAX_X_VELOCITY / 2) {
 				break;
@@ -276,6 +281,10 @@ public class MarioControls {
 			distanceMoved = futureDistanceMoved;
 			ticksAccelerating++;
 			
+			if (distanceToTarget < -(MAX_X_VELOCITY / 2)) {
+				moveInLastMovemet = false;
+				break;
+			}			
 		}
 		
 		final int ticksDrifting = Math.max(0, airTime - ticksAccelerating);
@@ -291,12 +300,12 @@ public class MarioControls {
 			speed = Math.abs(startSpeed);
 		}
 		
-		float tdistanceMoved = 0;
+		distanceMoved = 0;
 		for (int i = 0; i < ticksAccelerating; i++) {
 			pressButton[i] = true;
 			speed = getNextTickSpeed(speed, useSuperSpeed);
-			tdistanceMoved += speed;
-			xPositions[i] = tdistanceMoved;
+			distanceMoved += speed;
+			xPositions[i] = distanceMoved;
 		}
 		
 		if (airTime > 0) {
@@ -308,16 +317,21 @@ public class MarioControls {
 			//which should be on ground
 			//this allows two jumping edges
 			//after each other.
-			speed = getNextTickSpeed(speed, useSuperSpeed);
-			distanceMoved += speed;
-			xPositions[xPositions.length - 1] = distanceMoved;
-			pressButton[pressButton.length - 1] = true;
+			if (moveInLastMovemet) {
+				speed = getNextTickSpeed(speed, useSuperSpeed);
+				distanceMoved += speed;
+				xPositions[xPositions.length - 1] = distanceMoved;
+				pressButton[pressButton.length - 1] = true;	
+			}
+			else {
+				speed = getNextDriftingSpeed(speed);
+				distanceMoved += speed;
+				xPositions[xPositions.length - 1] = distanceMoved;
+				pressButton[pressButton.length - 1] = false;
+			}
 			
 			//already accounted for when totalTicks is created
 			//totalTicks++;
-		}
-		if (totalTicks == 0) {
-			System.out.println();
 		}
 		
 		//if distance is negative then put sign back on values as it was lost before and
@@ -329,7 +343,7 @@ public class MarioControls {
 				xPositions[i] = -xPositions[i];
 			}
 		}
-
+		
 		return new XMovementInformation(distanceMoved, speed, totalTicks, xPositions, pressButton, useSuperSpeed);
 	}
 	
@@ -386,12 +400,6 @@ public class MarioControls {
 		return currentXSpeed;
 	}
 
-	public static boolean canMarioUseFallEdge(DirectedEdge ancestorEdge, float xPos) {
-		// Not currently
-		//TODO make method
-		return false;
-	}
-	
 	public boolean[] getActions() {
 		return actions;
 	}

@@ -11,20 +11,20 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 8;
+	private static final float MAX_JUMP_RANGE = 4;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
 	public static final boolean ALLOW_RUNNING = true;
 	public static final boolean ALLOW_JUMPING = true;
-	public static final boolean ALLOW_SPEED_KEY = false;
+	public static final boolean ALLOW_SPEED_KEY = true;
 	private Node[][] observationGraph;
 
 	public void setMovementEdges(World world, Node marioNode) {
 		observationGraph = world.getLevelMatrix();
 
 		// First connects all the edges for Mario:
-		setMovementEdgesForMario(world, marioNode);
+		setMovementEdgesForMario(world, marioNode, marioNode.x);
 
 		// Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) {
@@ -39,9 +39,10 @@ public class EdgeCreator {
 
 	}
 	
-	public void setMovementEdgesForMario(World world, Node marioNode) {
+	public void setMovementEdgesForMario(World world, Node marioNode, float marioXPos) {
 		if (isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) && canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
-			connectNode(marioNode, GRID_WIDTH / 2, marioNode);
+			int extraValue = (marioNode.x - ((int) marioXPos));
+			connectNode(marioNode, GRID_WIDTH / 2 + extraValue, marioNode);
 		}
 	}
 
@@ -54,6 +55,9 @@ public class EdgeCreator {
 					canMarioStandThere(connectingEdge.target, marioNode) && // The edge must not go into for example a wall.
 					connectingEdge.source.hashCode() != connectingEdge.target.hashCode()) { // No movement to the same node. Notice that no equals method are needed.
 				// TODO (*) Maybe allow above.
+				if (connectingEdge.source.x == connectingEdge.target.x && connectingEdge.source.y != connectingEdge.target.y) {
+					continue;
+				}
 				node.addEdge(connectingEdge);
 			}
 		}
