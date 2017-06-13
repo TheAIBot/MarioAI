@@ -1,8 +1,7 @@
 package MarioAI.graph.edges.edgeCreation;
 
-import java.util.*;
-
-import com.sun.javafx.scene.traversal.Direction;
+import java.util.ArrayList;
+import java.util.List;
 
 import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
@@ -21,7 +20,7 @@ public class EdgeCreator {
 	//it is taken as 1.8.
 	public static final float MARIO_HEIGHT = (float) 1.8; 
 	public static final boolean ALLOW_RUNNING = true;
-	public static final boolean ALLOW_JUMPING = true;
+	public static final boolean ALLOW_JUMPING = false;
 	public static final boolean ALLOW_SPEED_KEY = false;
 	private Node[][] observationGraph;
 
@@ -29,6 +28,7 @@ public class EdgeCreator {
 		observationGraph = world.getLevelMatrix();
 		// First connects all the edges for Mario:
 		setMovementEdgesForMario(world, marioNode, marioNode.x);
+		
 		// Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) { 
 			for (int j = 0; j < observationGraph[i].length; j++) {
@@ -59,6 +59,9 @@ public class EdgeCreator {
 					canMarioStandThere(connectingEdge.target, marioNode) && // The edge must not go into for example a wall.
 					connectingEdge.source.hashCode() != connectingEdge.target.hashCode()) { // No movement to the same node. Notice that no equals method are needed.
 				// TODO (*) Maybe allow above.
+				if (connectingEdge.source.x == connectingEdge.target.x && connectingEdge.source.y != connectingEdge.target.y) {
+					continue;
+				}
 				node.addEdge(connectingEdge);
 			}  
 		}
@@ -667,6 +670,7 @@ public class EdgeCreator {
 				throw new Error("Logic error on corner collision detection");
 				//return Collision.HIT_WALL;
 				//TODO i don't think this should be possible:
+				//TODO remove throw error.
 			}
 		} else {
 			return Collision.HIT_NOTHING;

@@ -63,7 +63,7 @@ public class MarioControls {
 		oldX = marioXPos;
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved) {
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved, float[] xPositions) {
 		if (edge instanceof RunningEdge) {
 			return true;
 		}
@@ -79,6 +79,12 @@ public class MarioControls {
 		if (!( (distanceToMove < 0 && speed < 0) ||
 			   (distanceToMove > 0 && speed > 0) ||
 			    speed == 0)) {
+			return false;
+		}
+		
+		final float jumpLength = xPositions[ticksJumping - 1];
+		
+		if (jumpLength + (MAX_X_VELOCITY / 2) < edge.target.x - edge.source.x) {
 			return false;
 		}
 		
@@ -322,9 +328,6 @@ public class MarioControls {
 			
 			//already accounted for when totalTicks is created
 			//totalTicks++;
-		}
-		if (Math.abs(xPositions[xPositions.length - 1]) > Math.abs(originalNeededXDistance) + 0.5f) {
-			System.out.println();
 		}
 		
 		//if distance is negative then put sign back on values as it was lost before and

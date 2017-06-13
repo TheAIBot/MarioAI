@@ -74,11 +74,8 @@ class AStar {
 	 */
 	private void runAStar(final StateNode start, final StateNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
 		System.out.println("Start");
-		while (!openSet.isEmpty() && keepRunning) {
-			System.out.println("\n" + openSet.toString());
+		while (!openSet.isEmpty() && keepRunning) {			
 			final StateNode currentState = openSet.remove();
-			System.out.println("Chosen: " + currentState.toString());
-			System.out.println();
 			openSetMap.remove(currentState.hash);
 			
 			// If goal is reached return solution path.
@@ -93,14 +90,9 @@ class AStar {
 				currentBestPathEnd = currentState;
 			}
 			
-			//System.out.println("Current node:");
-			//System.out.println(current.node + "\nSpeed: " + current.vx + "\nFrom: " + current.ancestorEdge);
-			//System.out.println("Current node edges:");
-			//System.out.println(current.node.edges + "\n");
 			// Current node has been explored.
 			final long endHash = Hasher.hashEndStateNode(currentState, hashGranularity);
 			closedSet.add(endHash);
-			//System.out.println(openSet.size()); //Used to check how AStar performs.
 			
 			
 			
@@ -122,8 +114,11 @@ class AStar {
 				//If a similar enough node exists and that has a better g score
 				//then there is no need to add this edge as it's worse than the
 				//current one
-				if (openSetMap.containsKey(nextEndHash) &&
-					 tentativeGScore >= openSetMap.get(nextEndHash).gScore) {
+				final StateNode contester = openSetMap.get(nextEndHash);
+				if (contester != null &&
+					tentativeGScore + neighborEdge.getWeight()
+					>= contester.gScore + contester.ancestorEdge.getWeight()
+					) {
 					continue;
 				}
 				

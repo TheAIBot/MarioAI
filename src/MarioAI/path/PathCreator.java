@@ -25,10 +25,12 @@ import ch.idsia.mario.environments.Environment;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int MAX_HASH_GRANULARITY = 48;
+	private static final int[] HASH_GRANULARITY = new int[] {2, MAX_HASH_GRANULARITY, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
+	private final AStar singleThreadAstar;
 	private AStarPath bestPath = null;
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -54,6 +56,8 @@ public class PathCreator {
 		}
 		
 		Arrays.sort(aStars, (AStar a, AStar b) -> a.hashGranularity - b.hashGranularity);
+		
+		singleThreadAstar = new AStar(MAX_HASH_GRANULARITY);
 	}
 	
 	public void initialize(Environment observation) {
@@ -146,14 +150,12 @@ public class PathCreator {
 		final StateNode startSpeedNode = new StateNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, enemyPredictor.getCurrentLivingEnemies(), Mario.lives);
 		final StateNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
-		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
-		aStars[aStars.length - 1].stop();
+		singleThreadAstar.initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
+		singleThreadAstar.stop();
 		
 		removeGoalFrame();
 		
-		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
-		
-		
+		final AStarPath path = singleThreadAstar.getCurrentBestPath();
 		
 		if (shouldUpdateToNewPath(path, newEnemiesSpawned)) {
 			path.usePath();
@@ -201,9 +203,6 @@ public class PathCreator {
 			bestPath.isBestPath &&
 			bestPath.path.size() > 1) {
 			return false;
-		}
-		if (!newPotentialPath.isBestPath) {
-			System.out.println("Not best path");
 		}
 		
 		return true;

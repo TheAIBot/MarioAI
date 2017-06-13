@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import MarioAI.FastAndFurious;
-import MarioAI.enemySimuation.EnemyType;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
@@ -18,24 +17,23 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
 			//((UnitTestAgent) controller).action[0] = true;
 			//Agent controller = new HumanKeyboardAgent();
-			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("showcaseLevel.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//TestTools.spawnEnemy(observation, 5, 9, 1, EnemyType.GOOMBA);
 			//TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
-			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
 			//TODO bug i collision detection for level = thinStairs.
-			//TestTools.setMarioPosition(observation, 15, 10);
+			TestTools.setMarioPosition(observation, 7, 6);
 			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
 	        if (new File(FastAndFurious.saveStateFileName).exists()) {
@@ -79,14 +77,9 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1985638138);
-	        //options.setLevelRandSeed(1524448900);
-	        //options.setLevelRandSeed(493269332);
-	        //options.setLevelRandSeed(362336148);
-	        //options.setLevelRandSeed(1182521566); //Seed hvor han hopper ind i en fjende, pga. han laver for langt hop. Saet restriktion.
-	        //options.setLevelRandSeed(1179126435); //Gaar ret dårligt på der her seed.
-	        //options.setLevelRandSeed(1975381315);
-	        //options.setLevelRandSeed(238114835);
+	        options.setLevelRandSeed(1985638138);	//collision errors
+	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
+	        //options.setLevelRandSeed(324150513); //the best seed ever 2
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        //options.setLevelRandSeed(632962519); //Without speed enabled, he will act quite strange.
 	        //options.setLevelRandSeed(860788790);
@@ -122,7 +115,7 @@ public class Play {
 	        //options.setLevelDifficulty(2);
 	        options.setLevelDifficulty(-1);	 
 	        task.setOptions(options);
-	        
+	        	 
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);
 		}
 	}
