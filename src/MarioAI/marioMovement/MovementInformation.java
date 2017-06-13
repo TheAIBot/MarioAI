@@ -176,8 +176,7 @@ public class MovementInformation{
 		float previousPositionY = 0;
 		final float lastY = positionsY[positionsY.length - 1];
 		for (int i = 0; i < positionsX.length; i++) {
-			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY,
-					startX, startY, lastY)) {
+			if (world.isColliding(positionsX[i], positionsY[i], previousPositionX, previousPositionY, startX, startY, lastY)) {
 				return true;
 			}
 			previousPositionX = positionsX[i];
