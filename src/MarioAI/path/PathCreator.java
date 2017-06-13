@@ -195,9 +195,6 @@ public class PathCreator {
 			bestPath.path.size() > 1) {
 			return false;
 		}
-		if (!newPotentialPath.isBestPath) {
-			System.out.println("Not best path");
-		}
 		
 		return true;
 	}

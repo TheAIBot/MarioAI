@@ -24,7 +24,7 @@ public class EdgeCreator {
 		observationGraph = world.getLevelMatrix();
 
 		// First connects all the edges for Mario:
-		setMovementEdgesForMario(world, marioNode);
+		setMovementEdgesForMario(world, marioNode, marioNode.x);
 
 		// Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) {
@@ -39,9 +39,10 @@ public class EdgeCreator {
 
 	}
 	
-	public void setMovementEdgesForMario(World world, Node marioNode) {
+	public void setMovementEdgesForMario(World world, Node marioNode, float marioXPos) {
 		if (isOnLevelMatrix(GRID_WIDTH / 2, marioNode.y) && canMarioStandThere(GRID_WIDTH / 2, marioNode.y)) {
-			connectNode(marioNode, GRID_WIDTH / 2, marioNode);
+			int extraValue = (marioNode.x - ((int) marioXPos));
+			connectNode(marioNode, GRID_WIDTH / 2 + extraValue, marioNode);
 		}
 	}
 
@@ -54,6 +55,9 @@ public class EdgeCreator {
 					canMarioStandThere(connectingEdge.target, marioNode) && // The edge must not go into for example a wall.
 					connectingEdge.source.hashCode() != connectingEdge.target.hashCode()) { // No movement to the same node. Notice that no equals method are needed.
 				// TODO (*) Maybe allow above.
+				if (connectingEdge.source.x == connectingEdge.target.x && connectingEdge.source.y != connectingEdge.target.y) {
+					continue;
+				}
 				node.addEdge(connectingEdge);
 			}
 		}
