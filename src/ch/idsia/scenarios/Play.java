@@ -76,7 +76,7 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1985638138);
+	        //options.setLevelRandSeed(1985638138);	//collision errors
 	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
 	        //options.setLevelRandSeed(324150513); //the best seed ever 2
 	        //options.setLevelRandSeed(898452612); //Difficulty 1

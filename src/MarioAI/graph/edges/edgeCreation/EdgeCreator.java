@@ -11,7 +11,7 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 8;
+	private static final float MAX_JUMP_RANGE = 4;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
@@ -87,7 +87,7 @@ public class EdgeCreator {
 		}
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
 			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
 			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
