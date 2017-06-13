@@ -17,11 +17,7 @@ import org.junit.runners.MethodSorters;
 
 import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
-<<<<<<< HEAD
-=======
-import MarioAI.graph.edges.EdgeCreator;
 import MarioAI.graph.edges.FallEdge;
->>>>>>> CollisionMarioEngine
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.edgeCreation.Collision;
@@ -1129,6 +1125,11 @@ public class TestGrapher {
 	
 	@Test
 	public void testHittingStuffDownwards(){
+		fail("Make the test.");
+	}
+
+	@Test
+	public void testFoundAllEdges(){
 		fail("Make the test.");
 	}
 	
