@@ -39,7 +39,8 @@ public class testMassLevels {
 			
 			
 			try {
-				for (int x = 0; x < 4000; x++) {
+				final int MAX_TICKS_TO_WIN_LEVEL = 1700;
+				for (int x = 0; x < MAX_TICKS_TO_WIN_LEVEL; x++) {
 					final int status = TestTools.runOneTick(observation);
 
 					if (status != Mario.STATUS_RUNNING) {
