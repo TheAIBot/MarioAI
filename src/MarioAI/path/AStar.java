@@ -62,8 +62,10 @@ class AStar {
 	 * @param goal
 	 * @return
 	 */
-	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {		
-		while (!openSet.isEmpty() && keepRunning) {
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {	
+		final long startMiliseconds = System.currentTimeMillis();
+		final long MAX_TIME_IN_ASTAR = 25;
+		while (!openSet.isEmpty() && keepRunning && startMiliseconds + MAX_TIME_IN_ASTAR < System.currentTimeMillis()) {
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
