@@ -551,7 +551,7 @@ public class TestCollisionDetector {
 			verifyCollision("collisionWithEdge.lvl", path, world);
 		}
 	}
-	
+	@Test
 	public void testCollisionWithWallRightSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
