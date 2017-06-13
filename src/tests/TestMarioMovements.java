@@ -392,35 +392,34 @@ public class TestMarioMovements {
 	
 	@Test
 	public void testXWidthJumpNoAstarSlow() {
-		testJumpNoAstar(1, 2, false, false);
-		testJumpNoAstar(1, 3, false, false);
-		testJumpNoAstar(1, 4, false, false);
-		testJumpNoAstar(2, 3, false, false);
-		testJumpNoAstar(2, 4, false, false);
+		testJumpNoAstar(1, 2, 20, false, false);
+		testJumpNoAstar(1, 3, 20, false, false);
+		testJumpNoAstar(1, 4, 20, false, false);
+		testJumpNoAstar(2, 3, 20, false, false);
+		testJumpNoAstar(2, 4, 20, false, false);
 	}
 	@Test
 	public void testXWidthJumpNoAstarFast() {
-		testJumpNoAstar(1, 2, true, false);
-		testJumpNoAstar(1, 3, true, false);
-		testJumpNoAstar(1, 4, true, false);
-		testJumpNoAstar(2, 3, true, false);
-		testJumpNoAstar(2, 4, true, false);
+		testJumpNoAstar(1, 2, 20, true, false);
+		testJumpNoAstar(1, 3, 20, true, false);
+		testJumpNoAstar(1, 4, 20, true, false);
+		testJumpNoAstar(2, 3, 20, true, false);
+		testJumpNoAstar(2, 4, 20, true, false);
 	}
 	@Test
 	public void testXWidthJumpNoAstarMixed() {
-		testJumpNoAstar(1, 2, false, true);
-		testJumpNoAstar(1, 3, false, true);
-		testJumpNoAstar(1, 4, false, true);
-		testJumpNoAstar(2, 3, false, true);
-		testJumpNoAstar(2, 4, false, true);
-		testJumpNoAstar(1, 2, true , true);
-		testJumpNoAstar(1, 3, true , true);
-		testJumpNoAstar(1, 4, true , true);
-		testJumpNoAstar(2, 3, true , true);
-		testJumpNoAstar(2, 4, true , true);
+		testJumpNoAstar(1, 2, 20, false, true);
+		testJumpNoAstar(1, 3, 20, false, true);
+		testJumpNoAstar(1, 4, 20, false, true);
+		testJumpNoAstar(2, 3, 20, false, true);
+		testJumpNoAstar(2, 4, 20, false, true);
+		testJumpNoAstar(1, 2, 20, true , true);
+		testJumpNoAstar(1, 3, 20, true , true);
+		testJumpNoAstar(1, 4, 20, true , true);
+		testJumpNoAstar(2, 3, 20, true , true);
+		testJumpNoAstar(2, 4, 20, true , true);
 	}
-	private void testJumpNoAstar(int distanceX, int jumpHeight, boolean useSuperSpeed, boolean mixed) {
-		final int pathLength = 30;
+	private void testJumpNoAstar(int distanceX, int jumpHeight, int pathLength, boolean useSuperSpeed, boolean mixed) {
 		final boolean[] useSuperSpeeds = new boolean[pathLength];
 		for (int i = 0; i < useSuperSpeeds.length; i++) {
 			if (mixed) {
