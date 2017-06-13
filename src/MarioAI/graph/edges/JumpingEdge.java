@@ -99,7 +99,7 @@ public class JumpingEdge extends DirectedEdge {
 	}
 
 	private void setTopPoint() {
-		float x = ((-b / a) / 2);
+		float x = ((-b / a) / 2); //Maths
 		float y = f(x);
 		setTopPoint(x, y);
 	}
@@ -121,7 +121,7 @@ public class JumpingEdge extends DirectedEdge {
 	}
 
 	public float getWeight() {
-		return 0.1f;
+		return 2.1f;
 	}
 	
 	@Override

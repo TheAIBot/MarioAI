@@ -103,7 +103,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
-		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
+		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
 			return false;
 		}
 		
@@ -120,7 +120,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 			//Make sure the edge is possible to use
 			//all Running edges are possible
 			//not all jumps are possible
-			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
+			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
 				return false;
 			}
 			

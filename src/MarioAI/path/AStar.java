@@ -105,7 +105,9 @@ class AStar {
 				//current one
 				final SpeedNode contester = openSetMap.get(snEndHash);
 				if (contester != null &&
-					tentativeGScore >= contester.gScore) {
+					tentativeGScore + neighborEdge.getWeight()
+					>= contester.gScore + contester.ancestorEdge.getWeight()
+					) {
 					continue;
 				}
 				

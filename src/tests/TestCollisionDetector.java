@@ -410,6 +410,7 @@ public class TestCollisionDetector {
 			}
 		}
 	}
+	
 	private void testJumpRight(int jumpLength, int jumpHeight, boolean useSuperSpeed) {
 		final UnitTestAgent agent = new UnitTestAgent();
 		final Environment observation = TestTools.loadLevel("testCollisionDetector/jumpDown-" + jumpHeight + ".lvl", agent, false);
