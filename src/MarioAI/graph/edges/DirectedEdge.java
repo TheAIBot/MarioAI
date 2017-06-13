@@ -1,16 +1,46 @@
 package MarioAI.graph.edges;
 
-import MarioAI.Hasher;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MovementInformation;
 
 public abstract class DirectedEdge {
 	public final Node source; 
 	public final Node target;
+	public final boolean useSuperSpeed;
 	protected int hash;
+	private MovementInformation moveInfo;
 	
-	public DirectedEdge(Node source, Node target) {
+	public DirectedEdge(Node source, Node target, boolean useSuperSpeed) {
 		this.source = source;
 		this.target = target;
+		this.useSuperSpeed = useSuperSpeed;
+	}
+	
+	public abstract float getMaxY();
+	
+	public abstract float getWeight();
+	
+	protected abstract byte getExtraEdgeHashcode();
+		
+	@Override
+	public boolean equals(Object b) {
+		if (b == null) {
+			return false;
+		}
+		if (b instanceof DirectedEdge) {
+			final DirectedEdge bb = (DirectedEdge) b;
+			return bb.hashCode() == hashCode();
+		} else {
+			return false;
+		}
+	}
+		
+	public void setMoveInfo(MovementInformation moveInfo) {
+		this.moveInfo = moveInfo;
+	}
+	
+	public MovementInformation getMoveInfo() {
+		return moveInfo;
 	}
 	
 	@Override
@@ -19,37 +49,10 @@ public abstract class DirectedEdge {
 	}
 	
 	@Override
-	public boolean equals(Object b) {
-		if (b == null) {
-			return false;
-		}
-		if (b instanceof DirectedEdge) {
-			DirectedEdge bb = (DirectedEdge) b;
-			return bb.hashCode() == hashCode();
-		} else {
-			return false;
-		}
-	}
-	
-	public abstract float getMaxY();
-	
-	public abstract float getWeight();
-	
-	@Override
 	public String toString() {
-		return "[" + source.x + " : " + source.y + "]" + " --> " + "[" + target.x + " : " + target.y + "]" + " H: " + getMaxY();
+		return "[" + source.x + " : " + source.y + "]" + 
+				   " --> " + 
+	          "[" + target.x + " : " + target.y + "]" +
+				 " H: " + Math.round(getMaxY()) + "\n";
 	}
-	
-	/**
-	 * TODO Change assumption of not accelerating during traversal
-	 * @param initial velocity v0
-	 * @return the time it takes to traverse the edge given an intial velocity
-	 */
-	public abstract float getTraversedTime(float v0);
-	
-	public abstract float getSpeedAfterTraversal(float v0);
-
-	protected abstract int getExtraEdgeHashcode();
-	
-	
 }

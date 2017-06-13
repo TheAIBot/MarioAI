@@ -23,9 +23,6 @@ import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.GameViewer;
 import ch.idsia.tools.tcp.ServerAgent;
 import MarioAI.debugGraphics.DebugDrawing;
-import MarioAI.debugGraphics.DebugLines;
-import MarioAI.debugGraphics.DebugPoints;
-import MarioAI.graph.Grapher;
 
 public class MarioComponent extends JComponent implements Runnable, /* KeyListener, */ FocusListener, Environment {
 	private static final long serialVersionUID = 790878775993203817L;
@@ -43,6 +40,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 	private int ZLevelEnemies = 1;
 	private int ZLevelScene = 1;
+	private Graphics debugRenderGraphics = null;
+	private VolatileImage debugRenderImage = null;
 
 	public void setGameViewer(GameViewer gameViewer) {
 		this.gameViewer = gameViewer;
@@ -125,15 +124,17 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 	public int runOneTick() {
 		running = true;
 		adjustFPS();
-		EvaluationInfo evaluationInfo = new EvaluationInfo();
+		//EvaluationInfo evaluationInfo = new EvaluationInfo();
 
-		VolatileImage image = null;
 		Graphics g = null;
 		Graphics og = null;
 		if (GlobalOptions.VisualizationOn) {
-			image = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			if (debugRenderImage == null) {
+				debugRenderImage = createVolatileImage(320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);	
+			}
 			g = getGraphics();
-			og = image.getGraphics();	
+			og = debugRenderImage.getGraphics();
+			debugRenderGraphics = og;
 		}
 
 		addFocusListener(this);
@@ -144,7 +145,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		int marioStatus = Mario.STATUS_RUNNING;
 
 		mario = ((LevelScene) scene).mario;
-		int totalActionsPerfomed = 0;
+		//int totalActionsPerfomed = 0;
 		// TODO: Manage better place for this:
 		Mario.resetCoins();
 
@@ -161,17 +162,8 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			((LevelScene)scene).renderDebugDrawings(og, debugDrawingsToDraw);
 		}
 
-		boolean[] action = agent.getAction(this/* DummyEnvironment */);
-		if (action != null) {
-			for (int i = 0; i < Environment.numberOfButtons; ++i)
-				if (action[i]) {
-					++totalActionsPerfomed;
-					break;
-				}
-		} else {
-			System.err.println("Null Action received. Skipping simulation...");
-			stop();
-		}
+		
+		final boolean[] action = agent.getAction(this);
 
 		// Apply action;
 		// scene.keys = action;
@@ -208,7 +200,7 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 			LevelScene.drawStringDropShadow(og, "Trial:", 33, 4, 7);
 			LevelScene.drawStringDropShadow(og, msg, 33, 5, 7);
 
-			g.drawImage(image, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+			g.drawImage(debugRenderImage, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
 			/*
 			if (width != 320 || height != 240) {
 				g.drawImage(image, 0, 0, 640 * 2, 480 * 2, null);
@@ -225,6 +217,15 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 		// Advance the frame
 		frame++;
 		return mario.getStatus();
+	}
+	
+	public void render() {
+		if (debugRenderGraphics != null) {
+			debugRenderGraphics.fillRect(0 * Art.SIZE_MULTIPLIER, 0 * Art.SIZE_MULTIPLIER, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER);
+			scene.render(debugRenderGraphics, 0);
+			((LevelScene)scene).renderDebugDrawings(debugRenderGraphics, debugDrawingsToDraw);	
+			getGraphics().drawImage(debugRenderImage, 0, 0, 320 * Art.SIZE_MULTIPLIER, 240 * Art.SIZE_MULTIPLIER, null);
+		}
 	}
 
 	public EvaluationInfo run1(int currentTrial, int totalNumberOfTrials) {
@@ -577,5 +578,37 @@ public class MarioComponent extends JComponent implements Runnable, /* KeyListen
 
 	public int getMarioMode() {
 		return mario.getMode();
+	}
+	
+	public LevelScene getLevelScene() {
+		return (LevelScene)scene;
+	}
+	
+	public void setMarioPosition(int x, int y) {
+		mario.setPosition(x, y);
+	}
+	
+	public void setMarioXPosition(int x) {
+		mario.setXPosition(x);
+	}
+	
+	public void setMarioPixelPosition(int x, int y) {
+		mario.setPixelPosition(x, y);
+	}
+	
+	public void setMarioXPixelPosition(int x) {
+		mario.setXPixelPosition(x);
+	}
+	
+	public void resetMarioSpeed() {
+		mario.resetSpeed();
+	}
+	
+	public int getMarioInvulnerableTime() {
+		return mario.getInvulnerableTime();
+	}
+	
+	public void resetMarioHealth() {
+		mario.resetMarioHealth();
 	}
 }

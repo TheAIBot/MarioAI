@@ -4,12 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.MarioMethods;
-import MarioAI.graph.Graph;
+import MarioAI.World;
 import MarioAI.graph.nodes.Node;
-import ch.idsia.ai.agents.Agent;
-import ch.idsia.ai.agents.ai.BasicAIAgent;
-import ch.idsia.ai.agents.ai.ForwardAgent;
-import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 public class GraphTests {
@@ -17,11 +13,11 @@ public class GraphTests {
 	@Test
 	public void testLevelMatrixCreation()
 	{
-		BasicAIAgent agent = new BasicAIAgent("");
+		UnitTestAgent agent = new UnitTestAgent();
 		Environment observation = TestTools.loadLevel("flat.lvl", agent);
 		
-		Graph graph = new Graph();
-		graph.createStartGraph(observation);
+		World graph = new World();
+		graph.initialize(observation);
 		
 		final byte[][] levelMap = TestTools.getLevelMap(observation);
 		final Node[][] nodeMap = graph.getLevelMatrix();

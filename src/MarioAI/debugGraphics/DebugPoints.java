@@ -5,7 +5,9 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 
-public class DebugPoints extends DebugDrawing {
+import ch.idsia.mario.engine.Art;
+
+class DebugPoints extends DebugDrawing {
 	private final Color color;
 	private final ArrayList<Point> points; 
 	private final int size;
@@ -33,8 +35,9 @@ public class DebugPoints extends DebugDrawing {
 	
 	private void drawPoints(Graphics g) {
 		for (int i = 0; i < points.size(); i++) {
-			Point start = points.get(i);
-			g.fillOval(start.x - (size / 2), start.y - (size / 2), size, size);
+			final Point start = points.get(i);
+			final int correctedSize = size * Art.SIZE_MULTIPLIER;
+			g.fillOval(start.x - (correctedSize / 2), start.y - (correctedSize / 2), correctedSize, correctedSize);
 		}
 	}
 }

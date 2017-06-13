@@ -1,13 +1,12 @@
 package MarioAI.debugGraphics;
 
-import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Stroke;
 
-public class DebugString extends DebugDrawing {
+import ch.idsia.mario.engine.Art;
+
+class DebugString extends DebugDrawing {
 	private final String text;
 	private final Point position;
 	
@@ -19,7 +18,7 @@ public class DebugString extends DebugDrawing {
 	@Override
 	public void draw(Graphics g) {
 		final Font font = g.getFont();
-		g.setFont(new Font(font.getFontName(), Font.BOLD, 24));
+		g.setFont(new Font(font.getFontName(), Font.BOLD, 6 * Art.SIZE_MULTIPLIER));
 		
 		drawString(g);
 

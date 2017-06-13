@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.stream.Stream;
 
 import org.junit.Assert;
@@ -18,7 +17,6 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
-import wox.serial.ShadowTest.Y;
 
 public class testMassCrashSeeds {
 	@Test

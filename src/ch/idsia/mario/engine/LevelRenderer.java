@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import MarioAI.debugGraphics.DebugDrawing;
-import MarioAI.debugGraphics.DebugLines;
-import MarioAI.debugGraphics.DebugPoints;
 import ch.idsia.mario.engine.level.*;
 import jdk.internal.dynalink.linker.LinkerServices;
 

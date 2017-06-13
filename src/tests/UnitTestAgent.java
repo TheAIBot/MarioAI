@@ -5,7 +5,7 @@ import ch.idsia.mario.environments.Environment;
 
 public class UnitTestAgent implements Agent
 {
-    public final boolean action[] = new boolean[Environment.numberOfButtons];
+    public boolean action[] = new boolean[Environment.numberOfButtons];
 
     public void reset() {
     }
