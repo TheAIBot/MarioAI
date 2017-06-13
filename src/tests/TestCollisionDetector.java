@@ -503,37 +503,12 @@ public class TestCollisionDetector {
 	
 	
 	@Test
-	public void testCollisionWithEdgeLeftSlow() {
-		final World world = new World();
-		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
-			
-			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
-			verifyCollision("collisionWithEdge.lvl", path, world);
-		}
-	}
-	@Test
-	public void testCollisionWithEdgeLeftFast() {
-		final World world = new World();
-		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
-			
-			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
-			verifyCollision("collisionWithEdge.lvl", path, world);
-		}
-	}
-	
-	@Test
 	public void testCollisionWithEdgeRightSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, -1);
-			moveDirection[moveDirection.length -1] = 1;
+			Arrays.fill(moveDirection, 1);
+			moveDirection[moveDirection.length -1] = -1;
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
 			verifyCollision("collisionWithEdge.lvl", path, world);
@@ -544,6 +519,31 @@ public class TestCollisionDetector {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
+			Arrays.fill(moveDirection, 1);
+			moveDirection[moveDirection.length -1] = -1;
+			
+			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
+			verifyCollision("collisionWithEdge.lvl", path, world);
+		}
+	}
+	
+	@Test
+	public void testCollisionWithEdgeLeftSlow() {
+		final World world = new World();
+		for (int i = 2; i < 7; i++) {
+			final int[] moveDirection = new int[i];
+			Arrays.fill(moveDirection, -1);
+			moveDirection[moveDirection.length -1] = 1;
+			
+			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
+			verifyCollision("collisionWithEdge.lvl", path, world);
+		}
+	}
+	@Test
+	public void testCollisionWithEdgeLeftFast() {
+		final World world = new World();
+		for (int i = 2; i < 7; i++) {
+			final int[] moveDirection = new int[i];
 			Arrays.fill(moveDirection, -1);
 			moveDirection[moveDirection.length -1] = 1;
 			
@@ -552,7 +552,7 @@ public class TestCollisionDetector {
 		}
 	}
 	
-	public void testCollisionWithWallLeftSlow() {
+	public void testCollisionWithWallRightSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
@@ -564,7 +564,7 @@ public class TestCollisionDetector {
 		}
 	}
 	@Test
-	public void testCollisionWithWallLeftFast() {
+	public void testCollisionWithWallRightFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
@@ -577,7 +577,7 @@ public class TestCollisionDetector {
 	}
 	
 	@Test
-	public void testCollisionWithWallRightSlow() {
+	public void testCollisionWithWallLeftSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
@@ -589,7 +589,7 @@ public class TestCollisionDetector {
 		}
 	}
 	@Test
-	public void testCollisionWithWallRightFast() {
+	public void testCollisionWithWallLeftFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
 			final int[] moveDirection = new int[i];
