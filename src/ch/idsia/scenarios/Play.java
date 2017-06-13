@@ -18,7 +18,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -79,6 +79,7 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
+	        options.setLevelRandSeed(1985638138);
 	        //options.setLevelRandSeed(1524448900);
 	        //options.setLevelRandSeed(493269332);
 	        //options.setLevelRandSeed(362336148);
@@ -119,7 +120,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(0);	 
+	        options.setLevelDifficulty(-1);	 
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

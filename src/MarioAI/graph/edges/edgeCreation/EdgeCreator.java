@@ -29,9 +29,6 @@ public class EdgeCreator {
 		observationGraph = world.getLevelMatrix();
 		// First connects all the edges for Mario:
 		setMovementEdgesForMario(world, marioNode, marioNode.x);
-		if (marioNode.x != observationGraph[11][9].x) {
-			System.out.println("Error");
-		}
 		// Then for the rest of the level matrix:
 		for (int i = 0; i < observationGraph.length; i++) { 
 			for (int j = 0; j < observationGraph[i].length; j++) {
@@ -63,10 +60,7 @@ public class EdgeCreator {
 					connectingEdge.source.hashCode() != connectingEdge.target.hashCode()) { // No movement to the same node. Notice that no equals method are needed.
 				// TODO (*) Maybe allow above.
 				node.addEdge(connectingEdge);
-			}  else if (!(connectingEdge.source.hashCode() != connectingEdge.target.hashCode())) {
-				System.out.println("Error");
-				edges = getConnectingEdges(node, coloumn);
-			}
+			}  
 		}
 	}
 
@@ -94,9 +88,9 @@ public class EdgeCreator {
 		}
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
+			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
+			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
 
 		if (foundAllEdges)
@@ -212,9 +206,9 @@ public class EdgeCreator {
 		
 		//Run to the left:
 		if (nodeColoumn > 0) { //Not at the leftmost block in the view.
-			//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
+			listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], false));
 			if (ALLOW_SPEED_KEY) {
-				//listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));				
+				listOfEdges.add(new RunningEdge(startingNode, observationGraph[nodeColoumn -1][startingNode.y], true));				
 			}
 		}	else foundAllEdges = false;
 
@@ -232,13 +226,13 @@ public class EdgeCreator {
 	public boolean getPolynomialReachingEdges(Node startingNode, int nodeColoumn, List<DirectedEdge> listOfEdges) {
 		JumpingEdge polynomial = new JumpingEdge(null, null);
 		boolean foundAllEdges = true;
-		for (int jumpHeight = (int) 1; jumpHeight <= 1; jumpHeight++) {
-			for (int jumpRange = (int) 4; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { 
+		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
+			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { 
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,	JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; // TODO ERROR if removed onshortdeadend
 				
-				//polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
-				//foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;
+				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
+				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial, JumpDirection.LEFT_UPWARDS, listOfEdges) && foundAllEdges;
 			}
 		}
 		return foundAllEdges;

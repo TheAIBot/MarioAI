@@ -149,18 +149,6 @@ public class PathCreator {
 		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
 		aStars[aStars.length - 1].stop();
 		
-		StateNode current = aStars[aStars.length - 1].currentBestPathEnd;
-		
-		while (current.ancestorEdge != null && !(current.ancestorEdge instanceof JumpingEdge)) {
-			current = current.parent;			
-		}
-		if (current.ancestorEdge != null) {
-			System.out.println();
-
-			aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
-			aStars[aStars.length - 1].stop();
-		}
-		
 		removeGoalFrame();
 		
 		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
