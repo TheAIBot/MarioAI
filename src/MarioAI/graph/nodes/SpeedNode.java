@@ -100,6 +100,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	private boolean determineIfThisNodeIsUseable(World world) {
+		
+		if (moveInfo.getXPositions().length == 0) {
+			return false;
+		}
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
@@ -116,23 +120,25 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	public boolean isSpeedNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
-		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
-			//Make sure the edge is possible to use
-			//all Running edges are possible
-			//not all jumps are possible
-			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
-				return false;
-			}
-			
-			if (getMoveInfo().hasCollisions(parent, world)) {
-				return false;
-			}	
-			
-			return true;
-		}
-		else {
+		if (diffX <= MarioControls.ACCEPTED_DEVIATION) {
 			return isSpeedNodeUseable;
 		}
+			
+		if (moveInfo.getXPositions().length == 0) {
+			return false;
+		}
+		//Make sure the edge is possible to use
+		//all Running edges are possible
+		//not all jumps are possible
+		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
+			return false;
+		}
+		
+		if (getMoveInfo().hasCollisions(parent, world)) {
+			return false;
+		}	
+		
+		return true;
 	}
 	
 	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
