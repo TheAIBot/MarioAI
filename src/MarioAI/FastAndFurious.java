@@ -20,6 +20,9 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 
 
+/**
+ * The main class for the agent of the program
+ */
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	public final EdgeCreator grapher = new EdgeCreator();
@@ -86,21 +89,22 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
+				
 				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				DebugDraw.drawEnemies(observation, enemyPredictor);
+				//DebugDraw.drawEnemies(observation, enemyPredictor);
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
+				
 				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
 						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 						 							enemyPredictor.hasNewEnemySpawned();// ||
 						 							//pathCreator.getBestPath() == null;
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
 				DebugDraw.drawAction(observation, marioController.getActions());
-				//TestTools.renderLevel(observation);
 			}
 		}
 		tickCount++;
@@ -109,9 +113,14 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	public void findPath(Environment observation) {
+		final Node marioNode = world.getMarioNode(observation);
+		final Node[] goalNodes = world.getGoalNodes(0);
+		final float xVelocity = marioController.getXVelocity();
 		final float marioHeight = MarioMethods.getMarioHeightFromMarioMode(observation.getMarioMode());
+		final boolean hasNewEnemySpawned = enemyPredictor.hasNewEnemySpawned();
+		final int lives = MarioMethods.getMarioLives(observation.getMarioMode());
 		//long startTime = System.currentTimeMillis();
-		pathCreator.blockingFindPath(observation, world.getMarioNode(observation), world.getGoalNodes(0), marioController.getXVelocity(), enemyPredictor, marioHeight, world, enemyPredictor.hasNewEnemySpawned());
+		pathCreator.blockingFindPath(observation, marioNode, goalNodes, xVelocity, enemyPredictor, marioHeight, world, hasNewEnemySpawned, lives);
 		//System.out.println(System.currentTimeMillis() - startTime);
 	}
 	
@@ -120,7 +129,8 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 		//long startTime = System.currentTimeMillis();
 		final ArrayList<DirectedEdge> path =  pathCreator.getBestPath();
 		final Node[] goalNodes = world.getGoalNodes(0);
-		pathCreator.start(observation, path, goalNodes, marioHeight);
+		final int lives = MarioMethods.getMarioLives(observation.getMarioMode());
+		pathCreator.start(observation, path, goalNodes, marioHeight, lives);
 	}
 	
 	private void executeKeyCommands(Environment observation) {

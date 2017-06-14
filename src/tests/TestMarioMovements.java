@@ -526,7 +526,8 @@ public class TestMarioMovements {
 		float yOffset = 0;
 		agent.action = marioControls.getActions();
 		TestTools.runOneTick(observation);
-		for (int z = 0; z < path.size(); z++) {	
+		final int pathSize = path.size();
+		for (int z = 0; z < pathSize; z++) {	
 			final DirectedEdge edge = path.get(0);
 			final MovementInformation moveInfo = edge.getMoveInfo();
 			for (int i = 0; i < moveInfo.getMoveTime(); i++) {				

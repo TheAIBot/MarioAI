@@ -21,10 +21,12 @@ import ch.idsia.mario.environments.Environment;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
-	private static final int[] HASH_GRANULARITY = new int[] {2, 48, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
+	private static final int MAX_HASH_GRANULARITY = 48;
+	private static final int[] HASH_GRANULARITY = new int[] {2, MAX_HASH_GRANULARITY, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
 	private final AStar[] aStars;
+	private final AStar singleThreadAstar;
 	private AStarPath bestPath = null;
 	private final World world = new World();
 	private final EnemyPredictor enemyPredictor = new EnemyPredictor();
@@ -50,13 +52,15 @@ public class PathCreator {
 		}
 		
 		Arrays.sort(aStars, (AStar a, AStar b) -> a.hashGranularity - b.hashGranularity);
+		
+		singleThreadAstar = new AStar(MAX_HASH_GRANULARITY);
 	}
 	
 	public void initialize(Environment observation) {
 		enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
 	}
 	
-	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight) 
+	public void start(final Environment observation, final ArrayList<DirectedEdge> path, final Node[] rightmostNodes, float marioHeight, int lives) 
 	{
 		final DirectedEdge currentEdge = path.get(0);
 		
@@ -77,17 +81,18 @@ public class PathCreator {
 		
 		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
 		
-		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight);
+		// Note: The life given is not guaranteed to be correct in multi-thread mode
+		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight, lives);
 	}
 	
-	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight) {
+	private void start(final float marioXPos, final Node start, final Node[] rightmostNodes, final float marioSpeed, final float marioHeight, int lives) {
 		if (isRunning) {
 			throw new Error("PathCreator is already running. Stop PathCreator before starting it again.");
 		}
 		
 		isRunning = true;
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, lives);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
 		for (int i = 0; i < aStars.length; i++) {
@@ -136,18 +141,18 @@ public class PathCreator {
 		}
 	}
 	
-	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned) {
+	public void blockingFindPath(Environment observation, final Node start, final Node[] rightmostNodes, final float marioSpeed, final EnemyPredictor enemyPredictor, final float marioHeight, final World world, final boolean newEnemiesSpawned, int lives) {
 		final float marioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 		
-		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE);
+		final SpeedNode startSpeedNode = new SpeedNode(start, marioXPos, marioSpeed, Long.MAX_VALUE, lives);
 		final SpeedNode goalSpeedNode = createGoalSpeedNode(rightmostNodes);
 		
-		aStars[aStars.length - 1].initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
-		aStars[aStars.length - 1].stop();
+		singleThreadAstar.initAStar(startSpeedNode, goalSpeedNode, enemyPredictor, marioHeight, world);
+		singleThreadAstar.stop();
 		
 		removeGoalFrame();
 		
-		final AStarPath path = aStars[aStars.length - 1].getCurrentBestPath();
+		final AStarPath path = singleThreadAstar.getCurrentBestPath();
 		if (shouldUpdateToNewPath(path, newEnemiesSpawned)) {
 			path.usePath();
 			bestPath = path;	
@@ -160,7 +165,7 @@ public class PathCreator {
 			paths[i] = aStars[i].getCurrentBestPath();
 		}
 		
-		//Of one or more paths are finished then chose
+		//If one or more paths are finished then choose
 		//the path with the highest granularity.
 		for (int i = aStars.length - 1; i >= 0; i--) {
 			if (paths[i].isBestPath) {

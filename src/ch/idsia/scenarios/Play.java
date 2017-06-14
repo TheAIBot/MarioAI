@@ -26,8 +26,11 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("jumpLevels/semiAdvancedJumpingCourse.lvl", controller, true);
+			//TestTools.setMarioPosition(observation, 3, 12);
+			//TestTools.spawnEnemy(observation, 4, 6, 1, EnemyType.BULLET_BILL);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
-			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
@@ -78,7 +81,7 @@ public class Play {
 	        System.out.println("Seed = " + seed);
 	        options.setLevelRandSeed(1985638138);
 	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
-	        //options.setLevelRandSeed(324150513); //the best seed ever 2
+	        options.setLevelRandSeed(324150513); //the best seed ever 2
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
 	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
 	        //options.setLevelRandSeed(860788790);
@@ -93,7 +96,9 @@ public class Play {
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1028660435);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
-
+	        seed = (int) (Math.random() * Integer.MAX_VALUE);
+	        options.setLevelRandSeed(seed);
+	        
 	        /*
 860788790 //Error at difficulty 2
 1145934057 //Difficulty -1. Error with mario movement.
@@ -107,12 +112,17 @@ public class Play {
 1671739449 // gets stuck because cannot find path due to enemy (RED GOOMBA) 1/5th in
 916101382 // stuck in beginning because of drop down + gap
 
-1036439644 // seed hvor det faktisk gaar ret godt
+1036439644 seed hvor det faktisk gaar ret godt
+1385792443 fejler et hop, men klarer det ellers godt diff 5 lives 1
+1304574674 array index out of bounds mod slutning diff 5 lives 1
+728939595  faar brugt fireballs ret godt (heldigt) diff 5 lives 1
+2130133664 fejler pga. er i et hul hvor banker ind imod siden gentagende gange diff 5 lives 1
+243709966 smukt diff 5 lives 1
 	         */
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(-1);	 
+	        options.setLevelDifficulty(5);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

@@ -3,6 +3,10 @@ package MarioAI.graph.edges;
 import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MovementInformation;
 
+/**
+ * The super class of the actions the agent can do. An edge corresponds
+ * to a possible movement transition from one node to another (in practise, one block to another) 
+ */
 public abstract class DirectedEdge {
 	public final Node source; 
 	public final Node target;

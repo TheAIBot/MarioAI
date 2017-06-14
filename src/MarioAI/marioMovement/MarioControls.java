@@ -7,6 +7,7 @@ import java.util.List;
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
+import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
@@ -63,10 +64,7 @@ public class MarioControls {
 		oldX = marioXPos;
 	}
 	
-	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved) {
-		System.out.println(edge.target.x - (currentXPos + xMoved));
-		System.out.println(currentXPos);
-		System.out.println(edge.target.x);
+	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved, float[] xPositions) {
 		if (edge instanceof RunningEdge) {
 			return true;
 		}
@@ -84,6 +82,13 @@ public class MarioControls {
 			    speed == 0)) {
 			return false;
 		}
+		
+		final float jumpLength = xPositions[ticksJumping - 1];
+		
+		if (jumpLength + (MAX_X_VELOCITY / 2) < edge.target.x - edge.source.x) {
+			return false;
+		}
+		
 		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
 	}
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {

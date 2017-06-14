@@ -1,16 +1,14 @@
 package MarioAI.graph.nodes;
 
-import java.awt.geom.Point2D;
-
-import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.FallEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
+/**
+ * A speed node corresponds to a search node in the A* search algorithm, but includes more information and functionallity.
+ */
 public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
@@ -30,9 +28,11 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	private final boolean isSpeedNodeUseable;
 	
 	public static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
-	public static int MAX_MARIO_LIFE = 3;
+
+	public static final int PENALTY_SCORE = 70005; // semi arbitrary high value
 	public int ticksOfInvincibility = 0;
-	public int lives = MAX_MARIO_LIFE;
+	public int lives;
+	public int penalty; // the penalty this node will get for hitting an enemy. To be used for influencing the choices made in A*
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -47,9 +47,10 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.penalty = 0; // parent is null
 	}
 	
-	public SpeedNode(Node node, float marioX, float vx, long hash) {
+	public SpeedNode(Node node, float marioX, float vx, long hash, int lives) {
 		this.node = node;
 		this.moveInfo = null;
 		this.vx = vx;
@@ -62,7 +63,8 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
-		
+		this.penalty = 0; // parent is null
+		this.lives = lives;
 	}
 	
 	///Should only be used for testing purposes
@@ -78,6 +80,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = true;
 		this.hash = hash;
+		this.penalty = 0; // parent is null
 	}
 	
 	public SpeedNode(Node node, SpeedNode parent, DirectedEdge ancestorEdge, long hash, World world) {
@@ -97,13 +100,21 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.yPos = node.y;
 		this.isSpeedNodeUseable = determineIfThisNodeIsUseable(world);
 		this.hash = hash;
+		this.ticksOfInvincibility = parent.ticksOfInvincibility;
+		this.lives = parent.lives;
+		this.penalty = parent.penalty;
 	}
 	
+	/**
+	 * @param world
+	 * @return true if the speednode does not have collisions with blocks in the world and the movement leading to this speed node
+	 * is actually possible to carry out.
+	 */
 	private boolean determineIfThisNodeIsUseable(World world) {
 		//Make sure the edge is possible to use
 		//all Running edges are possible
 		//not all jumps are possible
-		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
+		if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
 			return false;
 		}
 		
@@ -114,16 +125,22 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
+	/**
+	 * @param world
+	 * @return true if the speednode does not have collisions with blocks in the world and the movement leading to this speed node
+	 * is actually possible to carry out.
+	 */
 	public boolean isSpeedNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
 		if (diffX > MarioControls.ACCEPTED_DEVIATION) {
 			//Make sure the edge is possible to use
 			//all Running edges are possible
 			//not all jumps are possible
-			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance())) {
+			if (!MarioControls.canMarioUseEdge(ancestorEdge, parentXPos, parentVx, moveInfo.getTotalTicksJumped(), moveInfo.getXMovementDistance(), moveInfo.getXPositions())) {
 				return false;
 			}
 			
+			// Are there any collisions with blocks in the world (this is not an enemy collision check) 
 			if (getMoveInfo().hasCollisions(parent, world)) {
 				return false;
 			}	
@@ -135,43 +152,58 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		}
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
-		int currentTick = startTime;
-		int i = parent.ticksOfInvincibility;
-		this.lives = parent.lives;
-		this.ticksOfInvincibility = parent.ticksOfInvincibility;
-		parent.ticksOfInvincibility = 0;
+	/**
+	 * Check if Mario collides with an enemey and set ticks of invincibility, lives and penalty accordingly.
+	 * 
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return true if Mario collides with an enemy during the movement leading to this speed node, false otherwise
+	 */
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
+		if (ticksOfInvincibility < 0) {
+			System.out.println("Error");
+		}
 		
 		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
 		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
-		if (i >= moveInfo.getMoveTime()) {
-			this.ticksOfInvincibility -= moveInfo.getMoveTime();
+		if (ticksOfInvincibility >= moveInfo.getMoveTime()) {
+			ticksOfInvincibility -= moveInfo.getMoveTime();
 			return false;
 		}
 		
-		currentTick += i;
+		int currentTick = ticksOfInvincibility + startTime;
 		boolean hasEnemyCollision = false;
-		for (; i < moveInfo.getMoveTime(); i++) {
+		for (int i = ticksOfInvincibility; i < moveInfo.getMoveTime(); i++) {
 			final float x = parentXPos  + moveInfo.getXPositions()[i];
 			final float y = parent.yPos - moveInfo.getYPositions()[i];
 			
 			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick)) {
-				hasEnemyCollision = true;
-				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+				if (ticksOfInvincibility == 0) {
+					hasEnemyCollision = true;
+					lives--;
+					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+					penalty += PENALTY_SCORE;
+				} else if (ticksOfInvincibility > 0){
+					ticksOfInvincibility--;
+				} else {
+					throw new Error("Negative invincibility error. It is: " + ticksOfInvincibility);
+				}
+			} else if(ticksOfInvincibility > 0) {
+				ticksOfInvincibility--;
 			}
 			
 			currentTick++;
 		}
-		
-		if (hasEnemyCollision) {
-			lives--;
+		if (ticksOfInvincibility < 0) {
+			System.out.println("Error");
 		}
 		
 		return hasEnemyCollision;
 	}
 	
 	/**
-	 * Old collision method. Momentarily only for ease of reference.
+	 * Deprecated collision method. Still present for ease of reference.
 	 * TODO remove this method
 	 * @param startTime
 	 * @param enemyPredictor
