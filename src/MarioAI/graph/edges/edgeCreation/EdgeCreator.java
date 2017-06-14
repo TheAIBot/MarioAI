@@ -87,7 +87,7 @@ public class EdgeCreator {
 		}
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
 			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
 			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
@@ -564,24 +564,29 @@ public class EdgeCreator {
 					&& observationGraph[nodeXPosition][node.y - 1] == null;
 		}
 	}
+	
 	private boolean canMarioStandThere(int coloumn,int row) {
 		//TODO changed 0 < row to 1 < row. Verify  that it makes sense
 		//Reason for change: Prevents a crash where row = 1
 		return 1 < row && row < GRID_HEIGHT &&
-			   isOnSolidGround(row, coloumn) && 
+			    isOnSolidGround(row, coloumn) && 
 			   !isSolid(observationGraph[coloumn][row - 1]) &&
 			   !isSolid(observationGraph[coloumn][row - 2]);
 	}
 
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
-			//TODO it crashed to changed 0 to 1 in 1 < yPosition to fix it
-			return 2 <= yPosition && yPosition < GRID_HEIGHT &&
-				   isOnSolidGround((int) (yPosition), coloumn) && 
+		//TODO it crashed to changed 0 to 1 in 1 < yPosition to fix it
+		boolean isOnLevelMatrix = (0 <= yPosition && yPosition < GRID_HEIGHT); 
+		return isOnLevelMatrix && 
+				(	(2 >= yPosition) //TODO still techinacally wrong.
+					||
+				   (isOnSolidGround((int) (yPosition), coloumn) && 
 				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 1]) &&
-				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]);
-			//One could use Marios height, but this is techinacally not correct, 
-			//if one only wants to use information from one corner, namely this
-		}
+				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]))
+				 );
+		//One could use Marios height, but this is techinacally not correct, 
+		//if one only wants to use information from one corner, namely this
+	}
 	
 	private boolean isOnSolidGround(int row, int coloumn) {
 		return observationGraph[coloumn][row] != null; // TODO Fix in general.
@@ -691,6 +696,7 @@ public class EdgeCreator {
 			if (canMarioStandThere(currentXPosition,  y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall
 				return Collision.HIT_GROUND;
 			} else {  
+				canMarioStandThere(currentXPosition,  y + 0.01f);
 				throw new Error("Logic error on corner collision detection");
 				//return Collision.HIT_WALL;
 				//TODO i don't think this should be possible:
