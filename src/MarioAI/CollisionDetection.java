@@ -167,7 +167,8 @@ public class CollisionDetection {
 				blocking |= (ya < 0) && ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
 			} else {
-				return false;//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
+				//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
+				return x < 0; //just an extra check, in case it checks outside the level matrix.
 			}
 		}
 	}

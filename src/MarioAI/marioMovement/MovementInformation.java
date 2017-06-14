@@ -149,6 +149,12 @@ public class MovementInformation{
 			else if (!Arrays.equals(bb.pressYButton, pressYButton)) {
 				return false;
 			}
+			else if (!Arrays.equals(bb.positionsX, positionsX)) {
+				return false;
+			}
+			else if (!Arrays.equals(bb.positionsY, positionsY)) {
+				return false;
+			}
 			else {
 				return true;
 			}
