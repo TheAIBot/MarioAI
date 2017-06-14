@@ -30,6 +30,7 @@ public class MarioControls {
 	private int ticksOnThisEdge = 0;
 	private float oldX = MARIO_START_X_POS;
 	private DirectedEdge prevEdge = null;
+	private MovementInformation prevMoveInfo = null;
 	private float currentXSpeed = 0;
 	private final boolean[] actions = new boolean[Environment.numberOfButtons];
 	
@@ -55,6 +56,7 @@ public class MarioControls {
 		ticksOnThisEdge = 0;
 		oldX = MARIO_START_X_POS;
 		prevEdge = null;
+		prevMoveInfo = null;
 		currentXSpeed = 0;
 	}
 	
@@ -91,6 +93,7 @@ public class MarioControls {
 		
 		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
 	}
+	
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
 			final DirectedEdge next = path.get(0);
@@ -98,9 +101,10 @@ public class MarioControls {
 			
 			if (prevEdge == null ||
 				!next.equals(prevEdge) ||
-				!next.getMoveInfo().equals(prevEdge.getMoveInfo())) {
+				!next.getMoveInfo().equals(prevMoveInfo)) {
 				ticksOnThisEdge = 0;
 	 			prevEdge = next;
+	 			prevMoveInfo = next.getMoveInfo();
 			}
 			else {
 				ticksOnThisEdge++;

@@ -3,6 +3,8 @@ package MarioAI.graph.edges.edgeCreation;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.swing.internal.plaf.basic.resources.basic;
+
 import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
@@ -11,8 +13,8 @@ import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
-	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 8;
+	public static final float MAX_JUMP_HEIGHT = 4;
+	public static final float MAX_JUMP_RANGE = 8;
 	public static final float MAX_FALL_RANGE = 2;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
@@ -730,14 +732,15 @@ public class EdgeCreator {
 	}
 
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
-			//TODO it crashed to changed 0 to 1 in 1 < yPosition to fix it
-			return 2 <= yPosition && yPosition < GRID_HEIGHT &&
-				   isOnSolidGround((int) (yPosition), coloumn) && 
-				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 1]) &&
-				   !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]);
-			//One could use Marios height, but this is techinacally not correct, 
-			//if one only wants to use information from one corner, namely this
-		}
+		boolean isOnLevelMatrix = (0 <= yPosition && yPosition < GRID_HEIGHT);
+		return 	(isOnLevelMatrix && isOnSolidGround((int) (yPosition), coloumn)) &&
+				 	(	(yPosition < 1) ||
+				 		(yPosition < 2 && !isSolid(observationGraph[coloumn][(int) (yPosition) - 1])) ||
+				 		(yPosition >= 2 && !isSolid(observationGraph[coloumn][(int) (yPosition) - 1])  && !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]))
+					 );
+		// One could use Marios height, but this is techinacally not correct,
+		// if one only wants to use information from one corner, namely this
+	}
 	
 	private boolean isOnSolidGround(int row, int coloumn) {
 		return observationGraph[coloumn][row] != null; // TODO Fix in general.
