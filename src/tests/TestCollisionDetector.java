@@ -1,19 +1,16 @@
 package tests;
 
-import java.awt.datatransfer.FlavorTable;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.annotation.processing.RoundEnvironment;
-import javax.print.attribute.Size2DSyntax;
-import javax.swing.text.DefaultEditorKit.CopyAction;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import MarioAI.CollisionDetection;
@@ -203,10 +200,6 @@ public class TestCollisionDetector {
 			
 	}
 
-	@Test
-	public void testSmallMarioJumpIntoCeiling(){
-		fail("Make the test");		
-	}
 	
 	@Test	
 	public void testStandardMovementsAtDifferentSpeeds(){
@@ -352,11 +345,6 @@ public class TestCollisionDetector {
 	}
 
 	@Test
-	public void testCompareWithMariosCollisionEngine(){
-		fail("Make the test");
-	}
-	
-	@Test
 	public void testBoxSlow() {
 		testBox(false);
 	}
@@ -476,9 +464,11 @@ public class TestCollisionDetector {
 				
 				final float expectedMarioXPos = startMarioXPos + moveInfo.getXPositions()[i] + xOffset;
 				final float expectedMarioYPos = startMarioYPos - moveInfo.getYPositions()[i] + yOffset;
+				//System.out.println("Expected (" + expectedMarioXPos*16 + ", " + expectedMarioYPos*16 + ")");
 				
 				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+				//System.out.println("Actual   (" + actualMarioXPos*16 + ", " + actualMarioYPos*16 + ")");
 				
 				if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos)) {
 					Arrays.fill(agent.action, false);
@@ -506,9 +496,11 @@ public class TestCollisionDetector {
 	public void testCollisionWithEdgeRightSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1,  1);
+			Arrays.fill(moveDirection, i * 1, i * 2, -1);
+			Arrays.fill(moveDirection, i * 2, i * 3,  1);
+			Arrays.fill(moveDirection, i * 3, i * 4, -1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
 			verifyCollision("collisionWithEdge.lvl", path, world);
@@ -518,9 +510,11 @@ public class TestCollisionDetector {
 	public void testCollisionWithEdgeRightFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1,  1);
+			Arrays.fill(moveDirection, i * 1, i * 2, -1);
+			Arrays.fill(moveDirection, i * 2, i * 3,  1);
+			Arrays.fill(moveDirection, i * 3, i * 4, -1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
 			verifyCollision("collisionWithEdge.lvl", path, world);
@@ -531,9 +525,11 @@ public class TestCollisionDetector {
 	public void testCollisionWithEdgeLeftSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, -1);
-			moveDirection[moveDirection.length -1] = 1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1, -1);
+			Arrays.fill(moveDirection, i * 1, i * 2,  1);
+			Arrays.fill(moveDirection, i * 2, i * 3, -1);
+			Arrays.fill(moveDirection, i * 3, i * 4,  1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
 			verifyCollision("collisionWithEdge.lvl", path, world);
@@ -543,9 +539,11 @@ public class TestCollisionDetector {
 	public void testCollisionWithEdgeLeftFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, -1);
-			moveDirection[moveDirection.length -1] = 1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1, -1);
+			Arrays.fill(moveDirection, i * 1, i * 2,  1);
+			Arrays.fill(moveDirection, i * 2, i * 3, -1);
+			Arrays.fill(moveDirection, i * 3, i * 4,  1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
 			verifyCollision("collisionWithEdge.lvl", path, world);
@@ -555,24 +553,31 @@ public class TestCollisionDetector {
 	public void testCollisionWithWallRightSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
+
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1,  1);
+			Arrays.fill(moveDirection, i * 1, i * 2, -1);
+			Arrays.fill(moveDirection, i * 2, i * 3,  1);
+			Arrays.fill(moveDirection, i * 3, i * 4, -1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
 			verifyCollision("collisionWithWall.lvl", path, world);
+			verifyCollision("collisionWithGrassWall.lvl", path, world);
 		}
 	}
 	@Test
 	public void testCollisionWithWallRightFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, 1);
-			moveDirection[moveDirection.length -1] = -1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1,  1);
+			Arrays.fill(moveDirection, i * 1, i * 2, -1);
+			Arrays.fill(moveDirection, i * 2, i * 3,  1);
+			Arrays.fill(moveDirection, i * 3, i * 4, -1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
 			verifyCollision("collisionWithWall.lvl", path, world);
+			verifyCollision("collisionWithGrassWall.lvl", path, world);
 		}
 	}
 	
@@ -580,24 +585,30 @@ public class TestCollisionDetector {
 	public void testCollisionWithWallLeftSlow() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, -1);
-			moveDirection[moveDirection.length -1] = 1;
+			final int[] moveDirection = new int[i*4];
+			Arrays.fill(moveDirection, i * 0, i * 1, -1);
+			Arrays.fill(moveDirection, i * 1, i * 2,  1);
+			Arrays.fill(moveDirection, i * 2, i * 3, -1);
+			Arrays.fill(moveDirection, i * 3, i * 4,  1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, false);
 			verifyCollision("collisionWithWall.lvl", path, world);
+			verifyCollision("collisionWithGrassWall.lvl", path, world);
 		}
 	}
 	@Test
 	public void testCollisionWithWallLeftFast() {
 		final World world = new World();
 		for (int i = 2; i < 7; i++) {
-			final int[] moveDirection = new int[i];
-			Arrays.fill(moveDirection, -1);
-			moveDirection[moveDirection.length -1] = 1;
+			final int[] moveDirection = new int[i * 4];
+			Arrays.fill(moveDirection, i * 0, i * 1, -1);
+			Arrays.fill(moveDirection, i * 1, i * 2,  1);
+			Arrays.fill(moveDirection, i * 2, i * 3, -1);
+			Arrays.fill(moveDirection, i * 3, i * 4,  1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i, world, true);
 			verifyCollision("collisionWithWall.lvl", path, world);
+			verifyCollision("collisionWithGrassWall.lvl", path, world);
 		}
 	}
 	
@@ -617,10 +628,11 @@ public class TestCollisionDetector {
 		
 		final int startXPixel = (centerMarioXPos - 2) * World.PIXELS_PER_BLOCK;
 		final int endXPixel   = (centerMarioXPos + 2) * World.PIXELS_PER_BLOCK;
-		
+
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
-		for (int i = startXPixel; i <= endXPixel; i++) {
+		
+		for (int i = startXPixel; i <= endXPixel; i++) { //TODO set i back.
 			TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
 			TestTools.resetMarioSpeed(observation);
 			TestTools.runOneTick(observation);
@@ -634,19 +646,22 @@ public class TestCollisionDetector {
 			final ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
 			path.forEach(x -> pathCopy.add(x));
 			
-			boolean expectedToHitSomething = false;
+			boolean expectedToFollowPath = false;
 			float xOffset = 0;
 			for (DirectedEdge directedEdge : pathCopy) {
-				expectedToHitSomething = !directedEdge.getMoveInfo().hasCollisions(marioXPos + xOffset, Math.round(marioYPos), world);
+				//System.out.println("Collision:");
+				expectedToFollowPath = !directedEdge.getMoveInfo().hasCollisions(marioXPos + xOffset, Math.round(marioYPos), world);
 				xOffset += directedEdge.getMoveInfo().getXMovementDistance();
-				if (expectedToHitSomething) {
+				if (!expectedToFollowPath) {
 					break;
 				}
 			}
-			
-			final boolean actualHitSomething = isFollowingPathCorrectly(observation, pathCopy, agent, marioControls);
-			
-			assertEquals(expectedToHitSomething, actualHitSomething);
+			//System.out.println("Verification: ");
+			final boolean actualFollowPath = isFollowingPathCorrectly(observation, pathCopy, agent, marioControls);
+			if (expectedToFollowPath ^ actualFollowPath) { //logical xor
+				System.out.println(i);
+			}
+			assertEquals(expectedToFollowPath, actualFollowPath);
 		}
 	}
 }

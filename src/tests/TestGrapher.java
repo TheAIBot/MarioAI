@@ -228,7 +228,7 @@ public class TestGrapher {
 				continue;
 			boolean hasJumpedAgainstWall = false;
 			addWall(WALL_HEIGHT, 11 + i, marioNode.y, world, marioNode);
-			grapher.clearAllEdges(world);
+			//grapher.clearAllEdges(world);
 			grapher.setMovementEdges(graph, marioNode);
 			List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
 			grapher.getPolynomialReachingEdges(marioNode, (short) 11, newEdges);
