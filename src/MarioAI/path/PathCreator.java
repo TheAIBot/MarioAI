@@ -81,7 +81,7 @@ public class PathCreator {
 		
 		final float futureMarioSpeed = currentEdge.getMoveInfo().getEndSpeed();; //path.get(1).getMoveInfo().getPositions()[0].x;
 		
-		// The life given is not correct in multi-thread mode
+		// Note: The life given is not guaranteed to be correct in multi-thread mode
 		start(futureMarioXPos, futureStartNode, rightmostNodes, futureMarioSpeed, marioHeight, lives);
 	}
 	
@@ -165,7 +165,7 @@ public class PathCreator {
 			paths[i] = aStars[i].getCurrentBestPath();
 		}
 		
-		//Of one or more paths are finished then chose
+		//If one or more paths are finished then choose
 		//the path with the highest granularity.
 		for (int i = aStars.length - 1; i >= 0; i--) {
 			if (paths[i].isBestPath) {

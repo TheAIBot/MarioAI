@@ -30,6 +30,7 @@ import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
+import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -282,7 +283,7 @@ public class TestAStar {
 		Long2ObjectOpenHashMap<SpeedNode> speedNodes = agent.pathCreator.getSpeedNodes();
 		SpeedNode end = speedNodes.values().stream().filter(x -> x.ancestorEdge != null && x.ancestorEdge.equals(polynomialEdge))
 													.findFirst().get();
-		
+		cei
 		assertTrue(end.isSpeedNodeUseable(world));
 		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
@@ -439,7 +440,8 @@ public class TestAStar {
 		SpeedNode sn = null;
 		SpeedNode newSn = sn;
 		
-		for (DirectedEdge edge : path) {
+		for (int i = 1; i < path.size(); i++) {
+			DirectedEdge edge = path.get(i);
 			newSn = speedNodes.values().stream()
 					.filter(x -> x.ancestorEdge.equals(edge))
 					.findFirst().get();
@@ -473,10 +475,22 @@ public class TestAStar {
 	 * @param originalGoalNodes
 	 */
 	private void verifyPath(List<DirectedEdge> path, Node[] originalGoalNodes) {
+		float speed = 0;
 		for (int i = 0; i < path.size(); i++) {
 			Node nextNode = path.get(i).source;
-			agent.pathCreator.blockingFindPath(observation, nextNode, originalGoalNodes, 0, enemyPredictor, 2, world, false, 3); // TODO
+			agent.pathCreator.blockingFindPath(observation, nextNode, originalGoalNodes, speed, enemyPredictor, 2, world, true, 3); // TODO
 			List<DirectedEdge> newPath = agent.pathCreator.getBestPath();
+			float marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
+			float marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
+			
+			MovementInformation movementInformation = newPath.get(0).getMoveInfo();
+			float[] xPositions = movementInformation.getXPositions();
+			float[] yPositions = movementInformation.getYPositions();
+			TestTools.setMarioPixelPosition(observation,
+											(int) (World.PIXELS_PER_BLOCK * (marioXPos + xPositions[xPositions.length - 1])),
+											(int) (World.PIXELS_PER_BLOCK * (marioYPos + yPositions[yPositions.length - 1])));
+			speed = newPath.get(0).getMoveInfo().getEndSpeed();
+			TestTools.runOneTick(observation);
 			
 			// Go through edges and check they are same and verify the movement 
 			assertEquals(path.size() - i, newPath.size());
