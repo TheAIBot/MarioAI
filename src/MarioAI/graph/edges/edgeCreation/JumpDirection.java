@@ -1,5 +1,9 @@
 package MarioAI.graph.edges.edgeCreation;
 
+/** Enum for direction of Jumps, like right and left, with their up and down variants.
+ * @author 
+ *
+ */
 public enum JumpDirection { 
 	STRAIGHT_UPWARDS{
 		@Override
@@ -25,6 +29,16 @@ public enum JumpDirection {
 		@Override
 		public JumpDirection getOppositeVerticalDirection() {
 			return STRAIGHT_DOWNWARDS;
+		}
+
+		@Override
+		public boolean isUpwardsType() {
+			return true;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return false;
 		}
 		
 	},
@@ -53,6 +67,16 @@ public enum JumpDirection {
 		public JumpDirection getOppositeVerticalDirection() {
 			return STRAIGHT_DOWNWARDS;
 		}
+
+		@Override
+		public boolean isUpwardsType() {
+			return false;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return false;
+		}
 		
 	},
 	LEFT_UPWARDS {
@@ -80,6 +104,16 @@ public enum JumpDirection {
 		public JumpDirection getOppositeVerticalDirection() {
 			return LEFT_DOWNWARDS;
 		}
+
+		@Override
+		public boolean isUpwardsType() {
+			return true;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return true;
+		}
 	},
 	LEFT_DOWNWARDS {
 		@Override
@@ -105,6 +139,16 @@ public enum JumpDirection {
 		@Override
 		public JumpDirection getOppositeVerticalDirection() {
 			return LEFT_UPWARDS;
+		}
+
+		@Override
+		public boolean isUpwardsType() {
+			return false;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return true;
 		}
 	},
 	RIGHT_UPWARDS {
@@ -132,6 +176,16 @@ public enum JumpDirection {
 		public JumpDirection getOppositeVerticalDirection() {
 			return RIGHT_DOWNWARDS;
 		}
+
+		@Override
+		public boolean isUpwardsType() {
+			return true;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return false;
+		}
 	},
 	RIGHT_DOWNWARDS {
 		@Override
@@ -158,23 +212,52 @@ public enum JumpDirection {
 		public JumpDirection getOppositeVerticalDirection() {
 			return RIGHT_UPWARDS;
 		}
-	};
 
-	public boolean isUpwardsType() {
-		return (this == LEFT_UPWARDS || this == RIGHT_UPWARDS);
-	}
+		@Override
+		public boolean isUpwardsType() {
+			return false;
+		}
+
+		@Override
+		public boolean isLeftType() {
+			return false;
+		}
+	};
 	
-	public boolean isLeftType() {
-		return (this == LEFT_UPWARDS || this == LEFT_DOWNWARDS);
-	}
+	/** Returns if the direction is upwards.
+	 * @return
+	 */
+	public abstract boolean isUpwardsType();
+	/** Returns if the direction is of the left type.
+	 * @return
+	 */
+	public abstract boolean isLeftType();
 	
+	/** Returns an integer representing the horizontal part of the direction.
+	 * @return Returns 1 if the direction is upwards, -1 if it is downwards.
+	 */
 	public abstract int getHorizontalDirectionAsInt();
 	
+	/** Returns an integer representing the vertical part of the direction.
+	 * @return Returns 1 if the direction is rightwards, -1 if it is leftwards.
+	 */
 	public abstract int getVerticalDirectionAsInt();
 	
+	/** Returns the complete opposite direction of the current direction. 
+	 * This inverts both the horizontal and vertical movement.
+	 * @return The direction with its horizontal and vertical component inverted.
+	 */
 	public abstract JumpDirection getOppositeDirection();
 	
+	/** Returns the direction with its horizontal component inverted.
+	 * If it is going rightwards, it is now going leftwards, and the other way around.
+	 * @return The direction with its horizontal component inverted.
+	 */
 	public abstract JumpDirection getOppositeHorizontalDirection();
 	
+	/** Returns the direction with its vertical component inverted.
+	 * If it is going upwards, it is now going downwards, and the other way around.
+	 * @return The direction with its vertical component inverted.
+	 */
 	public abstract JumpDirection getOppositeVerticalDirection();
 }
