@@ -224,6 +224,7 @@ public class MarioControls {
 			for (int i = 0; i < yPos.length; i++) {
 				yPos[i] = yPositions.get(i);
 			}
+			System.out.println(yPos.length);
 			
 			return new YMovementInformation(totalTicksJumped, yPos, pressJump);
 		}

@@ -25,7 +25,7 @@ public class Play {
 			//Agent controller = new HumanKeyboardAgent();
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("TheMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
@@ -76,7 +76,7 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(264076394);
+	        //options.setLevelRandSeed(1);
 	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
 	        //options.setLevelRandSeed(324150513); //the best seed ever 2
 	        //options.setLevelRandSeed(898452612); //Difficulty 1
@@ -112,7 +112,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(-1);
+	        options.setLevelDifficulty(20);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

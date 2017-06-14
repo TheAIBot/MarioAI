@@ -11,7 +11,7 @@ import MarioAI.graph.nodes.Node;
 
 public class EdgeCreator {
 	private static final float MAX_JUMP_HEIGHT = 4;
-	private static final float MAX_JUMP_RANGE = 4;
+	private static final float MAX_JUMP_RANGE = 8;
 	public static final int GRID_HEIGHT = 15;
 	public static final int GRID_WIDTH = 22;
 	public static final float MARIO_HEIGHT = (float) 1.8;
@@ -444,9 +444,6 @@ public class EdgeCreator {
 			final Collision lowerFacingMarioCorner 	= lowerFacingCornerCollision  	(y, currentXPosition, direction, collisionDetection);
 			final Collision upperFacingMarioCorner 	= upperFacingCornerCollision  	(y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision	(y, currentXPosition, direction);	
-			if (lowerOppositeMarioCorner == Collision.HIT_WALL) {
-				throw new Error("Logic error");
-			}
 			
 			//As it is descending to the right, only worry about the two corners to the right, and the left lower one.
 			//TODO change this so that walls are prioritized correctly
@@ -691,8 +688,8 @@ public class EdgeCreator {
 			if (canMarioStandThere(currentXPosition,  y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall
 				return Collision.HIT_GROUND;
 			} else {  
-				throw new Error("Logic error on corner collision detection");
-				//return Collision.HIT_WALL;
+				//throw new Error("Logic error on corner collision detection");
+				return Collision.HIT_WALL;
 				//TODO i don't think this should be possible:
 			}
 		} else {

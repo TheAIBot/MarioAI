@@ -86,7 +86,6 @@ public class World {
 		setMarioNode(observation);
 		if (changeX != 0 || changeY != 0) {
 			updateWholeMatrix(observation);
-			hasWorldChanged = true;
 		}
 		else {
 			hasWorldChanged = false;
@@ -143,9 +142,11 @@ public class World {
 			nodeColumn = new Node[byteColumn.length];
 		}
 		for (int y = 0; y < byteColumn.length; y++) {
+			//if a node was added that wasn't found before then the world obviously changed
 			if (nodeColumn[y] == null &&
 				byteColumn[y] != 0) {
 				nodeColumn[y] = new Node(x, y, byteColumn[y]);
+				hasWorldChanged = true;
 			}
 		}
 		return nodeColumn;
