@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import MarioAI.Hasher;
 import MarioAI.graph.edges.DirectedEdge;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**Represents a given block in level/mario world. Also sometimes Mario himself.
  * Used as a basis for pretty much everything about movements.
@@ -12,7 +13,7 @@ import MarioAI.graph.edges.DirectedEdge;
  */
 public class Node {
 	//Used to check for duplicate edges and the likes for the node in constant time.
-	private final HashMap<Integer, DirectedEdge> edgesMap = new HashMap<Integer, DirectedEdge>();
+	private final Int2ObjectOpenHashMap<DirectedEdge> edgesMap = new Int2ObjectOpenHashMap<DirectedEdge>();
 	public final ArrayList<DirectedEdge> edges = new ArrayList<DirectedEdge>();
 	private boolean allEdgesMade = false;
 	private final int hash;
