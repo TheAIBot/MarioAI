@@ -35,7 +35,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	private boolean deletePlace = false;
 	private boolean runToTick = false;
 	private int tickToRunTo = -1;
-	public static String saveStateFileName = "levelState.lvlst";
+	public static final String saveStateFileName = "levelState.lvlst";
 	private Object keyLock = new Object();
 
 	public void reset() {
@@ -74,8 +74,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
-				
-				pathCreator.syncWithRealWorld(world, enemyPredictor);
 				findPath(observation);
 
 				world.resetGoalNodesChanged();
