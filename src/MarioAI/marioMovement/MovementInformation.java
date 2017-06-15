@@ -52,6 +52,9 @@ public class MovementInformation{
 			this.positionsX = new float[yMoveInfo.yPositions.length];
 			this.positionsY = yMoveInfo.yPositions;
 		}
+		if (positionsY.length != positionsX.length) {
+			System.out.println();
+		}
 	}
 	
 	public boolean[] getActionsFromTick(int tick, boolean[] actions) {
@@ -147,6 +150,12 @@ public class MovementInformation{
 				return false;
 			}
 			else if (!Arrays.equals(bb.pressYButton, pressYButton)) {
+				return false;
+			}
+			else if (!Arrays.equals(bb.positionsX, positionsX)) {
+				return false;
+			}
+			else if (!Arrays.equals(bb.positionsY, positionsY)) {
 				return false;
 			}
 			else {

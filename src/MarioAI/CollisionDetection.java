@@ -29,7 +29,8 @@ public class CollisionDetection {
 		return isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, sourceNode.currentXPos, sourceNode.yPos, lastY, world);
 	}
 	
-	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY, float startX, float startY, float lastY, World world){
+	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY,
+										float startX, float startY, float lastY, World world){
 		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
@@ -41,6 +42,11 @@ public class CollisionDetection {
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffsetX + startX) * 16,
 															     (startY - currentOffsetY) * 16 - 1);
 		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
+		//System.out.println("current (" + currentPosition.x + ", " + currentPosition.y + ")");
+		
+		//System.out.println("expected   (" + expectedPosition.x + ", " + expectedPosition.y + ")");
+		
+		
 		if (lastY == futureOffsetY) {
 			ya += 1;
 		}
@@ -161,7 +167,8 @@ public class CollisionDetection {
 				blocking |= (ya < 0) && ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
 			} else {
-				return false;//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
+				//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
+				return x < 0; //just an extra check, in case it checks outside the level matrix.
 			}
 		}
 	}

@@ -26,6 +26,7 @@ class AStar {
 	private boolean foundBestPath = false;
 	
 	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
+	private static final int PENALTY_LONG_EDGE = 15; //Long edges gives mario a tendency to jump into enemies.
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
@@ -62,10 +63,11 @@ class AStar {
 	 * @param goal
 	 * @return
 	 */
-	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {	
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
+		final long MAX_TIME_IN_ASTAR = 30;
 		final long startMiliseconds = System.currentTimeMillis();
-		final long MAX_TIME_IN_ASTAR = 35;
-		while (!openSet.isEmpty() && keepRunning && startMiliseconds + MAX_TIME_IN_ASTAR > System.currentTimeMillis()) {
+		final long stopTime = startMiliseconds + MAX_TIME_IN_ASTAR;
+		while (!openSet.isEmpty() && keepRunning && stopTime >= System.currentTimeMillis()) {
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
@@ -86,8 +88,6 @@ class AStar {
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 			closedSet.add(endHash);
 			
-			
-			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
@@ -101,20 +101,26 @@ class AStar {
 				
 				// Distance from start to neighbor of current node
 				final int tentativeGScore = current.gScore + sn.getMoveTime();
-				
-				//If a similar enough node exists and that has a better g score
-				//then there is no need to add this edge as it's worse than the
-				//current one
-				final SpeedNode contester = openSetMap.get(snEndHash);
-				if (contester != null &&
-					tentativeGScore + neighborEdge.getWeight()
-					>= contester.gScore + contester.ancestorEdge.getWeight()
-					) {
-					continue;
+				final SpeedNode contester = openSetMap.get(snEndHash);	
+
+				//To long edges are not good, as they can hit into enemies. They are however sometimes necessary.
+				final int edgeLength = Math.abs(neighborEdge.source.x - neighborEdge.target.x);
+				final int pentaltyIfLongEdgeCurrent = (edgeLength > 5)? PENALTY_LONG_EDGE: 0;
+				int penalty = pentaltyIfLongEdgeCurrent;
+				if (contester != null) {
+					final int contesterEdgeLength = Math.abs(contester.ancestorEdge.source.x - contester.ancestorEdge.target.x);
+					final int pentaltyIfLongEdgeContester = (contesterEdgeLength > 5)? PENALTY_LONG_EDGE: 0;
+					
+					//If a similar enough node exists and that has a better g score
+					//then there is no need to add this edge as it's worse than the
+					//current one
+					if (tentativeGScore + neighborEdge.getWeight() + pentaltyIfLongEdgeCurrent
+						>= contester.gScore + contester.ancestorEdge.getWeight() + pentaltyIfLongEdgeContester) {
+						continue;
+					}
 				}
 				
 				// collision detection and invincibility handling 
-				int penalty = 0;
 				if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 					sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
 					sn.parentXPos = current.currentXPos;
