@@ -39,6 +39,7 @@ public class LevelScene extends Scene implements SpriteContext {
 	public float xCam, yCam, xCamO, yCamO;
 	public static Image tmpImage;
 	private int tick;
+	public static int killedByType = -132;
 
 	private LevelRenderer layer;
 	private BgRenderer[] bgLayer = new BgRenderer[2];

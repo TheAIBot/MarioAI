@@ -44,4 +44,8 @@ public class MarioMethods {
 		}
 		throw new Error("Invalid mario mode given: " + mode);
 	}
+	
+	public static int getMarioLives(int mode) {
+		return mode + 1;
+	}
 }

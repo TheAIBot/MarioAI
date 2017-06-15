@@ -62,6 +62,7 @@ public class BulletBill extends Sprite
                 }
                 else
                 {
+                	LevelScene.killedByType = Enemy.ENEMY_BULLET_BILL;
                     world.mario.getHurt();
                 }
             }

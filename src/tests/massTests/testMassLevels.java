@@ -11,6 +11,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import MarioAI.FastAndFurious;
+import MarioAI.MarioMethods;
+import MarioAI.graph.edges.AStarHelperEdge;
+import MarioAI.path.AStar;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -18,9 +21,10 @@ import tests.TestTools;
 
 public class testMassLevels {
 	
-	public static final String MASS_LEVEL_RESULTS_FILE_PATH = "src/tests/massTests/MassLevelsResults.txt";
-	public static final String MASS_LEVELS_LOSSED_FILE_PATH = "src/tests/massTests/MassLossedSeeds.txt";
-	public static final String MASS_CRASHED_SEEDS_FILE_PATH = "src/tests/massTests/MassCrashedSeeds.txt";
+	public static final String MASS_LEVEL_DIRETORY = "src/tests/massTests/";
+	public static final String MASS_LEVEL_RESULTS_FILE_PATH = MASS_LEVEL_DIRETORY + "MassLevelsResults.txt";
+	public static final String MASS_LEVELS_LOSSED_FILE_PATH = MASS_LEVEL_DIRETORY + "MassLossedSeeds.txt";
+	public static final String MASS_CRASHED_SEEDS_FILE_PATH = MASS_LEVEL_DIRETORY + "MassCrashedSeeds.txt";
 	
 	@Test
 	public void testWithoutEnemies() {
@@ -64,16 +68,18 @@ public class testMassLevels {
 		int crashes = 0;
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
 		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
+		
 		for (int i = 0; i < 1000; i++) {
 			FastAndFurious agent = new FastAndFurious();
 			agent.DEBUG = false;
 			int seed = (int) (Math.random () * Integer.MAX_VALUE);
 			Environment observation = TestTools.loadLevelWithSeed(agent, seed, difficulty, false);
 			
+			int ticksRun = 0;
 			
 			try {
 				final int MAX_TICKS_TO_WIN_LEVEL = 1700;
-				for (int x = 0; x < MAX_TICKS_TO_WIN_LEVEL; x++) {
+				for (ticksRun = 0; ticksRun < MAX_TICKS_TO_WIN_LEVEL; ticksRun++) {
 					final int status = TestTools.runOneTick(observation);
 
 					if (status != Mario.STATUS_RUNNING) {
@@ -83,12 +89,10 @@ public class testMassLevels {
 			} catch (Exception e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				continue;
 				
 			} catch (Error e) {
 				crashes++;
 				crashedSeeds.add(seed);
-				continue;
 			}
 
 			final int status = ((MarioComponent) observation).getMarioStatus();
@@ -98,7 +102,8 @@ public class testMassLevels {
 			else {
 				losses++;
 				lossedSeeds.add(seed);
-			}
+			}	
+			
 			System.out.println(i);
 		}
 		

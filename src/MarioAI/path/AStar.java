@@ -12,24 +12,29 @@ import MarioAI.marioMovement.MarioControls;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
-class AStar {
+public class AStar {
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
-	
-	// Set of nodes already explored
 	private final LongOpenHashSet closedSet = new LongOpenHashSet();
-	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Long2ObjectOpenHashMap<SpeedNode> openSetMap = new Long2ObjectOpenHashMap<SpeedNode>();
-	public final int hashGranularity;
 	private SpeedNode currentBestPathEnd = null;
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	
+	public final int hashGranularity;
+	
 	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
 	private static final int PENALTY_LONG_EDGE = 15; //Long edges gives mario a tendency to jump into enemies.
 	
+	public static int timesAStarHasRun;
+	public static int timesAStarDidNotFinish;
+	public static long totalTimeUsedByAStar;
+	public static int neighborsAsChildsCount;
+	public static int neighborsAsParentsCount;
+
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
+		resetStatistics();
 	}
 	
 	/**
@@ -54,7 +59,12 @@ class AStar {
 		start.gScore = 0;
 		start.fScore = heuristicFunction(start, goal);
 		
+		timesAStarHasRun++;
+		
+		final long startTime = System.nanoTime();
 		runAStar(start, goal, enemyPredictor, marioHeight, world);
+		final long timeElapsed = System.nanoTime() - startTime;
+		totalTimeUsedByAStar += timeElapsed;
 	}
 
 	/**
@@ -71,6 +81,7 @@ class AStar {
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
+			neighborsAsParentsCount++;
 			
 			// If goal is reached return solution path.
 			if (current.node.equals(goal.node)) {
@@ -132,19 +143,6 @@ class AStar {
 					if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 						continue;
 					}
-					/*
-					if (sn.ticksOfInvincibility == 0) {
-						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
-							continue;
-							
-							if (sn.lives <= 1) {
-								continue; // if Mario would die if he hits an enemy this node can under no circumstances be used on a path
-							}
-							penalty = PENALTY_SCORE;
-							
-						}
-					}
-					*/
 				}					
 				
 				// Update the edges position in the priority queue
@@ -155,11 +153,12 @@ class AStar {
 				sn.parent = current;
 				openSet.add(sn);
 				openSetMap.put(snEndHash, sn);
+				neighborsAsChildsCount++;
 			}
 		}
 		
-		//currentBestPathEnd = null;
 		foundBestPath = false;
+		timesAStarDidNotFinish++;
 	}
 	
 	/**
@@ -202,5 +201,13 @@ class AStar {
 	
 	public void stop() {
 		keepRunning = false;
+	}
+
+	public static void resetStatistics() {
+		timesAStarHasRun = 0;
+		timesAStarDidNotFinish = 0;
+		totalTimeUsedByAStar = 0;
+		neighborsAsChildsCount = 0;
+		neighborsAsParentsCount = 0;
 	}
 }

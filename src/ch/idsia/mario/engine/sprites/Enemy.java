@@ -13,6 +13,7 @@ public class Enemy extends Sprite
     public static final int ENEMY_GOOMBA = 2;
     public static final int ENEMY_SPIKY = 3;
     public static final int ENEMY_FLOWER = 4;
+    public static final int ENEMY_BULLET_BILL = 5;
 
     private static float GROUND_INERTIA = 0.89f;
     private static float AIR_INERTIA = 0.89f;
@@ -130,6 +131,7 @@ public class Enemy extends Sprite
                 }
                 else
                 {
+                	LevelScene.killedByType = type;
                     world.mario.getHurt();
                 }
             }
