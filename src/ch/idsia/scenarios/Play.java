@@ -16,7 +16,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -76,7 +76,7 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1045681246);
+	        options.setLevelRandSeed(130869110);
 	        //options.setLevelRandSeed(1610614020); //Collision errors, falls of ledge.
 	        //options.setLevelRandSeed(264076394);
 	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
@@ -114,7 +114,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(-1);
+	        options.setLevelDifficulty(8);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);
