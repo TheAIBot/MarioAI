@@ -67,31 +67,42 @@ public class MarioControls {
 	}
 	
 	public static boolean canMarioUseEdge(DirectedEdge edge, float currentXPos, float speed, int ticksJumping, float xMoved, float[] xPositions) {
+		final float xEndPos = currentXPos + xMoved;
+		
 		if (edge instanceof RunningEdge) {
-			return true;
+			//Edge is only allowed if mario ends within half marios max speed
+			//of the center of the target node.
+			return xEndPos < edge.target.x + (MAX_X_VELOCITY / 2) &&
+				   xEndPos > edge.target.x - (MAX_X_VELOCITY / 2);
 		}
+		//Edges are made for this but they are not
+		//implemented yet
 		if (edge instanceof FallEdge) {
 			return false;
 		}
+		
 		final float distanceToMove = edge.target.x - currentXPos;
 		
 		//If mario moves to the right, he can only jump to the right,
 		//the other way around with to the left, and if he stands still,
 		//he can go both ways.
-		//Note, this works as a limitation in his movement pattern.
-		if (!( (distanceToMove < 0 && speed < 0) ||
-			   (distanceToMove > 0 && speed > 0) ||
-			    speed == 0)) {
+		//Note, this works as a limitation in his movement pattern when jumping.
+		if (!((distanceToMove < 0 && speed < 0) ||
+			  (distanceToMove > 0 && speed > 0) ||
+			   speed == 0)) {
 			return false;
 		}
 		
+		//Can't take the jump if he doesn't jump long enough while in the air
 		final float jumpLength = xPositions[ticksJumping - 1];
-		
-		if (jumpLength + (MAX_X_VELOCITY / 2) < edge.target.x - edge.source.x) {
+		if (jumpLength + (MAX_X_VELOCITY / 2) < distanceToMove) {
 			return false;
 		}
 		
-		return Math.abs(edge.target.x - (currentXPos + xMoved)) < MAX_X_VELOCITY / 2;
+		//Edge is only allowed if mario lands within half marios max speed
+		//of the center of the target node.
+		return xEndPos < edge.target.x + (MAX_X_VELOCITY / 2) &&
+			   xEndPos > edge.target.x - (MAX_X_VELOCITY / 2);
 	}
 	
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
