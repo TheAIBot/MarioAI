@@ -63,10 +63,11 @@ class AStar {
 	 * @param goal
 	 * @return
 	 */
-	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {	
-		final long startMiliseconds = System.currentTimeMillis();
+	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
 		final long MAX_TIME_IN_ASTAR = 30;
-		while (!openSet.isEmpty() && keepRunning && startMiliseconds + MAX_TIME_IN_ASTAR > System.currentTimeMillis()) {
+		final long startMiliseconds = System.currentTimeMillis();
+		final long stopTime = startMiliseconds + MAX_TIME_IN_ASTAR;
+		while (!openSet.isEmpty() && keepRunning && stopTime >= System.currentTimeMillis()) {
 			
 			final SpeedNode current = openSet.remove();
 			openSetMap.remove(current.hash);
@@ -87,8 +88,6 @@ class AStar {
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);
 			closedSet.add(endHash);
 			
-			
-			
 			// Explore each neighbor of current node
 			for (DirectedEdge neighborEdge : current.node.getEdges()) {
 				final SpeedNode sn = getSpeedNode(neighborEdge, current, world);
@@ -105,10 +104,12 @@ class AStar {
 				final SpeedNode contester = openSetMap.get(snEndHash);	
 
 				//To long edges are not good, as they can hit into enemies. They are however sometimes necessary.
-				final int pentaltyIfLongEdgeCurrent = (Math.abs(neighborEdge.source.x - neighborEdge.target.x) > 5)? PENALTY_LONG_EDGE: 0;
+				final int edgeLength = Math.abs(neighborEdge.source.x - neighborEdge.target.x);
+				final int pentaltyIfLongEdgeCurrent = (edgeLength > 5)? PENALTY_LONG_EDGE: 0;
 				int penalty = pentaltyIfLongEdgeCurrent;
 				if (contester != null) {
-					final int pentaltyIfLongEdgeContester = (Math.abs(contester.ancestorEdge.source.x - contester.ancestorEdge.target.x) > 5)? PENALTY_LONG_EDGE: 0;
+					final int contesterEdgeLength = Math.abs(contester.ancestorEdge.source.x - contester.ancestorEdge.target.x);
+					final int pentaltyIfLongEdgeContester = (contesterEdgeLength > 5)? PENALTY_LONG_EDGE: 0;
 					
 					//If a similar enough node exists and that has a better g score
 					//then there is no need to add this edge as it's worse than the
