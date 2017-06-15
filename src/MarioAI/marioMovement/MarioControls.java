@@ -7,11 +7,18 @@ import java.util.List;
 import MarioAI.MarioMethods;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.FallEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
 
+/**
+ * Class for handling and calculating various things relating to Mario's movement.
+ * Some of the functionality includes: 
+ * 		- Is there a valid movement for a given edge
+ * 		- Converting edges into keys needed to be pressed
+ * 			for a movement to happen in the game itself.
+ * 		- Calculating time in the air for a given jump, drifting and the like
+ */
 public class MarioControls {
 	
 	public static final float ACCEPTED_DEVIATION = 0.0002f;
@@ -105,6 +112,12 @@ public class MarioControls {
 			   xEndPos > edge.target.x - (MAX_X_VELOCITY / 2);
 	}
 	
+	/**
+	 * @param observation
+	 * @param path of edges
+	 * @return a boolean array of keys to be pressed at the point in time of this method being invoked
+	 * for Mario to follow the given path.
+	 */
 	public boolean[] getNextAction(Environment observation, final List<DirectedEdge> path) {
 		if (path != null && path.size() > 0) {			
 			final DirectedEdge next = path.get(0);
