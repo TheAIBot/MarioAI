@@ -22,20 +22,53 @@ public class testMassLevels {
 	public static final String MASS_LEVELS_LOSSED_FILE_PATH = "src/tests/massTests/MassLossedSeeds.txt";
 	public static final String MASS_CRASHED_SEEDS_FILE_PATH = "src/tests/massTests/MassCrashedSeeds.txt";
 	
-	int wins = 0;
-	int losses = 0;
-	int crashes = 0;
+	@Test
+	public void testWithoutEnemies() {
+		test1000RandomLevels(-1);
+	}
 	
 	@Test
-	public void test1000RandomLevels() {
+	public void testWithDifficulty0() {
+		test1000RandomLevels(0);
+	}
 	
+	@Test
+	public void testWithDifficulty1() {
+		test1000RandomLevels(1);
+	}
+	
+	@Test
+	public void testWithDifficulty2() {
+		test1000RandomLevels(2);
+	}
+	
+	@Test
+	public void testWithDifficulty4() {
+		test1000RandomLevels(4);
+	}
+	
+	@Test
+	public void testWithDifficulty8() {
+		test1000RandomLevels(8);
+	}
+	
+	@Test
+	public void testWithDifficulty20() {
+		test1000RandomLevels(20);
+	}
+	
+	
+	private void test1000RandomLevels(int difficulty) {
+		int wins = 0;
+		int losses = 0;
+		int crashes = 0;
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
 		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
 		for (int i = 0; i < 1000; i++) {
 			FastAndFurious agent = new FastAndFurious();
 			agent.DEBUG = false;
 			int seed = (int) (Math.random () * Integer.MAX_VALUE);
-			Environment observation = TestTools.loadLevelWithSeed(agent, seed);
+			Environment observation = TestTools.loadLevelWithSeed(agent, seed, difficulty, false);
 			
 			
 			try {
@@ -69,7 +102,7 @@ public class testMassLevels {
 			System.out.println(i);
 		}
 		
-		appendStringToFile(MASS_LEVEL_RESULTS_FILE_PATH, wins + ", " + losses + ", " + crashes + "\n");
+		appendStringToFile(MASS_LEVEL_RESULTS_FILE_PATH, wins + ", " + losses + ", " + crashes + ", " + difficulty + "\n");
 		
 		StringBuilder lossedSBuilder = new StringBuilder();
 		lossedSeeds.forEach(x -> lossedSBuilder.append(x.intValue() + "\n"));
