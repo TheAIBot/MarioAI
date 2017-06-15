@@ -252,6 +252,10 @@ public class PathCreator {
 		return aStars[aStars.length-1].getSpeedNodes();
 	}
 	
+	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodesFromSingleThreadAStar() {
+		return singleThreadAstar.getSpeedNodes();
+	}
+	
 	public int getBlockingGranularity() {
 		return aStars[aStars.length-1].hashGranularity;
 	}
