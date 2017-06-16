@@ -26,7 +26,10 @@ import MarioAI.graph.edges.edgeCreation.JumpDirection;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * @author Emil
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEdgeCreator {
 	EdgeCreator grapher = new EdgeCreator();

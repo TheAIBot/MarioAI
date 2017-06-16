@@ -14,7 +14,11 @@ import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class TestMarioMovements {
 	
 	@Test

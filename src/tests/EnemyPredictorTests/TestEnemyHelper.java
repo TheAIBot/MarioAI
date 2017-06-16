@@ -18,7 +18,11 @@ import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
 import tests.UnitTestAgent;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 class TestEnemyHelper {
 	public static EnemyPredictor findEnemies(Environment observation, EnemyPredictor enemyPredictor, boolean makeCopy) {
 		for (int i = 0; i < 3; i++) {

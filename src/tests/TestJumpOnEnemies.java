@@ -13,7 +13,10 @@ import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * @author jesper
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJumpOnEnemies {
 	EdgeCreator grapher = new EdgeCreator();

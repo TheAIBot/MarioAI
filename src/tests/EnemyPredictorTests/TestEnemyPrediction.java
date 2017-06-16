@@ -15,7 +15,11 @@ import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
 import tests.UnitTestAgent;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class TestEnemyPrediction {
 	
 	@Test

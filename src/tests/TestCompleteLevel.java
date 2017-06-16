@@ -12,7 +12,11 @@ import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * 
+ * @author Emil
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCompleteLevel {
 	final int MARIO_WON = Mario.STATUS_WIN; // 1

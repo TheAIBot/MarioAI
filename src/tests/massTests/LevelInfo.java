@@ -1,5 +1,9 @@
 package tests.massTests;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 class LevelInfo {
 	private final int difficulty;
 	private final int ticksRun;

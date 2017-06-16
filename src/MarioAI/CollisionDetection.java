@@ -8,6 +8,9 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
+/** Used to verifiy if a given movement is possible.
+ * @author Jesper
+ */
 public class CollisionDetection {
 	public static final float MARIO_WIDTH = 4;
 	public static final float MARIO_HEIGHT = 24;
@@ -17,7 +20,6 @@ public class CollisionDetection {
     public static final int BIT_BLOCK_LOWER = 1 << 2;   
 
     public static final byte[] TILE_BEHAVIORS = new byte[256];
-   	//Test seed: 3261372
 	public static final byte[] TILE_CONVERTER 	     = new byte[]{16, 21, 34,   9, -74, 11};
 	public static final byte[] TILE_CONVERTER_MARKER = new byte[]{16, 21,  0, -10, -11, 20};
 	
@@ -25,10 +27,31 @@ public class CollisionDetection {
 		loadTileBehaviors();
 	}
 	
+	/** Returns whether or not a movement from one position, currentOffset, to another position, futureOffset, will go as predicted,
+	 * ie. according to the Mario game engine, is this a possible move. Movement must start from a given SpeedNode sourceNode.
+	 * @param futureOffset Next relative position Mario will be placed at. Relative, since 0,0 means the position of sorceNode.
+	 * @param currentOffset Current relative position Mario is placed at. Relative, since 0,0 means the position of sorceNode.
+	 * @param sourceNode Source of the movement.
+	 * @param lastY The y position of the last movement, ie. the last y position in the movement information for the movement.
+	 * @param world World in which the movement happens.
+	 * @return True if he can go to the next position without problems, else false.
+	 */
 	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastY, World world){
 		return isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, sourceNode.currentXPos, sourceNode.yPos, lastY, world);
 	}
-	
+	/** Returns whether or not a movement from one position, (currentOffsetX, currentOffsetY), to another position,
+	 * (futureOffsetX, futureOffsetY), will go as predicted, ie. according to the Mario game engine, is this a possible move. 
+	 *  Movement takes basis in (startX, startY)
+	 * @param futureOffsetX Next relative x coordinate of Mario's position. Relative, since 0 means placed at startX.
+	 * @param futureOffsetY Next relative y coordinate of Mario's position. Relative, since 0 means placed at startY.
+	 * @param currentOffsetX Current relative x coordinate of Mario's position. Relative, since 0 means placed at startX.
+	 * @param currentOffsetY Current relative y coordinate of Mario's position. Relative, since 0 means placed at startY.
+	 * @param startX X coordinate of the origin of the movement.
+	 * @param startY Y coordinate of the origin of the movement.
+	 * @param lastY The y position of the last movement, ie. the last y position in the movement information for the movement.
+	 * @param world World in which the movement happens.
+	 * @return True if he can go to the next position without problems, else false.
+	 */
 	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY,
 										float startX, float startY, float lastY, World world){
 		//One block = 16
@@ -59,10 +82,11 @@ public class CollisionDetection {
 	}
 	
 	/** Taken from the Mario class, with some changes. Lack of comments are due to their lack of comments.
-	 * 
-	 * @param xa
-	 * @param ya
-	 * @return
+	 * @param currentPosition Current position of Mario.
+	 * @param xa Relative x movement to the next position.
+	 * @param ya Relative y movement to the next position.
+	 * @param world The world in which the movement happens.
+	 * @return True if a collision is registered, else false.
 	 */
 	private boolean move(Point2D.Float currentPosition, float xa, float ya, World world) {
 		while (xa > 8) {
@@ -141,11 +165,15 @@ public class CollisionDetection {
 		}
 	}
 
-	/** Taken directly from the Mario class. Lack of comments are due to their lack of comments.
-	 * 
-	 * @param xa
-	 * @param ya
-	 * @return
+	/**Taken directly from the Mario class. Lack of comments are due to their lack of comments.
+	 * Do however use the world object.
+	 * @param currentPosition Current relative position of Mario.
+	 * @param newX Next x position of Mario.
+	 * @param newY Next y position of Mario.
+	 * @param xa Relative x movement to the next position.
+	 * @param ya Relative y movement to the next position.
+	 * @param world The world in which the movement happens.
+	 * @return True if Mario is blocked with his movement.
 	 */
 	private boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
 		int x = (int) (newX / 16);
@@ -170,6 +198,11 @@ public class CollisionDetection {
 		}
 	}
 	
+	/** Converts from the given type of a block, to that used by the game engine.
+	 * Must be done to get the correct type of collision.
+	 * @param type The type to be converted
+	 * @return The original type of the block (or one of the possible types of the block, their can be more)
+	 */
 	private byte convertType(byte type){
 		for (int i = 0; i < TILE_CONVERTER.length; i++) {
 			if (TILE_CONVERTER_MARKER[i] == type) {
@@ -178,7 +211,8 @@ public class CollisionDetection {
 		}
 		throw new Error("Missing tile converter type, for type = " + type);
 	}
-	
+	/**Loads the tile behavior array. 
+	 */
 	private void loadTileBehaviors()
 	{
 		try 

@@ -4,7 +4,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
-/**
+/** @author Emil
  * Auxiliary class used for assigning unique hash codes to different types of objects.
  * The overall strategy is to construct a value in the form a long, int or short, based
  * on the given parameters. Each parameter will have its own seperate place in the constructed value

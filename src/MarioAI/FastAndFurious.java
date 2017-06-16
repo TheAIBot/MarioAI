@@ -20,7 +20,10 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
-
+/** The ultimate agent.
+ * @author All.
+ *
+ */
 public class FastAndFurious extends KeyAdapter implements Agent {
 	public final World world = new World();
 	public final EdgeCreator grapher = new EdgeCreator();

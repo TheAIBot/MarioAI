@@ -17,7 +17,11 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class testMassCrashSeeds {
 	@Test
 	public void testCrashSeeds() {

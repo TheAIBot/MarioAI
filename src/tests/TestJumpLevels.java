@@ -7,7 +7,10 @@ import MarioAI.FastAndFurious;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * @author Emil
+ *
+ */
 public class TestJumpLevels {
 	
 	@Test
