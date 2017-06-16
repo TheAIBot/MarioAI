@@ -34,7 +34,6 @@ public class TestEdgeCreator {
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
 	public DirectedEdge runningEdgeType = new RunningEdge(null, null, false);
-	// TODO add more tests for collisions.
 
 	private short getColoumnRelativeToMario(int xPosition) {
 		// Assumes that node!=null.
@@ -75,9 +74,7 @@ public class TestEdgeCreator {
 	public static World totalFlatland(World graph, Node marioNode) {
 		Node[][] level = graph.getLevelMatrix();
 		for (short i = 0; i < GRID_WIDTH; i++) {
-			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) -11); // TODO(*)
-																// Error: try to set it to -11
-																//Check the same method in TestCollisonDetection.
+			level[i][marioNode.y] = new Node(getXPositionFromColoumn(marioNode, i), marioNode.y, (byte) -11); 
 		}
 		return graph;
 	}
@@ -167,34 +164,6 @@ public class TestEdgeCreator {
 		}
 	}
 
-	@Test
-	public void testJumpRightOverWall() {
-		// This includes correct jump heights
-		World graph = totalFlatland(flatlandWorld(), marioNode);
-		Node[][] world = graph.getLevelMatrix();
-		grapher.setMovementEdges(graph, marioNode);
-		// adding the walls:
-
-		// TODO change WALL_HEIGHT to be variable between 1 and 4.
-		for (int WALL_HEIGHT = 2; WALL_HEIGHT <= EdgeCreator.MAX_JUMP_HEIGHT; WALL_HEIGHT++) { // 4
-			for (short i = 2; i <= 4; i++) {
-				addWall(WALL_HEIGHT, 11 + i, marioNode.y, world, marioNode);
-				List<DirectedEdge> newEdges = new ArrayList<DirectedEdge>();
-				grapher.getPolynomialReachingEdges(marioNode, (short) 11, newEdges);
-				//System.out.println("meh");
-				for (DirectedEdge directedEdge : newEdges) {
-
-				}
-			}
-		}
-		fail("Finish making the test.");
-	}
-
-	@Test
-	public void testJumpLeftOverWall() {
-		fail("Not implemented yet");
-	}
-
 	public static void addWall(int height, int coloumn, int row, Node[][] levelMatrix, Node marioNode) {
 		for (short j = 1; j <= height; j++) {
 			levelMatrix[coloumn][row - j] = new Node(getXPositionFromColoumn(marioNode, coloumn),
@@ -264,7 +233,6 @@ public class TestEdgeCreator {
 			world[i][(short) (marioNode.y - 3)] = new Node(getXPositionFromColoumn(marioNode, i),
 					(short) (marioNode.y - 3), (byte) -11);
 		}
-		// TODO remove -1 after adding  possibility for left jump.
 		grapher.setMovementEdges(graph, marioNode); 
 		for (int i = 0; i < world.length; i++) {
 			boolean hasEdgeToUpperLevel = false;
@@ -278,11 +246,9 @@ public class TestEdgeCreator {
 
 	@Test
 	public void testNoJumpsThroughCeiling() {
-		// TODO add edge-cases
 		EdgeCreator grapher = new EdgeCreator();
 		World graph = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] world = graph.getLevelMatrix();
-		//TODO also make a test where it checks if it is only those edges that will lead to a crash, that are removed.
 		for (int height = 3; height <= 7; height++) {
 			//Adds the ceiling:
 			for (int i = 0; i < world.length; i++) {
@@ -300,7 +266,6 @@ public class TestEdgeCreator {
 				assertFalse("Error at coloumn: " + i, hasEdgeToUpperLevel);
 			}
 			//It should have jumps of a certain height, but not any greater:
-			//TODO change i back
 			for (int i = 0; i < world.length; i++) {
 				Node currentNode = world[i][marioNode.y];
 				boolean hasEdgeToExtremeHeights = false;
@@ -308,7 +273,6 @@ public class TestEdgeCreator {
 				for (DirectedEdge edge : currentNode.getEdges()) {
 					// Math.round(getMaxY()) is the height of the jump/run, rounded (will always be relativly precise, 
 					//as the jumps are in integer for).
-					//TODO (*)change assumption if this is changed for the jumps.
 					if (Math.round(edge.getMaxY()) >= height - 2)
 						hasEdgeToExtremeHeights = true;
 					else if (height - 2 > Math.round(edge.getMaxY()) && Math.round(edge.getMaxY()) >= height - 3) { //required heights.
@@ -331,7 +295,6 @@ public class TestEdgeCreator {
 	
 	@Test
 	public void testFallDownAtDefaultHeight(){
-		//TODO Crude test that needs could be expanded, for better verification.
 		//Like moving the tower/wall around + havig it different heights.
 		World world = totalFlatland(flatlandWorld(), marioNode);
 		Node[][] levelMatrix = world.getLevelMatrix();
@@ -376,8 +339,8 @@ public class TestEdgeCreator {
 		Node[][] levelMatrix = world.getLevelMatrix();
 		grapher.setMovementEdges(world, marioNode);
 		//For any given pillar, at any given height, he should be able to jump down from it:
-		for (int column = 3; column < EdgeCreator.GRID_WIDTH - 1; column++) { //TODO set back to 0
-			for (int pillarHeight = 3; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
+		for (int column = 1; column < EdgeCreator.GRID_WIDTH - 1; column++) {
+			for (int pillarHeight = 1; pillarHeight <= EdgeCreator.GRID_HEIGHT - 2 - marioNode.y; pillarHeight++) {
 				addWall(pillarHeight, column, marioNode.y, levelMatrix, marioNode);
 				Node currentNode = levelMatrix[column][marioNode.y - pillarHeight];
 				//Pillars to the currents pillars sides, to the height of the pillar
@@ -506,6 +469,7 @@ public class TestEdgeCreator {
 	
 	@Test
 	public void testJumpStraightUp() {
+		//This will fail depending on jumpstraightup being allowed or not, se getConnectingEdges in EdgeCreator..
 		World world = totalFlatland(flatlandWorld(), marioNode); 
 		Node[][] level = world.getLevelMatrix();
 		grapher.setMovementEdges(world, marioNode); //important, maybe
@@ -617,7 +581,6 @@ public class TestEdgeCreator {
 			
 			//Does not allow only the top to hit the ground, as this is not possible in reality.
 			//Does not start from 10, as this would lead to no ground collision
-			//TODO does i make sense that if j=10, then there should be Collision.HIT_NOTHING?
 			for (float j = (float) 0; j >= 8.01; j += 0.05) {
 				//Should only collide if Mario, at height = 1.8, is within the block, or on top of it.
 				
@@ -952,7 +915,7 @@ public class TestEdgeCreator {
 				if (xPos < 9) { //Beginning of the floor.
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionRightDown);
 					assertEquals(errorMessage, Collision.HIT_NOTHING, currentCollisionHittingWallRightDown);
-				} else {//TODO lacking case with one block above the floor.
+				} else {
 					//There might be a collision:
 					//The 0.01, is because of an addition by this in the code.
 					if (9 - 0.01 <= lowerYPos && lowerYPos <= 10 - 0.01) { //If there should be a collision:	
@@ -1104,33 +1067,5 @@ public class TestEdgeCreator {
 		}
 	}
 	
-	@Test
-	public void testDownwardsCollisionDetection(){
-	}
-	
-	@Test
-	public void testUpwardsCollisionDetection(){
-		fail("Make the test.");
-	}
-
-	@Test
-	public void testGlidingDownWall(){
-		fail("Make the test.");
-	}
-	
-	@Test
-	public void testHittingStuffUpwards(){
-		fail("Make the test.");
-	}
-	
-	@Test
-	public void testHittingStuffDownwards(){
-		fail("Make the test.");
-	}
-
-	@Test
-	public void testFoundAllEdges(){
-		fail("Make the test.");
-	}
 	
 }

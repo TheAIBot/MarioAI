@@ -173,7 +173,6 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	
 	/**
 	 * Original collision method. Momentarily only for ease of reference.
-	 * TODO remove this method
 	 * @param startTime
 	 * @param enemyPredictor
 	 * @param marioHeight
@@ -196,7 +195,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	/**
-	 * Method for functionality not finished before the deadline.
+	 * Method for functionality not implemented as of this moment.
 	 * Check if Mario collides with an enemey and set ticks of invincibility, lives and penalty accordingly.
 	 * @param startTime
 	 * @param enemyPredictor
