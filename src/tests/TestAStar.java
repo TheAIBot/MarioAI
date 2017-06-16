@@ -284,7 +284,7 @@ public class TestAStar {
 		assertEquals(target.x, polynomialEdge.target.x);
 		assertEquals(target.y, polynomialEdge.target.y);
 		
-		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);//, 3); //TODO
+		SpeedNode start = new SpeedNode(source, source.x, 0, Long.MAX_VALUE);//, 3); 
 		start.gScore = 0;
 		start.fScore = 0;
 		
@@ -501,7 +501,7 @@ public class TestAStar {
 		float speed = 0;
 		for (int i = 0; i < path.size(); i++) {
 			Node nextNode = path.get(i).source;
-			agent.pathCreator.blockingFindPath(observation, nextNode, originalGoalNodes, speed, enemyPredictor, 2, world, true);//, 3); TODO
+			agent.pathCreator.blockingFindPath(observation, nextNode, originalGoalNodes, speed, enemyPredictor, 2, world, true);//, 3); 
 			List<DirectedEdge> newPath = agent.pathCreator.getBestPath();
 			float marioXPos = MarioMethods.getMarioXPos(observation.getMarioFloatPos());
 			float marioYPos = MarioMethods.getMarioYPos(observation.getMarioFloatPos());
@@ -556,7 +556,7 @@ public class TestAStar {
 //		TestTools.runOneTick(observation);
 //		
 //		// Compare speednode with Mario's position
-//		long hashCode = Hasher.hashSpeedNode(vx, edge, 5000); //TODO
+//		long hashCode = Hasher.hashSpeedNode(vx, edge, 5000); 
 //		SpeedNode correspondingSpeedNode = agent.pathCreator.getSpeedNodesFromSingleThreadAStar().get(hashCode);
 //		assertEquals(correspondingSpeedNode.currentXPos, MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
 //		assertEquals(correspondingSpeedNode.yPos - (1f / World.PIXELS_PER_BLOCK), MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos()), MarioControls.ACCEPTED_DEVIATION);
