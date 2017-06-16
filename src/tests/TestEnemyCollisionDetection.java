@@ -51,7 +51,7 @@ public class TestEnemyCollisionDetection {
 	public void testCorrectMarioBlockPlacementDetection(){
 		EnemyPredictor enemyPredictor = new EnemyPredictor();
 		startup();
-		List<DirectedEdge> Path = new ArrayList<DirectedEdge>(); //Lenght 1 path. Testing one edge.
+		ArrayList<DirectedEdge> Path = new ArrayList<DirectedEdge>(); //Lenght 1 path. Testing one edge.
 		JumpingEdge polynomial =  new JumpingEdge(marioNode, null);
 		List<DirectedEdge> listOfEdges = new ArrayList<DirectedEdge>();
 		polynomial.setToJumpPolynomial(marioNode, 11, 4, 4);

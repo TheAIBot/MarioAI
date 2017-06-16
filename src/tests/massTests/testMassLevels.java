@@ -73,7 +73,7 @@ public class testMassLevels {
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
 		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
 		
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 100; i++) {
 			FastAndFurious agent = new FastAndFurious();
 			agent.DEBUG = false;
 			int seed = (int) (Math.random () * Integer.MAX_VALUE);
