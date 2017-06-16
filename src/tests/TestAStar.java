@@ -181,7 +181,7 @@ public class TestAStar {
 		
 		Map<Long, SpeedNode> speedNodes = agent.pathCreator.getSpeedNodesFromSingleThreadAStar(); //agent.pathCreator.getSpeedNodes();
 		Map<Integer, Integer> numberOfNodesMap = new HashMap<Integer, Integer>();
-		final int MAX_NUMBER_OF_SPEED_NODES = agent.pathCreator.getBlockingGranularity() * 2 + 1;
+		final int MAX_NUMBER_OF_SPEED_NODES = agent.pathCreator.getBlockingGranularitySingleThreadAStar() * 2 + 1;
 		final int NUMBER_OF_TEST_TICKS = 50;
 		final HashSet<Long>searchedNodes = new HashSet<Long>(); 
 		for (int i=0; i<NUMBER_OF_TEST_TICKS; i++) {

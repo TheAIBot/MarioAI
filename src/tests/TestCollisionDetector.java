@@ -59,7 +59,7 @@ public class TestCollisionDetector {
 	@Test
 	public void testRunIntoWall(){
 		World world = flatlandWorld();
-		world = TestGrapher.totalFlatland(world, marioNode);//Adds a wall later, to force it to run into the wall.
+		world = TestEdgeCreator.totalFlatland(world, marioNode);//Adds a wall later, to force it to run into the wall.
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Again, edge before the wall.
 		Node[][] level = world.getLevelMatrix();
@@ -69,8 +69,8 @@ public class TestCollisionDetector {
 		for (int size = 1; size <= WALL_HEIGHT; size++) {			
 			short i = 1; //TODO change back to 1
 			for (; i < GRID_WIDTH/2; i++) {
-				TestGrapher.addWall(size, 11 - i - 1, marioNode.y, level, marioNode); //Left wall
-				TestGrapher.addWall(size, 11 + i, marioNode.y, level, marioNode); //Right wall
+				TestEdgeCreator.addWall(size, 11 - i - 1, marioNode.y, level, marioNode); //Left wall
+				TestEdgeCreator.addWall(size, 11 + i, marioNode.y, level, marioNode); //Right wall
 				//Placed at different distances. To the right:
 				ArrayList<DirectedEdge> leftWalkingPath = new ArrayList<DirectedEdge>();
 				ArrayList<DirectedEdge> rightWalkingPath = new ArrayList<DirectedEdge>();
@@ -158,8 +158,8 @@ public class TestCollisionDetector {
 					currentLeft 	= snLeft;					
 				}				
 				//removing the walls:
-				TestGrapher.removeWall(size, 11 - i - 1, marioNode.y, level);
-				TestGrapher.removeWall(size, 11 + i, marioNode.y, level);
+				TestEdgeCreator.removeWall(size, 11 - i - 1, marioNode.y, level);
+				TestEdgeCreator.removeWall(size, 11 + i, marioNode.y, level);
 			}
 		}	
 	}
@@ -167,7 +167,7 @@ public class TestCollisionDetector {
 	@Test
 	public void testJumpIntoCeiling(){
 		//TODO go trough the test step by step, and check it is correct.
-		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
+		World world = TestEdgeCreator.totalFlatland(flatlandWorld(),marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode); //Edges are made before the ceiling, to ensure that the movements are possible.
 		Node[][] level = world.getLevelMatrix();
@@ -203,7 +203,7 @@ public class TestCollisionDetector {
 	
 	@Test	
 	public void testStandardMovementsAtDifferentSpeeds(){
-		World world = TestGrapher.totalFlatland(flatlandWorld(),marioNode);
+		World world = TestEdgeCreator.totalFlatland(flatlandWorld(),marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
 		
@@ -245,7 +245,7 @@ public class TestCollisionDetector {
 	public void testStepwiseRaiseIntoCeiling(){
 
 		World world = flatlandWorld();
-		world = TestGrapher.totalFlatland(world, marioNode);
+		world = TestEdgeCreator.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
 		Node[][] level = world.getLevelMatrix();
@@ -293,7 +293,7 @@ public class TestCollisionDetector {
 	public void testStepwiseLowerIntoFloor(){
 		
 		World world = flatlandWorld();
-		world = TestGrapher.totalFlatland(world, marioNode);
+		world = TestEdgeCreator.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
 		Node[][] level = world.getLevelMatrix();
@@ -330,7 +330,7 @@ public class TestCollisionDetector {
 	public void testIgnoreFloorIfLastPosition(){
 		
 		World world = flatlandWorld();
-		world = TestGrapher.totalFlatland(world, marioNode);
+		world = TestEdgeCreator.totalFlatland(world, marioNode);
 		EdgeCreator grapher = new EdgeCreator();
 		grapher.setMovementEdges(world, marioNode);
 		Node[][] level = world.getLevelMatrix();

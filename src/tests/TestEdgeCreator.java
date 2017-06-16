@@ -28,7 +28,7 @@ import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.environments.Environment;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestGrapher {
+public class TestEdgeCreator {
 	EdgeCreator grapher = new EdgeCreator();
 	Environment observation;
 	private static final int GRID_WIDTH = 22;

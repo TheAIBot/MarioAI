@@ -2,7 +2,9 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import MarioAI.FastAndFurious;
 import MarioAI.World;
@@ -11,6 +13,7 @@ import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCompleteLevel {
 	final int MARIO_WON = Mario.STATUS_WIN; // 1
 	final int MARIO_LOST = Mario.STATUS_DEAD; // 0
@@ -65,8 +68,8 @@ public class TestCompleteLevel {
 	}
 	
 	@Test
-	public void testTheMaze() {
-		assertEquals(MARIO_WON, testLevel("theMaze"));
+	public void testUltraMaze() {
+		assertEquals(MARIO_WON, testLevel("UltraMaze"));
 	}
 	
 	@Test
