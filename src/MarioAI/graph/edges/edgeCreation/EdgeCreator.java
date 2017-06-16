@@ -808,7 +808,7 @@ public class EdgeCreator {
 	 * @param currentXPosition The column given.
 	 * @param direction Current direction of the jump.
 	 * @param collisionDetection The former collision object. Necessary to discern between hitting a wall or the ground.
-	 * @return
+	 * @return The kind of collision the corner makes.
 	 */
 	public Collision lowerFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, Collision collisionDetection) {
 		if (direction.isUpwardsType()) { 
@@ -838,7 +838,17 @@ public class EdgeCreator {
 			return Collision.HIT_NOTHING;
 		}
 	}
-
+	
+	/** Returns the kind of collision that the upper facing corner (in the direction given) will make,
+	 * when placed at the given x and y position. This depends on the end y position in the former column, formerLowerYPosition,
+	 * and if it is already hitting a wall, isHittingWall.
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @param isHittingWall If it is hitting the wall in the column.
+	 * @param formerLowerYPosition The end y position in the former column.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision upperFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, boolean isHittingWall, float formerLowerYPosition) {
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
@@ -867,6 +877,13 @@ public class EdgeCreator {
 		}
 	}
 	
+	/** Returns the kind of collision that the upper opposite corner (from the direction given) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision upperOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
 		//The x coordinate/column of the opposite corner of the facing corner.
 		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
@@ -880,6 +897,13 @@ public class EdgeCreator {
 		}
 	}
 	
+	/** Returns the kind of collision that the lower opposite corner (from the direction given) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision lowerOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
 		//The x coordinate/column of the opposite corner of the facing corner.
 		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
@@ -896,12 +920,13 @@ public class EdgeCreator {
 			return Collision.HIT_NOTHING;
 		}
 	}
-	/**
-	 * 
-	 * @param y
-	 * @param currentXPosition
-	 * @param direction
-	 * @return
+	
+	/** Returns the kind of collision that the middle opposite corner (middle part of Mario in the facing direction) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
 	 */
 	public Collision middleFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction){
 		//Mario must have height > 1 before this is relevant (in the case one wants to change Mario's height):
