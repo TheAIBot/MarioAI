@@ -135,9 +135,9 @@ public class EdgeCreator {
 		}
 		if (ALLOW_JUMPING) {
 			foundAllEdges = getPolynomialReachingEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
-			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
-			foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
+			//foundAllEdges = getJumpStraightUpEdges(startingNode, nodeColoumn, listOfEdges) && foundAllEdges;
+			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.RIGHT_DOWNWARDS, listOfEdges) && foundAllEdges;
+			//foundAllEdges = getFallingDownEdges(startingNode, nodeColoumn, JumpDirection.LEFT_DOWNWARDS,	listOfEdges) && foundAllEdges;
 		}
 
 		if (foundAllEdges) {

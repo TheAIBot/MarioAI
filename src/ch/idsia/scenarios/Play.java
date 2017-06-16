@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import MarioAI.FastAndFurious;
+import ch.idsia.ai.agents.human.HumanKeyboardAgent;
 import ch.idsia.ai.tasks.ProgressTask;
 import ch.idsia.ai.tasks.Task;
 import ch.idsia.mario.environments.Environment;
@@ -16,7 +17,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -25,9 +26,9 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
-			//Environment observation = TestTools.loadLevel("UltraMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("UltraMaze.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
-			Environment observation = TestTools.loadLevel("flat.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
 			//TODO bug i collision detection for level = TheMazeError.
@@ -76,7 +77,7 @@ public class Play {
 			}
             
 	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(130869110);
+	        options.setLevelRandSeed(1580961499);
 	        //options.setLevelRandSeed(1610614020); //Collision errors, falls of ledge.
 	        //options.setLevelRandSeed(264076394);
 	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
@@ -114,7 +115,7 @@ public class Play {
 	        
 	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
 	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(8);
+	        options.setLevelDifficulty(-1);
 	        task.setOptions(options);
 	        
 	        System.out.println ("Score: " + task.evaluate (controller)[0]);

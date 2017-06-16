@@ -17,6 +17,7 @@ import MarioAI.marioMovement.MarioControls;
 import MarioAI.path.PathCreator;
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
 
@@ -84,24 +85,24 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				/*
+				
 				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
 				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
 				DebugDraw.drawEdges(observation, world.getLevelMatrix());
 				DebugDraw.drawMarioReachableNodes(observation, world);
 				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
 				//DebugDraw.drawEnemies(observation, enemyPredictor);
-				//DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-				//DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
+				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
-				*/			
+					
 				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
 						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 						 							enemyPredictor.hasNewEnemySpawned();// ||
 						 							//pathCreator.getBestPath() == null;
-				//DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-				//DebugDraw.drawAction(observation, marioController.getActions());
+				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
+				DebugDraw.drawAction(observation, marioController.getActions());
 				//TestTools.renderLevel(observation);
 				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
 				DebugDraw.drawAction(observation, marioController.getActions());
