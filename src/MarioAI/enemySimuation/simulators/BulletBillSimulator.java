@@ -5,6 +5,11 @@ import java.awt.geom.Point2D;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 
+/**
+ * Code in this class is mostly from the games source code
+ * @author Andreas Gramstrup
+ *
+ */
 public class BulletBillSimulator extends EnemySimulator
 {
     private int facing;

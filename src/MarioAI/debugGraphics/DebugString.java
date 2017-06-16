@@ -6,6 +6,11 @@ import java.awt.Point;
 
 import ch.idsia.mario.engine.Art;
 
+/**
+ * 
+ * @author Andreas Gramstrup
+ *
+ */
 class DebugString extends DebugDrawing {
 	private final String text;
 	private final Point position;

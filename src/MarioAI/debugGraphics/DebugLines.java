@@ -10,6 +10,11 @@ import java.util.ArrayList;
 
 import ch.idsia.mario.engine.Art;
 
+/**
+ * 
+ * @author Andreas Gramstrup
+ *
+ */
 class DebugLines extends DebugDrawing {
 	private final Color color;
 	private final ArrayList<Point> lines; 

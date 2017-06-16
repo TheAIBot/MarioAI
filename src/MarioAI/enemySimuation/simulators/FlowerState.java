@@ -1,5 +1,10 @@
 package MarioAI.enemySimuation.simulators;
 
+/**
+ * POD class
+ * @author Andreas Gramstrup
+ *
+ */
 public class FlowerState {
 	public final int jumpTime;
 	public final float y;

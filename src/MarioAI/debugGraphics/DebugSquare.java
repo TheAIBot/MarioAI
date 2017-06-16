@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import ch.idsia.mario.engine.Art;
-
+/**
+ * 
+ * @author Andreas Gramstrup
+ *
+ */
 class DebugSquare extends DebugDrawing {
 	private final Color color;
 	private final Point startPoint; 

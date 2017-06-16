@@ -17,6 +17,12 @@ import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
 
+/**
+ * Can keep track of enemies by creating and removing simulations of 
+ * those enemies.
+ * @author Andreas Gramstrup
+ *
+ */
 public class EnemyPredictor {
 	
 	public static final int FLOATS_PER_ENEMY = 3;
@@ -26,9 +32,11 @@ public class EnemyPredictor {
 	public static final int ACCEPTED_POSITION_DEVIATION = 1;
 	
 	private LevelScene levelScene;
+	//Stores the position of the enemies last time the method update was called
 	private HashMap<Integer, ArrayList<Point2D.Float>> oldEnemyInfo;
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
+	//is true if a new enemy has spawned since last time this variable was set to false
 	private boolean newEnemySpawned = false;
 	
 	public void intialize(LevelScene levelScene) {
@@ -36,10 +44,21 @@ public class EnemyPredictor {
 		FlowerEnemy.createStateTable(levelScene);
 	}
 	
+	/**
+	 * Returns true if mario collides with an enemy or false if not
+	 * @param marioX marios x position
+	 * @param marioY marios y position
+	 * @param marioHeight marios current height
+	 * @param time time in ticks into the future from this current tick that the 
+	 * collision detection should be checked in
+	 * @return True if mario hits an enemy
+	 */
 	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
+			//+1 to time because magic
 			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
 			
+			//The collide check only takes positions in pixels and marios position and height is in blocks
 			final float marioXInPixels = marioX * World.PIXELS_PER_BLOCK;
 			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK;
 			final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
@@ -51,9 +70,15 @@ public class EnemyPredictor {
 		return false;	
 	}
 	
+	/**
+	 * Updates all the simulations, adds new ones and removes those that don't exist in the game anymore
+	 * @param enemyInfo an array of the enemy info given by the game
+	 */
 	public void updateEnemies(final float[] enemyInfo) {
+		//Sorted version of the enemyInfo which is easier to access
 		final HashMap<Integer, ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
+		//move all valid simulations forward
 		updateSimulations();
 		
 		removeDeadEnemies(sortedEnemyInfo);
@@ -65,6 +90,12 @@ public class EnemyPredictor {
 		oldEnemyInfo = sortedEnemyInfo;
 	}
 	
+	/**
+	 * Converts the enemy array of floats into a hashmap where there is an entry
+	 * for each kind in the array where the value is a list of all enemy positions of that kind
+	 * @param enemyInfo
+	 * @return
+	 */
 	private HashMap<Integer, ArrayList<Point2D.Float>> sortEnemiesByType(final float[] enemyInfo) {
 		final HashMap<Integer, ArrayList<Point2D.Float>> byType = new HashMap<Integer, ArrayList<Point2D.Float>>();
 		for (int i = 0; i < enemyInfo.length; i += FLOATS_PER_ENEMY) {
@@ -83,13 +114,22 @@ public class EnemyPredictor {
 		return byType;
 	}
 	
+	/**
+	 * Moves all valid enemies one tick forward
+	 */
 	private void updateSimulations() {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			enemySimulation.moveTimeForward();
 		}
 	}
 	
+	/**
+	 * If an enemy doesn't exist anymore then it's removed with this method
+	 * @param enemyInfo
+	 */
 	private void removeDeadEnemies(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+		//As a foreach is used there can't be deleted from the arraylist so instead
+		//a new list is created where all the not dead simulations are added
 		final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
 			final int kind = enemySimulation.getKind();
@@ -99,10 +139,14 @@ public class EnemyPredictor {
 			
 			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind);
 			
+			//Simulation can only be alive if there is a position for it in the enemyInfo
 			if (enemyPositions != null) {
 				Point2D.Float simulatedPosition = null;
 				float leastDifference = Integer.MAX_VALUE;
 				
+				//foreach enemy position of the same kind as the simulator
+				//if the expected position is within one of the values in the
+				//enemyInfo list then the simulator is assumed to be alive
 				for (Point2D.Float enemyPosition : enemyPositions) {
 					final float deltaX = Math.abs(enemyPosition.x - simulationX);
 					final float deltaY = Math.abs(enemyPosition.y - simulationY);
@@ -117,7 +161,9 @@ public class EnemyPredictor {
 						break;
 					}
 				}
-				
+				//if a position matched the positon of the simulator
+				//then remove the position from the arraylist so it can't
+				//also be used by another enemy and add the simulation to the alive simulations list
 				if (simulatedPosition != null) {
 					enemyPositions.remove(simulatedPosition);
 					//enemySimulation.setX(simulatedPosition.x);
@@ -127,10 +173,14 @@ public class EnemyPredictor {
 				}
 			}
 		}
-		
+		//replace old list with correct list of alive simulations
 		verifiedEnemySimulations = notDeletedSimulations;	
 	}
 	
+	/**
+	 * Goes through all possible correct simulation and adds all the simulations which are correct
+	 * @param enemyInfo
+	 */
 	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
@@ -139,6 +189,9 @@ public class EnemyPredictor {
 			final float y = enemyPosition.y;
 			final ArrayList<Point2D.Float> enemyPositions = enemyInfo.get(kind); 
 			
+			//Go through all position of the same kind and if any
+			//position matches the position of the simulation then 
+			//it's assumed that the simulation is correct
 			if (enemyPositions != null) {
 				Point2D.Float foundPoint = null;
 				
@@ -156,14 +209,23 @@ public class EnemyPredictor {
 				if (foundPoint != null) {
 					enemyPositions.remove(foundPoint);
 					verifiedEnemySimulations.add(enemySimulation);	
+					//when a new simulation is added a new enemy is supposedly also on the screen
 					newEnemySpawned = true;
 				}
 			}
 		}
 	}
 	
+	/**
+	 * Creates simulations from the enemyInfo. As it's not known which way the
+	 * enemy moves simulations are added for all possible movements. Tihis is where the old enemyInfo is used
+	 * @param enemyInfo
+	 */
 	private void addPotentialCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+		//Potential simulation are only in this list for one tick. they are either moved to the
+		//vlid simulations list or were invalid and are now garbage.
 		potentialCorrectSimulations.clear();
+		//Can onlydo this if the old enemyInfo is known as it's used to crate the speed which is required
 		if (oldEnemyInfo != null) {
 			for (Entry<Integer, ArrayList<Point2D.Float>> keyValueSet : enemyInfo.entrySet()) {
 				final int kind = keyValueSet.getKey();
@@ -174,6 +236,8 @@ public class EnemyPredictor {
 					continue;
 				}
 				
+				//Make a simulation for any possible movement vector possible using the old and
+				//new enemyInfo
 				for (int i = 0; i < enemyPositions.size(); i++) {
 					for (int z = 0; z < oldEnemyPositions.size(); z++) {
 						final Point2D.Float p1 = enemyPositions.get(i);
@@ -190,6 +254,9 @@ public class EnemyPredictor {
 						final float deltaX = Math.abs(xa);
 						final float deltaY = Math.abs(ya);
 						
+						//Max speed for an enemy is way below one block per tick
+						//so assume that all simulation with a speed above this are invalid
+						//and thus won't be created
 						if (deltaX <= World.PIXELS_PER_BLOCK && 
 							deltaY <= World.PIXELS_PER_BLOCK) {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
@@ -208,6 +275,15 @@ public class EnemyPredictor {
 		}
 	}
 	
+	/**
+	 * Returns a new simulator given the parameters
+	 * @param x
+	 * @param y
+	 * @param xa
+	 * @param ya
+	 * @param kind
+	 * @return
+	 */
 	private EnemySimulator getSimulator(final float x, final float y, final float xa , final float ya, final int kind) {
 		switch (kind) {
 		case Sprite.KIND_BULLET_BILL:
@@ -223,7 +299,13 @@ public class EnemyPredictor {
 			return new WalkingEnemySimulator(levelScene, x, y, xa, ya, type, kind, winged);
 		}
 	}
-		
+	
+	/**
+	 * returns whether the kind can fly
+	 * which is the same as the kind has wings
+	 * @param kind
+	 * @return
+	 */
 	private boolean canKindFly(final int kind) {
         switch (kind) {
         case Sprite.KIND_GOOMBA_WINGED:
@@ -236,6 +318,11 @@ public class EnemyPredictor {
 		}
 	} 
 	
+	/**
+	 * Converts the kind into a type
+	 * @param kind
+	 * @return
+	 */
 	private int getTypeFromKind(final int kind) {
         switch (kind) {
 		case Sprite.KIND_GOOMBA:
@@ -254,12 +341,20 @@ public class EnemyPredictor {
 		throw new Error("Unkown kind: " + kind);
 	}
 	
+	/**
+	 * moves all simulations timeToMove ticks into the future
+	 * @param timeToMove
+	 */
 	public void moveIntoFuture(final int timeToMove) {
 		for (int i = 0; i < timeToMove; i++) {
 			updateSimulations();
 		}
 	}
 	
+	/**
+	 * Updates this EnemyPredictor's information with the one given
+	 * @param correctPredictor
+	 */
 	public void syncFrom(EnemyPredictor correctPredictor) {
 		verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 		for (EnemySimulator enemySimulator : correctPredictor.verifiedEnemySimulations) {

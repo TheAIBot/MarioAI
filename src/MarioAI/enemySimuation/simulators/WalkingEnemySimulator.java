@@ -7,7 +7,11 @@ import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Shell;
 
-
+/**
+ * Code in this class is mostly from the games source code
+ * @author Andreas Gramstrup
+ *
+ */
 public class WalkingEnemySimulator extends EnemySimulator
 {
     public static final int ENEMY_RED_KOOPA = 0;

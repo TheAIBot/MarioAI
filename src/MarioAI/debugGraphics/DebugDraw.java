@@ -20,6 +20,11 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
+/**
+ * Static class which draws information about an agent onto the screen
+ * @author Andreas Gramstrup
+ *
+ */
 public class DebugDraw {
 
 	public static final int LEVEL_HEIGHT = 15;

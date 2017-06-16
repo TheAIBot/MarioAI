@@ -7,6 +7,11 @@ import MarioAI.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
 
+/**
+ * Code in this class is mostly from the games source code
+ * @author Andreas Gramstrup
+ *
+ */
 public class FlowerEnemy extends EnemySimulator
 {
 	private static final ArrayList<FlowerState> flowerStates = new ArrayList<FlowerState>();

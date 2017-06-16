@@ -25,15 +25,31 @@ public class MarioMethods {
 		return marioPos[1] / BLOCK_PIXEL_SIZE;
 	}
 
+	/**
+	 * Returns marios x pos as a float moved half a block to the left
+	 * @param marioPos
+	 * @return
+	 */
 	public static float getPreciseCenteredMarioXPos(final float[] marioPos) {
 		return getPreciseMarioXPos(marioPos) - BLOCK_CENTERING_OFFSET;
 	}
 
+	/**
+	 * Returns marios y pos as a float moved half a block to the left
+	 * @param marioPos
+	 * @return
+	 */
 	public static float getPreciseCenteredMarioYPos(final float[] marioPos) {
 		return getPreciseMarioYPos(marioPos) - BLOCK_CENTERING_OFFSET;
 	}
 	
+	/**
+	 * Returns marios height as a float from marios mode
+	 * @param mode
+	 * @return
+	 */
 	public static float getMarioHeightFromMarioMode(int mode) {
+		//Numbers taken from the games source code.
 		switch (mode) {
 		case 0:
 			return 0.75f;

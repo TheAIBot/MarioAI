@@ -6,7 +6,11 @@ import MarioAI.World;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Sprite;
 
-
+/**
+ * Code in this class is mostly from the games source code
+ * @author Andreas Gramstrup
+ *
+ */
 public class ShellSimulator extends EnemySimulator
 {
     private static float GROUND_INERTIA = 0.89f;

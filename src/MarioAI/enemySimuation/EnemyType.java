@@ -1,5 +1,11 @@
 package MarioAI.enemySimuation;
 
+/**
+ * Enum for all the different enemy types that exists.
+ * Only used in tests to specify which enemy to spawn
+ * @author Andreas Gramstrup
+ *
+ */
 public enum EnemyType {
 	RED_KOOPA {
 		@Override
