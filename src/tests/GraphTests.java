@@ -7,7 +7,10 @@ import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.graph.nodes.Node;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * @author Andreas
+ *
+ */
 public class GraphTests {
 	
 	@Test

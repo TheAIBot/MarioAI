@@ -20,7 +20,11 @@ import ch.idsia.mario.environments.Environment;
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEnemyCollisionDetection {
 	boolean[] action;

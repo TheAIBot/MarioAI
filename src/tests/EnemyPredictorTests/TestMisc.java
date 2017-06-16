@@ -15,7 +15,11 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
 import tests.UnitTestAgent;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class TestMisc {
 	@Test
 	public void testMultithreadedEnemyAccess() {

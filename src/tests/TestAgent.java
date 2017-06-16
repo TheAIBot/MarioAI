@@ -4,7 +4,10 @@ import MarioAI.MarioMethods;
 import ch.idsia.ai.agents.*;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-
+/** 
+ * @author Andreas
+ *
+ */
 public class TestAgent implements Agent {
 	private int tick = 0;	
 	private float prevX = 0;

@@ -20,7 +20,11 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class MassCreateStatistics {
 	private static final int LEVEL_CRASHED = -1;
 	private static final int LEVEL_LOSSED = 0;

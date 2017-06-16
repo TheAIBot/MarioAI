@@ -18,7 +18,11 @@ import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 import tests.TestTools;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class testMassLevels {
 	
 	public static final String MASS_LEVEL_DIRETORY = "src/tests/massTests/";

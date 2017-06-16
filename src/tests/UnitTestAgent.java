@@ -2,7 +2,10 @@ package tests;
 
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.environments.Environment;
-
+/** Agent to be used for unit testing.
+ * @author Andreas.
+ *
+ */
 public class UnitTestAgent implements Agent
 {
     public boolean action[] = new boolean[Environment.numberOfButtons];

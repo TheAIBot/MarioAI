@@ -14,10 +14,13 @@ import MarioAI.graph.edges.FallEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.marioMovement.MarioControls;
-
+/**
+ * @author Emil
+ *
+ */
 public class TestHasher {
 	
-	private final int LIMIT_X = 32;
+	private final int LIMIT_X = 17;
 	private final int LIMIT_Y = 15;
 	
 	@Test

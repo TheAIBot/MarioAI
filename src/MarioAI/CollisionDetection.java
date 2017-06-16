@@ -8,6 +8,10 @@ import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.mario.engine.LevelScene;
 
+/** Used to verifiy if a given movement is possible.
+ * @author Jesper
+ *
+ */
 public class CollisionDetection {
 	public static final float MARIO_WIDTH = 4;
 	public static final float MARIO_HEIGHT = 24;
@@ -24,7 +28,14 @@ public class CollisionDetection {
 	public CollisionDetection() {
 		loadTileBehaviors();
 	}
-	
+	/** 
+	 * @param futureOffset
+	 * @param currentOffset
+	 * @param sourceNode
+	 * @param lastY
+	 * @param world
+	 * @return
+	 */
 	public boolean isColliding(Point2D.Float futureOffset, Point2D.Float currentOffset, SpeedNode sourceNode, float lastY, World world){
 		return isColliding(futureOffset.x, futureOffset.y, currentOffset.x, currentOffset.y, sourceNode.currentXPos, sourceNode.yPos, lastY, world);
 	}
@@ -141,10 +152,14 @@ public class CollisionDetection {
 		}
 	}
 
-	/** Taken directly from the Mario class. Lack of comments are due to their lack of comments.
-	 * 
+	/**Taken directly from the Mario class. Lack of comments are due to their lack of comments.
+	 * Do however use the world object.
+	 * @param currentPosition
+	 * @param newX
+	 * @param newY
 	 * @param xa
 	 * @param ya
+	 * @param world
 	 * @return
 	 */
 	private boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
@@ -170,6 +185,11 @@ public class CollisionDetection {
 		}
 	}
 	
+	/** Converts from the given type of a block, to that used by the game engine.
+	 * Must be done to get the correct type of collision.
+	 * @param type The type to be converted
+	 * @return The original type of the block (or one of the possible types of the block, their can be more)
+	 */
 	private byte convertType(byte type){
 		for (int i = 0; i < TILE_CONVERTER.length; i++) {
 			if (TILE_CONVERTER_MARKER[i] == type) {
@@ -178,7 +198,8 @@ public class CollisionDetection {
 		}
 		throw new Error("Missing tile converter type, for type = " + type);
 	}
-	
+	/**Loads the tile behavior array. 
+	 */
 	private void loadTileBehaviors()
 	{
 		try 

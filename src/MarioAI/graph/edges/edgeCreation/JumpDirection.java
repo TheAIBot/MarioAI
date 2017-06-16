@@ -1,7 +1,7 @@
 package MarioAI.graph.edges.edgeCreation;
 
 /** Enum for direction of Jumps, like right and left, with their up and down variants.
- * @author 
+ * @author jesper.
  *
  */
 public enum JumpDirection { 

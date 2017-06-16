@@ -9,7 +9,10 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 import MarioAI.graph.nodes.SpeedNode;
-
+/**
+ * @author Andreas
+ *
+ */
 public class PathHelper {
 	private static int hashNumber = 0;
 	

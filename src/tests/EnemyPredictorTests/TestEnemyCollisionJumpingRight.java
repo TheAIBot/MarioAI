@@ -14,7 +14,11 @@ import ch.idsia.mario.environments.Environment;
 import tests.PathHelper;
 import tests.TestTools;
 import tests.UnitTestAgent;
-
+/**
+ * 
+ * @author Andreas
+ *
+ */
 public class TestEnemyCollisionJumpingRight {
 	@Test
 	public void testRedKoopaCollisionBox() {

@@ -26,7 +26,11 @@ import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.ai.agents.ai.BasicAIAgent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
-
+/**
+ * 
+ * @author Andreas and Jesper.
+ *
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCollisionDetector {
 	MarioControls marioControler = new MarioControls();
