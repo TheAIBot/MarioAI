@@ -17,7 +17,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = true;
+		boolean loadLevel = false;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -31,8 +31,6 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpStraightUp.lvl", controller, true);
-			//TODO bug i collision detection for level = TheMazeError.
-			//TODO bug i collision detection for level = thinStairs.
 			//TestTools.setMarioPosition(observation, 15, 10);
 			//Environment observation = TestTools.loadLevel("jumpLevels/only1Width.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("deadend1.lvl", controller, true);
@@ -48,8 +46,8 @@ public class Play {
 			}
 			TestTools.runWholeLevel(observation);
 		} else {
-			//FastAndFurious controller = new FastAndFurious();
-			HumanKeyboardAgent controller = new HumanKeyboardAgent();
+			FastAndFurious controller = new FastAndFurious();
+			//HumanKeyboardAgent controller = new HumanKeyboardAgent();
 			EvaluationOptions options = new CmdLineOptions(new String[0]);
 			options.setAgent(controller);
 			Task task = new ProgressTask(options);
@@ -76,48 +74,28 @@ public class Play {
 				}
 			}
             
-	        System.out.println("Seed = " + seed);
-	        options.setLevelRandSeed(1580961499);
-	        //options.setLevelRandSeed(1610614020); //Collision errors, falls of ledge.
-	        //options.setLevelRandSeed(264076394);
-	        //options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
-	        //options.setLevelRandSeed(324150513); //the best seed ever 2
-	        //options.setLevelRandSeed(898452612); //Difficulty 1
-	        //options.setLevelRandSeed(632962519); //Difficulty 1, good seed
-	        //options.setLevelRandSeed(860788790);
-	        //options.setLevelRandSeed(1145934057);
-	        //options.setLevelRandSeed(1319952038); //Difficulty 2, error, especially with reusing speed nodes.
-	        //options.setLevelRandSeed(1585046168);
-	        //options.setLevelRandSeed(3261372);
-	        //options.setLevelRandSeed(41);
-	        //options.setLevelRandSeed(42);
-	        //options.setLevelRandSeed(650);
-	        //options.setLevelRandSeed(666);
-	        //options.setLevelRandSeed(42243);
-	        //options.setLevelRandSeed(1028660435);
-	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
-	        /*
-860788790 //Error at difficulty 2
-1145934057 //Difficulty -1. Error with mario movement.
-1145934057
-1549733898
-793284811
-640346535
-1772112418
-232887628
-500432374 //Difficulty 2, fejl i collision engine
-1671739449 // gets stuck because cannot find path due to enemy (RED GOOMBA) 1/5th in
-916101382 // stuck in beginning because of drop down + gap
-
-1036439644 // seed hvor det faktisk gaar ret godt
-	         */
-	        
-	        //options.setLevelRandSeed(42243);(*) Includes a missing feature.
-	        //options.setLevelDifficulty(2);
-	        options.setLevelDifficulty(-1);
-	        task.setOptions(options);
-	        
-	        System.out.println ("Score: " + task.evaluate (controller)[0]);
+			System.out.println("Seed = " + seed);
+			//options.setLevelRandSeed(264076394);
+			//options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
+			//options.setLevelRandSeed(324150513); //the best seed ever 2
+			//options.setLevelRandSeed(860788790);
+			//options.setLevelRandSeed(1145934057);
+			//options.setLevelRandSeed(1580961499);
+			//options.setLevelRandSeed(1585046168);
+			//options.setLevelRandSeed(3261372);
+			//options.setLevelRandSeed(41);
+			//options.setLevelRandSeed(42);
+			//options.setLevelRandSeed(650);
+			//options.setLevelRandSeed(666);
+			//options.setLevelRandSeed(42243);
+			//options.setLevelRandSeed(1028660435);
+			
+			//options.setLevelRandSeed(42243);(*) Includes a missing feature.
+			//options.setLevelDifficulty(2);
+			options.setLevelDifficulty(-1);
+			task.setOptions(options);
+			
+			System.out.println ("Score: " + task.evaluate (controller)[0]);
 		}
 	}
 }

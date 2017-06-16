@@ -313,14 +313,9 @@ public class Mario extends Sprite {
 			}
 			ya *= 0.5f;
 		}
-		//TODO comment the print outs, out, when they are not needed any longer
-		//System.out.println("Mario actual position: x = " + x + ", y = " + y);
-		//System.out.println("Mario actual accelleration: xa = " + xa + ", ya = " + ya);
 		onGround = false;
 		move(xa, 0);
 		move(0, ya);
-		//System.out.println("Mario new position: x = " + x + ", y = " + y);
-		//System.out.println();
 
 		if (y > world.level.height * 16 + 16) {
 			die();
