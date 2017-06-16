@@ -2,17 +2,21 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import MarioAI.FastAndFurious;
 import MarioAI.World;
 import MarioAI.graph.edges.edgeCreation.EdgeCreator;
 import ch.idsia.ai.agents.Agent;
+import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestCompleteLevel {
-	final int MARIO_WON = 1;
-	final int MARIO_LOST = 0;
+	final int MARIO_WON = Mario.STATUS_WIN; // 1
+	final int MARIO_LOST = Mario.STATUS_DEAD; // 0
 	
 	Agent agent;
 	Environment observation;
@@ -38,12 +42,14 @@ public class TestCompleteLevel {
 		assertEquals(MARIO_WON, testLevel("flat"));
 	}
 	
-	/**
-	 * Mario should not be able to finish this level, because the agent cannot jump 5 blocks horizontally 
-	 */
 	@Test
 	public void testPit() {
-		assertEquals(MARIO_LOST, testLevel("pit12345"));
+		assertEquals(MARIO_WON, testLevel("pit12345"));
+	}
+	
+	@Test
+	public void testPit12345678() {
+		assertEquals(MARIO_WON, testLevel("pit12345678"));
 	}
 	
 	@Test
@@ -62,13 +68,21 @@ public class TestCompleteLevel {
 	}
 	
 	@Test
-	public void testTheMaze() {
-		assertEquals(MARIO_WON, testLevel("theMaze"));
+	public void testUltraMaze() {
+		assertEquals(MARIO_WON, testLevel("UltraMaze"));
 	}
 	
 	@Test
 	public void testDropDown1() {
 		assertEquals(MARIO_WON, testLevel("dropDown1"));
+	}
+	
+	/**
+	 * Level for which no solution exists
+	 */
+	@Test
+	public void testProgramNotCrashInUnsolvableLevel() {
+		assertEquals(MARIO_LOST, testLevel("bumbybox"));
 	}
 	
 }

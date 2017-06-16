@@ -4,6 +4,17 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.nodes.SpeedNode;
 import MarioAI.marioMovement.MarioControls;
 
+/**
+ * Auxiliary class used for assigning unique hash codes to different types of objects.
+ * The overall strategy is to construct a value in the form a long, int or short, based
+ * on the given parameters. Each parameter will have its own seperate place in the constructed value
+ * to avoid overlaps and to achieve a unique hash code, which will only be the same for another object
+ * if the same input parameters are given.
+ * 
+ * To do this, a mask for each parameter is made, with a number of bits and placements based on knowledge of
+ * high values the input can take. Using bit-shifting and logical-and, each segment of the value to be returned is created and they are combiend
+ * with logical-or in the end giving the resulting hash code to be returned.
+ */
 public class Hasher {
 	
 	public static int hashIntPoint(int x, int y) {

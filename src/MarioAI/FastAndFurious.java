@@ -96,7 +96,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
 				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
 				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
-					
 				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
 						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
 						 							enemyPredictor.hasNewEnemySpawned();// ||

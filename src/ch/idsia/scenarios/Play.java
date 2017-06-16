@@ -17,7 +17,7 @@ public class Play {
 
 
 	public static void main(String[] args) {
-		boolean loadLevel = false;
+		boolean loadLevel = true;
 		if (loadLevel) {
 			FastAndFurious controller = new FastAndFurious();
 			//Agent controller = new UnitTestAgent();
@@ -26,7 +26,7 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("UltraMaze.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);
@@ -48,27 +48,27 @@ public class Play {
 			}
 			TestTools.runWholeLevel(observation);
 		} else {
-			FastAndFurious controller = new FastAndFurious();
-	        //HumanKeyboardAgent controller = new HumanKeyboardAgent();
-	        EvaluationOptions options = new CmdLineOptions(new String[0]);
-	        options.setAgent(controller);
-	        Task task = new ProgressTask(options);
-	        options.setMaxFPS(false);
-	        options.setVisualization(true);
-	        options.setNumberOfTrials(1);
-	        options.setMatlabFileName("");
-	        int seed = (int) (Math.random() * Integer.MAX_VALUE);
-	        options.setLevelRandSeed(seed);
+			//FastAndFurious controller = new FastAndFurious();
+			HumanKeyboardAgent controller = new HumanKeyboardAgent();
+			EvaluationOptions options = new CmdLineOptions(new String[0]);
+			options.setAgent(controller);
+			Task task = new ProgressTask(options);
+			options.setMaxFPS(false);
+			options.setVisualization(true);
+			options.setNumberOfTrials(1);
+			options.setMatlabFileName("");
+			int seed = (int) (Math.random() * Integer.MAX_VALUE);
+			options.setLevelRandSeed(seed);
             
-	        if (new File(FastAndFurious.saveStateFileName).exists()) {
-	        	String fileContent = null;
+			if (new File(FastAndFurious.saveStateFileName).exists()) {
+				String fileContent = null;
 				try {
 					fileContent = Files.readAllLines(Paths.get(FastAndFurious.saveStateFileName)).get(0);
 					
 					final long loadedSeed = Long.parseLong(fileContent.split(" ")[0]);
 					final int tick = Integer.parseInt(fileContent.split(" ")[1]);
 					
-					controller.runToTick(tick);
+					//controller.runToTick(tick);
 					options.setLevelRandSeed((int)loadedSeed);
 					options.setMaxFPS(true);
 				} catch (IOException e) {
@@ -96,7 +96,6 @@ public class Play {
 	        //options.setLevelRandSeed(42243);
 	        //options.setLevelRandSeed(1028660435);
 	        //options.setLevelRandSeed(1905810938); //Bug here without running edges
-
 	        /*
 860788790 //Error at difficulty 2
 1145934057 //Difficulty -1. Error with mario movement.

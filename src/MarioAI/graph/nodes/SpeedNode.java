@@ -177,8 +177,6 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	/**
-	 * Old collision method. Momentarily only for ease of reference.
-	 * TODO remove this method
 	 * @param startTime
 	 * @param enemyPredictor
 	 * @param marioHeight

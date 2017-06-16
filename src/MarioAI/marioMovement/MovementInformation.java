@@ -1,12 +1,15 @@
 package MarioAI.marioMovement;
 
-import java.awt.geom.Point2D;
 import java.util.Arrays;
 
 import MarioAI.World;
 import MarioAI.graph.nodes.SpeedNode;
 import ch.idsia.mario.engine.sprites.Mario;
 
+/**
+ * Class used for storing and retrieving information about Mario's movement.
+ * It holds two objects for the movement information in the horizontal, x, and vertical, y, directions.
+ */
 public class MovementInformation{
 	//vertical information
 	private final int totalTicksJumped;
@@ -57,6 +60,12 @@ public class MovementInformation{
 		}
 	}
 	
+	/**
+	 * @param tick
+	 * @param actions
+	 * @return a boolean array giving which keys need to be pressed at the given tick
+	 * to make the move (e.g. run, jump) in question. 
+	 */
 	public boolean[] getActionsFromTick(int tick, boolean[] actions) {
 		if (tick < 0 || tick >= getMoveTime()) {
 			throw new Error("Invalid tick given: " + tick);
@@ -166,6 +175,11 @@ public class MovementInformation{
 		}
 	}
 
+	/**
+	 * @param sourceNode
+	 * @param world
+	 * @return true if there is a collision with a block in the world
+	 */
 	public boolean hasCollisions(SpeedNode sourceNode, World world) { //The x position should however suffice, as edges only comes from the ground.		
 		float previousPositionX = 0;
 		float previousPositionY = 0;
@@ -180,6 +194,12 @@ public class MovementInformation{
 		return false;
 	}
 	
+	/**
+	 * @param startX
+	 * @param startY
+	 * @param world
+	 * @return true if there is a collision with a block in the world
+	 */
 	public boolean hasCollisions(float startX, float startY, World world) { //The x position should however suffice, as edges only comes from the ground.
 		float previousPositionX = 0;
 		float previousPositionY = 0;

@@ -31,7 +31,6 @@ public class CollisionDetection {
 	
 	public boolean isColliding(float futureOffsetX, float futureOffsetY, float currentOffsetX, float currentOffsetY,
 										float startX, float startY, float lastY, World world){
-		//TODO check correct directions.
 		//One block = 16
 		//Note that it will take it as Marios right corner, if he had width=16, is placed at the speed node position initially
 		final float xa =  (futureOffsetX - currentOffsetX) * 16;
@@ -151,12 +150,11 @@ public class CollisionDetection {
 	private boolean isBlocking(Point2D.Float currentPosition, float newX, float newY, float xa, float ya, World world) {
 		int x = (int) (newX / 16);
 		int y = (int) (newY / 16);
-		//TODO check why this is necessary.
 		if (x == (int) (currentPosition.x / 16) && y == (int) (currentPosition.y / 16))
 			return false;
 		else {
 			Node[] column = world.getColumn(x);
-			if (column != null && y >= 0 && y <= 15) { //TODO (*)Check correct null check
+			if (column != null && y >= 0 && y <= 15) { 
 				Node block = column[y];
 				if (block == null) {
 					return false; //Can't block if it is air.
@@ -167,7 +165,6 @@ public class CollisionDetection {
 				blocking |= (ya < 0) && ((TILE_BEHAVIORS[blockType & 0xff]) & BIT_BLOCK_LOWER) > 0;
 				return blocking;
 			} else {
-				//Haven't seen the column=no collision. Corresponds to goal nodes(*) TODO check
 				return x < 0; //just an extra check, in case it checks outside the level matrix.
 			}
 		}
@@ -184,7 +181,6 @@ public class CollisionDetection {
 	
 	private void loadTileBehaviors()
 	{
-		//TODO check done correctly
 		try 
 		{
 			new DataInputStream(LevelScene.class.getResourceAsStream("resources/tiles.dat")).readFully(CollisionDetection.TILE_BEHAVIORS);

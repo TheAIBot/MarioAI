@@ -248,12 +248,12 @@ public class PathCreator {
 		isRunning = false;
 	}
 	
-	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodes() {
-		return aStars[aStars.length-1].getSpeedNodes();
+	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodesFromSingleThreadAStar() {
+		return singleThreadAstar.getSpeedNodes();
 	}
 	
-	public int getBlockingGranularity() {
-		return aStars[aStars.length-1].hashGranularity;
+	public int getBlockingGranularitySingleThreadAStar() {
+		return singleThreadAstar.hashGranularity;
 	}
 	
 }
