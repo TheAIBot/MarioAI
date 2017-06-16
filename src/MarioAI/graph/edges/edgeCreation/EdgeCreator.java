@@ -12,6 +12,10 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 
+/** Manages the edge creation for given worlds/level-matrixes.
+ * @author jesper
+ *
+ */
 public class EdgeCreator {
 	public static final float MAX_JUMP_HEIGHT = 4;
 	public static final float MAX_JUMP_RANGE = 8;
