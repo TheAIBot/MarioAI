@@ -48,8 +48,8 @@ public class Play {
 			}
 			TestTools.runWholeLevel(observation);
 		} else {
-			//FastAndFurious controller = new FastAndFurious();
-			HumanKeyboardAgent controller = new HumanKeyboardAgent();
+			FastAndFurious controller = new FastAndFurious();
+			//HumanKeyboardAgent controller = new HumanKeyboardAgent();
 			EvaluationOptions options = new CmdLineOptions(new String[0]);
 			options.setAgent(controller);
 			Task task = new ProgressTask(options);

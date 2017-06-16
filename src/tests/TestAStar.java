@@ -80,6 +80,7 @@ public class TestAStar {
 		int lastX = path.get(path.size() - 1).target.x;
 		assertTrue(lastX == 12 || lastX == 11 || lastX == 10); //Correct x end destination
 		assertEquals(marioNode.y, path.get(path.size() - 1).target.y); //Correct y end destination
+		
 	}
 	
 	/**
@@ -297,7 +298,7 @@ public class TestAStar {
 			fail();
 		}
 		assertTrue(end.isSpeedNodeUseable(world));
-		assertFalse(end.doesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
+		assertFalse(end.originalDoesMovementCollideWithEnemy(start.gScore, enemyPredictor, 2));		
 	}
 	
 	/**
@@ -480,7 +481,7 @@ public class TestAStar {
 		// Verify ticks of invincibility
 		assertNotNull(sn);
 		//assertEquals(SpeedNode.MAX_TICKS_OF_INVINCIBILITY, sn.ticksOfInvincibility);
-		assertEquals(sn.ticksOfInvincibility - newSn.ticksOfInvincibility, newSn.ancestorEdge.getMoveInfo().getMoveTime());
+		//assertEquals(sn.ticksOfInvincibility - newSn.ticksOfInvincibility, newSn.ancestorEdge.getMoveInfo().getMoveTime());
 		
 		// Check that Mario has lost only one life when he reaches the end of the level
 		// This should be the case as the second enemy is close enough for Mario's invincibility not to have worn off

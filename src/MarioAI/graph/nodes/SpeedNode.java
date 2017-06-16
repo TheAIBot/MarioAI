@@ -6,6 +6,11 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
+/**
+ * @author Emil
+ * Speed nodes are used as search nodes internally in the A* search algorithm as well as
+ * containing various kinds of additional usfull information. Corresponds to states in the world (state space)
+ */
 public class SpeedNode implements Comparable<SpeedNode> {
 	public final float SCORE_MULTIPLIER = 1024;
 	
@@ -15,19 +20,20 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	public float parentXPos;
 	public final float parentVx;
 	public final long hash;
-	public final DirectedEdge ancestorEdge;
+	public final DirectedEdge ancestorEdge; // The edge (action) used to get to this speed node
 	public final float creationXPos;
 	public float currentXPos;
 	public final int yPos;
 	public int gScore = 0;
 	public float fScore = 0;
-	private final MovementInformation moveInfo;
-	private final boolean isSpeedNodeUseable;
+	private final MovementInformation moveInfo; // movement information about the movement to get to this node
+	private final boolean isSpeedNodeUseable; // field for quickly checking if this speed node is possible to get to
+											  // with the ancestor edge and no collisions occured.
 	
-	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
-	public static int MAX_MARIO_LIFE = 3;
-	public int ticksOfInvincibility = 0;
-	public int lives = MAX_MARIO_LIFE;
+//	private static final int MAX_TICKS_OF_INVINCIBILITY = 32; // source: Mario.java line 596
+//	public static int MAX_MARIO_LIFE = 3;
+//	public int ticksOfInvincibility = 0;
+//	public int lives = MAX_MARIO_LIFE;
 	
 	public SpeedNode(Node node, float vx, long hash) {
 		this.node = node;
@@ -60,7 +66,7 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		
 	}
 	
-	///Should only be used for testing purposes
+	// Constructor only used in unit tests
 	public SpeedNode(Node node, float parentXPos, float parentVx, DirectedEdge ancestorEdge, long hash, World world) {
 		this.node = node;
 		this.moveInfo = MarioControls.getEdgeMovementInformation(ancestorEdge, parentVx, parentXPos);
@@ -94,6 +100,12 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		this.hash = hash;
 	}
 	
+	/**
+	 * Used for setting the field isThisSpeedNodeUsuable to quickly return an answer to this check when possible.
+	 * @param world
+	 * @return true if the edge to this speed node is possible to use and there are no collisions with the world
+	 * during the movement of the said edge.
+	 */
 	private boolean determineIfThisNodeIsUseable(World world) {
 		
 		if (moveInfo.getXPositions().length == 0) {
@@ -113,6 +125,17 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
+	/**
+	 * Determines if this node is usable based on if there are collisions with the world moving to this node
+	 * using the edge leading to this node as well as checking if the edge can be used.
+	 * If there is a minimal difference in x position between the speed node's current x position (the latter can
+	 * be changed in the fetching of speed nodes in A* to allowed reuse when applicable) then the check
+	 * for the edge being usable and no collisions with the world can be done quickly by just returning
+	 * the precomputed isSpeedNodeUsable field.
+	 * @param world
+	 * @return true if the edge to this speed node is possible to use and there are no collisions with the world
+	 * during the movement of the said edge.
+	 */
 	public boolean isSpeedNodeUseable(World world) {
 		final float diffX = Math.abs(creationXPos - currentXPos);
 		if (diffX <= MarioControls.ACCEPTED_DEVIATION) {
@@ -136,47 +159,13 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		return true;
 	}
 	
-	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, int marioHeight) {
-		int currentTick = startTime;
-		int i = parent.ticksOfInvincibility;
-		this.lives = parent.lives;
-		this.ticksOfInvincibility = parent.ticksOfInvincibility;
-		parent.ticksOfInvincibility = 0;
-		
-		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
-		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
-		if (i >= moveInfo.getMoveTime()) {
-			this.ticksOfInvincibility -= moveInfo.getMoveTime();
-			return false;
-		}
-		
-		currentTick += i;
-		boolean hasEnemyCollision = false;
-		for (; i < moveInfo.getMoveTime(); i++) {
-			final float x = parentXPos  + moveInfo.getXPositions()[i];
-			final float y = parent.yPos - moveInfo.getYPositions()[i];
-			
-			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick)) {
-				hasEnemyCollision = true;
-				ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
-			}
-			
-			currentTick++;
-		}
-		
-		if (hasEnemyCollision) {
-			lives--;
-		}
-		
-		return hasEnemyCollision;
-	}
-	
 	/**
-	 * Original collision method. Momentarily only for ease of reference.
+	 * Original collision method. Checks if there is a collision with an enemy during the movement
+	 * using the edge to get to the speed node.
 	 * @param startTime
 	 * @param enemyPredictor
 	 * @param marioHeight
-	 * @return
+	 * @return true if movement collides with an enemey, false otherwise.
 	 */
 	public boolean originalDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		int currentTick = startTime;
@@ -270,6 +259,9 @@ public class SpeedNode implements Comparable<SpeedNode> {
 		}
 	}
 	
+	/**
+	 * Used in the priority queue in A* when coparing the fitness (f-score) of this speed node with another
+	 */
 	public int compareTo(SpeedNode o) {
 		return (int) ((this.fScore * SCORE_MULTIPLIER) - (o.fScore * SCORE_MULTIPLIER));
 	}
