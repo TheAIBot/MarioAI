@@ -12,7 +12,12 @@ import MarioAI.marioMovement.MarioControls;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
+/**
+ * @author Emil
+ * The main class for the A* search algorithm.
+ */
 class AStar {
+	// A hash map of speed nodes created since initialising the search
 	private final Long2ObjectOpenHashMap<SpeedNode> speedNodes = new Long2ObjectOpenHashMap<SpeedNode>();
 	
 	// Set of nodes already explored
@@ -20,19 +25,23 @@ class AStar {
 	// Set of nodes yet to be explored
 	private final PriorityQueue<SpeedNode> openSet = new PriorityQueue<SpeedNode>();
 	private final Long2ObjectOpenHashMap<SpeedNode> openSetMap = new Long2ObjectOpenHashMap<SpeedNode>();
+	
 	public final int hashGranularity;
-	private SpeedNode currentBestPathEnd = null;
+	private SpeedNode currentBestPathEnd = null; // The current best node found by the search
 	private boolean keepRunning = false;
 	private boolean foundBestPath = false;
 	
-	private static final int PENALTY_SCORE = 9001; // arbitrary high value; "It's over 9000".
-	private static final int PENALTY_LONG_EDGE = 15; //Long edges gives mario a tendency to jump into enemies.
+	//private static final int PENALTY_SCORE = 9001; // arbitrary high value; Used for penalizing hitting enemies
+	private static final int PENALTY_LONG_EDGE = 15; // Long edges gives mario a tendency to jump into enemies.
 	
 	public AStar(int hashGranularity) {
 		this.hashGranularity = hashGranularity;
 	}
 	
 	/**
+	 * Initializes the A* search by resetting the various fields such as the closed and open set,
+	 * the current best node found and setting the f and g scores for the start node.
+	 * Then starting the main search method. 
 	 * @param start
 	 * @param goal
 	 * @param enemyPredictor
@@ -61,10 +70,12 @@ class AStar {
 	 * Main part of the A* search algorithm. Adapted to fit project and problem specification.
 	 * @param start
 	 * @param goal
-	 * @return
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @param world
 	 */
 	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
-		final long MAX_TIME_IN_ASTAR = 30;
+		final long MAX_TIME_IN_ASTAR = 30; // max time in milliseconds allowed for A* to run 
 		final long startMiliseconds = System.currentTimeMillis();
 		final long stopTime = startMiliseconds + MAX_TIME_IN_ASTAR;
 		while (!openSet.isEmpty() && keepRunning && stopTime >= System.currentTimeMillis()) {
@@ -120,7 +131,7 @@ class AStar {
 					}
 				}
 				
-				// collision detection and invincibility handling 
+				// collision detection (once invincibility handling was also made here) 
 				if (!(sn.ancestorEdge instanceof AStarHelperEdge)) {
 					sn.currentXPos = current.currentXPos + sn.getMoveInfo().getXMovementDistance();
 					sn.parentXPos = current.currentXPos;
@@ -129,9 +140,10 @@ class AStar {
 						continue;
 					}
 					
-					if (sn.tempDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
+					if (sn.originalDoesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
 						continue;
 					}
+					
 					/*
 					if (sn.ticksOfInvincibility == 0) {
 						if (sn.doesMovementCollideWithEnemy(current.gScore, enemyPredictor, marioHeight)) {
@@ -145,7 +157,7 @@ class AStar {
 						}
 					}
 					*/
-				}					
+				}
 				
 				// Update the edges position in the priority queue
 				// by updating the scores and taking it in and out of the queue.
@@ -163,20 +175,23 @@ class AStar {
 	}
 	
 	/**
-	 * @param neighborEdge
+	 * Retrieves or creates the child speed node from making the action in the ancestorEdge.
+	 * If it is present in the recorded hash map of speed node this will be returned, otherwise
+	 * a new speed node instance is created and returned. 
+	 * @param ancestorEdge
 	 * @param current
 	 * @param world
 	 * @return speedNode
 	 */
-	private SpeedNode getSpeedNode(DirectedEdge neighborEdge, SpeedNode current, World world) {
-		final long hash = Hasher.hashSpeedNode(current.vx, neighborEdge, 5000);
+	private SpeedNode getSpeedNode(DirectedEdge ancestorEdge, SpeedNode current, World world) {
+		final long hash = Hasher.hashSpeedNode(current.vx, ancestorEdge, 5000);
 		
 		final SpeedNode speedNode = speedNodes.get(hash);
 		if (speedNode != null) {
 			return speedNode;
 		}
 		
-		final SpeedNode newSpeedNode = new SpeedNode(neighborEdge.target, current, neighborEdge, hash, world);
+		final SpeedNode newSpeedNode = new SpeedNode(ancestorEdge.target, current, ancestorEdge, hash, world);
 		speedNodes.put(hash, newSpeedNode);
 		return newSpeedNode;
 	}
@@ -190,6 +205,9 @@ class AStar {
 		return MarioControls.getTicksToTarget(goal.node.x - current.currentXPos, current.vx);
 	}
 	
+	/**
+	 * @return the currently best path available, which will be the path to the rightmost node found
+	 */
 	public AStarPath getCurrentBestPath() {
 		//lock out here because the lock has to surround foundBestPath aswell
 		//because that can also change

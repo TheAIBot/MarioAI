@@ -12,6 +12,10 @@ import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.nodes.Node;
 
+/** Manages the edge creation for given worlds/level-matrixes.
+ * @author jesper
+ *
+ */
 public class EdgeCreator {
 	public static final float MAX_JUMP_HEIGHT = 4;
 	public static final float MAX_JUMP_RANGE = 8;
@@ -150,7 +154,6 @@ public class EdgeCreator {
 	/** Does what it says on the tin, and it does it for a given Node, startingNode. 
 	 *  getPolynomialReachingEdges cannot take those kind of edges into account, 
 	 *  why it is necessary.
-	 *  //TODO do i need to describe the algorithm?
 	 * @param startingNode The starting Node, and the node which the algorithm will take basis in. 
 	 * 						  All the edges found will have this Node as its source.
 	 * @param nodeColoumn The column of the level matrix the Node startingNode is placed at.
@@ -259,6 +262,7 @@ public class EdgeCreator {
 		
 		return foundAllEdges;
 	}
+	
 	/**Finds all the RunningEdge's that can reached by running, from the given Node startNode, 
 	 * at the given column nodeColumn in the level matrix. They are added to listOfEdges.
 	 * @param startingNode The given Node that will work as the source for the running edges.
@@ -302,7 +306,6 @@ public class EdgeCreator {
 		for (int jumpHeight = (int) 1; jumpHeight <= MAX_JUMP_HEIGHT; jumpHeight++) {
 			for (int jumpRange = (int) 1; jumpRange <= MAX_JUMP_RANGE; jumpRange++) { 				
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, jumpRange, jumpHeight);
-				// TODO ERROR if removed onshortdeadend
 				foundAllEdges = jumpAlongPolynomial(startingNode, nodeColoumn, polynomial,	JumpDirection.RIGHT_UPWARDS, listOfEdges) && foundAllEdges; 
 				
 				polynomial.setToJumpPolynomial(startingNode, nodeColoumn, -jumpRange, jumpHeight);
@@ -361,10 +364,9 @@ public class EdgeCreator {
 				hasAlreadyPassedTopPoint = true;
 			}
 
-			if (!isPastTopPointColumn && polynomial.isPastTopPoint(direction, currentXPosition + xPositionOffsetForJump)) { // TODO fix here, probably a bug.
+			if (!isPastTopPointColumn && polynomial.isPastTopPoint(direction, currentXPosition + xPositionOffsetForJump)) {
 				//If it has just passed the toppoint, it needs to take the max of the actual toppoint,
 				//and that given by the function, as it must go to its highest point.
-				//TODO the later is not needed?
 				currentYPosition = Math.max(polynomial.getTopPointY(), polynomial.f(currentXPosition + xPositionOffsetForJump)); 
 				// Because of the cursed limited precision:
 				currentYPosition = roundWithingMargin(currentYPosition,  0.02f);
@@ -469,7 +471,6 @@ public class EdgeCreator {
 			//one can find all the kinds of collisions he can make along the function/polynomial.
 			//Only needs those of the direction he faces, and the upper part, as if he will hit with those first,
 			//before the lower part and the part opposite to the facing direction. Thus, they will determine the kind of collisons.
-			//TODO we must go through and verify the correctness of the corners collision detection.
 			final Collision lowerFacingMarioCorner   = lowerFacingCornerCollision  	(y, currentXPosition, direction, collisionDetection);
 			final Collision upperFacingMarioCorner   = upperFacingCornerCollision  	(y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision upperOppositeMarioCorner = upperOppositeCornerCollision	(y, currentXPosition, direction);	
@@ -479,7 +480,7 @@ public class EdgeCreator {
 				 collisionDetection = Collision.HIT_CEILING;
 				break;
 			} 
-			//For the case that Mario have just risen above a wall:
+			//For the case that Mario has just risen above a wall:
 			else if (ascendingRisenAboveWall(lowerFacingMarioCorner, upperFacingMarioCorner, middleFacingMarioCorner)) {
 				collisionDetection = Collision.HIT_GROUND;//He hits the ground above the wall.
 				int groundXPosition = currentXPosition;
@@ -567,7 +568,7 @@ public class EdgeCreator {
 			final Collision middleFacingMarioCorner	= middleFacingCornerCollision	(y, currentXPosition, direction);
 			final Collision upperFacingMarioCorner 	= upperFacingCornerCollision  (y, currentXPosition, direction, isHittingWall, formerLowerYPosition);	
 			final Collision lowerOppositeMarioCorner 	= lowerOppositeCornerCollision(y, currentXPosition, direction);
-			//TODO maybe not give the middle facing Mario corner?
+			
 			if (landsOnGroundDescending(lowerFacingMarioCorner, upperFacingMarioCorner, middleFacingMarioCorner, lowerOppositeMarioCorner)) {
 				collisionDetection = Collision.HIT_GROUND;
 				
@@ -661,32 +662,57 @@ public class EdgeCreator {
 			return number; // else it is just normal.
 	}
 
-	
+	/**Gets the bounds of a part of a jump. More precisely, given a height, currentLowerYPosition, from a jump function,
+	 * and the source Node of the jump, it converts it to the height used by the level matrix.
+	 * @param startingNode The source Node of the jump
+	 * @param currentLowerYPosition The height at the given part of the jump.
+	 * @return The bound of the jump, ie. the height converted to the right format.
+	 */
 	private float getBounds(Node startingNode, float currentLowerYPosition) {
+		//For the height function, bigger number = higher up. This is converted to the format used in the game:'
+		//Higher up=smaller number:
 		return startingNode.y - (currentLowerYPosition - startingNode.y);
 	}
-
+	/**Returns whether a given Node is fully solid. This means false if it something like Air or grass blocks.
+	 * @param node The Node to check.
+	 * @return True if it is fully solid, else false.
+	 */
 	private static boolean isSolid(Node node) {
-		// return node != null;
-		return node != null && node.type != -11;// TODO(*) Fix
+		return node != null && node.type != -11;
 	}
 	
+	/** Determines whether or not, for a given x,y position in the level matrix (x is the column number),
+	 * if this is a part of Mario, if he would hit something moving upwards. 
+	 * @param xPosition The column of the part of Mario.
+	 * @param yPosition The row of the part of Mario.
+	 * @return True if he hits something, else false.
+	 */
 	private boolean isHittingWallOrGroundUpwards(int xPosition, float yPosition) {
 		//Floors the y position, as we are interested in the block Mario is currently in.
-		//Needs yPosition-0.01, as else one will get an immediate collision with the ground, as mario starts on it.
+		//Needs yPosition-0.01, as else one will get an immediate collision with the ground, as Mario starts on it.
 		//Ie. takes it as though mario howers a little above the ground (which he actually does in the code.)
-		return isOnLevelMatrix(xPosition, (int) (yPosition - 0.01)) && isSolid(observationGraph[xPosition][(int) (yPosition - 0.01)]);
+		return isOnLevelMatrix(xPosition, (int) (yPosition - 0.01)) && 
+				 isSolid(observationGraph[xPosition][(int) (yPosition - 0.01)]);
 	}
-
+	/** Returns whether or not Mario can jump up through the given Node.
+	 * @param node The given node to check. 
+	 * @return True if he can jump up through the node, else false.
+	 */
 	private static boolean isJumpThroughNode(Node node) {
 		return (node != null && node.type == -11);
 	}
 	
+	/** Determines whether or not, for a given x,y position in the level matrix (x is the column number),
+	 * if this is a part of Mario, if he would hit something moving downwards.
+	 * @param xPosition The column of the part of Mario.
+	 * @param yPosition The row of the part of Mario.
+	 * @return True if he hits something, else false.
+	 */
 	private boolean isHittingWallOrGroundDownwards(int xPosition, float yPosition) {
-		
 		//Floors the y position, as we are interested in the block Mario is currently in.
-		//Uses yPosition + 0.01, so when mario is close to the ground, it will be taken as a collision, without floating point errors.
-		//Not strictly neccessary.
+		//Uses yPosition + 0.01, so when Mario is close to the ground, it will be taken as a collision, 
+		//without floating point errors interfering.
+		//Not strictly necessary.
 		if (isOnLevelMatrix(xPosition, (int) (yPosition + 0.01))) {
 			final boolean isAtSolidNode = isSolid(observationGraph[xPosition][(int) (yPosition + 0.01)]);
 			final boolean isAtJumpThroughNode = isJumpThroughNode(observationGraph[xPosition][(int) (yPosition + 0.01)]);
@@ -695,74 +721,108 @@ public class EdgeCreator {
 			return false;
 		}
 	}
-
+	
+	/**Returns whether or not Mario is within the level matrix, after he moves in a given direction.
+	 * Only checks the column he is in.
+	 * @param xPosition The column he is in.
+	 * @param direction The direction he will move in.
+	 * @return True if he will be within view, else false.
+	 */
 	private boolean isWithinView(int xPosition, JumpDirection direction) {
 		if (direction.isLeftType()) {
 			return xPosition < GRID_WIDTH && xPosition >= 1;
 		} else return xPosition < GRID_WIDTH - 1 && xPosition >= 0;
 	}
-	
-	private boolean isWithinView(int xPosition) {
-		return xPosition < GRID_WIDTH && xPosition >= 0;
-	}
 
+	/** Returns whether or not Mario can stand on the given Node node.
+	 * @param node The node to check.
+	 * @param marioNode The Node for where Mario is placed. Used for position referencing.
+	 * @return True if Mario can stand on the Node, else false.
+	 */
 	private boolean canMarioStandThere(Node node, Node marioNode) {
-		boolean bool1 = node == null;
-		boolean bool2 = node.y < 0;
-		boolean bool3 = GRID_HEIGHT <= node.y;
-		// if (node == null || node.y < 0 || GRID_HEIGHT <= node.y ) {
-		if (bool1 || bool2 || bool3) { // Node can't stand on air, nor
-						// can he stand on nothing ->
-						// things that are not in the
-						// array.
+		boolean isAir = node == null;
+		boolean isUnderLevel = node.y < 0;
+		boolean isOverLevel = GRID_HEIGHT <= node.y;
+		// Mario can't stand on air, nor can he stand on nothing ->
+		// things that are not in the array:
+		if (isAir || isUnderLevel || isOverLevel) { 
 			return false;
 		} else {
 			int nodeXPosition = getColoumnRelativeToMario(node, marioNode);
 			return isOnSolidGround(node.y, nodeXPosition)
-					&& observationGraph[nodeXPosition][node.y - 1] == null;
+					 && observationGraph[nodeXPosition][node.y - 1] == null;
 		}
 	}
+	/** Checks if Mario can stand on the node, given by the column and row given.
+	 * 
+	 * @param coloumn The column of the Node to check
+	 * @param row The row of the Node to check
+	 * @return True if he can stand there, else false.
+	 */
 	private boolean canMarioStandThere(int coloumn,int row) {
-		//TODO changed 0 < row to 1 < row. Verify  that it makes sense
-		//Reason for change: Prevents a crash where row = 1
 		return 1 < row && row < GRID_HEIGHT &&
 			   isOnSolidGround(row, coloumn) && 
 			   !isSolid(observationGraph[coloumn][row - 1]) &&
 			   !isSolid(observationGraph[coloumn][row - 2]);
 	}
-
+	
+	/** Checks if Mario can stand on the node, given by the column and y position given.
+	 * 
+	 * @param coloumn The column of the Node to check
+	 * @param yPosition The y position of the Node to check
+	 * @return True if he can stand there, else false.
+	 */
 	private boolean canMarioStandThere(int coloumn, float yPosition) {
 		boolean isOnLevelMatrix = (0 <= yPosition && yPosition < GRID_HEIGHT);
+		//Depending on how high up Mario is, one need to check for 0, 1 or 2 blocks block above where he "stands",
+		//to avoid all those pesky array out of bounds exception.
 		return 	(isOnLevelMatrix && isOnSolidGround((int) (yPosition), coloumn)) &&
 				 	(	(yPosition < 1) ||
 				 		(yPosition < 2 && !isSolid(observationGraph[coloumn][(int) (yPosition) - 1])) ||
 				 		(yPosition >= 2 && !isSolid(observationGraph[coloumn][(int) (yPosition) - 1])  && !isSolid(observationGraph[coloumn][(int) (yPosition) - 2]))
 					 );
-		// One could use Marios height, but this is techinacally not correct,
-		// if one only wants to use information from one corner, namely this
+		// One could use Marios height, but this is technically not correct,
+		// if one only wants to use information from one corner, namely this.
 	}
-	
+	/** Returns whether or not the Node given by the column and row given, is solid or not.
+	 * @param row Row of the Node to check.
+	 * @param coloumn Column of the Node to check-
+	 * @return True if it is solid, else false.
+	 */
 	private boolean isOnSolidGround(int row, int coloumn) {
-		return observationGraph[coloumn][row] != null; // TODO Fix in general.
+		//Everything but air is solid for this purpose:
+		return observationGraph[coloumn][row] != null;
 	}
+	/** Returns whether or not the Node given by the column and row given, is air or not.
+	 * @param row Row of the Node to check.
+	 * @param coloumn Column of the Node to check-
+	 * @return True if it is air, else false.
+	 */
 
 	private boolean isAir(int coloumn, int row) {
-		//return node != null;
+		//An out of bounds check, and then the actual check:
 		return !(0 <= row 	  && row < GRID_HEIGHT     &&
 				 0 <= coloumn && coloumn < GRID_WIDTH) ||				
-				 observationGraph[coloumn][row] == null;// TODO(*) Fix
+				 observationGraph[coloumn][row] == null;
 	}
-				
+	
+	/** Returns the kind of collision that the lower facing corner (in the direction given) will make,
+	 * when placed at the given x and y position. This depends on the former Collision, collisionDetector.
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @param collisionDetection The former collision object. Necessary to discern between hitting a wall or the ground.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision lowerFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, Collision collisionDetection) {
 		if (direction.isUpwardsType()) { 
 			//In the case one is going upwards, one should not check for any other type of collisions, 
-			//than those originating from wall collisions.
-			//TODO check and discuss if ceiling the result is correct.
-			if (isHittingWallOrGroundUpwards(currentXPosition, y)) { //If it is hitting the ceiling, upperRight will notice.
+			//than those originating from wall collisions: if it is hitting the ceiling, upperRight will notice.
+			if (isHittingWallOrGroundUpwards(currentXPosition, y)) { //If it hits something it must be the wall.
 				return Collision.HIT_WALL;
 			} else {	
-				if (//isAir(currentXPosition, (int) (y - MARIO_HEIGHT)) && //TODO Is this needed?
-					 collisionDetection == Collision.HIT_WALL) {
+				//Else, if it has just hit a wall, this means that it have risen above the wall, and thus is hitting the ground.
+				if (collisionDetection == Collision.HIT_WALL) {
 					return Collision.HIT_GROUND;
 				} else {
 					return Collision.HIT_NOTHING;
@@ -770,11 +830,10 @@ public class EdgeCreator {
 			}
 		} else {
 			//One must be going downwards, and there should be checked for collisions:
-			//TODO check and discuss if ceiling the result is correct.
 			if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
 				//If this corner is hitting something, then there are two possibilities: either it is the ground or a wall.
 				//If it is the ground, then Mario can stand there, and if it is a wall, it is not possible.
-				if (canMarioStandThere(currentXPosition, y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall...
+				if (canMarioStandThere(currentXPosition, y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWallOrGroundDownwards.
 					return Collision.HIT_GROUND;
 				} else {
 					return Collision.HIT_WALL;
@@ -783,18 +842,29 @@ public class EdgeCreator {
 			return Collision.HIT_NOTHING;
 		}
 	}
-
+	
+	/** Returns the kind of collision that the upper facing corner (in the direction given) will make,
+	 * when placed at the given x and y position. This depends on the end y position in the former column, formerLowerYPosition,
+	 * and if it is already hitting a wall, isHittingWall.
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @param isHittingWall If it is hitting the wall in the column.
+	 * @param formerLowerYPosition The end y position in the former column.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision upperFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction, boolean isHittingWall, float formerLowerYPosition) {
 		if (direction.isUpwardsType()) {
 			//If mario is going upwards, one needs to check for ceiling collisions and the wall collisions,
 			//and not whether he hits the ground. This will be registered by the lower part.
-			//TODO check and discuss if ceiling the result is correct.
 			if (isHittingWallOrGroundUpwards(currentXPosition, y - MARIO_HEIGHT)) {
-				if (y == formerLowerYPosition) {
+				if (y == formerLowerYPosition) { 
+					//If y==formerLowerYPostion, then he has just moved to the right/left, and thus, he can't hit a ceiling,
+					//as it must happen from below, not the side. Thus it is a wall.
 					return Collision.HIT_WALL;
-				} else if (!isHittingWall){
+				} else if (!isHittingWall){ //If he is not currently moving up along a wall, he will hit a ceiling.
 					return Collision.HIT_CEILING;					
-				} else {
+				} else { //Else he is moving along a wall, and thus is still hitting the wall.
 					return Collision.HIT_WALL;
 				}
 			} else {
@@ -802,8 +872,7 @@ public class EdgeCreator {
 			}
 
 		} else {
-			//It can only hit a wall, or nothing, so:
-			//TODO check and discuss if ceiling the result is correct.
+			//It can only hit a wall, or nothing (no ceiling if one is moving downwards), so:
 			if (isHittingWallOrGroundDownwards(currentXPosition, y - MARIO_HEIGHT)) {
 				return Collision.HIT_WALL;
 			} else {
@@ -812,12 +881,19 @@ public class EdgeCreator {
 		}
 	}
 	
+	/** Returns the kind of collision that the upper opposite corner (from the direction given) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision upperOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
+		//The x coordinate/column of the opposite corner of the facing corner.
 		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
 		
 		//If Mario is going upwards, and since this is the opposite corner of the way he is going, 
-		//one only needs to check for ceiling collisions.
-		//TODO check and discuss if ceiling the result is correct.
+		//one only needs to check for ceiling collisions: hitting a wall will happen with the upper facing corner.
 		if (isHittingWallOrGroundUpwards(currentXPosition, y - MARIO_HEIGHT)) {
 			return Collision.HIT_CEILING;
 		} else {
@@ -825,41 +901,52 @@ public class EdgeCreator {
 		}
 	}
 	
+	/** Returns the kind of collision that the lower opposite corner (from the direction given) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision lowerOppositeCornerCollision(float y, int currentXPosition, JumpDirection direction) {
+		//The x coordinate/column of the opposite corner of the facing corner.
 		currentXPosition += direction.getOppositeDirection().getHorizontalDirectionAsInt();
 		
 		//It should check if Mario hits the ground: it can't be the wall, as Mario is going in the way opposite to this corner.
-		//TODO check and discuss if ceiling the result is correct.
 		if (isHittingWallOrGroundDownwards(currentXPosition, y)) {
-			if (canMarioStandThere(currentXPosition,  y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWall
+			if (canMarioStandThere(currentXPosition,  y + 0.01f)) { //+0.01, for the same reason it is done in isHittingWallOrGroundDownwards
 				return Collision.HIT_GROUND;
-			} else {  
-				//throw new Error("Logic error on corner collision detection");
+			} else {
+				//This isn't and shouldn't be possible, but it was included to check for logic errors.
 				return Collision.HIT_WALL;
-				//TODO i don't think this should be possible:
-				//TODO remove throw error.
 			}
 		} else {
 			return Collision.HIT_NOTHING;
 		}
 	}
-
+	
+	/** Returns the kind of collision that the middle opposite corner (middle part of Mario in the facing direction) will make,
+	 * when placed at the given x and y position. 
+	 * @param y Y position of the corner when it must be checked.
+	 * @param currentXPosition The column given.
+	 * @param direction Current direction of the jump.
+	 * @return The kind of collision the corner makes.
+	 */
 	public Collision middleFacingCornerCollision	(float y, int currentXPosition, JumpDirection direction){
-		//Mario must have height < 1, before this is relevant:
-		if (MARIO_HEIGHT > 1) {
-			//All blocks that can be passed downwards, can also be passed downwards, 
-			//for this case:
+		//Mario must have height > 1 before this is relevant (in the case one wants to change Mario's height):
+		if (MARIO_HEIGHT > 1) { //Since this is a constant, it will always be true.
+			//Can only lead to a wall collision, and this happens, if and only if it is in a wall:		
 			float marioMiddleYPosition = y - MARIO_HEIGHT/2;
 			if (isOnLevelMatrix(currentXPosition, (int) marioMiddleYPosition) &&
-			isSolid(observationGraph[currentXPosition][(int) marioMiddleYPosition])) { //If it is hitting the ceiling, upperRight will notice.
+				 isSolid(observationGraph[currentXPosition][(int) marioMiddleYPosition])) { //If it is hitting the ceiling, upperRight will notice before it.
 				return Collision.HIT_WALL;
 			} else {
 				return Collision.HIT_NOTHING;
 			}
 		} else return Collision.HIT_NOTHING; //Do not include it, which means, take it as having no collisions
-		//Can only lead to a wall collision, and this happens, if and only if it is in a wall:		
 	}
-
+	/**Clears all the edges in the level matrix: included for testing purposes.
+	 */
 	public void clearAllEdges() {
 		resetFoundAllEdges();
 		for (int i = 0; i < observationGraph.length; i++) {
@@ -870,7 +957,8 @@ public class EdgeCreator {
 			}
 		}
 	}
-
+	/**Reset for all nodes in the observation, whether or not all edges have been found. Used for testing purposes.
+	 */
 	public void resetFoundAllEdges(){
 		for (int i = 0; i < observationGraph.length; i++) {
 			for (int j = 0; j < observationGraph[i].length; j++) {
@@ -880,8 +968,9 @@ public class EdgeCreator {
 			}
 		}
 	}
-
-	
+	/**Set the observation graph/level matrix
+	 * @param world The world associated with the given levelmatrix/observationgraph.
+	 */
 	public void setWorld(World world) {
 		this.observationGraph = world.getLevelMatrix();
 	}

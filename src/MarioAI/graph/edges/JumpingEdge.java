@@ -10,13 +10,7 @@ public class JumpingEdge extends DirectedEdge {
 	private float c; // Parameters of the polynomial.
 	private float topPointX;
 	private float topPointY; // Coordinates of the toppunkt
-	// TODO Maybe change ceil after discussions. Problem associated with making
-	// this into an integer
-	// , as sometimes two possible jump position in a row will be registrated as
-	// possible to reach,
-	// even though it is only one it should be possible to reach. Mario changing
-	// position in the air can compensate for this.
-	public int ceiledTopPointX; //TODO change to private after tests.
+	public int ceiledTopPointX;
 	public int ceiledTopPointY; // Ceiled coordinates of the toppunkt
 	
 	public JumpingEdge(Node source, Node target, JumpingEdge polynomial, boolean useSuperSpeed) {
@@ -57,7 +51,6 @@ public class JumpingEdge extends DirectedEdge {
 		//This does not cause any problems, as a given edge is only made using one and only one level matrix,
 		//and the equals method does not discern edges based on this.
 		
-		//TODO described it in the report.
 		
 		
 		a = -4 * jumpHeight / (jumpRange * jumpRange);

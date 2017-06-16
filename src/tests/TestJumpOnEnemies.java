@@ -21,7 +21,6 @@ public class TestJumpOnEnemies {
 	private static final int GRID_WIDTH = 22;
 	public Node marioNode;
 	public DirectedEdge runningEdgeType = new RunningEdge(null, null, false);
-	// TODO add more tests for collisions.
 
 	private short getColoumnRelativeToMario(int xPosition) {
 		// Assumes that node!=null.
