@@ -21,7 +21,7 @@ import ch.idsia.mario.environments.Environment;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class PathCreator {
-	private static final int MAX_HASH_GRANULARITY = 48;
+	private static final int MAX_HASH_GRANULARITY = 16;
 	private static final int[] HASH_GRANULARITY = new int[] {2, MAX_HASH_GRANULARITY, 8, 40, 24, 16, 40, 4}; //{2, 4, 8, 16, 24, 32, 40, 48};
 	public static final int MAX_THREAD_COUNT = 8;
 	private final ExecutorService threadPool;
@@ -250,6 +250,10 @@ public class PathCreator {
 	
 	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodes() {
 		return aStars[aStars.length-1].getSpeedNodes();
+	}
+	
+	public Long2ObjectOpenHashMap<SpeedNode> getSpeedNodesFromSingleThreadAStar() {
+		return singleThreadAstar.getSpeedNodes();
 	}
 	
 	public int getBlockingGranularity() {
