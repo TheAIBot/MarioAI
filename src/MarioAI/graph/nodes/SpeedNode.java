@@ -1,13 +1,8 @@
 package MarioAI.graph.nodes;
 
-import java.awt.geom.Point2D;
-
-import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
-import MarioAI.graph.edges.FallEdge;
-import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.marioMovement.MarioControls;
 import MarioAI.marioMovement.MovementInformation;
 
@@ -177,14 +172,14 @@ public class SpeedNode implements Comparable<SpeedNode> {
 	}
 	
 	/**
-	 * Old collision method. Momentarily only for ease of reference.
+	 * Original collision method. Momentarily only for ease of reference.
 	 * TODO remove this method
 	 * @param startTime
 	 * @param enemyPredictor
 	 * @param marioHeight
 	 * @return
 	 */
-	public boolean tempDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
+	public boolean originalDoesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
 		int currentTick = startTime;
 		
         for (int i = 0; i < moveInfo.getMoveTime(); i++) {
@@ -199,6 +194,57 @@ public class SpeedNode implements Comparable<SpeedNode> {
         }
 		return false;
 	}
+	
+	/**
+	 * Method for functionality not finished before the deadline.
+	 * Check if Mario collides with an enemey and set ticks of invincibility, lives and penalty accordingly.
+	 * @param startTime
+	 * @param enemyPredictor
+	 * @param marioHeight
+	 * @return true if Mario collides with an enemy during the movement leading to this speed node, false otherwise
+	 */
+	/*
+	public boolean doesMovementCollideWithEnemy(int startTime, EnemyPredictor enemyPredictor, float marioHeight) {
+		if (ticksOfInvincibility < 0) {
+			System.out.println("Error");
+		}
+		
+		// If Mario is invincible longer than the time taken to get to traverse edge it does not matter
+		// if an enemy is hit underway or not, so just deduct the ticks it takes from the ticks left of invincibility 
+		if (ticksOfInvincibility >= moveInfo.getMoveTime()) {
+			ticksOfInvincibility -= moveInfo.getMoveTime();
+			return false;
+		}
+		
+		int currentTick = ticksOfInvincibility + startTime;
+		boolean hasEnemyCollision = false;
+		for (int i = ticksOfInvincibility; i < moveInfo.getMoveTime(); i++) {
+			final float x = parentXPos  + moveInfo.getXPositions()[i];
+			final float y = parent.yPos - moveInfo.getYPositions()[i];
+			
+			if (enemyPredictor.hasEnemy(x, y - (1f / World.PIXELS_PER_BLOCK), marioHeight, currentTick)) {
+				if (ticksOfInvincibility == 0) {
+					hasEnemyCollision = true;
+					lives--;
+					ticksOfInvincibility = MAX_TICKS_OF_INVINCIBILITY;
+					penalty += PENALTY_SCORE;
+				} else if (ticksOfInvincibility > 0){
+					ticksOfInvincibility--;
+				} else {
+					throw new Error("Negative invincibility error. It is: " + ticksOfInvincibility);
+				}
+			} else if(ticksOfInvincibility > 0) {
+				ticksOfInvincibility--;
+			}
+			
+			currentTick++;
+		}
+		if (ticksOfInvincibility < 0) {
+			System.out.println("Error");
+		}
+		
+		return hasEnemyCollision;
+	}*/
 	
 	public MovementInformation getMoveInfo() {
 		return moveInfo;
