@@ -111,6 +111,25 @@ public class Mario extends Sprite {
 		setLarge(Mario.large, Mario.fire);
 	}
 
+	
+	/**
+	 * Copy constructor
+	 * @param mario
+	 */
+	public Mario(Mario mario) {
+		this(mario.world);
+//		kind = KIND_MARIO;
+//		Mario.instance = this;
+//		this.world = mario.world;
+//		keys = mario.keys;
+//		cheatKeys = mario.cheatKeys;
+//		x = mario.x;
+//		y = mario.y;
+//
+//		facing = mario.facing;
+//		//setLarge(Mario.large, Mario.fire);
+	}
+
 	private boolean lastLarge;
 	private boolean lastFire;
 	private boolean newLarge;

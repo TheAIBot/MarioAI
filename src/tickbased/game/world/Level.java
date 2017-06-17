@@ -55,6 +55,15 @@ public class Level
         
         spriteTemplates = new SpriteTemplate[width][height];
     }
+    
+    
+   	/**
+   	 * Copy constructor
+   	 * @param level
+   	 */
+	public Level(Level level) {
+		this(level.width, level.height);
+	}
 
 //    public void ASCIIToOutputStream(OutputStream os) throws IOException {
 //        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
@@ -113,7 +122,8 @@ public class Level
 //
 ////        bw.close();
 //    }
-    
+   
+
 	/**
 	 * Method for loading tiles.dat without reading from the file
 	 * (The data is included in this method)

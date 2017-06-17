@@ -101,9 +101,24 @@ public class LevelScene implements SpriteContext
         this.killedCreaturesByStomp = levelScene.killedCreaturesByStomp;
         this.killedCreaturesByShell = levelScene.killedCreaturesByShell;
         
-        this.level = levelScene.level;
-        this.sprites = levelScene.sprites;
-		this.mario = levelScene.mario;
+    	this.mario = new Mario(levelScene.mario);
+    	this.level = new Level(levelScene.level);
+    	this.mario.world = this;
+    	
+    	// Enemies
+//    	List<Sprite> spritesArrayClone = new ArrayList<Sprite>();
+//        for (int i = 0; i < levelScene.sprites.size(); i++) {
+//        	Sprite sprite = levelScene.sprites.get(i);
+//        	if (sprite == mario) {
+//        		spritesArrayClone.add(this.mario);
+//        	} else {
+//        		Sprite s = new Sprite(sprite);
+//        		s.world = this;
+//        		spritesArrayClone.add(s);
+//        	}
+//        }
+//        this.sprites = spritesArrayClone;
+        
 		startTime = 1;
 		timeLeft = totalTime * 15;
 		tick = 1;
