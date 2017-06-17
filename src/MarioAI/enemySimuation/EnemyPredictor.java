@@ -16,6 +16,7 @@ import MarioAI.path.PathCreator;
 import ch.idsia.mario.engine.LevelScene;
 import ch.idsia.mario.engine.sprites.Enemy;
 import ch.idsia.mario.engine.sprites.Sprite;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Can keep track of enemies by creating and removing simulations of 
@@ -33,7 +34,7 @@ public class EnemyPredictor {
 	
 	private LevelScene levelScene;
 	//Stores the position of the enemies last time the method update was called
-	private HashMap<Integer, ArrayList<Point2D.Float>> oldEnemyInfo;
+	private Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> oldEnemyInfo;
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
 	//is true if a new enemy has spawned since last time this variable was set to false
@@ -76,7 +77,7 @@ public class EnemyPredictor {
 	 */
 	public void updateEnemies(final float[] enemyInfo) {
 		//Sorted version of the enemyInfo which is easier to access
-		final HashMap<Integer, ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
+		final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
 		//move all valid simulations forward
 		updateSimulations();
@@ -96,20 +97,25 @@ public class EnemyPredictor {
 	 * @param enemyInfo
 	 * @return
 	 */
-	private HashMap<Integer, ArrayList<Point2D.Float>> sortEnemiesByType(final float[] enemyInfo) {
-		final HashMap<Integer, ArrayList<Point2D.Float>> byType = new HashMap<Integer, ArrayList<Point2D.Float>>();
+	private Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> sortEnemiesByType(final float[] enemyInfo) {
+		final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> byType = new Int2ObjectOpenHashMap<ArrayList<Point2D.Float>>();
 		for (int i = 0; i < enemyInfo.length; i += FLOATS_PER_ENEMY) {
 			final int kind = (int) enemyInfo[i + TYPE_OFFSET];
 			final float x  =       enemyInfo[i + X_OFFSET];
 			final float y  =       enemyInfo[i + Y_OFFSET];
 			
-			final Point2D.Float enemyPos = new Point2D.Float(x, y);
-			
-			if (!byType.containsKey(kind)) {
-				byType.put(kind, new ArrayList<Point2D.Float>());
+			//Apparently mushrooms and other powerups
+			//are also considered enemies so first 
+			//filter those away
+			if (isKindAnEnemy(kind)) {
+				final Point2D.Float enemyPos = new Point2D.Float(x, y);
+				
+				if (!byType.containsKey(kind)) {
+					byType.put(kind, new ArrayList<Point2D.Float>());
+				}
+				
+				byType.get(kind).add(enemyPos);	
 			}
-			
-			byType.get(kind).add(enemyPos);
 		}
 		return byType;
 	}
@@ -127,7 +133,7 @@ public class EnemyPredictor {
 	 * If an enemy doesn't exist anymore then it's removed with this method
 	 * @param enemyInfo
 	 */
-	private void removeDeadEnemies(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+	private void removeDeadEnemies(final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> enemyInfo) {
 		//As a foreach is used there can't be deleted from the arraylist so instead
 		//a new list is created where all the not dead simulations are added
 		final ArrayList<EnemySimulator> notDeletedSimulations = new ArrayList<EnemySimulator>();
@@ -181,7 +187,7 @@ public class EnemyPredictor {
 	 * Goes through all possible correct simulation and adds all the simulations which are correct
 	 * @param enemyInfo
 	 */
-	private void addCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+	private void addCorrectSimulations(final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> enemyInfo) {
 		for (EnemySimulator enemySimulation : potentialCorrectSimulations) {			
 			final int kind = enemySimulation.getKind();
 			final Point2D.Float enemyPosition = enemySimulation.getCurrentPosition();
@@ -221,7 +227,7 @@ public class EnemyPredictor {
 	 * enemy moves simulations are added for all possible movements. Tihis is where the old enemyInfo is used
 	 * @param enemyInfo
 	 */
-	private void addPotentialCorrectSimulations(final HashMap<Integer, ArrayList<Point2D.Float>> enemyInfo) {
+	private void addPotentialCorrectSimulations(final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> enemyInfo) {
 		//Potential simulation are only in this list for one tick. they are either moved to the
 		//vlid simulations list or were invalid and are now garbage.
 		potentialCorrectSimulations.clear();
@@ -339,6 +345,22 @@ public class EnemyPredictor {
 			return Enemy.ENEMY_SPIKY;
 		}
 		throw new Error("Unkown kind: " + kind);
+	}
+	
+	private boolean isKindAnEnemy(final int kind) {
+        switch (kind) {
+		case Sprite.KIND_GOOMBA:
+		case Sprite.KIND_GOOMBA_WINGED:;
+		case Sprite.KIND_RED_KOOPA:
+		case Sprite.KIND_RED_KOOPA_WINGED:
+		case Sprite.KIND_GREEN_KOOPA:
+		case Sprite.KIND_GREEN_KOOPA_WINGED:
+		case Sprite.KIND_SPIKY:
+		case Sprite.KIND_SPIKY_WINGED:
+			return true;
+		default:
+			return false;
+		}
 	}
 	
 	/**
