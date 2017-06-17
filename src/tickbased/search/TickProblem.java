@@ -137,50 +137,49 @@ public class TickProblem extends Problem {
 		// Blocks
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
         	int xStart = (marioXPos - SCREEN_WIDTH > 0) ? marioXPos - SCREEN_WIDTH : 0;
-        	int xEnd = (marioXPos <= 15) ? 15 : marioXPos - SCREEN_WIDTH ; // in the beginning Mario cannot see very far for some reason. So take care of this.
+        	int xEnd = (marioXPos <= 15) ? 15 : marioXPos - SCREEN_WIDTH ; // in the beginning Mario cannot see very far, so take care of this.
         	for (int x = xStart; x < xEnd; x++) {
         		worldScene.level.setBlock(x, y, blockPositions[x][y]);
         	}
         }
         
-        // Enemies
-        float delta = 0.5f; // uncertainty of already seen enemy positions relative to observed now
-        Sprite sprite = null;
-        for (int i = 0; i < enemyPositions.length; i += 3) {
-        	int kind = (int) enemyPositions[i];
-        	float x = enemyPositions[i+1];
-        	float y = enemyPositions[i+2];
-        	
-        	boolean hasFoundEnemy = false;
-        	for (Sprite spr : sprites) {
-        		// check if enemy has been seen previously
-        		if (Math.abs(spr.x - x) < delta && Math.abs(spr.y - y) < delta && spr.kind == kind
-        			&& spr.kind != Sprite.KIND_SHELL
-	        		&& spr.kind != Sprite.KIND_BULLET_BILL) {
-        			if (!spr.hasFacingBeenSet) { // if enemy.facing has not been set previously
-        				((Enemy) spr).facing = (spr.x - x > 0) ? 1 : -1;
-        			}
-        			hasFoundEnemy = true;
-        			break;
-        		}
-        	}
-        	
-			if (!hasFoundEnemy) {
-				if (kind == Enemy.ENEMY_FLOWER) {
-					int xBlockPos = (int) x / 16;
-					int yBlockPos = (int) y / 16;
-					sprite = new FlowerEnemy(worldScene, (int) x, (int) y, xBlockPos, yBlockPos);
-				} else if (kind == Sprite.KIND_BULLET_BILL) {
-					sprite = new BulletBill(worldScene, x, y, -1);
-				} else {
-					boolean winged = false; // TODO temporarily not taken care of
-					sprite = new Enemy(worldScene, (int) x, (int) y, -1, kind, winged, (int) x / 16, (int) y / 16);
-				}
-				sprites.add(sprite);
-        	}
-			if (sprite != null) worldScene.addSprite(sprite);
-        	
-        }
+//        // Enemies
+//        float delta = 0.5f; // uncertainty of already seen enemy positions relative to observed now
+//        Sprite sprite = null;
+//        for (int i = 0; i < enemyPositions.length; i += 3) {
+//        	int kind = (int) enemyPositions[i];
+//        	float x = enemyPositions[i+1];
+//        	float y = enemyPositions[i+2];
+//        	
+//        	boolean hasFoundEnemy = false;
+//        	for (Sprite spr : sprites) {
+//        		// check if enemy has been seen previously
+//        		if (Math.abs(spr.x - x) < delta && Math.abs(spr.y - y) < delta && spr.kind == kind
+//        			&& spr.kind != Sprite.KIND_SHELL
+//	        		&& spr.kind != Sprite.KIND_BULLET_BILL) {
+//        			if (!spr.hasFacingBeenSet) { // if enemy.facing has not been set previously
+//        				((Enemy) spr).facing = (spr.x - x > 0) ? 1 : -1;
+//        			}
+//        			hasFoundEnemy = true;
+//        			break;
+//        		}
+//        	}
+//        	
+//			if (!hasFoundEnemy) {
+//				if (kind == Enemy.ENEMY_FLOWER) {
+//					int xBlockPos = (int) x / 16;
+//					int yBlockPos = (int) y / 16;
+//					sprite = new FlowerEnemy(worldScene, (int) x, (int) y, xBlockPos, yBlockPos);
+//				} else if (kind == Sprite.KIND_BULLET_BILL) {
+//					sprite = new BulletBill(worldScene, x, y, -1);
+//				} else {
+//					boolean winged = false; // TODO temporarily not taken care of
+//					sprite = new Enemy(worldScene, (int) x, (int) y, -1, kind, winged, (int) x / 16, (int) y / 16);
+//				}
+//				sprites.add(sprite);
+//        	}
+//			if (sprite != null) worldScene.addSprite(sprite);
+//        }
         
         ((Node) initialState).x = marioPosition[0];
         ((Node) initialState).y = marioPosition[1];

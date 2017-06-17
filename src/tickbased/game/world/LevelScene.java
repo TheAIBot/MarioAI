@@ -103,7 +103,8 @@ public class LevelScene implements SpriteContext
         
     	this.mario = new Mario(levelScene.mario);
     	this.level = new Level(levelScene.level);
-    	this.mario.world = this;
+    	
+//    	this.mario.world = this;
     	
     	// Enemies
 //    	List<Sprite> spritesArrayClone = new ArrayList<Sprite>();

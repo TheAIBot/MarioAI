@@ -36,8 +36,12 @@ public class AStarTickBased {
 		start.fScore = problem.heuristicFunction(start, goal);
 		
 		int timeTaken = (int) (System.currentTimeMillis() - startTime);
+		
+		// DEBUG
+		int runThroughsAllowed = 40;
+		
 		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
-		while (!frontier.isEmpty() && (timeTaken < problem.MAX_ALLOWED_RUN_TIME)) {
+		while (!frontier.isEmpty() && (runThroughsAllowed-- > 0)) { //(timeTaken < problem.MAX_ALLOWED_RUN_TIME)) {
 			SearchNode current = frontier.remove();
 			frontierMap.remove(current.hashCode());
 
@@ -48,7 +52,9 @@ public class AStarTickBased {
 			}
 			
 			// If the searchNode has a higher x value than the previous ones then this will be the new currentBest
-			if (((Node) current.state).x > ((Node) currentBest.state).x) currentBest = current;
+			if (((Node) current.state).x > ((Node) currentBest.state).x) {
+				currentBest = current;
+			}
 			
 			// Current node has been explored
 			explored.add(current);

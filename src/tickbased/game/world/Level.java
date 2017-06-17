@@ -63,6 +63,16 @@ public class Level
    	 */
 	public Level(Level level) {
 		this(level.width, level.height);
+//		this.width = level.width;
+//        this.height = level.height;
+//
+//        xExit = 10;
+//        yExit = 10;
+//        map = new byte[level.width][level.height];
+//        data = new byte[level.width][level.height];
+//        observation = new byte[level.width][level.height];
+//        
+//		spriteTemplates = new SpriteTemplate(level.spriteTemplates);
 	}
 
 //    public void ASCIIToOutputStream(OutputStream os) throws IOException {

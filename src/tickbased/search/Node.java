@@ -44,7 +44,6 @@ public class Node implements State {
 			if (Math.abs(oo.x - x) < delta
 				&& Math.abs(oo.y - y) < delta
 				&& Math.abs(oo.ticksInFuture - ticksInFuture) < timeDelta) {
-				
 			}
 		}
 		return false;

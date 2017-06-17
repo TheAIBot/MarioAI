@@ -21,7 +21,7 @@ public class SearchNode implements Comparable<SearchNode> {
 		if (o == null) return false;
 		if (o instanceof SearchNode) {
 			SearchNode oo = (SearchNode) o;
-			oo.state.equals(this);
+			return (oo.state.equals(this.state) && oo.action.equals(this.action) && oo.parent.equals(this.parent));
 		}
 		return false;
 	}
