@@ -73,7 +73,7 @@ public class testMassLevels {
 		ArrayList<Integer> crashedSeeds = new ArrayList<Integer>();
 		ArrayList<Integer> lossedSeeds = new ArrayList<Integer>();
 		
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			FastAndFurious agent = new FastAndFurious();
 			agent.DEBUG = false;
 			int seed = (int) (Math.random () * Integer.MAX_VALUE);
@@ -93,10 +93,12 @@ public class testMassLevels {
 			} catch (Exception e) {
 				crashes++;
 				crashedSeeds.add(seed);
+				continue;
 				
 			} catch (Error e) {
 				crashes++;
 				crashedSeeds.add(seed);
+				continue;
 			}
 
 			final int status = ((MarioComponent) observation).getMarioStatus();
