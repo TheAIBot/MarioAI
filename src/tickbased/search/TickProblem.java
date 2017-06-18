@@ -46,10 +46,34 @@ public class TickProblem extends Problem {
 //		// stand still and jump
 //		if (node.levelScene.mario.mayJump()) actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
 		
+		
+		
+//		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
+//		actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
+//		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
+//		actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
+//
+//		// move left
+//		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
+//		actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+//		actions.add(new MarioAction(node, createAction(true, false, false, false, true)));
+//		actions.add(new MarioAction(node, createAction(true, false, false, true, true)));
+//
+//		// jump straight up
+//		actions.add(new MarioAction(node, createAction(false, false, false, true, true)));
+//		
+//		// stand still and jump
+//		actions.add(new MarioAction(node, createAction(false, false, false, true, false)));
+		
+		
+		
 		actions.add(new MarioAction(node, createAction(false, true, false, false, false)));
 		actions.add(new MarioAction(node, createAction(true, false, false, false, false)));
 		actions.add(new MarioAction(node, createAction(false, true, false, true, false)));
 		actions.add(new MarioAction(node, createAction(true, false, false, true, false)));
+		
+		actions.add(new MarioAction(node, createAction(false, true, false, false, true)));
+		actions.add(new MarioAction(node, createAction(false, true, false, true, true)));
 		
 		return actions;
 	}

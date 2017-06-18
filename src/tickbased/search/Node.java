@@ -36,8 +36,8 @@ public class Node implements State {
 	
 	// TODO compare x,y and ticks in future
 	public boolean equals(Object o) {
-		int delta = 1; // for now
-		int timeDelta = 1; // for now
+		float delta = 2f; // for now
+		float timeDelta = 2f; // for now
 		if (o == null) return false;
 		if (o instanceof Node) {
 			Node oo = (Node) o; 

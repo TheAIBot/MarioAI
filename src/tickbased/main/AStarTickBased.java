@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import tickbased.search.MarioAction;
 import tickbased.search.Node;
 
 public class AStarTickBased {
@@ -39,7 +38,7 @@ public class AStarTickBased {
 		int timeTaken = (int) (System.currentTimeMillis() - startTime);
 		
 		// DEBUG
-		int runThroughsAllowed = 500;
+		int runThroughsAllowed = 100;
 		
 		// Continue exploring as long as there are states in the state space, which have not been visited, or until goal is reached
 		while (!frontier.isEmpty() && (runThroughsAllowed-- > 0)) { //(timeTaken < problem.MAX_ALLOWED_RUN_TIME)) {
@@ -63,12 +62,6 @@ public class AStarTickBased {
 			// Explore each neighbor of current node
 			for (Action action : problem.actions(current.state)) {
 				SearchNode child = problem.childNode(current, action);
-				
-				if (current != null && current.parent != null && current.parent.action != null) {
-					if (((MarioAction) action).action[3] && ((MarioAction) current.action).action[3] && ((MarioAction) current.parent.action).action[3]) {
-						System.out.println();
-					}
-				}
 				
 				// Cost of reaching child node
 				double tentativeGScore = current.gScore + problem.pathCost(current, child);
