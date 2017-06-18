@@ -14,4 +14,13 @@ public class MarioAction implements Action {
 		this.action = action;
 	}
 	
+	public String toString() {
+		String str = "";
+		for (boolean b : action) {
+			if (b) str += "T ";
+			else str += "F ";
+		}
+		return str;
+	}
+	
 }

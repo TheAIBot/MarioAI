@@ -102,6 +102,7 @@ public class LevelScene implements SpriteContext
         this.killedCreaturesByShell = levelScene.killedCreaturesByShell;
         
     	this.mario = new Mario(levelScene.mario);
+    	sprites.add(this.mario);
     	this.level = new Level(levelScene.level);
     	
 //    	this.mario.world = this;
@@ -120,9 +121,9 @@ public class LevelScene implements SpriteContext
 //        }
 //        this.sprites = spritesArrayClone;
         
-		startTime = 1;
-		timeLeft = totalTime * 15;
-		tick = 1;
+		startTime = levelScene.startTime;
+		timeLeft = levelScene.timeLeft;
+		tick = levelScene.tick;
     }
 
     /**

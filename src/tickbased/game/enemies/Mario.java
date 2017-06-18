@@ -119,7 +119,6 @@ public class Mario extends Sprite {
 	public Mario(Mario mario) {
 		//this(mario.world);
 		kind = KIND_MARIO;
-		Mario.instance = this;
 		this.world = mario.world;
 		keys = mario.keys;
 		cheatKeys = mario.cheatKeys;
@@ -128,6 +127,33 @@ public class Mario extends Sprite {
 
 		facing = mario.facing;
 		//setLarge(Mario.large, Mario.fire);
+		
+		
+		runTime = mario.runTime;
+		wasOnGround = mario.wasOnGround;
+		onGround = mario.onGround;
+		mayJump = mario.mayJump;
+		ducking = mario.ducking;
+		sliding = mario.sliding;
+		jumpTime = mario.jumpTime;
+		xJumpSpeed = mario.xJumpSpeed;
+		yJumpSpeed = mario.yJumpSpeed;
+		canShoot = mario.canShoot;
+
+		width = mario.width;
+		height = mario.height;
+		xDeathPos = mario.xDeathPos;
+		yDeathPos = mario.yDeathPos;
+
+		deathTime = mario.deathTime;
+		winTime = mario.winTime;
+		invulnerableTime = mario.invulnerableTime;
+
+		carried = mario.carried;
+		
+		// Sprite fields
+		mapX = mario.mapX;
+		mapY = mario.mapY;
 	}
 
 	private boolean lastLarge;

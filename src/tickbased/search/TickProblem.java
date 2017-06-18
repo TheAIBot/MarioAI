@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.idsia.mario.environments.Environment;
-import tickbased.game.enemies.BulletBill;
-import tickbased.game.enemies.Enemy;
-import tickbased.game.enemies.FlowerEnemy;
 import tickbased.game.enemies.Mario;
 import tickbased.game.enemies.Sprite;
 import tickbased.game.world.LevelScene;
@@ -95,8 +92,10 @@ public class TickProblem extends Problem {
 	}
 
 	@Override
-	public double pathCost(SearchNode n1, SearchNode n2) {
-		return 1;
+	public double pathCost(SearchNode sn1, SearchNode sn2) {
+		Node n1 = (Node) sn1.state;
+		Node n2 = (Node) sn2.state;
+		return Math.sqrt(Math.pow((n2.x - n1.x), 2) + Math.pow((n2.y - n1.y), 2));
 	}
 
 	/**
@@ -129,17 +128,23 @@ public class TickProblem extends Problem {
 		
 		worldScene.mario.x = marioPosition[0];
 		worldScene.mario.y = marioPosition[1];
-		Mario mario = worldScene.mario;
 		
+		Mario mario = worldScene.mario;
 		int marioXPos = (int) mario.x / 16; // block precision
 		int marioYPos = (int) mario.y / 16; // block precision
-
+		final int halfObservedWidth = 11;
+		final int halfObservedHeight = 11;
+		
 		// Blocks
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        	int xStart = (marioXPos - SCREEN_WIDTH > 0) ? marioXPos - SCREEN_WIDTH : 0;
-        	int xEnd = (marioXPos <= 15) ? 15 : marioXPos - SCREEN_WIDTH ; // in the beginning Mario cannot see very far, so take care of this.
-        	for (int x = xStart; x < xEnd; x++) {
-        		worldScene.level.setBlock(x, y, blockPositions[x][y]);
+		for (int y = marioYPos - halfObservedHeight; y < marioYPos + halfObservedHeight; y++) {
+			int obsX = 0;
+        	for (int x = marioXPos - halfObservedWidth; x < marioXPos + halfObservedWidth; x++) {
+        		if (x >= 0 && x <= worldScene.level.xExit && y >= 0 && y < worldScene.level.yExit ) {
+        			worldScene.level.setBlock(x, y, blockPositions[obsX][y]);
+        		} else {
+        			//System.out.println("spring over");
+        		}
+        		obsX++;
         	}
         }
         

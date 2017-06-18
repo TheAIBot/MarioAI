@@ -46,8 +46,8 @@ public class Level
         this.width = width;
         this.height = height;
 
-        xExit = 10;
-        yExit = 10;
+        xExit = 1000; // custom
+        yExit = 22; // custom
         map = new byte[width][height];
         data = new byte[width][height];
         spriteTemplates = new SpriteTemplate[width][height];
@@ -62,17 +62,17 @@ public class Level
    	 * @param level
    	 */
 	public Level(Level level) {
-		this(level.width, level.height);
-//		this.width = level.width;
-//        this.height = level.height;
-//
-//        xExit = 10;
-//        yExit = 10;
-//        map = new byte[level.width][level.height];
-//        data = new byte[level.width][level.height];
-//        observation = new byte[level.width][level.height];
-//        
-//		spriteTemplates = new SpriteTemplate(level.spriteTemplates);
+		//this(level.width, level.height);
+		this.width = level.width;
+        this.height = level.height;
+
+        xExit = level.xExit;
+        yExit = level.yExit;
+        map = level.map;
+        data = level.data;
+        observation = level.observation;
+        
+        spriteTemplates = new SpriteTemplate[width][height];
 	}
 
 //    public void ASCIIToOutputStream(OutputStream os) throws IOException {
@@ -520,5 +520,14 @@ public class Level
 
     public double getWidthPhys() {         return width * 16;    }
 
-
+    public String toString() {
+    	String str = "";
+    	for (int x = 0; x < map.length; x++) {
+    		for (int y = 0; y < map[x].length; y++) {
+        		str += map[x][y];
+        	}
+    		str += "\n";
+    	}
+    	return str;
+    }
 }
