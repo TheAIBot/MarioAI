@@ -345,17 +345,6 @@ public class EnemyPredictor {
 		throw new Error("Unkown kind: " + kind);
 	}
 	
-    public static final int KIND_GOOMBA = 2;
-    public static final int KIND_GOOMBA_WINGED = 3;
-    public static final int KIND_RED_KOOPA = 4;
-    public static final int KIND_RED_KOOPA_WINGED = 5;
-    public static final int KIND_GREEN_KOOPA = 6;
-    public static final int KIND_GREEN_KOOPA_WINGED = 7;
-    public static final int KIND_BULLET_BILL = 8;
-    public static final int KIND_SPIKY = 9;
-    public static final int KIND_SPIKY_WINGED = 10;
-    public static final int KIND_ENEMY_FLOWER = 12;
-    public static final int KIND_SHELL = 13; 
 	private boolean isKindAnEnemy(final int kind) {
         switch (kind) {
 		case Sprite.KIND_GOOMBA:
