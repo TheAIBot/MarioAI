@@ -18,6 +18,7 @@ public abstract class EnemySimulator {
     protected final int width;
     protected final int height;
     protected final int kind;
+    private int positionTimeOffsetIndex = 0;
     //Contains the position of the enemy for all the requested times so they don't have
     //to be recalculated. index 0 is the enemy's current position
     private final ArrayList<Point2D.Float> positionAtTime = new ArrayList<Point2D.Float>(); 
@@ -59,7 +60,8 @@ public abstract class EnemySimulator {
      */
     public void moveTimeForward() {
     	if (positionAtTime.size() > 0) {
-			positionAtTime.remove(0);
+			//positionAtTime.remove(0);
+    		positionTimeOffsetIndex++;
 		}
     	else {
     		move();
@@ -89,11 +91,11 @@ public abstract class EnemySimulator {
      * @return
      */
     public synchronized Point2D.Float getPositionAtTime(int time) {
-    	while (positionAtTime.size() <= time) {
+    	while (positionAtTime.size() - positionTimeOffsetIndex <= time) {
     		moveEnemy();
 		}
     	
-    	return positionAtTime.get(time);
+    	return positionAtTime.get(time + positionTimeOffsetIndex);
     }
     
     public float getWidth() {
