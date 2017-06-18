@@ -42,7 +42,7 @@ public abstract class EnemySimulator {
      * @param marioHeight
      * @return
      */
-    public abstract boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight);
+    public abstract boolean collideCheck(float marioX, float marioY, float marioHeight, int time);
     
     /**
      * Returns a copy of this simulation
@@ -89,13 +89,10 @@ public abstract class EnemySimulator {
      * @return
      */
     public synchronized Point2D.Float getPositionAtTime(int time) {
-    	if (positionAtTime.size() <= time) {
-			//synchronized (createPositionsLock) {
-		    	while (positionAtTime.size() <= time) {
-		    		moveEnemy();
-				}
-			//}
+    	while (positionAtTime.size() <= time) {
+    		moveEnemy();
 		}
+    	
     	return positionAtTime.get(time);
     }
     

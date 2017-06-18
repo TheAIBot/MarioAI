@@ -56,15 +56,13 @@ public class EnemyPredictor {
 	 */
 	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time) {
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			//+1 to time because magic
-			final Point2D.Float enemyPositionInPixels = enemySimulation.getPositionAtTime(time + 1);
-			
 			//The collide check only takes positions in pixels and marios position and height is in blocks
 			final float marioXInPixels = marioX * World.PIXELS_PER_BLOCK;
 			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK;
 			final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
 			
-			if (enemySimulation.collideCheck(enemyPositionInPixels.x, enemyPositionInPixels.y, marioXInPixels, marioYInPixels, marioHeightInPixels)) {
+			//+1 to time because magic
+			if (enemySimulation.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time + 1)) {
 				return true;
 			}
 		}
@@ -347,6 +345,17 @@ public class EnemyPredictor {
 		throw new Error("Unkown kind: " + kind);
 	}
 	
+    public static final int KIND_GOOMBA = 2;
+    public static final int KIND_GOOMBA_WINGED = 3;
+    public static final int KIND_RED_KOOPA = 4;
+    public static final int KIND_RED_KOOPA_WINGED = 5;
+    public static final int KIND_GREEN_KOOPA = 6;
+    public static final int KIND_GREEN_KOOPA_WINGED = 7;
+    public static final int KIND_BULLET_BILL = 8;
+    public static final int KIND_SPIKY = 9;
+    public static final int KIND_SPIKY_WINGED = 10;
+    public static final int KIND_ENEMY_FLOWER = 12;
+    public static final int KIND_SHELL = 13; 
 	private boolean isKindAnEnemy(final int kind) {
         switch (kind) {
 		case Sprite.KIND_GOOMBA:
@@ -355,8 +364,11 @@ public class EnemyPredictor {
 		case Sprite.KIND_RED_KOOPA_WINGED:
 		case Sprite.KIND_GREEN_KOOPA:
 		case Sprite.KIND_GREEN_KOOPA_WINGED:
+		case Sprite.KIND_BULLET_BILL:
 		case Sprite.KIND_SPIKY:
 		case Sprite.KIND_SPIKY_WINGED:
+		case Sprite.KIND_ENEMY_FLOWER:
+		case Sprite.KIND_SHELL:
 			return true;
 		default:
 			return false;

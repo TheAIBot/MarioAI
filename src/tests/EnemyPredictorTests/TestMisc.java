@@ -31,6 +31,8 @@ public class TestMisc {
 		TestTools.spawnEnemy(observation, 1, 1, 1, EnemyType.BULLET_BILL);
 		final EnemyPredictor copy = TestEnemyHelper.findEnemies(observation, enemyPredictor, true);
 		
+		assertEquals(1, copy.getEnemies().size());
+		
 		for (int i = 0; i < 100000; i++) {
 			final int finalI = i;
 			exe.submit(() -> copy.getEnemies().get(0).getPositionAtTime(finalI));

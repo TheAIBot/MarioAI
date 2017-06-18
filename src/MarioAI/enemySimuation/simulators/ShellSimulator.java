@@ -168,8 +168,12 @@ public class ShellSimulator extends EnemySimulator
     }
     
     @Override
-    public boolean collideCheck(float enemyX, float enemyY, float marioX, float marioY, float marioHeight)
+    public boolean collideCheck(float marioX, float marioY, float marioHeight, int time)
     {
+    	final Point2D.Float enemyPos = getPositionAtTime(time);
+    	final float enemyX = enemyPos.x;
+    	final float enemyY = enemyPos.y;
+    	
         final float xMarioD = marioX - enemyX;
         final float yMarioD = marioY - enemyY;
         
