@@ -171,6 +171,20 @@ public class TickProblem extends Problem {
         		obsX++;
         	}
         }
+		
+//		for (int y = marioYPos - halfObservedHeight; y < marioYPos + halfObservedHeight; y++) {
+//			int obsX = 0;
+//        	for (int x = marioXPos - halfObservedWidth; x < marioXPos + halfObservedWidth; x++) {
+//        		int obsY = 0;
+//        		if (x >= 0 && x <= worldScene.level.xExit && y >= 0 && y < worldScene.level.yExit ) {
+//        			worldScene.level.setBlock(x, y, blockPositions[obsX][obsY]);
+//        		} else {
+//        			//System.out.println("spring over");
+//        		}
+//        		obsY++;
+//        	}
+//        	obsX++;
+//        }
         
 //        // Enemies
 //        float delta = 0.5f; // uncertainty of already seen enemy positions relative to observed now

@@ -36,7 +36,7 @@ public class LevelScene implements SpriteContext
 
 //    private GraphicsConfiguration graphicsConfiguration;
 
-    public boolean paused = false;
+    public boolean paused = true;
     public int startTime = 0;
     public int timeLeft;
 
@@ -102,7 +102,10 @@ public class LevelScene implements SpriteContext
         this.killedCreaturesByShell = levelScene.killedCreaturesByShell;
         
     	this.mario = new Mario(levelScene.mario);
-    	sprites.add(this.mario);
+//    	sprites = levelScene.sprites;
+//    	spritesToAdd = levelScene.spritesToAdd;
+//    	spritesToRemove = levelScene.spritesToRemove;
+    	this.sprites.add(this.mario);
     	this.level = new Level(levelScene.level);
     	
 //    	this.mario.world = this;
@@ -121,6 +124,11 @@ public class LevelScene implements SpriteContext
 //        }
 //        this.sprites = spritesArrayClone;
         
+    	xCam = levelScene.xCam;
+    	yCam = levelScene.yCam;
+    	xCamO = levelScene.xCamO;
+    	yCamO = levelScene.yCam;
+    	
 		startTime = levelScene.startTime;
 		timeLeft = levelScene.timeLeft;
 		tick = levelScene.tick;
@@ -926,7 +934,7 @@ public class LevelScene implements SpriteContext
 
             if (((Level.TILE_BEHAVIORS[block & 0xff]) & Level.BIT_SPECIAL) > 0)
             {
-                if (!Mario.large)
+                if (!mario.large)
                 {
                     addSprite(new Mushroom(this, x * 16 + 8, y * 16 + 8));
                 }

@@ -7,19 +7,19 @@ import tickbased.game.world.Level;
 import tickbased.game.world.LevelScene;
 
 public class Mario extends Sprite {
-	public static boolean large = false;
-	public static boolean fire = false;
+	public boolean large = false; //not static anymore
+	public boolean fire = false; //not static anymore
 	public static int coins = 0;
 	public static int lives = 1024;
 	// public static int numberOfAttempts = 0;
 	// public static String levelString = "none";
 	private int status = STATUS_RUNNING;
 	private final int FractionalPowerUpTime = 0;
-	public static int gainedMushrooms;
-	public static int gainedFlowers;
+	public int gainedMushrooms; //not static anymore
+	public int gainedFlowers; //not static anymore
 	public static boolean isMarioInvulnerable;
 
-	public static void resetStatic(int marioMode) {
+	public void resetStatic(int marioMode) { //not static anymore
 		large = marioMode > 0;
 		fire = marioMode == 2;
 		coins = 0;
@@ -31,7 +31,7 @@ public class Mario extends Sprite {
 		// numberOfAttempts = 0;
 	}
 
-	public static void setMode(MODE mode) {
+	public void setMode(MODE mode) { //not static anymore
 		large = (mode == MODE.MODE_LARGE);
 		fire = (mode == MODE.MODE_FIRE);
 	}
@@ -46,7 +46,7 @@ public class Mario extends Sprite {
 
 	public static void resetCoins() {
 		coins = 0;
-		// ++numberOfAttempts;
+		//++numberOfAttempts;
 	}
 
 	public static final int KEY_LEFT = 0;
@@ -94,23 +94,20 @@ public class Mario extends Sprite {
 	private int invulnerableTime = 0;
 
 	public Sprite carried = null;
-	private static Mario instance;
+//	private static Mario instance;
 
 	public Mario(LevelScene world) {
 		kind = KIND_MARIO;
-		Mario.instance = this;
+//		Mario.instance = this;
 		this.world = world;
-		keys = Scene.keys; // SK: in fact, this is already redundant due
-					// to using Agent
-		cheatKeys = Scene.keys; // SK: in fact, this is already
-					// redundant due to using Agent
+		keys = Scene.keys;
+		cheatKeys = Scene.keys;
 		x = 32;
 		y = 0;
 
 		facing = 1;
-		setLarge(Mario.large, Mario.fire);
+		setLarge(true, true); //setLarge(Mario.large, Mario.fire);
 	}
-
 	
 	/**
 	 * Copy constructor
@@ -154,52 +151,50 @@ public class Mario extends Sprite {
 		// Sprite fields
 		mapX = mario.mapX;
 		mapY = mario.mapY;
+		
 	}
 
-	private boolean lastLarge;
-	private boolean lastFire;
-	private boolean newLarge;
-	private boolean newFire;
+//	private boolean lastLarge;
+//	private boolean lastFire;
+//	private boolean newLarge;
+//	private boolean newFire;
 
-	private void blink(boolean on) {
-		Mario.large = on ? newLarge : lastLarge;
-		Mario.fire = on ? newFire : lastFire;
+//	private void blink(boolean on) {
+//		Mario.large = on ? newLarge : lastLarge;
+//		Mario.fire = on ? newFire : lastFire;
+//
+//		if (large) {
+//			sheet = Art.mario;
+//			if (fire)
+//				sheet = Art.fireMario;
+//
+//			xPicO = 16;
+//			yPicO = 31;
+//			wPic = hPic = 32;
+//		} else {
+//			sheet = Art.smallMario;
+//
+//			xPicO = 8;
+//			yPicO = 15;
+//			wPic = hPic = 16;
+//		}
+//
+//		calcPic();
+//	}
 
-		if (large) {
-			sheet = Art.mario;
-			if (fire)
-				sheet = Art.fireMario;
-
-			xPicO = 16;
-			yPicO = 31;
-			wPic = hPic = 32;
-		} else {
-			sheet = Art.smallMario;
-
-			xPicO = 8;
-			yPicO = 15;
-			wPic = hPic = 16;
-		}
-
-		calcPic();
-	}
-
+	/**
+	 * Modified
+	 * @param large
+	 * @param fire
+	 */
 	void setLarge(boolean large, boolean fire) {
 		if (fire)
 			large = true;
 		if (!large)
 			fire = false;
-
-		lastLarge = Mario.large;
-		lastFire = Mario.fire;
-
-		Mario.large = large;
-		Mario.fire = fire;
-
-		newLarge = Mario.large;
-		newFire = Mario.fire;
-
-		blink(true);
+		
+		this.large = large;
+        this.fire = fire;
 	}
 
 	public void move() {
@@ -229,16 +224,16 @@ public class Mario extends Sprite {
 		if (powerUpTime != 0) {
 			if (powerUpTime > 0) {
 				powerUpTime--;
-				blink(((powerUpTime / 3) & 1) == 0);
+				//blink(((powerUpTime / 3) & 1) == 0);
 			} else {
 				powerUpTime++;
-				blink(((-powerUpTime / 3) & 1) == 0);
+				//blink(((-powerUpTime / 3) & 1) == 0);
 			}
 
 			if (powerUpTime == 0)
 				world.paused = false;
 
-			calcPic();
+			//calcPic();
 			return;
 		}
 
@@ -315,17 +310,17 @@ public class Mario extends Sprite {
 			sliding = false;
 		}
 
-		if (keys[KEY_SPEED] && canShoot && Mario.fire && world.fireballsOnScreen < 2) {
+		if (keys[KEY_SPEED] && canShoot && fire && world.fireballsOnScreen < 2) {
 			world.addSprite(new Fireball(world, x + facing * 6, y - 20, facing));
 		}
 		// Cheats:
-		if (GlobalOptions.PowerRestoration && keys[KEY_SPEED] && (!Mario.large || !Mario.fire))
-			setLarge(true, true);
-		if (cheatKeys[KEY_LIFE_UP])
-			this.lives++;
-		world.paused = GlobalOptions.pauseWorld;
-		if (cheatKeys[KEY_WIN])
-			win();
+//		if (GlobalOptions.PowerRestoration && keys[KEY_SPEED] && (!Mario.large || !Mario.fire))
+//			setLarge(true, true);
+//		if (cheatKeys[KEY_LIFE_UP])
+//			this.lives++;
+//		world.paused = GlobalOptions.pauseWorld;
+//		if (cheatKeys[KEY_WIN])
+//			win();
 		// if (keys[KEY_DUMP_CURRENT_WORLD])
 		// try {
 		// System.out.println("DUMP:");
@@ -339,6 +334,10 @@ public class Mario extends Sprite {
 		canShoot = !keys[KEY_SPEED];
 
 		mayJump = (onGround || sliding) && !keys[KEY_JUMP];
+		
+		if (mayJump) {
+			System.out.println("may jump");
+		}
 
 		xFlipPic = facing == -1;
 
@@ -348,7 +347,7 @@ public class Mario extends Sprite {
 			xa = 0;
 		}
 
-		calcPic();
+		//calcPic();
 
 		if (sliding) {
 			for (int i = 0; i < 1; i++) {
@@ -403,64 +402,64 @@ public class Mario extends Sprite {
 		}
 	}
 
-	private void calcPic() {
-		int runFrame = 0;
-
-		if (large) {
-			runFrame = ((int) (runTime / 20)) % 4;
-			if (runFrame == 3)
-				runFrame = 1;
-			if (carried == null && Math.abs(xa) > 10)
-				runFrame += 3;
-			if (carried != null)
-				runFrame += 10;
-			if (!onGround) {
-				if (carried != null)
-					runFrame = 12;
-				else if (Math.abs(xa) > 10)
-					runFrame = 7;
-				else
-					runFrame = 6;
-			}
-		} else {
-			runFrame = ((int) (runTime / 20)) % 2;
-			if (carried == null && Math.abs(xa) > 10)
-				runFrame += 2;
-			if (carried != null)
-				runFrame += 8;
-			if (!onGround) {
-				if (carried != null)
-					runFrame = 9;
-				else if (Math.abs(xa) > 10)
-					runFrame = 5;
-				else
-					runFrame = 4;
-			}
-		}
-
-		if (onGround && ((facing == -1 && xa > 0) || (facing == 1 && xa < 0))) {
-			if (xa > 1 || xa < -1)
-				runFrame = large ? 9 : 7;
-
-			if (xa > 3 || xa < -3) {
-				for (int i = 0; i < 3; i++) {
-					world.addSprite(new Sparkle((int) (x + Math.random() * 8 - 4),
-							(int) (y + Math.random() * 4), (float) (Math.random() * 2 - 1),
-							(float) Math.random() * -1, 0, 1, 5));
-				}
-			}
-		}
-
-		if (large) {
-			if (ducking)
-				runFrame = 14;
-			height = ducking ? 12 : 24;
-		} else {
-			height = 12;
-		}
-
-		xPic = runFrame;
-	}
+//	private void calcPic() {
+//		int runFrame = 0;
+//
+//		if (large) {
+//			runFrame = ((int) (runTime / 20)) % 4;
+//			if (runFrame == 3)
+//				runFrame = 1;
+//			if (carried == null && Math.abs(xa) > 10)
+//				runFrame += 3;
+//			if (carried != null)
+//				runFrame += 10;
+//			if (!onGround) {
+//				if (carried != null)
+//					runFrame = 12;
+//				else if (Math.abs(xa) > 10)
+//					runFrame = 7;
+//				else
+//					runFrame = 6;
+//			}
+//		} else {
+//			runFrame = ((int) (runTime / 20)) % 2;
+//			if (carried == null && Math.abs(xa) > 10)
+//				runFrame += 2;
+//			if (carried != null)
+//				runFrame += 8;
+//			if (!onGround) {
+//				if (carried != null)
+//					runFrame = 9;
+//				else if (Math.abs(xa) > 10)
+//					runFrame = 5;
+//				else
+//					runFrame = 4;
+//			}
+//		}
+//
+//		if (onGround && ((facing == -1 && xa > 0) || (facing == 1 && xa < 0))) {
+//			if (xa > 1 || xa < -1)
+//				runFrame = large ? 9 : 7;
+//
+//			if (xa > 3 || xa < -3) {
+//				for (int i = 0; i < 3; i++) {
+//					world.addSprite(new Sparkle((int) (x + Math.random() * 8 - 4),
+//							(int) (y + Math.random() * 4), (float) (Math.random() * 2 - 1),
+//							(float) Math.random() * -1, 0, 1, 5));
+//				}
+//			}
+//		}
+//
+//		if (large) {
+//			if (ducking)
+//				runFrame = 14;
+//			height = ducking ? 12 : 24;
+//		} else {
+//			height = 12;
+//		}
+//
+//		xPic = runFrame;
+//	}
 
 	private boolean move(float xa, float ya) {
 		while (xa > 8) {
@@ -517,6 +516,7 @@ public class Mario extends Sprite {
 				collide = true;
 			else
 				sliding = false;
+			System.out.println();
 		}
 		if (xa < 0) {
 			sliding = true;

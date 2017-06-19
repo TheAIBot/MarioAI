@@ -44,6 +44,10 @@ public class AStarTickBased {
 		while (!frontier.isEmpty() && (runThroughsAllowed-- > 0)) { //(timeTaken < problem.MAX_ALLOWED_RUN_TIME)) {
 			SearchNode current = frontier.remove();
 			frontierMap.remove(current.hashCode());
+			
+			if (((Node)current.state).x > 187.6) {
+				System.out.println();
+			}
 
 			// If goal is reached return solution path
 			if (problem.goalTest(current.state)) {
