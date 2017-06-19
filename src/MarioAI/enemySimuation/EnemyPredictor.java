@@ -55,14 +55,14 @@ public class EnemyPredictor {
 	 * @return True if mario hits an enemy
 	 */
 	public boolean hasEnemy(float marioX, final float marioY, final float marioHeight, final int time) {
-		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {
-			//The collide check only takes positions in pixels and marios position and height is in blocks
-			final float marioXInPixels = marioX * World.PIXELS_PER_BLOCK;
-			final float marioYInPixels = marioY * World.PIXELS_PER_BLOCK;
-			final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
-			
+		//The collide check only takes positions in pixels and marios position and height is in blocks
+		final float marioXInPixels      = marioX      * World.PIXELS_PER_BLOCK;
+		final float marioYInPixels      = marioY      * World.PIXELS_PER_BLOCK;
+		final float marioHeightInPixels = marioHeight * World.PIXELS_PER_BLOCK;
+
+		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {			
 			//+1 to time because magic
-			if (enemySimulation.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time + 1)) {
+			if (enemySimulation.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time/* + 1*/)) {
 				return true;
 			}
 		}
@@ -169,10 +169,7 @@ public class EnemyPredictor {
 				//then remove the position from the arraylist so it can't
 				//also be used by another enemy and add the simulation to the alive simulations list
 				if (simulatedPosition != null) {
-					enemyPositions.remove(simulatedPosition);
-					//enemySimulation.setX(simulatedPosition.x);
-					//enemySimulation.setY(simulatedPosition.y);
-					
+					enemyPositions.remove(simulatedPosition);					
 					notDeletedSimulations.add(enemySimulation);
 				}
 			}
