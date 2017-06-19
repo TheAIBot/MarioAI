@@ -1,5 +1,8 @@
 package MarioAI;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import MarioAI.graph.nodes.Node;
@@ -15,13 +18,16 @@ public class World {
 	public static final int SIGHT_HEIGHT = 22;
 	public static final int PIXELS_PER_BLOCK = 16;
 	private static final int MARIO_START_X_POS = 2;
+	private static final int TOWER_TYPE = 20;
 	
 	private final CollisionDetection collisionDetection = new CollisionDetection();
 	//A 2D array of the nodes that mario can see
 	//this is stored for easy access to EdgeCreator
 	private final Node[][] levelMatrix = new Node[SIGHT_WIDTH][LEVEL_HEIGHT]; 
 	//Contains all the seen columns of the world
-	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();
+	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();	
+	 //Will not handle negative x values. Level must not be longer than 400.
+	private final Int2ObjectOpenHashMap<List<Node>> bulletBillTowers = new Int2ObjectOpenHashMap<List<Node>>();	
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos; // The maximum x position that mario has seen
@@ -79,6 +85,10 @@ public class World {
 			levelMatrix[i] = columnToInsert;
 			//Save column in case it's a new column
 			saveColumn(columnIndex, columnToInsert);
+			//Also updates the list of towers:
+			if (0 < i && i < levelMatrix.length - 1) {
+				updateTowers(levelMatrix[i-1], columnToInsert, levelMatrix[i+1]);				
+			}
 		}
 	}
 
@@ -257,6 +267,42 @@ public class World {
 
 	public boolean hasWorldChanged() {
 		return hasWorldChanged;
+	}
+	
+	private void updateTowers(Node[] formerColumn, Node[] columnToInsert, Node[] nextColumn) {
+		for (int i = 0; i < columnToInsert.length; i++) {
+			Node currentNode = columnToInsert[i];
+			//If the one currently is part of a bullet bill tower, and the node above isn't part of the tower:
+			if (currentNode != null && currentNode.type == TOWER_TYPE && 
+				(i == 0 || (columnToInsert[i-1] == null || columnToInsert[i-1].type != TOWER_TYPE))) {		
+				
+				//neighbors must not be "towers", as pipes have the same type as towers.
+				if ((formerColumn[i] == null || formerColumn[i].type != TOWER_TYPE) &&
+					 (nextColumn[i] == null || nextColumn[i].type != TOWER_TYPE)) {
+					List<Node> bulletColumn = bulletBillTowers.get(currentNode.x);
+					if (bulletColumn == null) {
+						bulletColumn = new ArrayList<Node>();
+						bulletColumn.add(currentNode);
+						bulletBillTowers.put(currentNode.x, bulletColumn);
+					} else if (!bulletColumn.contains(currentNode)) {
+						bulletColumn.add(currentNode);
+					}					
+				}
+			}
+		}
+	}
+	
+	public List<Node> getTowersOnLevel(){
+		List<Node> relevantTowers = new ArrayList<Node>();
+		//Testing it out in reality, and looking at the code, this seems about right.
+		for (int i = -LEVEL_WIDTH/2 - 1 + marioNode.x; i < LEVEL_WIDTH/2 + 1 + marioNode.x; i++) {
+			List<Node> currentTowers = bulletBillTowers.get(i);
+			if (currentTowers != null) {
+				relevantTowers.addAll(currentTowers);
+			}
+		}		
+		System.out.println(relevantTowers.toString());
+		return relevantTowers;
 	}
 	
 	public void resetHasWorldChanged() {

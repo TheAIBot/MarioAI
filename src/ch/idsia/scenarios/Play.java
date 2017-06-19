@@ -75,6 +75,10 @@ public class Play {
 			}
             
 			System.out.println("Seed = " + seed);
+			options.setLevelRandSeed(275778524);
+			//options.setLevelRandSeed(1588492331);
+			//options.setLevelRandSeed(1734535926); //Gik ind i en blomst
+			//options.setLevelRandSeed(1363048982); //Her dur bullet-bills ikke perfekt.
 			//options.setLevelRandSeed(264076394);
 			//options.setLevelRandSeed(933697569); // the best seed ever, difficulty 40
 			//options.setLevelRandSeed(324150513); //the best seed ever 2
@@ -92,7 +96,7 @@ public class Play {
 			
 			//options.setLevelRandSeed(42243);(*) Includes a missing feature.
 			//options.setLevelDifficulty(2);
-			options.setLevelDifficulty(40);
+			options.setLevelDifficulty(5);
 			task.setOptions(options);
 			
 			System.out.println ("Score: " + task.evaluate (controller)[0]);

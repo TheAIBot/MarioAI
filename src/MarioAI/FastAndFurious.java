@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.List;
 
 import MarioAI.debugGraphics.DebugDraw;
 import MarioAI.enemySimuation.EnemyPredictor;
@@ -19,6 +20,7 @@ import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
+import tests.TestTools;
 
 /** The ultimate agent.
  * @author All.
@@ -32,7 +34,8 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	public final EnemyPredictor enemyPredictor = new EnemyPredictor();
 	private int tickCount = 0;
 	public boolean DEBUG = true;
-	
+	public boolean ONLY_PATH = true;
+	Environment currentObservation;
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
 	private boolean savePlace = false;
@@ -48,7 +51,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	
 	public boolean[] getAction(Environment observation) {
 		executeKeyCommands(observation);
-
 		if (tickCount == 30) {
 			//Create the initial world and all its edges
 			world.initialize(observation);
@@ -66,7 +68,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			marioController.update(observation);
 			world.update(observation);
 			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation), MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
-			
+			List<Node> towers = world.getTowersOnLevel();
 			if (world.hasWorldChanged()) {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
@@ -88,26 +90,34 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			
 			if (DEBUG) {
 				DebugDraw.resetGraphics(observation);
-				
-				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
-				DebugDraw.drawEdges(observation, world.getLevelMatrix());
-				DebugDraw.drawMarioReachableNodes(observation, world);
-				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-				//DebugDraw.drawEnemies(observation, enemyPredictor);
-				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
-				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
-				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
-						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
-						 							enemyPredictor.hasNewEnemySpawned();// ||
-						 							//pathCreator.getBestPath() == null;
-				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-				DebugDraw.drawAction(observation, marioController.getActions());
-				//TestTools.renderLevel(observation);
-				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-				DebugDraw.drawAction(observation, marioController.getActions());
+				if (ONLY_PATH) {
+					final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
+ 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
+ 							enemyPredictor.hasNewEnemySpawned();// ||
+ 							//pathCreator.getBestPath() == null;
+					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
+				} else{
+
+					
+					DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
+					DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
+					DebugDraw.drawEdges(observation, world.getLevelMatrix());
+					DebugDraw.drawMarioReachableNodes(observation, world);
+					DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
+					DebugDraw.drawEnemies(observation, enemyPredictor);
+					DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+					DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
+					DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+					DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
+					
+					final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
+							 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
+							 							enemyPredictor.hasNewEnemySpawned();// ||
+							 							//pathCreator.getBestPath() == null;
+					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
+					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
+					DebugDraw.drawAction(observation, marioController.getActions());
+				}
 			}
 		}
 		tickCount++;
@@ -188,32 +198,30 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			System.out.println("Failed to delete save state.");
 		}
 	}
-	
-    public void keyPressed(KeyEvent e)
-    {
-        toggleKey(e.getKeyCode(), true);
-    }
 
-    public void keyReleased(KeyEvent e)
-    {
-        toggleKey(e.getKeyCode(), false);
-    }
-    
-    private void toggleKey(int keyCode, boolean pressed) {
-    	switch (keyCode) {
+	public void keyPressed(KeyEvent e) {
+		toggleKey(e.getKeyCode(), true);
+	}
+
+	public void keyReleased(KeyEvent e) {
+		toggleKey(e.getKeyCode(), false);
+	}
+
+	private void toggleKey(int keyCode, boolean pressed) {
+		switch (keyCode) {
 		case KeyEvent.VK_P:
 			if (pressed) {
-				pauseGame = !pauseGame;	
+				pauseGame = !pauseGame;
 			}
 			break;
 		case KeyEvent.VK_O:
 			synchronized (keyLock) {
-				unpauseForOneTick = pressed;	
+				unpauseForOneTick = pressed;
 			}
 			break;
 		case KeyEvent.VK_I:
 			synchronized (keyLock) {
-				savePlace = pressed;	
+				savePlace = pressed;
 			}
 			break;
 		case KeyEvent.VK_L:
@@ -221,13 +229,18 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				deletePlace = pressed;
 			}
 			break;
+		case KeyEvent.VK_M:
+			if (pressed) {
+				ONLY_PATH = !ONLY_PATH;
+			}
+			break;
 		}
-    }
-    
-    public void runToTick(int tick) {
+	}
+
+   public void runToTick(int tick) {
     	tickToRunTo = tick;
     	runToTick = true;
-    }
+    	}
 
 	public AGENT_TYPE getType() {
 		return Agent.AGENT_TYPE.AI;
