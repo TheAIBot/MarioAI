@@ -64,9 +64,9 @@ public class CollisionDetection {
 		final Point2D.Float currentPosition = new Point2D.Float( (currentOffsetX + startX) * 16,
 															     (startY - currentOffsetY) * 16 - 1);
 		final Point2D.Float expectedPosition = new Point2D.Float(currentPosition.x + xa, currentPosition.y + ya);
-		//System.out.println("current (" + currentPosition.x + ", " + currentPosition.y + ")");
+		System.out.println("current (" + currentPosition.x + ", " + currentPosition.y + ")");
 		
-		//System.out.println("expected   (" + expectedPosition.x + ", " + expectedPosition.y + ")");
+		System.out.println("expected   (" + expectedPosition.x + ", " + expectedPosition.y + ")");
 		
 		
 		if (lastY == futureOffsetY) {
@@ -74,6 +74,8 @@ public class CollisionDetection {
 		}
 		move(currentPosition, xa, 0, world);
 		move(currentPosition, 0, ya, world);
+
+		System.out.println("actual   (" + currentPosition.x + ", " + currentPosition.y + ")");
 		
 		final float diffX = Math.abs(currentPosition.x - expectedPosition.x);
 		final float diffY = Math.abs(currentPosition.y - expectedPosition.y);
