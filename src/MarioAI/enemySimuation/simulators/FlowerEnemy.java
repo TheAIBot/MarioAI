@@ -26,7 +26,7 @@ public class FlowerEnemy extends EnemySimulator
     
     private FlowerEnemy(LevelScene world, float x, float y, float ya, boolean fromFlowerState)
     {
-    	super(Sprite.KIND_ENEMY_FLOWER, 4, 12);
+    	super(Sprite.KIND_ENEMY_FLOWER, 2, 12);
         
     	this.world = world;
     	this.x = x;
@@ -127,5 +127,10 @@ public class FlowerEnemy extends EnemySimulator
 		copy.jumpTime = jumpTime;
 		
 		return copy;
+	}
+	
+	@Override
+	public int timeOffset() {
+		return 1;
 	}
 }

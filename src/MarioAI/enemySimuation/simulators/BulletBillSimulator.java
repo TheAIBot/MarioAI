@@ -2,8 +2,7 @@ package MarioAI.enemySimuation.simulators;
 
 import java.awt.geom.Point2D;
 
-import MarioAI.World;
-import MarioAI.enemySimuation.EnemyPredictor;
+import ch.idsia.mario.engine.sprites.Sprite;
 
 /**
  * Code in this class is mostly from the games source code
@@ -14,9 +13,9 @@ public class BulletBillSimulator extends EnemySimulator
 {
     private int facing;
 
-    public BulletBillSimulator(float x, float y, int dir, int kind)
+    public BulletBillSimulator(float x, float y, int dir)
     {
-    	super(kind, 4, 12);
+    	super(Sprite.KIND_BULLET_BILL, 4, 12);
         this.x = x;
         this.y = y;
         
@@ -50,7 +49,7 @@ public class BulletBillSimulator extends EnemySimulator
 
 	@Override
 	public EnemySimulator copy() {
-		EnemySimulator copy = new BulletBillSimulator(x, y, facing, kind);
+		EnemySimulator copy = new BulletBillSimulator(x, y, facing);
 		copy.x = x;
 		copy.y = y;
 		copy.xa = xa;
@@ -60,5 +59,10 @@ public class BulletBillSimulator extends EnemySimulator
 		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		return copy;
+	}
+
+	@Override
+	public int timeOffset() {
+		return 1;
 	}
 }

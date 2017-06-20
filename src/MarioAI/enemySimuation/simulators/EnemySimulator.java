@@ -3,8 +3,6 @@ package MarioAI.enemySimuation.simulators;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import javax.swing.text.DefaultEditorKit.CopyAction;
-
 /**
  * Super class that each enemy simulation extends
  * @author Andreas Gramstrup
@@ -51,6 +49,8 @@ public abstract class EnemySimulator {
      */
     public abstract EnemySimulator copy();
 	
+    public abstract int timeOffset();
+    
     public int getKind() {
     	return kind;
     }
@@ -59,13 +59,7 @@ public abstract class EnemySimulator {
      * Moves the enemys position forward one tick
      */
     public void moveTimeForward() {
-    	if (positionAtTime.size() > 0) {
-			//positionAtTime.remove(0);
-    		positionTimeOffsetIndex++;
-		}
-    	else {
-    		move();
-    	}
+    	positionTimeOffsetIndex++;
     }
     
     public void moveEnemy() {
@@ -108,5 +102,11 @@ public abstract class EnemySimulator {
     
     public void insertPosition(float x, float y) {
     	positionAtTime.add(new Point2D.Float(x, y));
+    }
+    
+    public void onlyForwardAccelerationByOne(float x, float y) {
+    	move();
+    	this.x = x;
+    	this.y = y;
     }
 }

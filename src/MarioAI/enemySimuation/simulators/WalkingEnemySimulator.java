@@ -215,4 +215,9 @@ public class WalkingEnemySimulator extends EnemySimulator
 		
 		return copy;
 	}
+	
+	@Override
+	public int timeOffset() {
+		return 1;
+	}
 }

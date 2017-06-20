@@ -110,7 +110,7 @@ public class testMassLevels {
 				lossedSeeds.add(seed);
 			}	
 			
-			System.out.println(i);
+			System.out.println(i + " : " + ((float)wins / (losses + wins)) * 100 + "%");
 		}
 		
 		appendStringToFile(MASS_LEVEL_RESULTS_FILE_PATH, wins + ", " + losses + ", " + crashes + ", " + difficulty + "\n");

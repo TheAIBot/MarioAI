@@ -157,14 +157,7 @@ public class ShellSimulator extends EnemySimulator
         int y = (int) (_y / 16);
         if (x == (int) (this.x / 16) && y == (int) (this.y / 16)) return false;
 
-        boolean blocking = world.level.isBlocking(x, y, xa, ya);
-        
-        if (blocking && ya == 0 && xa!=0)
-        {
-            world.bump(x, y, true);
-        }
-
-        return blocking;
+        return world.level.isBlocking(x, y, xa, ya);
     }
     
     @Override
@@ -195,5 +188,10 @@ public class ShellSimulator extends EnemySimulator
 		copy.insertPosition(currentPosition.x, currentPosition.y);
 		
 		return copy;
+	}
+	
+	@Override
+	public int timeOffset() {
+		return 1;
 	}
 }

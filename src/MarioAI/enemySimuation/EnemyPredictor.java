@@ -62,7 +62,7 @@ public class EnemyPredictor {
 
 		for (EnemySimulator enemySimulation : verifiedEnemySimulations) {			
 			//+1 to time because magic
-			if (enemySimulation.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time/* + 1*/)) {
+			if (enemySimulation.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time + enemySimulation.timeOffset())) {
 				return true;
 			}
 		}
@@ -261,12 +261,20 @@ public class EnemyPredictor {
 						if (deltaX <= World.PIXELS_PER_BLOCK && 
 							deltaY <= World.PIXELS_PER_BLOCK) {
 							final EnemySimulator potentialSimulation = getSimulator(x1, y1, xa, ya, kind);
-							//the xa and ya are 1 tick too old so they are updated here
-							potentialSimulation.moveEnemy();
+							//insert first and second first position
+							potentialSimulation.insertPosition(x2, y2);
+							potentialSimulation.insertPosition(x1, y1);
 							potentialSimulation.moveTimeForward();
+							potentialSimulation.moveTimeForward();
+							potentialSimulation.onlyForwardAccelerationByOne(x1, y1);
+							
+							
+							//the xa and ya are 1 tick too old so they are updated here
+							//potentialSimulation.moveEnemy();
+							//potentialSimulation.moveTimeForward();
 							//but the position isn't too old so it's set here again
-							potentialSimulation.setX(x1);
-							potentialSimulation.setY(y1);
+							//potentialSimulation.setX(x1);
+							//potentialSimulation.setY(y1);
 							
 							potentialCorrectSimulations.add(potentialSimulation);
 						}
@@ -289,7 +297,7 @@ public class EnemyPredictor {
 		switch (kind) {
 		case Sprite.KIND_BULLET_BILL:
 			final int direction = (xa > 0) ? 1 : -1;
-			return new BulletBillSimulator(x, y, direction, kind);
+			return new BulletBillSimulator(x, y, direction);
 		case Sprite.KIND_ENEMY_FLOWER:
 			return new FlowerEnemy(levelScene, x, y, ya);
 		case Sprite.KIND_SHELL:
