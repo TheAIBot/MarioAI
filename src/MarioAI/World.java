@@ -304,7 +304,7 @@ public class World {
 				}
 			}
 		}		
-		System.out.println(relevantTowers.toString());
+		//System.out.println(relevantTowers.toString());
 		return relevantTowers;
 	}
 	

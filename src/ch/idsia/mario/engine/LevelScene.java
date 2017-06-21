@@ -733,6 +733,7 @@ public class LevelScene extends Scene implements SpriteContext {
 						byte b = level.getBlock(x, y);
 						if (((Level.TILE_BEHAVIORS[b & 0xff]) & Level.BIT_ANIMATED) > 0) {
 							if ((b % 16) / 4 == 3 && b / 16 == 0) {
+								System.out.println("Actual tick until spawn = " + (tick - x * 2) % 100);
 								if ((tick - x * 2) % 100 == 0) {
 									xCannon = x;
 									for (int i = 0; i < 8; i++) {

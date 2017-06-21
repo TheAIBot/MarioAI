@@ -380,9 +380,6 @@ public class EnemyPredictor {
 		updateTowers();
 		removeDeadTowers(towerPositions);
 		addTowers(towerPositions, tick);
-		
-		System.out.println(bulletTowers.size());
-		System.out.println();
 	}
 	
 	private void updateTowers() {
@@ -418,7 +415,7 @@ public class EnemyPredictor {
 			}
 			
 			if (!alreadyCreated) {
-				bulletTowers.add(new BulletBillTower(point, tick));
+				bulletTowers.add(new BulletBillTower(point, tick + 1));
 			}
 		}
 	}
