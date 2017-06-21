@@ -123,7 +123,7 @@ public class MarioControls {
 		//he can go both ways.
 		//Note, this works as a limitation in his movement pattern when jumping.
 		if (!((distanceToMove < 0 && speed < 0) ||
-			  (distanceToMove > 0 && speed > 0) ||
+			   (distanceToMove > 0 && speed > 0) ||
 			   speed == 0)) {
 			return false;
 		}
@@ -137,14 +137,14 @@ public class MarioControls {
 		//Edge is only allowed if mario lands within half marios max speed
 		//of the center of the target node.
 		return xEndPos < edge.target.x + (MAX_X_VELOCITY / 2) &&
-			   xEndPos > edge.target.x - (MAX_X_VELOCITY / 2);
+			    xEndPos > edge.target.x - (MAX_X_VELOCITY / 2);
 	}
 	
 	/**
 	 * Uses the path that mario should follow to chose which button to press
 	 * @param observation
 	 * @param path
-	 * @return Returnsa boolen array fo the buttons to press
+	 * @return Returns a boolen array for the buttons to press
 	 */
 	public boolean[] getNextAction(Environment observation, final ArrayList<DirectedEdge> path) {
 		//can't follow a path if there is not
