@@ -401,8 +401,12 @@ public class TestCollisionDetector {
 		float yOffset = 0;
 		agent.action = marioControls.getActions();
 		TestTools.runOneTick(observation);
+		System.out.println("Actual movement:");
 		final int pathSize = path.size();
 		for (int z = 0; z < pathSize; z++) {	
+			if (z == 21) {
+				System.out.println("Edge " + z);				
+			}
 			final DirectedEdge edge = path.get(0);
 			final MovementInformation moveInfo = edge.getMoveInfo();
 			for (int i = 0; i < moveInfo.getMoveTime(); i++) {				
@@ -415,14 +419,15 @@ public class TestCollisionDetector {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}*/
+				System.out.println();
 				
 				final float expectedMarioXPos = startMarioXPos + moveInfo.getXPositions()[i] + xOffset;
 				final float expectedMarioYPos = startMarioYPos - moveInfo.getYPositions()[i] + yOffset;
-				//System.out.println("Expected (" + expectedMarioXPos*16 + ", " + expectedMarioYPos*16 + ")");
+				System.out.println("Expected (" + expectedMarioXPos*16 + ", " + expectedMarioYPos*16 + ")");
 				
 				final float actualMarioXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
 				final float actualMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-				//System.out.println("Actual   (" + actualMarioXPos*16 + ", " + actualMarioYPos*16 + ")");
+				System.out.println("Actual   (" + actualMarioXPos*16 + ", " + actualMarioYPos*16 + ")");
 				
 				if (!withinAcceptableError(expectedMarioXPos, actualMarioXPos, actualMarioYPos, expectedMarioYPos)) {
 					Arrays.fill(agent.action, false);
@@ -463,7 +468,7 @@ public class TestCollisionDetector {
 	@Test
 	public void testCollisionWithEdgeRightFast() {
 		final World world = new World();
-		for (int i = 2; i < 13; i++) {
+		for (int i = 7; i < 13; i++) {
 			final int[] moveDirection = new int[i*4];
 			Arrays.fill(moveDirection, i * 0, i * 1,  1);
 			Arrays.fill(moveDirection, i * 1, i * 2, -1);
@@ -471,6 +476,7 @@ public class TestCollisionDetector {
 			Arrays.fill(moveDirection, i * 3, i * 4, -1);
 			
 			final ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, moveDirection, 0, 0, i * 4, world, true);
+			System.out.println(i);
 			verifyCollision("collisionWithEdge.lvl", path, world);
 		}
 	}
@@ -569,7 +575,7 @@ public class TestCollisionDetector {
 	
 	private void verifyCollision(String levelName, ArrayList<DirectedEdge> path, World world) {
 		final UnitTestAgent agent = new UnitTestAgent();
-		final Environment observation = TestTools.loadLevel("testCollisionDetector/" + levelName, agent, false);
+		final Environment observation = TestTools.loadLevel("testCollisionDetector/" + levelName, agent, true);
 		final MarioControls marioControls = new MarioControls();
 		world.initialize(observation);
 		
@@ -586,7 +592,7 @@ public class TestCollisionDetector {
 		final float startMarioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
 		
 		
-		for (int i = startXPixel; i <= endXPixel; i++) { 
+		for (int i = 120; i <= endXPixel; i++) { //TODO set back
 			TestTools.setMarioPixelPosition(observation, i, Math.round(startMarioYPos * World.PIXELS_PER_BLOCK));
 			TestTools.resetMarioSpeed(observation);
 			TestTools.runOneTick(observation);
@@ -599,23 +605,26 @@ public class TestCollisionDetector {
 			
 			final ArrayList<DirectedEdge> pathCopy = new ArrayList<DirectedEdge>();
 			path.forEach(x -> pathCopy.add(x));
-			
+			System.out.println("Start: ");
 			boolean expectedToFollowPath = false;
 			float xOffset = 0;
-			for (DirectedEdge directedEdge : pathCopy) {
-				//System.out.println("Collision:");
+			for (int j = 0; j < pathCopy.size(); j++) {
+				DirectedEdge directedEdge = pathCopy.get(j);
+				System.out.println();
 				expectedToFollowPath = !directedEdge.getMoveInfo().hasCollisions(marioXPos + xOffset, Math.round(marioYPos), world);
-				xOffset += directedEdge.getMoveInfo().getXMovementDistance();
-				if (!expectedToFollowPath) {
+				System.out.println("Edge " + j + ": ");
+				if (!expectedToFollowPath) { //j=21
+					expectedToFollowPath = !directedEdge.getMoveInfo().hasCollisions(marioXPos + xOffset, Math.round(marioYPos), world);
 					break;
 				}
+				xOffset += directedEdge.getMoveInfo().getXMovementDistance();
 			}
 			//System.out.println("Verification: ");
 			final boolean actualFollowPath = isFollowingPathCorrectly(observation, pathCopy, agent, marioControls);
 			if (expectedToFollowPath ^ actualFollowPath) { //logical xor
 				System.out.println(i);
 			}
-			assertEquals(expectedToFollowPath, actualFollowPath);
+			assertEquals("Error at i = " + i, expectedToFollowPath, actualFollowPath);
 		}
 	}
 }

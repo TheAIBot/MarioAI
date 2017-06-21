@@ -8,12 +8,16 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.sun.xml.internal.org.jvnet.fastinfoset.VocabularyApplicationData;
 
 import MarioAI.World;
 import MarioAI.graph.edges.DirectedEdge;
@@ -63,6 +67,59 @@ public class TestEdgeCreator {
 		World graph = getStartLevelWorld("flat.lvl");
 		//grapher.setMovementEdges(graph, marioNode);
 		return graph;
+	}
+	
+	@Test
+	public void testJumpLeftWithSideBlock(){
+		//Having a block to the right shouldn't change how Mario can jump to the left:
+		World world = totalFlatland(flatlandWorld(), marioNode);
+		grapher.setMovementEdges(world, marioNode);
+		Node[][] level = world.getLevelMatrix();
+		for (int i = 0; i < EdgeCreator.GRID_WIDTH - 1; i++) {
+			grapher.clearAllEdges();
+			grapher.setMovementEdges(world, marioNode);
+			Node currentNode = level[i][9];
+			List<DirectedEdge> oldLeftEdges = currentNode.edges.stream().filter(edge -> edge.source.x > edge.target.x).collect(Collectors.toList());
+			level[i+1][9-1] = new Node(level[i+1][9].x, 9-1, (byte) -10); //TODO check if type matters.
+			grapher.clearAllEdges();
+			grapher.setMovementEdges(world, marioNode);
+			List<DirectedEdge> newLeftEdges = currentNode.edges.stream().filter(edge -> edge.source.x > edge.target.x).collect(Collectors.toList());
+			//TODO check edges are cleared.
+			assertEquals(oldLeftEdges.size(), newLeftEdges.size());
+			//Because of how the hash codes works, they are the same, if adding them both to a hashset doesen't change anything:
+			HashSet<DirectedEdge> allLeftEdges = new HashSet<DirectedEdge>();
+			allLeftEdges.addAll(oldLeftEdges);
+			allLeftEdges.addAll(newLeftEdges);
+			assertEquals(allLeftEdges.size(), oldLeftEdges.size());
+			level[i+1][9-1] = null; //reset.
+		}
+	}
+	
+
+	@Test
+	public void testJumpRightWithSideBlock(){
+		//Having a block to the left shouldn't change how Mario can jump to the right:
+		World world = totalFlatland(flatlandWorld(), marioNode);
+		grapher.setMovementEdges(world, marioNode);
+		Node[][] level = world.getLevelMatrix();
+		for (int i = 1; i < EdgeCreator.GRID_WIDTH; i++) {
+			grapher.clearAllEdges();
+			grapher.setMovementEdges(world, marioNode);
+			Node currentNode = level[i][9];
+			List<DirectedEdge> oldRightEdges = currentNode.edges.stream().filter(edge -> edge.source.x < edge.target.x).collect(Collectors.toList());
+			level[i-1][9-1] = new Node(level[i-1][9].x, 9-1, (byte) -10); //TODO check if type matters.
+			grapher.clearAllEdges();
+			grapher.setMovementEdges(world, marioNode);
+			List<DirectedEdge> newRightEdges = currentNode.edges.stream().filter(edge -> edge.source.x < edge.target.x).collect(Collectors.toList());
+			//TODO check edges are cleared.
+			assertEquals(oldRightEdges.size(), newRightEdges.size());
+			//Because of how the hash codes works, they are the same, if adding them both to a hashset doesen't change anything:
+			HashSet<DirectedEdge> allRightEdges = new HashSet<DirectedEdge>();
+			allRightEdges.addAll(oldRightEdges);
+			allRightEdges.addAll(newRightEdges);
+			assertEquals(allRightEdges.size(), oldRightEdges.size());
+			level[i-1][9-1] = null; //reset.
+		}
 	}
 
 	@Test
