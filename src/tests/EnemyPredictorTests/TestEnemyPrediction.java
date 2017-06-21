@@ -196,14 +196,14 @@ public class TestEnemyPrediction {
 	}
 	
 	private void testNoRemovalOfEnemyAndPrediction(Environment observation, EnemyPredictor enemyPredictor, ArrayList<Sprite> enemies, int enemyCount, int testTime, String enemyName, boolean makeCopy) {
-		enemyPredictor = findEnemies(observation, enemyPredictor, makeCopy);
+		enemyPredictor = TestEnemyHelper.findEnemies(observation, enemyPredictor, makeCopy);
 		
 		assertEquals("Didn't find " + enemyName + " after the first 3 ticks", enemyCount, enemyPredictor.getEnemies().size());
 		
 		for (int i = 0; i < 80; i++) {
 			TestTools.runOneTick(observation);
 			final float[] enemyArray = observation.getEnemiesFloatPos();
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 			EnemyPredictor copy = new EnemyPredictor();
 			copy.intialize(((MarioComponent)observation).getLevelScene());
 			if (makeCopy) {
@@ -253,19 +253,5 @@ public class TestEnemyPrediction {
 		}
 		
 		return enemiesLeftToFind;
-	}
-	
-	private EnemyPredictor findEnemies(Environment observation, EnemyPredictor enemyPredictor, boolean makeCopy) {
-		for (int i = 0; i < 3; i++) {
-			TestTools.runOneTick(observation);
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
-		}
-		
-		final EnemyPredictor copy = new EnemyPredictor();
-		copy.intialize(((MarioComponent)observation).getLevelScene());
-		copy.syncFrom(enemyPredictor);
-		
-		return (makeCopy) ? copy : enemyPredictor;
-	}
-	
+	}	
 }

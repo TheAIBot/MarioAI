@@ -27,7 +27,7 @@ class TestEnemyHelper {
 	public static EnemyPredictor findEnemies(Environment observation, EnemyPredictor enemyPredictor, boolean makeCopy) {
 		for (int i = 0; i < 3; i++) {
 			TestTools.runOneTick(observation);
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		}
 		
 		final EnemyPredictor copy = new EnemyPredictor();

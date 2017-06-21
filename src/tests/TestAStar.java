@@ -227,18 +227,18 @@ public class TestAStar {
 	public void testJumpOverEnemy() {
 		setup("testAStarEnemyJumpOver", true);
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		
 //		TestTools.renderLevel(observation);
 		//Node[] originalGoalNodes = world.getGoalNodes(0);
@@ -261,15 +261,15 @@ public class TestAStar {
 		
 		TestTools.spawnEnemy(observation, 6, 10, 1, EnemyType.RED_KOOPA);		
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 //		TestTools.renderLevel(observation);
 		
 		final int columnStart = 11;
@@ -318,7 +318,7 @@ public class TestAStar {
 		TestTools.spawnEnemy(observation, 7, 12, -1, EnemyType.GREEN_KOOPA);
 		world.update(observation);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		//TestTools.renderLevel(observation);
 		
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false); //, 1);
@@ -337,7 +337,7 @@ public class TestAStar {
 		TestTools.spawnEnemy(observation, 7, 12, -1, EnemyType.GREEN_KOOPA);
 		world.update(observation);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		//TestTools.renderLevel(observation);
 		
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false); //, 3);
@@ -450,7 +450,7 @@ public class TestAStar {
 		TestTools.spawnEnemy(observation, enemyOneXStartPos - 1, 12, -1, EnemyType.GREEN_KOOPA);
 		world.update(observation);
 		TestTools.runOneTick(observation);
-		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
+		enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), new ArrayList<>(), 0);
 		
 		agent.pathCreator.blockingFindPath(observation, world.getMarioNode(observation),  world.getGoalNodes(0), 0, enemyPredictor, 2, world, false);//, 3);
 		List<DirectedEdge> path = agent.pathCreator.getBestPath();

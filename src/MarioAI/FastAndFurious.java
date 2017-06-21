@@ -50,7 +50,9 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	}
 	
 	public boolean[] getAction(Environment observation) {
+		tickCount++;
 		executeKeyCommands(observation);
+		
 		if (tickCount == 30) {
 			//Create the initial world and all its edges
 			world.initialize(observation);
@@ -64,11 +66,12 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			findPath(observation);
 			
 		} else if (tickCount > 30) {
-			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos());
-			marioController.update(observation);
 			world.update(observation);
+			enemyPredictor.updateEnemies(observation.getEnemiesFloatPos(), world.getTowersOnLevel(), tickCount);
+			marioController.update(observation);
+			
 			grapher.setMovementEdgesForMario(world, world.getMarioNode(observation), MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos()));
-			List<Node> towers = world.getTowersOnLevel();
+			
 			if (world.hasWorldChanged()) {
 				grapher.setMovementEdges(world, world.getMarioNode(observation));
 				world.resetHasWorldChanged();
@@ -120,7 +123,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 				}
 			}
 		}
-		tickCount++;
 		
 		return marioController.getActions();
 	}

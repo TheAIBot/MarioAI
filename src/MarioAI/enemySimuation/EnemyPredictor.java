@@ -1,5 +1,6 @@
 package MarioAI.enemySimuation;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.concurrent.Semaphore;
 
 import MarioAI.World;
 import MarioAI.enemySimuation.simulators.BulletBillSimulator;
+import MarioAI.enemySimuation.simulators.BulletBillTower;
 import MarioAI.enemySimuation.simulators.EnemySimulator;
 import MarioAI.enemySimuation.simulators.FlowerEnemy;
 import MarioAI.enemySimuation.simulators.ShellSimulator;
@@ -37,6 +39,7 @@ public class EnemyPredictor {
 	private Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> oldEnemyInfo;
 	private final ArrayList<EnemySimulator> potentialCorrectSimulations = new ArrayList<EnemySimulator>();
 	private ArrayList<EnemySimulator> verifiedEnemySimulations = new ArrayList<EnemySimulator>();
+	private ArrayList<BulletBillTower> bulletTowers = new ArrayList<BulletBillTower>();
 	//is true if a new enemy has spawned since last time this variable was set to false
 	private boolean newEnemySpawned = false;
 	
@@ -66,6 +69,12 @@ public class EnemyPredictor {
 				return true;
 			}
 		}
+		
+		for (BulletBillTower bulletBillTower : bulletTowers) {
+			if (bulletBillTower.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time)) {
+				return true;
+			}
+		}
 		return false;	
 	}
 	
@@ -73,20 +82,18 @@ public class EnemyPredictor {
 	 * Updates all the simulations, adds new ones and removes those that don't exist in the game anymore
 	 * @param enemyInfo an array of the enemy info given by the game
 	 */
-	public void updateEnemies(final float[] enemyInfo) {
+	public void updateEnemies(final float[] enemyInfo, ArrayList<Point> towerPositions, int tick) {
 		//Sorted version of the enemyInfo which is easier to access
 		final Int2ObjectOpenHashMap<ArrayList<Point2D.Float>> sortedEnemyInfo = sortEnemiesByType(enemyInfo);
 		
 		//move all valid simulations forward
 		updateSimulations();
-		
 		removeDeadEnemies(sortedEnemyInfo);
-		
 		addCorrectSimulations(sortedEnemyInfo);
-		
 		addPotentialCorrectSimulations(sortedEnemyInfo);
-		
 		oldEnemyInfo = sortedEnemyInfo;
+		
+		updateTowers(towerPositions, tick);
 	}
 	
 	/**
@@ -126,7 +133,7 @@ public class EnemyPredictor {
 			enemySimulation.moveTimeForward();
 		}
 	}
-	
+		
 	/**
 	 * If an enemy doesn't exist anymore then it's removed with this method
 	 * @param enemyInfo
@@ -366,6 +373,53 @@ public class EnemyPredictor {
 			return true;
 		default:
 			return false;
+		}
+	}
+	
+	private void updateTowers(ArrayList<Point> towerPositions, int tick) {
+		updateTowers();
+		removeDeadTowers(towerPositions);
+		addTowers(towerPositions, tick);
+		
+		System.out.println(bulletTowers.size());
+		System.out.println();
+	}
+	
+	private void updateTowers() {
+		for (BulletBillTower bulletBillTower : bulletTowers) {
+			bulletBillTower.update();
+		}
+	}
+	
+	private void removeDeadTowers(ArrayList<Point> towerPositions) {
+		final ArrayList<BulletBillTower> aliveTowers = new ArrayList<BulletBillTower>();
+		for (BulletBillTower bulletBillTower : bulletTowers) {
+			for (Point point : towerPositions) {
+				if (point.x == bulletBillTower.towerPos.x &&
+					point.y == bulletBillTower.towerPos.y) {
+					aliveTowers.add(bulletBillTower);
+					break;
+				}
+			}
+		}
+		
+		bulletTowers = aliveTowers;
+	}
+	
+	private void addTowers(ArrayList<Point> towerPositions, int tick) {
+		for (Point point : towerPositions) {
+			boolean alreadyCreated = false;
+			for (BulletBillTower bulletBillTower : bulletTowers) {
+				if (point.x == bulletBillTower.towerPos.x &&
+					point.y == bulletBillTower.towerPos.y) {
+					alreadyCreated = true;
+					break;
+				}
+			}
+			
+			if (!alreadyCreated) {
+				bulletTowers.add(new BulletBillTower(point, tick));
+			}
 		}
 	}
 	

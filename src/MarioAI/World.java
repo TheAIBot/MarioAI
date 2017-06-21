@@ -1,5 +1,6 @@
 package MarioAI;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class World {
 	//Contains all the seen columns of the world
 	private final Int2ObjectOpenHashMap<Node[]> savedColumns = new Int2ObjectOpenHashMap<Node[]>();	
 	 //Will not handle negative x values. Level must not be longer than 400.
-	private final Int2ObjectOpenHashMap<List<Node>> bulletBillTowers = new Int2ObjectOpenHashMap<List<Node>>();	
+	private final Int2ObjectOpenHashMap<ArrayList<Node>> bulletBillTowers = new Int2ObjectOpenHashMap<ArrayList<Node>>();
 	private int oldMarioXPos = MARIO_START_X_POS;
 	private int oldMarioYPos;
 	private int maxMarioXPos = oldMarioXPos; // The maximum x position that mario has seen
@@ -279,7 +280,7 @@ public class World {
 				//neighbors must not be "towers", as pipes have the same type as towers.
 				if ((formerColumn[i] == null || formerColumn[i].type != TOWER_TYPE) &&
 					 (nextColumn[i] == null || nextColumn[i].type != TOWER_TYPE)) {
-					List<Node> bulletColumn = bulletBillTowers.get(currentNode.x);
+					ArrayList<Node> bulletColumn = bulletBillTowers.get(currentNode.x);
 					if (bulletColumn == null) {
 						bulletColumn = new ArrayList<Node>();
 						bulletColumn.add(currentNode);
@@ -292,13 +293,15 @@ public class World {
 		}
 	}
 	
-	public List<Node> getTowersOnLevel(){
-		List<Node> relevantTowers = new ArrayList<Node>();
+	public ArrayList<Point> getTowersOnLevel(){
+		ArrayList<Point> relevantTowers = new ArrayList<Point>();
 		//Testing it out in reality, and looking at the code, this seems about right.
 		for (int i = -LEVEL_WIDTH/2 - 1 + marioNode.x; i < LEVEL_WIDTH/2 + 1 + marioNode.x; i++) {
-			List<Node> currentTowers = bulletBillTowers.get(i);
+			ArrayList<Node> currentTowers = bulletBillTowers.get(i);
 			if (currentTowers != null) {
-				relevantTowers.addAll(currentTowers);
+				for (Node node : currentTowers) {
+					relevantTowers.add(new Point(node.x, node.y));
+				}
 			}
 		}		
 		System.out.println(relevantTowers.toString());
