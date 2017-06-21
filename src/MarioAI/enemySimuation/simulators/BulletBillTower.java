@@ -1,7 +1,6 @@
 package MarioAI.enemySimuation.simulators;
 
 import java.awt.Point;
-import java.util.ArrayList;
 
 import MarioAI.World;
 
@@ -11,28 +10,15 @@ public class BulletBillTower {
 	public final Point towerPos;
 	private final int yPos;
 	private int ticksUntilFirstSpawn;
-	private static final float[] bulletPositions = new float[TICKS_PER_SPAWN];
-	private static boolean createdPositions = false;
+	private static final float BULLET_SPEED = 4;
 	
 	
 	public BulletBillTower(Point towerPos, int tick) {
 		this.towerPos = towerPos;
-		this.ticksUntilFirstSpawn = (tick - towerPos.x * 2) % TICKS_PER_SPAWN;
+		this.ticksUntilFirstSpawn = -((tick - towerPos.x * 2) % TICKS_PER_SPAWN);
 		
 		//from game source code
 		this.yPos = towerPos.y * 16 + 15;
-		
-		if (!createdPositions) {
-			createPositions();
-			createdPositions = true;
-		}
-	}
-	
-	public void createPositions() {
-        final float sideWaysSpeed = 4f;
-		for (int i = 0; i < TICKS_PER_SPAWN; i++) {
-			bulletPositions[0] = i * sideWaysSpeed;
-		}
 	}
 	
 	public void update() {
@@ -41,26 +27,38 @@ public class BulletBillTower {
 	
     public boolean collideCheck(float marioX, float marioY, float marioHeight, int time)
     {
+    	if (ticksUntilFirstSpawn < 0 && time < Math.abs(ticksUntilFirstSpawn)) {
+			return false;
+		}
+    	
     	int dir = 0;
 		if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) > marioX + World.PIXELS_PER_BLOCK) {
 			dir = -1;
 		}
-		if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) < marioX - World.PIXELS_PER_BLOCK) {
+		else if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) < marioX - World.PIXELS_PER_BLOCK) {
 			dir = 1;
 		}
     	if (dir != 0) {
-    		final int correctTime = time - ticksUntilFirstSpawn;
-    		final float directionOffset = towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) + dir * (World.PIXELS_PER_BLOCK / 2);
-        	final float enemyX = bulletPositions[correctTime] + directionOffset;
-        	final float enemyY = yPos;
-        	
-            final float xMarioD = marioX - enemyX;
-            final float yMarioD = marioY - enemyY;
-            
-            return (xMarioD > -16 && 
-            		xMarioD < 16 && 
+    		final int correctTime = time + ticksUntilFirstSpawn;
+    		int timeOffset = 0;
+    		
+    		do {
+        		final float directionOffset = towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) + dir * (World.PIXELS_PER_BLOCK / 2);
+            	final float enemyX = dir * BULLET_SPEED * (correctTime - timeOffset) + directionOffset;
+            	final float enemyY = yPos;
+            	
+                final float xMarioD = marioX - enemyX;
+                final float yMarioD = marioY - enemyY;
+                
+                if (xMarioD > -World.PIXELS_PER_BLOCK && 
+            		xMarioD < World.PIXELS_PER_BLOCK && 
             		yMarioD > -height && 
-            		yMarioD < marioHeight);	
+            		yMarioD < marioHeight) {
+					return true;
+				}
+                
+                timeOffset += TICKS_PER_SPAWN;	
+			} while (correctTime - timeOffset >= 0);
 		}
     	
     	return false;
