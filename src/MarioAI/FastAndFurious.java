@@ -35,7 +35,6 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 	private int tickCount = 0;
 	public boolean DEBUG = true;
 	public boolean ONLY_PATH = true;
-	Environment currentObservation;
 	private boolean pauseGame = false;
 	private boolean unpauseForOneTick = false;
 	private boolean savePlace = false;
@@ -91,36 +90,26 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			
 			marioController.getNextAction(observation, pathCreator.getBestPath());
 			
-			if (DEBUG) {
-				DebugDraw.resetGraphics(observation);
-				if (ONLY_PATH) {
-					final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
- 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
- 							enemyPredictor.hasNewEnemySpawned();// ||
- 							//pathCreator.getBestPath() == null;
-					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-				} else{
-
-					
-					DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
-					DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
-					DebugDraw.drawEdges(observation, world.getLevelMatrix());
-					DebugDraw.drawMarioReachableNodes(observation, world);
-					DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
-					DebugDraw.drawEnemies(observation, enemyPredictor);
-					DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-					DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());
-					DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
-					DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
-					
-					final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
-							 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
-							 							enemyPredictor.hasNewEnemySpawned();// ||
-							 							//pathCreator.getBestPath() == null;
-					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-					DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
-					DebugDraw.drawAction(observation, marioController.getActions());
-				}
+			DebugDraw.resetGraphics(observation);
+			if (ONLY_PATH) {
+				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), false);
+			}
+			else if (DEBUG) {
+				DebugDraw.drawGoalNodes(observation, world.getGoalNodes(0));
+				DebugDraw.drawBlockBeneathMarioNeighbors(observation, world);
+				DebugDraw.drawEdges(observation, world.getLevelMatrix());
+				DebugDraw.drawMarioReachableNodes(observation, world);
+				DebugDraw.drawNodeEdgeTypes(observation, world.getLevelMatrix());
+				DebugDraw.drawEnemies(observation, enemyPredictor);
+				DebugDraw.drawMarioNode(observation, world.getMarioNode(observation));
+				DebugDraw.drawPathEdgeTypes(observation, pathCreator.getBestPath());	
+				
+				final boolean pathShouldBeUpdated = //world.hasGoalNodesChanged() || 
+						 							//MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
+						 							enemyPredictor.hasNewEnemySpawned();// ||
+						 							//pathCreator.getBestPath() == null;
+				DebugDraw.drawPathMovement(observation, pathCreator.getBestPath(), pathShouldBeUpdated);
+				DebugDraw.drawAction(observation, marioController.getActions());
 			}
 		}
 		

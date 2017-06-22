@@ -1,6 +1,11 @@
 package tests;
 
+import java.util.ArrayList;
+
 import MarioAI.MarioMethods;
+import MarioAI.World;
+import MarioAI.graph.edges.DirectedEdge;
+import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.*;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
@@ -137,26 +142,32 @@ public class TestAgent implements Agent {
 	}
 	
     public static void main(String[] args) {
-    	/*
+    	
+    	World world = new World();
     	UnitTestAgent agent = new UnitTestAgent();
+    	MarioControls marioControls = new MarioControls();
     	Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
-    	float startXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-    	float startYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+    	//float startXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+    	//float startYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
     	//agent.action[Mario.KEY_RIGHT] = true;
     	//agent.action[Mario.KEY_JUMP] = true;
-    	TestTools.setMarioXPosition(observation, 3);
+    	//TestTools.setMarioXPosition(observation, 3);
+    	ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, 1, 0, 0, 1, world, false);
+    	
+    	MarioAI.debugGraphics.DebugDraw.drawPathParts(observation, path);
     	TestTools.runOneTick(observation);
     	TestTools.renderLevel(observation);
-    	float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
-    	float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
-    	System.out.println((endXPos - startXPos) + ", " + (endYPos - startYPos));
-    	*/
+    	System.out.println();
+    	//float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
+    	//float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+    	//System.out.println((endXPos - startXPos) + ", " + (endYPos - startYPos));
     	
+    	/*
         Agent agent = new TestAgent();
         Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
         //Environment observation = TestTools.loadLevel("jumpLevels/jumpDown.lvl", agent, true);
         TestTools.runWholeLevel(observation);
-    	
+    	*/
     }
 
 	public AGENT_TYPE getType() {

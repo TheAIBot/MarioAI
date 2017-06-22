@@ -100,9 +100,9 @@ public class AStar {
 			}
 			// The current best speednode is the one furthest to the right
 			// (disregarding if it passes through an enemy or not).
-			//if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
+			if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
 				currentBestPathEnd = current;
-			//}
+			}
 			
 			// Current node has been explored.
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);

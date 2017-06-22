@@ -6,16 +6,15 @@ import MarioAI.World;
 
 public class BulletBillTower {
 	private static final int TICKS_PER_SPAWN = 100;
-	private static final int height = 12;
-	public final Point towerPos;
+	private static final float BULLET_SPEED = 4;
+	private static final int HEIGHT = 12;
 	private final int yPos;
 	private int ticksUntilFirstSpawn;
-	private static final float BULLET_SPEED = 4;
-	
+	public final Point towerPos;
 	
 	public BulletBillTower(Point towerPos, int tick) {
 		this.towerPos = towerPos;
-		this.ticksUntilFirstSpawn = -((tick - towerPos.x * 2) % TICKS_PER_SPAWN);
+		this.ticksUntilFirstSpawn = -(TICKS_PER_SPAWN - ((tick - towerPos.x * 2) % TICKS_PER_SPAWN));
 		
 		//from game source code
 		this.yPos = towerPos.y * 16 + 15;
@@ -35,15 +34,15 @@ public class BulletBillTower {
 		if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) > marioX + World.PIXELS_PER_BLOCK) {
 			dir = -1;
 		}
-		else if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) < marioX - World.PIXELS_PER_BLOCK) {
+		if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) < marioX - World.PIXELS_PER_BLOCK) {
 			dir = 1;
 		}
     	if (dir != 0) {
+    		final float directionOffset = towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) + dir * (World.PIXELS_PER_BLOCK / 2);
     		final int correctTime = time + ticksUntilFirstSpawn;
     		int timeOffset = 0;
     		
     		do {
-        		final float directionOffset = towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) + dir * (World.PIXELS_PER_BLOCK / 2);
             	final float enemyX = dir * BULLET_SPEED * (correctTime - timeOffset) + directionOffset;
             	final float enemyY = yPos;
             	
@@ -52,7 +51,7 @@ public class BulletBillTower {
                 
                 if (xMarioD > -World.PIXELS_PER_BLOCK && 
             		xMarioD < World.PIXELS_PER_BLOCK && 
-            		yMarioD > -height && 
+            		yMarioD > -HEIGHT && 
             		yMarioD < marioHeight) {
 					return true;
 				}

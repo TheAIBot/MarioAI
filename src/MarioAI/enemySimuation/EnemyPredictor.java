@@ -381,8 +381,8 @@ public class EnemyPredictor {
 		removeDeadTowers(towerPositions);
 		addTowers(towerPositions, tick);
 		
-		System.out.println(bulletTowers.size());
-		System.out.println();
+		//System.out.println(bulletTowers.size());
+		//System.out.println();
 	}
 	
 	private void updateTowers() {

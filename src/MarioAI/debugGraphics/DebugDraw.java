@@ -6,6 +6,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.spi.DirObjectFactory;
+
 import MarioAI.MarioMethods;
 import MarioAI.World;
 import MarioAI.enemySimuation.EnemyPredictor;
@@ -15,6 +17,7 @@ import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.graph.edges.RunningEdge;
 import MarioAI.graph.edges.JumpingEdge;
 import MarioAI.graph.nodes.Node;
+import MarioAI.marioMovement.MovementInformation;
 import ch.idsia.mario.engine.Art;
 import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
@@ -242,18 +245,81 @@ public class DebugDraw {
 		}
 	}
 	
+	public static void drawPathParts(final Environment observation, final ArrayList<DirectedEdge> path) {
+		if (path !=  null) {
+			float marioXPos = MarioMethods.getPreciseCenteredMarioXPos(observation.getMarioFloatPos());
+			float marioYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
+			
+			for (DirectedEdge directedEdge : path) {
+				final ArrayList<Point> accel = new ArrayList<Point>(); 
+				final ArrayList<Point> drift = new ArrayList<Point>(); 
+				final ArrayList<Point> last = new ArrayList<Point>(); 
+				final MovementInformation mInfo = directedEdge.getMoveInfo();
+				
+				final Point2D.Float fiskss = new Point2D.Float(marioXPos, marioYPos);
+				convertLevelPointToOnScreenPoint(observation, fiskss);
+				final Point kagess = new Point((int)fiskss.x, (int)fiskss.y);
+				accel.add(kagess);			
+				
+				Point lastPoint = null;
+				int i;
+				for (i = 0; i < mInfo.getMoveTime(); i++) {
+					if (!mInfo.getPressXButton()[i]) {
+						break;
+					}
+					final float posX = mInfo.getXPositions()[i];
+			        final float posY = mInfo.getYPositions()[i];
+					final Point2D.Float fisk = new Point2D.Float(marioXPos + posX, marioYPos - posY);
+					convertLevelPointToOnScreenPoint(observation, fisk);
+					final Point kage = new Point((int)fisk.x, (int)fisk.y);
+					accel.add(kage);
+					lastPoint = kage;
+				}
+				
+				drift.add(lastPoint);
+				for (; i < mInfo.getMoveTime(); i++) {
+					if (mInfo.getPressXButton()[i]) {
+						break;
+					}
+					final float posX = mInfo.getXPositions()[i];
+			        final float posY = mInfo.getYPositions()[i];
+					final Point2D.Float fisk = new Point2D.Float(marioXPos + posX, marioYPos - posY);
+					convertLevelPointToOnScreenPoint(observation, fisk);
+					final Point kage = new Point((int)fisk.x, (int)fisk.y);
+					drift.add(kage);
+					lastPoint = kage;
+				}
+				
+				last.add(lastPoint);
+				final float posX = mInfo.getXPositions()[mInfo.getXPositions().length - 1];
+			    final float posY = mInfo.getYPositions()[mInfo.getYPositions().length - 1];
+				final Point2D.Float fisk = new Point2D.Float(marioXPos + posX, marioYPos - posY);
+				marioXPos = fisk.x;
+				marioYPos = fisk.y;
+				convertLevelPointToOnScreenPoint(observation, fisk);
+				final Point kage = new Point((int)fisk.x, (int)fisk.y);
+				last.add(kage);
+				
+				addDebugDrawing(observation, new DebugLines(Color.RED, accel));
+				addDebugDrawing(observation, new DebugLines(Color.ORANGE, drift));
+				addDebugDrawing(observation, new DebugLines(Color.BLUE, last));	
+			}
+		}
+	}
+	
 	public static void drawPathMovement(final Environment observation, final List<DirectedEdge> path, final boolean pathShouldBeUpdated) {
-		if (path != null) {
+		if (path != null) {			
 			final ArrayList<Point> positions = new ArrayList<Point>(); 
 			for (DirectedEdge edge : path) {
-                            for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
-                                final float posX = edge.getMoveInfo().getXPositions()[i];
-                                final float posY = edge.getMoveInfo().getYPositions()[i];
-                                Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + posX, edge.source.y - posY);
-                                convertLevelPointToOnScreenPoint(observation, correctPos);
+				
+                for (int i = 0; i < edge.getMoveInfo().getMoveTime(); i++) {
+                    final float posX = edge.getMoveInfo().getXPositions()[i];
+                    final float posY = edge.getMoveInfo().getYPositions()[i];
+                    Point2D.Float correctPos = new Point2D.Float((float)edge.source.x + posX, edge.source.y - posY);
+                    convertLevelPointToOnScreenPoint(observation, correctPos);
 
-                                positions.add(new Point((int)correctPos.x, (int)correctPos.y));
-                            }
+                    positions.add(new Point((int)correctPos.x, (int)correctPos.y));
+                }
 			}
 			if (pathShouldBeUpdated) {
 				addDebugDrawing(observation, new DebugLines(Color.BLUE, positions));
