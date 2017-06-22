@@ -19,18 +19,18 @@ public class BulletBillTower {
 		//from game source code
 		this.yPos = towerPos.y * 16 + 15;
 	}
-	
+
 	public void update() {
 		ticksUntilFirstSpawn++;
+		System.out.println(" Tick until spawn = "+ ticksUntilFirstSpawn);
 	}
-	
-    public boolean collideCheck(float marioX, float marioY, float marioHeight, int time)
-    {
-    	if (ticksUntilFirstSpawn < 0 && time < Math.abs(ticksUntilFirstSpawn)) {
+
+	public boolean collideCheck(float marioX, float marioY, float marioHeight, int time) {
+		if (ticksUntilFirstSpawn < 0 && time < Math.abs(ticksUntilFirstSpawn)) {
 			return false;
 		}
-    	
-    	int dir = 0;
+
+		int dir = 0;
 		if (towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) > marioX + World.PIXELS_PER_BLOCK) {
 			dir = -1;
 		}
@@ -55,26 +55,25 @@ public class BulletBillTower {
             		yMarioD < marioHeight) {
 					return true;
 				}
-                
-                timeOffset += TICKS_PER_SPAWN;	
+
+				timeOffset += TICKS_PER_SPAWN;
 			} while (correctTime - timeOffset >= 0);
 		}
-    	
-    	return false;
-    }
-	
+
+		return false;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj instanceof BulletBillTower) {
-			final BulletBillTower otherTower = (BulletBillTower)obj;
-			return otherTower.towerPos.x == towerPos.x &&
-				   otherTower.towerPos.y == towerPos.y;
+			final BulletBillTower otherTower = (BulletBillTower) obj;
+			return otherTower.towerPos.x == towerPos.x && otherTower.towerPos.y == towerPos.y;
 		}
-		
+
 		return false;
-		
+
 	}
 }

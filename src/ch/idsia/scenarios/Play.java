@@ -26,7 +26,8 @@ public class Play {
 			//Environment observation = TestTools.loadLevel("jumpLevels/jumpDownLevels/jumpDown1.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("jumpLevels/randomWidthJump.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
-			Environment observation = TestTools.loadLevel("evadebullets.lvl", controller, true);
+			Environment observation = TestTools.loadLevel("1BulletBill.lvl", controller, true);
+			//Environment observation = TestTools.loadLevel("evadebullets.lvl", controller, true);
 			//TestTools.setMariogetRunningReachableEdgesPosition(observation, 6, 8);
 			//Environment observation = TestTools.loadLevel("staircase.lvl", controller, true);
 			//Environment observation = TestTools.loadLevel("straightTunnel.lvl", controller, true);

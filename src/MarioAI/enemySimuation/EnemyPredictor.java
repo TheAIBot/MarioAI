@@ -418,7 +418,7 @@ public class EnemyPredictor {
 			}
 			
 			if (!alreadyCreated) {
-				bulletTowers.add(new BulletBillTower(point, tick));
+				bulletTowers.add(new BulletBillTower(point, tick + 1));
 			}
 		}
 	}
