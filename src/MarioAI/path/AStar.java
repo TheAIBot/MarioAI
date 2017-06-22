@@ -83,7 +83,7 @@ public class AStar {
 	 * @param world
 	 */
 	private void runAStar(final SpeedNode start, final SpeedNode goal, final EnemyPredictor enemyPredictor, float marioHeight, World world) {
-		final long MAX_TIME_IN_ASTAR = 30; // max time in milliseconds allowed for A* to run 
+		final long MAX_TIME_IN_ASTAR = 3000000; // max time in milliseconds allowed for A* to run 
 		final long startMiliseconds = System.currentTimeMillis();
 		final long stopTime = startMiliseconds + MAX_TIME_IN_ASTAR;
 		while (!openSet.isEmpty() && keepRunning && stopTime >= System.currentTimeMillis()) {
@@ -100,9 +100,9 @@ public class AStar {
 			}
 			// The current best speednode is the one furthest to the right
 			// (disregarding if it passes through an enemy or not).
-			if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
+			//if ((currentBestPathEnd == null || current.currentXPos > currentBestPathEnd.currentXPos) && current != start) {
 				currentBestPathEnd = current;
-			}
+			//}
 			
 			// Current node has been explored.
 			final long endHash = Hasher.hashEndSpeedNode(current, hashGranularity);

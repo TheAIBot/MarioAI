@@ -22,7 +22,7 @@ public class BulletBillTower {
 
 	public void update() {
 		ticksUntilFirstSpawn++;
-		System.out.println(" Tick until spawn = "+ ticksUntilFirstSpawn);
+		//System.out.println(" Tick until spawn = "+ ticksUntilFirstSpawn);
 	}
 
 	public boolean collideCheck(float marioX, float marioY, float marioHeight, int time) {
@@ -43,6 +43,7 @@ public class BulletBillTower {
     		int timeOffset = 0;
     		
     		do {
+    			//System.out.println(dir * BULLET_SPEED * (correctTime - timeOffset));
             	final float enemyX = dir * BULLET_SPEED * (correctTime - timeOffset) + directionOffset;
             	final float enemyY = yPos;
             	

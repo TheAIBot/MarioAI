@@ -71,7 +71,7 @@ public class EnemyPredictor {
 		}
 		
 		for (BulletBillTower bulletBillTower : bulletTowers) {
-			if (bulletBillTower.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time)) {
+			if (bulletBillTower.collideCheck(marioXInPixels, marioYInPixels, marioHeightInPixels, time + 1)) {
 				return true;
 			}
 		}

@@ -78,7 +78,7 @@ public class FastAndFurious extends KeyAdapter implements Agent {
 			
 			if ((world.hasGoalNodesChanged() || 
 				 MarioControls.isPathInvalid(observation, pathCreator.getBestPath()) ||
-				 enemyPredictor.hasNewEnemySpawned() ||
+				 /*enemyPredictor.hasNewEnemySpawned() ||*/
 				 pathCreator.getBestPath() == null) && 
 				marioController.canUpdatePath) 
 			{
