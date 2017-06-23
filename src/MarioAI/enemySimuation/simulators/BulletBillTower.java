@@ -9,12 +9,16 @@ public class BulletBillTower {
 	private static final float BULLET_SPEED = 4;
 	private static final int HEIGHT = 12;
 	private final int yPos;
+	private final int tickSpawned;
 	private int ticksUntilFirstSpawn;
+	private int currentTick;
 	public final Point towerPos;
 	
 	public BulletBillTower(Point towerPos, int tick) {
 		this.towerPos = towerPos;
-		this.ticksUntilFirstSpawn = -(TICKS_PER_SPAWN - ((tick - towerPos.x * 2) % TICKS_PER_SPAWN));
+		this.ticksUntilFirstSpawn = -(TICKS_PER_SPAWN - ((tick - towerPos.x * 2) % (TICKS_PER_SPAWN)));
+		tickSpawned = tick;
+		currentTick = tick;
 		
 		//from game source code
 		this.yPos = towerPos.y * 16 + 15;
@@ -22,11 +26,12 @@ public class BulletBillTower {
 
 	public void update() {
 		ticksUntilFirstSpawn++;
+		currentTick++;
 		//System.out.println(" Tick until spawn = "+ ticksUntilFirstSpawn);
 	}
 
 	public boolean collideCheck(float marioX, float marioY, float marioHeight, int time) {
-		if (ticksUntilFirstSpawn < 0 && time < Math.abs(ticksUntilFirstSpawn)) {
+		if (ticksUntilFirstSpawn + time < 0) {
 			return false;
 		}
 
@@ -39,13 +44,16 @@ public class BulletBillTower {
 		}
     	if (dir != 0) {
     		final float directionOffset = towerPos.x * World.PIXELS_PER_BLOCK + (World.PIXELS_PER_BLOCK / 2) + dir * (World.PIXELS_PER_BLOCK / 2);
-    		final int correctTime = time + ticksUntilFirstSpawn;
+    		final int bulletAliveInTicks = time + ticksUntilFirstSpawn;
     		int timeOffset = 0;
     		
     		do {
     			//System.out.println(dir * BULLET_SPEED * (correctTime - timeOffset));
-            	final float enemyX = dir * BULLET_SPEED * (correctTime - timeOffset) + directionOffset;
+            	final float enemyX = dir * BULLET_SPEED * (bulletAliveInTicks - timeOffset) + directionOffset;
             	final float enemyY = yPos;
+            	System.out.println("Time: " + (time - ticksUntilFirstSpawn) + " " + 
+            					   "x: " + enemyX + " " + 
+            					   "y: " + enemyY);
             	
                 final float xMarioD = marioX - enemyX;
                 final float yMarioD = marioY - enemyY;
@@ -58,7 +66,7 @@ public class BulletBillTower {
 				}
 
 				timeOffset += TICKS_PER_SPAWN;
-			} while (correctTime - timeOffset >= 0);
+			} while (bulletAliveInTicks - timeOffset >= 0);
 		}
 
 		return false;

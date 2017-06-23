@@ -2,11 +2,16 @@ package tests;
 
 import java.util.ArrayList;
 
+import com.sun.org.apache.xerces.internal.util.NamespaceContextWrapper;
+
 import MarioAI.MarioMethods;
 import MarioAI.World;
+import MarioAI.enemySimuation.EnemyPredictor;
 import MarioAI.graph.edges.DirectedEdge;
 import MarioAI.marioMovement.MarioControls;
 import ch.idsia.ai.agents.*;
+import ch.idsia.mario.engine.LevelScene;
+import ch.idsia.mario.engine.MarioComponent;
 import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.environments.Environment;
 /** 
@@ -146,17 +151,39 @@ public class TestAgent implements Agent {
     	World world = new World();
     	UnitTestAgent agent = new UnitTestAgent();
     	MarioControls marioControls = new MarioControls();
-    	Environment observation = TestTools.loadLevel("flat.lvl", agent, true);
+    	EnemyPredictor enemyPredictor = new EnemyPredictor();
+    	Environment observation = TestTools.loadLevel("1BulletBill.lvl", agent, true);
+		TestTools.setMarioInvulnerability(observation, true);
+    	world.initialize(observation);
+    	world.update(observation);
+    	enemyPredictor.intialize(((MarioComponent)observation).getLevelScene());
+    	final int ticck = ((MarioComponent)observation).getLevelScene().getTick();
+    	enemyPredictor.updateEnemies(new float[0], world.getTowersOnLevel(), ticck);
+    	for (int i = 0; i < 100; i++) {
+			enemyPredictor.hasEnemy(1, 1, 1, i);
+			//enemyPredictor.updateEnemies(new float[0], world.getTowersOnLevel(), ticck + i);
+		}
+    	
+    	for (int i = 0; i < 400; i++) {
+    		float[] enemyInfo = observation.getEnemiesFloatPos();
+    		if (enemyInfo.length > 0) {
+    			System.out.println("Time: " + (ticck + i) + " " + 
+    					   "x: " + enemyInfo[1] + " " + 
+    					   "y: " + enemyInfo[2] + 
+    					   " ++++++ ");
+    		}
+    		TestTools.runOneTick(observation);
+		}
     	//float startXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
     	//float startYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());
     	//agent.action[Mario.KEY_RIGHT] = true;
     	//agent.action[Mario.KEY_JUMP] = true;
     	//TestTools.setMarioXPosition(observation, 3);
-    	ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, 1, 0, 0, 1, world, false);
+    	//ArrayList<DirectedEdge> path = PathHelper.createPath(1, 1, 1, 0, 0, 1, world, false);
     	
-    	MarioAI.debugGraphics.DebugDraw.drawPathParts(observation, path);
-    	TestTools.runOneTick(observation);
-    	TestTools.renderLevel(observation);
+    	//MarioAI.debugGraphics.DebugDraw.drawPathParts(observation, path);
+    	//TestTools.runOneTick(observation);
+    	//TestTools.renderLevel(observation);
     	System.out.println();
     	//float endXPos = MarioMethods.getPreciseMarioXPos(observation.getMarioFloatPos());
     	//float endYPos = MarioMethods.getPreciseMarioYPos(observation.getMarioFloatPos());

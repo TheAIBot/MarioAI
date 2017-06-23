@@ -1089,4 +1089,13 @@ public class LevelScene extends Scene implements SpriteContext {
     public long getSeed() {
     	return levelSeed;
     }
+
+    public int getTick() {
+    	return tick;
+    }
+
+
+
+
+
 }
